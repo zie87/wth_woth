@@ -30,7 +30,7 @@ HGE_OBJS = src/hge/hgecolor.o src/hge/hgeparticle.o \
        src/hge/hgedistort.o src/hge/hgefont.o
 
 
-CXXFLAGS = -W -Wall -Werror -Wno-unused
+CXXFLAGS = -std=gnu++03 -W -Wall -Wno-unused
 
 ifdef DEBUG
 CXXFLAGS += -ggdb3

@@ -22,6 +22,6 @@ jobs:
         submodules: true
 
     - name: build
-      uses: docker://zie87/woth_pspdev:latest
+      uses: docker://zie87/wth_woth_pspdev:latest
       with:
         args: /bin/sh -c ".github/tools/psp/build.sh" ${{ matrix.config }}

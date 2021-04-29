@@ -6,8 +6,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends sudo ca-certificates pkg-config curl wget bzip2 xz-utils make git tar doxygen gnupg && \
     apt-get install -y --no-install-recommends gdebi-core && \
     apt-get install -y --no-install-recommends cmake && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN wget https://github.com/devkitPro/pacman/releases/latest/download/devkitpro-pacman.amd64.deb && \
     dpkg -i devkitpro-pacman.amd64.deb && \

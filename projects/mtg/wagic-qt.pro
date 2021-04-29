@@ -12,9 +12,10 @@ maemo5:QT += dbus
 TARGET = wagic
 TEMPLATE = app
 
+QMAKE_CXXFLAGS += -std=c++03
+
 #!macx:CONFIG += precompile_header
 unix|macx:QMAKE_CXXFLAGS += -Wno-unused-parameter
-unix|macx:!maemo5:!symbian:QMAKE_CXXFLAGS += -Werror
 windows:DEFINES += WIN32
 windows:DEFINES += _CRT_SECURE_NO_WARNINGS
 unix|macx:DEFINES += LINUX

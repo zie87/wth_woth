@@ -11,7 +11,8 @@ using namespace std;
 class JSocket;
 #include <iostream>
 #include <sstream>
-#include "Threading.h"
+
+#include <wge/thread.hpp>
 
 typedef void(*processCmd)(istream&, ostream&);
 
@@ -19,8 +20,8 @@ class JNetwork {
 private:
   int connected_to_ap;
   JSocket* socket;
-  boost::mutex sendMutex;
-  boost::mutex receiveMutex;
+  wge::mutex sendMutex;
+  wge::mutex receiveMutex;
   stringstream received;
   stringstream toSend;
   static map<string, processCmd> sCommandMap;
@@ -40,7 +41,7 @@ public:
   static void registerCommand(string command, processCmd processCommand, processCmd processResponse);
 
 private:
-  boost::thread *mpWorkerThread;
+  wge::thread *mpWorkerThread;
 };
 
 #endif

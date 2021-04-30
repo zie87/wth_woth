@@ -117,7 +117,6 @@ target_compile_options(jge300 PRIVATE "$<$<CONFIG:DEBUG>:-ggdb3>")
 target_include_directories(jge300
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/../Boost
         ${CMAKE_CURRENT_SOURCE_DIR}/include/psp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/psp/freetype2
         ${CMAKE_CURRENT_SOURCE_DIR}/src/zipFS

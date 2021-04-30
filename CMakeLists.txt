@@ -20,7 +20,6 @@ add_library(woth_options INTERFACE)
 target_compile_options(woth_options INTERFACE "$<$<CONFIG:DEBUG>:-D_DEBUG>")
 target_compile_options(woth_options INTERFACE "$<$<CONFIG:RELEASE>:-O2>")
 
-
 if(DEFINED PSP)
     target_link_libraries(woth_options INTERFACE psp::interface)
     target_compile_definitions(woth_options INTERFACE "WOTH_PLATFORM_PSP")
@@ -30,6 +29,14 @@ if(DEFINED PSP)
     
     include(psp_tools) 
     set(WOTH_PSP_BUILD ON)
+elseif(DEFINED WIN32)
+    target_compile_options(woth_options INTERFACE "/wd4005")
+
+    target_compile_definitions(woth_options INTERFACE "WOTH_PLATFORM_WIN32")
+    target_compile_definitions(woth_options INTERFACE "WIN32")
+    target_compile_definitions(woth_options INTERFACE "NOMINMAX")
+    target_compile_definitions(woth_options INTERFACE "__STDC_LIMIT_MACROS")
+    target_compile_definitions(woth_options INTERFACE "_CRT_SECURE_NO_WARNINGS")
 else() 
     message(FATAL_ERROR "Platform can not be detected!")
 endif()

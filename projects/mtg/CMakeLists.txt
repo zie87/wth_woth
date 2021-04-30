@@ -123,8 +123,11 @@ target_sources(wth_woth
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TestSuiteAI.cpp
     )
 
-target_compile_options(wth_woth PRIVATE "-DUSE_PRECOMPILED_HEADERS=1")
-target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-ggdb3>")
+if(NOT DEFINED WIN32)
+    target_compile_options(wth_woth PRIVATE "-DUSE_PRECOMPILED_HEADERS=1")
+    target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-ggdb3>")
+endif()
+
 target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-D_DEBUG>")
 target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-DDEBUG>")
 target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-DDEBUG_CACHE>")
@@ -138,15 +141,18 @@ target_include_directories(wth_woth
 
 target_link_libraries(wth_woth
     PUBLIC
+        WotH::wge
         WotH::jge
     PRIVATE
         woth_options
 )
 
 
+if(DEFINED PSP)
 create_pbp_file(TARGET wth_woth
                 TITLE "Wagic, the Homebrew?!" 
                 ICON_PATH ${CMAKE_CURRENT_SOURCE_DIR}/icon.png
                 BACKGROUND_PATH ${CMAKE_CURRENT_SOURCE_DIR}/pic1.png
                 PREVIEW_PATH ${CMAKE_CURRENT_SOURCE_DIR}/pic0.png
 )
+endif()

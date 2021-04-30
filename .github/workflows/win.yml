@@ -1,0 +1,34 @@
+name: Windows
+
+on:
+  push:
+    branches-ignore:
+      - 'docker'
+  schedule:
+    - cron: '0 4 * * 0' # Weekly on Sundays at 04:00
+
+jobs:       
+  sdl_build:
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        config: [Release, Debug]
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v1
+      with:
+        submodules: true
+    
+    - name: prepare
+      shell: bash
+      run: |
+        mkdir build
+        cd build
+        cmake .. -G"Visual Studio 16 2019" -A Win32 -DCMAKE_BUILD_TYPE=${{ matrix.config }}
+        
+    - name: build
+      run : |
+        cd build
+        cmake --build . --config ${{ matrix.config }}

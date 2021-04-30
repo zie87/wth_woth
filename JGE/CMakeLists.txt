@@ -80,6 +80,7 @@ if(DEFINED WIN32)
     target_include_directories(zlib_alias INTERFACE "${DEPENDENCIES_INCLUDE_DIR}")    
     find_library(ZLIB_LIBRARIES NAMES zlib1 zlib1d zdll zlibd HINTS "${DEPENDENCIES_LIBRARY_DIR}" "${DEPENDENCIES_SHARED_LIBRARY_DIR}")
     target_link_libraries(zlib_alias INTERFACE ${ZLIB_LIBRARIES})
+    add_library(ZLIB::ZLIB ALIAS zlib_alias)
 endif()
 
 #########################################################################

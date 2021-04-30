@@ -1,6 +1,8 @@
 #ifndef THREADING_H
 #define THREADING_H
 
+#include <wge/memory.hpp>
+
 #if !defined(PSP) && !defined(QT_CONFIG)
 #include <boost/date_time.hpp>
 
@@ -16,7 +18,6 @@
 #include <boost/thread/mutex.hpp>
 #elif !defined(QT_CONFIG)
 #include <boost/bind.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include "pspthreadman.h"
 
@@ -182,7 +183,7 @@ namespace boost
             virtual void run() = 0;
         };
 
-        typedef boost::shared_ptr<detail::thread_data_base> thread_data_ptr;
+        typedef wge::shared_ptr<detail::thread_data_base> thread_data_ptr;
 
         template<typename F>
         class thread_data : public detail::thread_data_base
@@ -313,10 +314,9 @@ namespace boost
 #include <QThread>
 
 #include <boost/bind.hpp>
-#include <boost/shared_ptr.hpp>
 
-#include "../include/DebugRoutines.h"
-#include "../include/JLogger.h"
+#include "DebugRoutines.h"
+#include "JLogger.h"
 
 namespace boost
 {
@@ -421,7 +421,7 @@ namespace boost
             virtual void run() = 0;
         };
 
-        typedef boost::shared_ptr<detail::thread_data_base> thread_data_ptr;
+        typedef wge::shared_ptr<detail::thread_data_base> thread_data_ptr;
 
         template<typename F>
         class thread_data : public detail::thread_data_base

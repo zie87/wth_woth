@@ -1,6 +1,13 @@
 
 add_executable(wth_woth)
 
+set_target_properties(wth_woth
+    PROPERTIES
+        CXX_STANDARD 11
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS YES
+)
+
 target_sources(wth_woth
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/InteractiveButton.cpp
@@ -114,13 +121,6 @@ target_sources(wth_woth
         ${CMAKE_CURRENT_SOURCE_DIR}/src/WFont.cpp
     )
 
-
-set_target_properties(wth_woth
-    PROPERTIES
-        CXX_STANDARD 98
-        CXX_STANDARD_REQUIRED YES
-        CXX_EXTENSIONS ON
-)
 target_compile_options(wth_woth PRIVATE "-DUSE_PRECOMPILED_HEADERS=1")
 target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-ggdb3>")
 target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-D_DEBUG>")

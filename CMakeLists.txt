@@ -30,6 +30,16 @@ if(DEFINED PSP)
     
     include(psp_tools) 
     set(WOTH_PSP_BUILD ON)
+elseif(DEFINED WIN32)
+    target_compile_options(woth_options INTERFACE "/wd4005")
+
+    target_compile_definitions(woth_options INTERFACE "WOTH_PLATFORM_WIN32")
+    target_compile_definitions(woth_options INTERFACE "WIN32")
+    target_compile_definitions(woth_options INTERFACE "_CRT_SECURE_NO_WARNINGS")
+    target_compile_definitions(woth_options INTERFACE "NOMINMAX")
+
+    find_package(Threads REQUIRED)
+    target_link_libraries(woth_options INTERFACE Threads::Threads)
 else() 
     message(FATAL_ERROR "Platform can not be detected!")
 endif()

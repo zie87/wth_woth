@@ -1,0 +1,27 @@
+name: Android
+
+on:
+  push:
+    branches-ignore:
+      - 'docker'
+  schedule:
+    - cron: '0 4 * * 0' # Weekly on Sundays at 04:00
+
+jobs:
+  native_build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        config: [release, debug]
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v1
+      with:
+        submodules: true
+
+    - name: build
+      uses: docker://zie87/wth_woth_android:latest
+      with:
+        args: /bin/sh -c ".github/tools/ndk/build.sh" ${{ matrix.config }}

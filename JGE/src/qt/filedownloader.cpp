@@ -25,6 +25,7 @@ FileDownloader::FileDownloader(QString localPath, QString targetFile, QObject *p
         return;
     }
     dir.cd(localPath);
+    m_tmp.setFileTemplate(dir.filePath("tmp"));
     m_localPath = dir.filePath("core.zip");
 
     QFile local(m_localPath);
@@ -37,7 +38,7 @@ FileDownloader::FileDownloader(QString localPath, QString targetFile, QObject *p
     if(m_WebCtrl.networkAccessible()) {
         /* Network is OK, we request the remote hash file */
         m_state = DOWNLOADING_HASH;
-        requestHash(QUrl("http://code.google.com/p/wagic/downloads/detail?name="+m_targetFile));
+        requestHash(QUrl("https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/wagic/"+m_targetFile));
     }
 
     emit stateChanged(m_state);
@@ -75,7 +76,7 @@ FileDownloader::~FileDownloader()
 void FileDownloader::requestHash(QUrl url)
 {
     QNetworkRequest request(url);
-    m_hashReply = m_WebCtrl.get(request);
+    m_hashReply = m_WebCtrl.head(request);
 
     connect(m_hashReply, SIGNAL(finished()), SLOT(computeRemoteHash()));
 }
@@ -85,14 +86,18 @@ void FileDownloader::computeRemoteHash()
     if(m_hashReply->error() != QNetworkReply::NoError) {
         m_state = NETWORK_ERROR;
     } else {
-        QString aString = m_hashReply->readAll();
+        foreach(QByteArray hash, m_hashReply->rawHeader("x-goog-hash").split(',')) {
+            hash = hash.trimmed();
+            if(hash.startsWith("md5=")) {
+                m_remoteHash = hash.mid(4);
+                break;
+            }
+        }
 
-        int index = aString.indexOf("SHA1 Checksum: ");
-        m_remoteHash = aString.mid(index+52, 40);
         if(m_localHash != m_remoteHash)
         {   /* We download the real file */
             m_state = DOWNLOADING_FILE;
-            setDownloadUrl(QUrl("http://wagic.googlecode.com/files/" + m_targetFile));
+            setDownloadUrl(QUrl("https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/wagic/" + m_targetFile));
         }
         else
         {
@@ -104,12 +109,12 @@ void FileDownloader::computeRemoteHash()
 
 void FileDownloader::computeLocalHash(QFile& file)
 {
-    QCryptographicHash crypto(QCryptographicHash::Sha1);
+    QCryptographicHash crypto(QCryptographicHash::Md5);
     QFile myFile(file.fileName());
     myFile.open(QFile::ReadOnly);
     while(!myFile.atEnd()){
         crypto.addData(myFile.read(8192));
     }
     QByteArray hash = crypto.result();
-    m_localHash = hash.toHex();
+    m_localHash = hash.toBase64();
 }

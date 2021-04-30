@@ -57,8 +57,8 @@ all: $(DEFAULT_RULE)
 
 endif
 
-CFLAGS := -Wall -W -Werror -Wno-unused $(CFLAGS)
-CXXFLAGS += $(CFLAGS)
+CFLAGS := -Wall -W -Wno-unused $(CFLAGS)
+CXXFLAGS += -std=gnu++03 $(CFLAGS)
 # -fno-exceptions
 
 LDFLAGS += $(LIBS)

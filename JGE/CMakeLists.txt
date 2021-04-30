@@ -69,19 +69,17 @@ if(DEFINED WIN32)
     find_library(FMOD_LIBRARY NAMES fmodvc HINTS "${DEPENDENCIES_LIBRARY_DIR}")
     target_link_libraries(fmod INTERFACE ${FMOD_LIBRARY})
     add_library(WotH::fmod ALIAS fmod)
+    add_library(sdl_alias INTERFACE)
+
+    target_include_directories(sdl_alias INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/SDL/include")    
+    find_library(SDL_LIBRARIES NAMES SDL HINTS "${DEPENDENCIES_SHARED_LIBRARY_DIR}")
+    target_link_libraries(sdl_alias INTERFACE ${SDL_LIBRARIES})
+    add_library(WotH::SDL ALIAS sdl_alias)
 
     add_library(zlib_alias INTERFACE)
     target_include_directories(zlib_alias INTERFACE "${DEPENDENCIES_INCLUDE_DIR}")    
     find_library(ZLIB_LIBRARIES NAMES zlib1 zlib1d zdll zlibd HINTS "${DEPENDENCIES_LIBRARY_DIR}" "${DEPENDENCIES_SHARED_LIBRARY_DIR}")
     target_link_libraries(zlib_alias INTERFACE ${ZLIB_LIBRARIES})
-    add_library(ZLIB::ZLIB ALIAS zlib_alias)
-
-    add_library(sdl_alias INTERFACE)
-    target_include_directories(sdl_alias INTERFACE "${DEPENDENCIES_INCLUDE_DIR}")    
-    find_library(SDL_LIBRARIES NAMES SDL HINTS "${DEPENDENCIES_SHARED_LIBRARY_DIR}")
-    target_link_libraries(sdl_alias INTERFACE ${SDL_LIBRARIES})
-    add_library(Woth::SDL ALIAS sdl_alias)
-
 endif()
 
 #########################################################################
@@ -212,7 +210,7 @@ target_link_libraries(jge300
 if(DEFINED WIN32)
     set(JGE_EXTRAS_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../projects/mtg/extra")
     target_include_directories(jge300 PUBLIC "${JGE_EXTRAS_INCLUDE_DIR}")
-    target_link_libraries(jge300 PUBLIC WotH::fmod Woth::SDL)
+    target_link_libraries(jge300 PUBLIC WotH::fmod WotH::SDL)
 endif()
 
 add_library(WotH::jge ALIAS jge300)

@@ -72,7 +72,8 @@ if(DEFINED WIN32)
     add_library(sdl_alias INTERFACE)
 
     target_include_directories(sdl_alias INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/SDL/include")    
-    find_library(SDL_LIBRARIES NAMES SDL HINTS "${DEPENDENCIES_SHARED_LIBRARY_DIR}")
+    #find_library(SDL_LIBRARIES NAMES SDL HINTS "${DEPENDENCIES_SHARED_LIBRARY_DIR}")
+    set(SDL_LIBRARIES "${DEPENDENCIES_SHARED_LIBRARY_DIR}/SDL.dll")
     target_link_libraries(sdl_alias INTERFACE ${SDL_LIBRARIES})
     add_library(WotH::SDL ALIAS sdl_alias)
 

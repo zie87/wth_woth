@@ -31,6 +31,8 @@ if(DEFINED PSP)
     set(FREETYPE2_LIBRARY "${DEPENDENCIES_LIBRARY_DIR}/libfreetype.a")
     target_link_libraries(old_ft INTERFACE ${FREETYPE2_LIBRARY})
     add_library(WotH::freetype ALIAS old_ft)
+
+    find_package(ZLIB REQUIRED)
 endif()
 
 if(DEFINED WIN32)
@@ -184,8 +186,6 @@ target_include_directories(jge300
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/src/zipFS
 )
-
-find_package(ZLIB REQUIRED)
 
 target_link_libraries(jge300
     PUBLIC

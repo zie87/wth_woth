@@ -20,13 +20,6 @@ add_library(woth_options INTERFACE)
 target_compile_options(woth_options INTERFACE "$<$<CONFIG:DEBUG>:-D_DEBUG>")
 target_compile_options(woth_options INTERFACE "$<$<CONFIG:RELEASE>:-O2>")
 
-set_target_properties(woth_options
-    PROPERTIES
-        CXX_STANDARD 98
-        CXX_STANDARD_REQUIRED YES
-        CXX_EXTENSIONS ON
-)
-
 if(DEFINED PSP)
     target_link_libraries(woth_options INTERFACE psp::interface)
     target_compile_definitions(woth_options INTERFACE "WOTH_PLATFORM_PSP")

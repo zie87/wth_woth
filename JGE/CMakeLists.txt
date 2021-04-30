@@ -193,7 +193,12 @@ set_target_properties(jge300
         CXX_STANDARD_REQUIRED YES
         CXX_EXTENSIONS YES
 )
+
+
+
+if(NOT DEFINED WIN32)
 target_compile_options(jge300 PRIVATE "$<$<CONFIG:DEBUG>:-ggdb3>")
+endif()
 
 target_include_directories(jge300
     PUBLIC
@@ -216,7 +221,7 @@ target_link_libraries(jge300
 
 
 if(DEFINED WIN32)
-    set(JGE_EXTRAS_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../mtg/extra")
+    set(JGE_EXTRAS_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../projects/mtg/extra")
     target_include_directories(jge300 PUBLIC "${JGE_EXTRAS_INCLUDE_DIR}")
     target_link_libraries(jge300 PUBLIC WotH::fmod Boost::thread Boost::system)
 endif()

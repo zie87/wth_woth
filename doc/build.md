@@ -5,7 +5,7 @@
 
 ```.sh
 docker pull zie87/wth_woth_pspdev:latest
-docker run --rm -u $UID --init -v $PWD:/opt/workspace -e LANG=$LANG -w /opt/workspace -it zie87/wth_woth_pspdev /bin/sh "./.github/tools/psp/build.sh" Debug
+docker run --rm -u $UID --init -v $PWD:/opt/workspace -e LANG=$LANG -w /opt/workspace -it zie87/wth_woth_pspdev /bin/sh "./.github/tools/psp/build.sh" debug
 ```
 
 ## Linux (Qt4)
@@ -25,5 +25,5 @@ make -j 4(nproc)
 
 ```.sh
 docker pull zie87/wth_woth_android:latest
-docker run --rm -u $UID --init -v $PWD:/opt/workspace -e LANG=$LANG -w /opt/workspace -it zie87/wth_woth_android /bin/sh "./.github/tools/ndk/build.sh" Debug
+docker run --rm --init -v $PWD:/opt/workspace -e LANG=$LANG -w /opt/workspace -it zie87/wth_woth_android /bin/sh "./.github/tools/ndk/build.sh" debug
 ```

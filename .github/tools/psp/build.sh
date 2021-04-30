@@ -9,12 +9,20 @@ cp libhgetools.a lib/psp/libhgetools.a
 cd ..
 
 cd  JGE
-make -f Makefile -j $(nproc)
+if [ $1 == "debug" ]; then
+    make -f Makefile debug -j $(nproc)
+else
+    make -f Makefile -j $(nproc)
+fi
 cd ..
 
 cd projects/mtg
 mkdir -p objs deps
-make -f Makefile -j $(nproc)
+if [ $1 == "debug" ]; then
+    make -f Makefile debug -j $(nproc)
+else
+    make -f Makefile -j $(nproc)
+fi
 cd -
 
 

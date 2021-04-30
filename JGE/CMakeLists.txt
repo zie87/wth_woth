@@ -82,21 +82,6 @@ if(DEFINED WIN32)
     target_link_libraries(sdl_alias INTERFACE ${SDL_LIBRARIES})
     add_library(Woth::SDL ALIAS sdl_alias)
 
-    add_library(bthread_alias INTERFACE)
-    target_include_directories(bthread_alias INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/../Boost")    
-    find_library(BTHREAD_LIBRARIES 
-        NAMES libboost-thread-vc90-mt-1_44 libboost-thread-vc90-mt-gd-1_44 libboost-thread-vc100-mt-1_44 libboost-thread-vc100-mt-gd-1_44 
-        HINTS "${CMAKE_CURRENT_SOURCE_DIR}/../Boost/lib")
-    target_link_libraries(bthread_alias INTERFACE ${BTHREAD_LIBRARIES})
-    add_library(Boost::thread ALIAS bthread_alias)
-
-    add_library(bsystem_alias INTERFACE)
-    target_include_directories(bsystem_alias INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/../Boost")    
-    find_library(BSYS_LIBRARIES 
-        NAMES libboost-system-vc100-mt-1_44 libboost-system-vc100-mt-gd-1_44 
-        HINTS "${CMAKE_CURRENT_SOURCE_DIR}/../Boost/lib")
-    target_link_libraries(bsystem_alias INTERFACE ${BSYS_LIBRARIES})
-    add_library(Boost::system ALIAS bsystem_alias)
 endif()
 
 #########################################################################
@@ -227,7 +212,7 @@ target_link_libraries(jge300
 if(DEFINED WIN32)
     set(JGE_EXTRAS_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../projects/mtg/extra")
     target_include_directories(jge300 PUBLIC "${JGE_EXTRAS_INCLUDE_DIR}")
-    target_link_libraries(jge300 PUBLIC WotH::fmod Woth::SDL Boost::thread Boost::system)
+    target_link_libraries(jge300 PUBLIC WotH::fmod Woth::SDL)
 endif()
 
 add_library(WotH::jge ALIAS jge300)

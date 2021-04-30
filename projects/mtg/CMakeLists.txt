@@ -123,9 +123,6 @@ target_sources(wth_woth
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TestSuiteAI.cpp
     )
 
-target_compile_options(wth_woth PRIVATE "-DUSE_PRECOMPILED_HEADERS=1")
-target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-ggdb3>")
-
 if(NOT DEFINED WIN32)
     target_compile_options(wth_woth PRIVATE "-DUSE_PRECOMPILED_HEADERS=1")
     target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-ggdb3>")
@@ -144,6 +141,7 @@ target_include_directories(wth_woth
 
 target_link_libraries(wth_woth
     PUBLIC
+        WotH::wge
         WotH::jge
     PRIVATE
         woth_options

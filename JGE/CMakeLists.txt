@@ -76,6 +76,12 @@ if(DEFINED WIN32)
     target_link_libraries(zlib_alias INTERFACE ${ZLIB_LIBRARIES})
     add_library(ZLIB::ZLIB ALIAS zlib_alias)
 
+    add_library(sdl_alias INTERFACE)
+    target_include_directories(sdl_alias INTERFACE "${DEPENDENCIES_INCLUDE_DIR}")    
+    find_library(SDL_LIBRARIES NAMES SDL HINTS "${DEPENDENCIES_SHARED_LIBRARY_DIR}")
+    target_link_libraries(sdl_alias INTERFACE ${SDL_LIBRARIES})
+    add_library(Woth::SDL ALIAS sdl_alias)
+
     add_library(bthread_alias INTERFACE)
     target_include_directories(bthread_alias INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/../Boost")    
     find_library(BTHREAD_LIBRARIES 
@@ -194,8 +200,6 @@ set_target_properties(jge300
         CXX_EXTENSIONS YES
 )
 
-
-
 if(NOT DEFINED WIN32)
 target_compile_options(jge300 PRIVATE "$<$<CONFIG:DEBUG>:-ggdb3>")
 endif()
@@ -223,7 +227,7 @@ target_link_libraries(jge300
 if(DEFINED WIN32)
     set(JGE_EXTRAS_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../projects/mtg/extra")
     target_include_directories(jge300 PUBLIC "${JGE_EXTRAS_INCLUDE_DIR}")
-    target_link_libraries(jge300 PUBLIC WotH::fmod Boost::thread Boost::system)
+    target_link_libraries(jge300 PUBLIC WotH::fmod Woth::SDL Boost::thread Boost::system)
 endif()
 
 add_library(WotH::jge ALIAS jge300)

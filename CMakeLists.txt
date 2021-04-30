@@ -29,9 +29,11 @@ if(DEFINED PSP)
     target_compile_definitions(woth_options INTERFACE "PSPFW3XX")
     
     include(psp_tools) 
+    set(WOTH_PSP_BUILD ON)
 else() 
     message(FATAL_ERROR "Platform can not be detected!")
 endif()
 
+add_subdirectory(wge)
 add_subdirectory(JGE)
 add_subdirectory(projects)

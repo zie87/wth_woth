@@ -1480,7 +1480,7 @@ ostream& operator<<(ostream& out, const GameObserver& g)
     else
     {
         out << "rvalues:";
-        out << g.randomGenerator.saveUsedRandValues(out);
+        g.randomGenerator.saveUsedRandValues(out);
         out << endl;
         out << g.startupGameSerialized;
     }

@@ -561,7 +561,7 @@ int TestSuite::loadNext()
         thread_count = 6;
 #endif
         for(size_t i = 0; i < (thread_count-1); i++)
-            mWorkerThread.push_back(new boost::thread(ThreadProc, this));
+            mWorkerThread.push_back(new wge::thread(ThreadProc, this));
     }
 
     cleanup();
@@ -781,7 +781,7 @@ void TestSuite::ThreadProc(void* inParam)
     LOG("Leaving TestSuite::ThreadProc");
 }
 
-boost::mutex TestSuiteGame::mMutex;
+wge::mutex TestSuiteGame::mMutex;
 
 TestSuiteGame::~TestSuiteGame()
 {
@@ -829,7 +829,7 @@ void TestSuiteGame::initGame()
         p->life = initState.players[i]->life;
         p->poisonCount = initState.players[i]->poisonCount;
         stringstream stream;
-        stream << initState.players[i]->getRandomGenerator()->saveLoadedRandValues(stream);
+        initState.players[i]->getRandomGenerator()->saveLoadedRandValues(stream);
         p->getRandomGenerator()->loadRandValues(stream.str());
         MTGGameZone * playerZones[] = { p->game->graveyard, p->game->library, p->game->hand, p->game->inPlay };
         MTGGameZone * loadedPlayerZones[] = { initState.players[i]->game->graveyard,

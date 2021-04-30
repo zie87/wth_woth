@@ -7,9 +7,10 @@
 #include "GameApp.h"
 #include "WResourceManager.h"
 #include <dirent.h>
-#include <Threading.h>
 #include <Subtypes.h>
 #include <string>
+
+#include <wge/thread.hpp>
 
 using std::string;
 class GameApp;
@@ -133,11 +134,11 @@ public:
     int randomCardId();
 
     static int findType(string subtype, bool forceAdd = true) {
-        boost::mutex::scoped_lock lock(instance->mMutex);
+        std::lock_guard<wge::mutex> lock(instance->mMutex);
         return instance->subtypesList.find(subtype, forceAdd);
     };
     static int add(string value, unsigned int parentType) {
-        boost::mutex::scoped_lock lock(instance->mMutex);
+        std::lock_guard<wge::mutex> lock(instance->mMutex);
         return instance->subtypesList.add(value, parentType);
     };
     static string findType(unsigned int id) {
@@ -164,7 +165,7 @@ public:
 
     static void sortSubtypeList()
     {
-        boost::mutex::scoped_lock lock(instance->mMutex);
+        std::lock_guard<wge::mutex> lock(instance->mMutex);
         instance->subtypesList.sortSubTypes();
     }
 
@@ -177,7 +178,7 @@ public:
     static inline MTGAllCards* getInstance() { return instance; };
 
 private:
-    boost::mutex mMutex;
+    wge::mutex mMutex;
     Subtypes subtypesList;
     map<string, MTGCard *> mtgCardByNameCache;
     int processConfLine(string &s, MTGCard* card, CardPrimitive * primitive);

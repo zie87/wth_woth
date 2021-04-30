@@ -1,9 +1,10 @@
 #include "PrecompiledHeader.h"
 
-#include "Threading.h"
+#include <wge/thread.hpp>
+
 #include <queue>
 #include <set>
-
+#include <chrono>
 
 struct CacheRequest
 {
@@ -21,7 +22,7 @@ struct CacheRequest
     int cacheID;
 };
 
-const boost::posix_time::milliseconds kIdleTime(100);
+const std::chrono::milliseconds kIdleTime(100);
 
 
 class CardRetrieverBase
@@ -81,7 +82,7 @@ public:
         : CardRetrieverBase(inCache), mProcessing(true)
     {
         DebugTrace("Threaded Version");
-        mWorkerThread = boost::thread(ThreadProc, this);
+        mWorkerThread = wge::thread(ThreadProc, this);
     }
 
     virtual ~ThreadedCardRetriever()
@@ -93,7 +94,7 @@ public:
 
     void QueueRequest(const std::string& inFilePath, int inSubmode, int inCacheID)
     {
-        boost::mutex::scoped_lock lock(mMutex);
+        std::lock_guard<wge::mutex> lock(mMutex);
         // mRequestLookup is used to prevent duplicate requests for the same id
         if (mRequestLookup.find(inCacheID) == mRequestLookup.end() && mTextureCache.cache.find(inCacheID) == mTextureCache.cache.end())
         {
@@ -138,7 +139,7 @@ protected:
                 {
                     CacheRequest request;
                     {
-                        boost::mutex::scoped_lock lock(instance->mMutex);
+                        std::lock_guard<wge::mutex> lock(instance->mMutex);
                         request = instance->mRequestQueue.front();
                         instance->mRequestQueue.pop();
                     }
@@ -146,27 +147,27 @@ protected:
                     instance->mTextureCache.LoadIntoCache(request.cacheID, request.filename, request.submode);
 
                     {
-                        boost::mutex::scoped_lock lock(instance->mMutex);
+                        std::lock_guard<wge::mutex> lock(instance->mMutex);
                         instance->mRequestLookup.erase(request.cacheID);
                     }
 
                     // not sure this is necessary, adding it to potentially prevent SIGHUP on the psp
                     // rumour has it that if a worker thread doesn't allow the main thread a chance to run, it can hang the unit
 #ifdef PSP
-                    boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+                    wge::this_thread::sleep_for(std::chrono::milliseconds(10));
 #endif
                 }
 
-                boost::this_thread::sleep(kIdleTime);
+                wge::this_thread::sleep_for(kIdleTime);
             }
         }
     }
 
-    boost::thread mWorkerThread;
+    wge::thread mWorkerThread;
 
     std::queue<CacheRequest> mRequestQueue;
     std::set<int> mRequestLookup;
-    boost::mutex mMutex;
+    wge::mutex mMutex;
     volatile bool mProcessing;
 
 };

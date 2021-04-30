@@ -108,16 +108,15 @@ target_sources(jge300
 
 set_target_properties(jge300
     PROPERTIES
-        CXX_STANDARD 98
+        CXX_STANDARD 11
         CXX_STANDARD_REQUIRED YES
-        CXX_EXTENSIONS ON
+        CXX_EXTENSIONS YES
 )
 target_compile_options(jge300 PRIVATE "$<$<CONFIG:DEBUG>:-ggdb3>")
 
 target_include_directories(jge300
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/../Boost
         ${CMAKE_CURRENT_SOURCE_DIR}/include/psp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/psp/freetype2
         ${CMAKE_CURRENT_SOURCE_DIR}/src/zipFS
@@ -128,6 +127,7 @@ find_package(ZLIB REQUIRED)
 target_link_libraries(jge300
     PUBLIC
         WotH::hge
+        WotH::wge
         WotH::png
         WotH::jpeg
         WotH::gif

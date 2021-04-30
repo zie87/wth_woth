@@ -203,8 +203,8 @@ target_link_libraries(jge300
 
 if(DEFINED WIN32)
     set(JGE_EXTRAS_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../mtg/extra")
-    target_include_directories(jge PUBLIC "${JGE_EXTRAS_INCLUDE_DIR}")
-    target_link_libraries(jge PUBLIC WotH::fmod Boost::thread)
+    target_include_directories(jge300 PUBLIC "${JGE_EXTRAS_INCLUDE_DIR}")
+    target_link_libraries(jge300 PUBLIC WotH::fmod Boost::thread)
 endif()
 
 add_library(WotH::jge ALIAS jge300)

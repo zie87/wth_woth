@@ -5,7 +5,7 @@
 
 ```.sh
 docker pull zie87/wth_woth_pspdev:latest
-docker run --rm -u $UID --init -v $PWD:/opt/workspace -e LANG=$LANG -w /opt/workspace -it zie87/wth_woth_pspdev /bin/sh "./.github/tools/psp/build.sh" debug
+docker run --rm -u $UID --init -v $PWD:/opt/workspace -e LANG=$LANG -w /opt/workspace -it zie87/wth_woth_pspdev /bin/sh "./.github/tools/psp/build.sh" Debug
 ```
 
 ## Linux (Qt4)

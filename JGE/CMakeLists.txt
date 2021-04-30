@@ -58,6 +58,12 @@ if(DEFINED WIN32)
     target_link_libraries(jpeg_alias INTERFACE ${JPEG_LIBRARIES})
     add_library(WotH::jpeg ALIAS jpeg_alias)
 
+    add_library(old_ft INTERFACE)
+    target_include_directories(old_ft INTERFACE "${DEPENDENCIES_INCLUDE_DIR}/freetype2")
+    find_library(FREETYPE2_LIBRARY NAMES freetype HINTS "${DEPENDENCIES_LIBRARY_DIR}")
+    target_link_libraries(old_ft INTERFACE ${FREETYPE2_LIBRARY})
+    add_library(WotH::freetype ALIAS old_ft)
+
     add_library(fmod INTERFACE)
     target_include_directories(fmod INTERFACE "${DEPENDENCIES_INCLUDE_DIR}")
     find_library(FMOD_LIBRARY NAMES fmodvc HINTS "${DEPENDENCIES_LIBRARY_DIR}")

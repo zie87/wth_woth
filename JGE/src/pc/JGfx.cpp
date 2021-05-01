@@ -12,7 +12,6 @@
 #if (!defined IOS) && (!defined QT_CONFIG)
 #ifdef WIN32
 #pragma warning(disable : 4786)
-#pragma comment( lib, "giflib.lib" )
 #endif
 
 #include <png.h>
@@ -1818,10 +1817,6 @@ JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureForm
 
     if (strstr(filename, ".jpg")!=NULL || strstr(filename, ".JPG")!=NULL)
         LoadJPG(textureInfo, filename);
-#if (!defined IOS) && (!defined QT_CONFIG) && (!defined SDL_CONFIG)
-    else if(strstr(filename, ".gif")!=NULL || strstr(filename, ".GIF")!=NULL)
-        LoadGIF(textureInfo,filename);
-#endif
     else if(strstr(filename, ".png")!=NULL || strstr(filename, ".PNG")!=NULL)
         LoadPNG(textureInfo, filename);
 
@@ -1976,170 +1971,6 @@ int JRenderer::LoadPNG(TextureInfo &textureInfo, const char *filename, int mode 
 // 	tex = NULL;
 // }
 
-
-#if (!defined IOS) && (!defined QT_CONFIG) && (!defined SDL_CONFIG)
-//////////////////////////////////////////////////////////////////////////
-/// GIF Support
-int JRenderer::image_readgif(void * handle, TextureInfo &textureInfo, DWORD * bgcolor, InputFunc readFunc, int mode __attribute__((unused)), int TextureFormat __attribute__((unused)))
-{
-
-    //	pixel ** image_data=NULL;
-    DWORD *p32=NULL;
-    //	DWORD *buff=NULL;
-    //#define gif_color(c) RGB(palette->Colors[c].Red, palette->Colors[c].Green, palette->Colors[c].Blue)
-#define gif_color32(c) ARGB(255,palette->Colors[c].Blue,palette->Colors[c].Green,  palette->Colors[c].Red)
-    GifRecordType RecordType;
-    GifByteType *Extension;
-    GifRowType LineIn = NULL;
-    GifFileType *GifFileIn = NULL;
-    ColorMapObject *palette;
-    int ExtCode;
-    if ((GifFileIn = DGifOpen(handle, readFunc)) == NULL)
-        return 1;
-    *bgcolor = 0;
-    textureInfo.mWidth = 0;
-    textureInfo.mHeight = 0;
-    //*image_data = NULL;
-
-    do {
-        if (DGifGetRecordType(GifFileIn, &RecordType) == GIF_ERROR)
-        {
-            DGifCloseFile(GifFileIn);
-            return 1;
-        }
-
-        switch (RecordType) {
-        case IMAGE_DESC_RECORD_TYPE:
-            {
-                if (DGifGetImageDesc(GifFileIn) == GIF_ERROR)
-                {
-                    DGifCloseFile(GifFileIn);
-                    return 1;
-                }
-                if((palette = (GifFileIn->SColorMap != NULL) ? GifFileIn->SColorMap : GifFileIn->Image.ColorMap) == NULL)
-                {
-                    DGifCloseFile(GifFileIn);
-                    return 1;
-                }
-                textureInfo.mWidth = GifFileIn->Image.Width;
-                textureInfo.mHeight = GifFileIn->Image.Height;
-                *bgcolor = gif_color32(GifFileIn->SBackGroundColor);
-                if((LineIn = (GifRowType) malloc(GifFileIn->Image.Width * sizeof(GifPixelType))) == NULL)
-                {
-                    DGifCloseFile(GifFileIn);
-                    return 1;
-                }
-                textureInfo.mTexWidth = getNextPower2(GifFileIn->Image.Width);
-                textureInfo.mTexHeight = getNextPower2(GifFileIn->Image.Height);
-
-                //if((*image_data = (pixel *)malloc(sizeof(pixel) * GifFileIn->Image.Width * GifFileIn->Image.Height)) == NULL)
-                if((p32 = (DWORD *)malloc(sizeof(PIXEL_TYPE) * textureInfo.mTexWidth * textureInfo.mTexHeight)) == NULL)
-                {
-                    free((void *)LineIn);
-                    DGifCloseFile(GifFileIn);
-                    return 1;
-                }
-                DWORD * curr = p32;
-                DWORD * imgdata;
-                for (GifWord i = 0; i < GifFileIn->Image.Height; i ++)
-                {
-                    imgdata = curr;
-                    if (DGifGetLine(GifFileIn, LineIn, GifFileIn->Image.Width) == GIF_ERROR)
-                    {
-                        free((void *)p32);
-                        free((void *)LineIn);
-                        DGifCloseFile(GifFileIn);
-                        return 1;
-                    }
-                    for (GifWord j = 0; j < GifFileIn->Image.Width; j ++)
-                    {
-                        DWORD color32 = gif_color32(LineIn[j]);
-
-                        //if(mTexLoadingCB) mTexLoadingCB(color32);
-                        //if(JRenderer::GetInstance()->GetTextureLoadingCallback())
-                        //	JRenderer::GetInstance()->GetTextureLoadingCallback()(color32);
-
-                        *imgdata++ = color32;
-                    }
-
-                    curr += textureInfo.mTexWidth;
-                }
-                textureInfo.mBits = (u8 *)p32;
-                break;
-            }
-        case EXTENSION_RECORD_TYPE:
-            if (DGifGetExtension(GifFileIn, &ExtCode, &Extension) == GIF_ERROR)
-            {
-                if(textureInfo.mBits != NULL)
-                {
-                    free((void *)textureInfo.mBits);
-                    textureInfo.mBits = NULL;
-                }
-                if(LineIn != NULL)
-                    free((void *)LineIn);
-                DGifCloseFile(GifFileIn);
-                return 1;
-            }
-            while (Extension != NULL) {
-                if (DGifGetExtensionNext(GifFileIn, &Extension) == GIF_ERROR)
-                {
-                    if(textureInfo.mBits != NULL)
-                    {
-                        free((void *)textureInfo.mBits);
-                        textureInfo.mBits = NULL;
-                    }
-                    if(LineIn != NULL)
-                        free((void *)LineIn);
-                    DGifCloseFile(GifFileIn);
-                    return 1;
-                }
-            }
-            break;
-        case TERMINATE_RECORD_TYPE:
-            break;
-        default:
-            break;
-        }
-    }
-    while (RecordType != TERMINATE_RECORD_TYPE);
-
-    if(LineIn != NULL)
-        free((void *)LineIn);
-    DGifCloseFile(GifFileIn);
-
-    return 0;
-}
-
-int image_gif_read(GifFileType * ft, GifByteType * buf, int size)
-{
-    JFileSystem *fileSys = (JFileSystem *)ft->UserData;
-    //return fread(buf, 1, size, (FILE *)ft->UserData);
-    if (fileSys->ReadFile(buf, size))
-        return size;
-    else
-        return 0;
-
-}
-
-void JRenderer::LoadGIF(TextureInfo &textureInfo, const char *filename, int mode, int TextureFormat __attribute__((unused)))
-{
-    ///*
-    //FILE * fp = fopen(filename, "rb");
-    JFileSystem *fileSys = JFileSystem::GetInstance();
-    if (!fileSys->OpenFile(filename))
-        return;
-
-    //if(fp == NULL)
-    //	return;
-    DWORD bkcol;
-    int result = image_readgif(fileSys, textureInfo, &bkcol, image_gif_read, mode);
-    if(result!=0)
-        textureInfo.mBits=NULL;
-    //fclose(fp);
-    fileSys->CloseFile();
-    return ;//*/
-}
-#endif //(!defined IOS) && (!defined QT_CONFIG) && (!defined SDL_CONFIG)
 
 #elif (defined IOS)
 

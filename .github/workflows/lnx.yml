@@ -1,0 +1,42 @@
+name: Linux
+
+on:
+  push:
+    branches-ignore:
+      - 'docker'
+  schedule:
+    - cron: '0 4 * * 0' # Weekly on Sundays at 04:00
+
+jobs:        
+  sdl_build:
+    runs-on: ubuntu-20.04
+    
+    strategy:
+      matrix:
+        config: [Release, Debug]
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v1
+      with:
+        submodules: true
+    - name: dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get -y -qq install g++ \
+                                    cmake \
+                                    doxygen \
+                                    ninja-build \
+                                    zip \
+                                    libsdl2-dev \
+                                    libz-dev
+        sudo add-apt-repository -y ppa:linuxuprising/libpng12
+        sudo apt-get update
+        sudo apt-get -y -qq install libpng12-dev
+    - name: prepare
+      run: |
+        cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=${{ matrix.config }} -GNinja
+        
+    - name: build
+      run : |
+        cmake --build build

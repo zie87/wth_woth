@@ -3,24 +3,90 @@
 # 3rd
 #########################################################################
 
-add_library(png13 INTERFACE)
-target_include_directories(png13 INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include/psp)
-target_link_directories(png13 INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/lib/psp)
-target_link_libraries(png13 INTERFACE png)
-add_library(WotH::png ALIAS png13)
 
-add_library(jpg INTERFACE)
-target_include_directories(jpg INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include/psp)
-target_link_directories(jpg INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/lib/psp)
-target_link_libraries(jpg INTERFACE jpeg)
-add_library(WotH::jpeg ALIAS jpg)
+if(DEFINED PSP)
+    set(DEPENDENCIES_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/psp")
+    set(DEPENDENCIES_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/psp")
 
+    add_library(png_old INTERFACE)
+    target_include_directories(png_old INTERFACE "${DEPENDENCIES_INCLUDE_DIR}")
+    set(PNG_LIBRARY "${DEPENDENCIES_LIBRARY_DIR}/libpng.a")
+    target_link_libraries(png_old INTERFACE ${PNG_LIBRARY})
+    add_library(WotH::png ALIAS png_old)
 
-add_library(giflib INTERFACE)
-target_include_directories(giflib INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include/psp)
-target_link_directories(giflib INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/lib/psp)
-target_link_libraries(giflib INTERFACE gif)
-add_library(WotH::gif ALIAS giflib)
+    add_library(jpeg_old INTERFACE)
+    target_include_directories(jpeg_old INTERFACE "${DEPENDENCIES_INCLUDE_DIR}")
+    set(JPEG_LIBRARY "${DEPENDENCIES_LIBRARY_DIR}/libjpeg.a")
+    target_link_libraries(jpeg_old INTERFACE ${JPEG_LIBRARY})
+    add_library(WotH::jpeg ALIAS jpeg_old)
+
+    add_library(old_ft INTERFACE)
+    target_include_directories(old_ft INTERFACE "${DEPENDENCIES_INCLUDE_DIR}/freetype2")
+    set(FREETYPE2_LIBRARY "${DEPENDENCIES_LIBRARY_DIR}/libfreetype.a")
+    target_link_libraries(old_ft INTERFACE ${FREETYPE2_LIBRARY})
+    add_library(WotH::freetype ALIAS old_ft)
+
+    find_package(ZLIB REQUIRED)
+endif()
+
+if(DEFINED UNIX OR DEFINED WIN32)
+    find_package(JPEG REQUIRED)
+    add_library(jpg_alias INTERFACE)
+    target_link_libraries(jpg_alias INTERFACE JPEG::JPEG)
+    add_library(WotH::jpeg ALIAS jpg_alias)
+
+    find_package(ZLIB REQUIRED)
+    find_package(SDL2 REQUIRED)
+    find_package(OpenGL COMPONENTS OpenGL REQUIRED)
+
+    # on ubuntu target is not defined
+    if(NOT TARGET SDL2::SDL2)
+        add_library(sdl_wrapper INTERFACE)
+        target_include_directories(sdl_wrapper INTERFACE ${SDL2_INCLUDE_DIRS})
+        target_link_libraries(sdl_wrapper INTERFACE ${SDL2_LIBRARIES})
+        add_library(SDL2::SDL2 ALIAS sdl_wrapper)
+    endif()
+endif()
+
+if(DEFINED UNIX)
+    add_library(png_old INTERFACE)
+    target_include_directories(png_old INTERFACE "/usr/include/libpng12")
+    target_link_libraries(png_old INTERFACE png12)
+    add_library(WotH::png ALIAS png_old)
+
+    find_package(Freetype REQUIRED)
+    add_library(ft_alias INTERFACE)
+    target_link_libraries(ft_alias INTERFACE Freetype::Freetype)
+    add_library(WotH::freetype ALIAS ft_alias)
+endif()
+
+if(DEFINED WIN32)
+    set(DEPENDENCIES_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/include/")
+    set(DEPENDENCIES_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/lib/")
+    set(DEPENDENCIES_SHARED_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/dll/")
+
+    add_library(png_old INTERFACE)
+    target_include_directories(png_old INTERFACE "${DEPENDENCIES_INCLUDE_DIR}")
+    find_library(PNG_LIBRARY NAMES libpng libpngd PATHS "${DEPENDENCIES_LIBRARY_DIR}" "${DEPENDENCIES_SHARED_LIBRARY_DIR}")
+    target_link_libraries(png_old INTERFACE ${PNG_LIBRARY})
+    add_library(WotH::png ALIAS png_old)
+
+    add_library(old_ft INTERFACE)
+    target_include_directories(old_ft INTERFACE "${DEPENDENCIES_INCLUDE_DIR}/freetype2")
+    find_library(FREETYPE2_LIBRARY NAMES freetype HINTS "${DEPENDENCIES_LIBRARY_DIR}")
+    target_link_libraries(old_ft INTERFACE ${FREETYPE2_LIBRARY})
+    add_library(WotH::freetype ALIAS old_ft)
+
+    add_library(fmod INTERFACE)
+    target_include_directories(fmod INTERFACE "${DEPENDENCIES_INCLUDE_DIR}")
+    find_library(FMOD_LIBRARY NAMES fmodvc HINTS "${DEPENDENCIES_LIBRARY_DIR}")
+    target_link_libraries(fmod INTERFACE ${FMOD_LIBRARY})
+    add_library(WotH::fmod ALIAS fmod)
+
+    find_package(ZLIB REQUIRED)
+    find_package(SDL2 REQUIRED)
+    find_package(OpenGL COMPONENTS OpenGL REQUIRED)
+endif()
 
 #########################################################################
 # HGE
@@ -39,10 +105,8 @@ target_sources(hgetools
         ${CMAKE_CURRENT_SOURCE_DIR}/src/hge/hgevector.cpp
 )
 
-target_include_directories(hgetools 
+target_include_directories(hgetools
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/psp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/psp/freetype2
         ${CMAKE_CURRENT_SOURCE_DIR}/src/zipFS
 )
 
@@ -50,6 +114,10 @@ target_link_libraries(hgetools
     PRIVATE
         woth_options
 )
+
+if(DEFINED UNIX OR DEFINED WIN32)
+    target_link_libraries(hgetools PRIVATE SDL2::SDL2)
+endif()
 
 add_library(WotH::hge ALIAS hgetools)
 
@@ -92,7 +160,7 @@ target_sources(jge300
         ${CMAKE_CURRENT_SOURCE_DIR}/src/JOBJModel.cpp
     )
 
-# psp
+if(DEFINED PSP)
 target_sources(jge300
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/JSocket.cpp 
@@ -104,7 +172,17 @@ target_sources(jge300
         ${CMAKE_CURRENT_SOURCE_DIR}/src/decoder_prx.c 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vram.c
     )
+endif()
 
+if(DEFINED UNIX OR WIN32)
+target_sources(jge300
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/SDL2main.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JSfx.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JGfx.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JSocket.cpp
+    )
+endif()
 
 set_target_properties(jge300
     PROPERTIES
@@ -112,17 +190,16 @@ set_target_properties(jge300
         CXX_STANDARD_REQUIRED YES
         CXX_EXTENSIONS YES
 )
+
+if(NOT DEFINED WIN32)
 target_compile_options(jge300 PRIVATE "$<$<CONFIG:DEBUG>:-ggdb3>")
+endif()
 
 target_include_directories(jge300
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/psp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/psp/freetype2
         ${CMAKE_CURRENT_SOURCE_DIR}/src/zipFS
 )
-
-find_package(ZLIB REQUIRED)
 
 target_link_libraries(jge300
     PUBLIC
@@ -130,10 +207,21 @@ target_link_libraries(jge300
         WotH::wge
         WotH::png
         WotH::jpeg
-        WotH::gif
+        WotH::freetype
         ZLIB::ZLIB
     PRIVATE
         woth_options
 )
+
+
+if(DEFINED UNIX OR DEFINED WIN32)
+    target_link_libraries(jge300 PUBLIC SDL2::SDL2 OpenGL::GL OpenGL::GLU )
+endif()
+
+if(DEFINED WIN32)
+    set(JGE_EXTRAS_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../projects/mtg/extra")
+    target_include_directories(jge300 PUBLIC "${JGE_EXTRAS_INCLUDE_DIR}")
+    target_link_libraries(jge300 PUBLIC WotH::fmod)
+endif()
 
 add_library(WotH::jge ALIAS jge300)

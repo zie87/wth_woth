@@ -35,6 +35,41 @@ if(DEFINED PSP)
     find_package(ZLIB REQUIRED)
 endif()
 
+if(DEFINED UNIX)
+    add_library(png_old INTERFACE)
+    target_include_directories(png_old INTERFACE "/usr/include/libpng12")
+    target_link_libraries(png_old INTERFACE png12)
+    add_library(WotH::png ALIAS png_old)
+
+    add_library(giflib4 INTERFACE)
+    target_include_directories(giflib4 INTERFACE "/usr/include/giflib4")
+    find_library(GIFLIB4_LIBRARY gif HINTS /usr/lib/giflib4)
+    target_link_libraries(giflib4 INTERFACE ${GIFLIB4_LIBRARY})
+    add_library(WotH::gif ALIAS giflib4)
+
+    find_package(JPEG REQUIRED)
+    add_library(jpg_alias INTERFACE)
+    target_link_libraries(jpg_alias INTERFACE JPEG::JPEG)
+    add_library(WotH::jpeg ALIAS jpg_alias)
+
+    find_package(Freetype REQUIRED)
+    add_library(ft_alias INTERFACE)
+    target_link_libraries(ft_alias INTERFACE Freetype::Freetype)
+    add_library(WotH::freetype ALIAS ft_alias)
+    
+    find_package(ZLIB REQUIRED)
+    find_package(SDL2 REQUIRED)
+    find_package(OpenGL COMPONENTS OpenGL REQUIRED)
+
+    # on ubuntu target is not defined
+    if(NOT TARGET SDL2::SDL2)
+        add_library(sdl_wrapper INTERFACE)
+        target_include_directories(sdl_wrapper INTERFACE ${SDL2_INCLUDE_DIRS})
+        target_link_libraries(sdl_wrapper INTERFACE ${SDL2_LIBRARIES})
+        add_library(SDL2::SDL2 ALIAS sdl_wrapper)
+    endif()
+endif()
+
 if(DEFINED WIN32)
     set(DEPENDENCIES_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/include/")
     set(DEPENDENCIES_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/lib/")
@@ -69,19 +104,10 @@ if(DEFINED WIN32)
     find_library(FMOD_LIBRARY NAMES fmodvc HINTS "${DEPENDENCIES_LIBRARY_DIR}")
     target_link_libraries(fmod INTERFACE ${FMOD_LIBRARY})
     add_library(WotH::fmod ALIAS fmod)
-    add_library(sdl_alias INTERFACE)
 
-    target_include_directories(sdl_alias INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/SDL/include")    
-    #find_library(SDL_LIBRARIES NAMES SDL HINTS "${DEPENDENCIES_SHARED_LIBRARY_DIR}")
-    set(SDL_LIBRARIES "${DEPENDENCIES_SHARED_LIBRARY_DIR}/SDL.dll")
-    target_link_libraries(sdl_alias INTERFACE ${SDL_LIBRARIES})
-    add_library(WotH::SDL ALIAS sdl_alias)
-
-    add_library(zlib_alias INTERFACE)
-    target_include_directories(zlib_alias INTERFACE "${DEPENDENCIES_INCLUDE_DIR}")    
-    find_library(ZLIB_LIBRARIES NAMES zlib1 zlib1d zdll zlibd HINTS "${DEPENDENCIES_LIBRARY_DIR}" "${DEPENDENCIES_SHARED_LIBRARY_DIR}")
-    target_link_libraries(zlib_alias INTERFACE ${ZLIB_LIBRARIES})
-    add_library(ZLIB::ZLIB ALIAS zlib_alias)
+    find_package(ZLIB REQUIRED)
+    find_package(SDL2 REQUIRED)
+    find_package(OpenGL COMPONENTS OpenGL REQUIRED)
 endif()
 
 #########################################################################
@@ -112,6 +138,10 @@ target_link_libraries(hgetools
     PRIVATE
         woth_options
 )
+
+if(DEFINED UNIX)
+    target_link_libraries(hgetools PUBLIC SDL2::SDL2)
+endif()
 
 add_library(WotH::hge ALIAS hgetools)
 
@@ -168,6 +198,17 @@ target_sources(jge300
     )
 endif()
 
+if(DEFINED UNIX)
+target_sources(jge300
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/SDL2main.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JSfx.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JGfx.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JSocket.cpp
+    )
+endif()
+
+
 if(DEFINED WIN32)
 target_sources(jge300
     PRIVATE
@@ -209,10 +250,14 @@ target_link_libraries(jge300
 )
 
 
+if(DEFINED UNIX OR DEFINED WIN32)
+    target_link_libraries(jge300 PUBLIC SDL2::SDL2 OpenGL::GL OpenGL::GLU )
+endif()
+
 if(DEFINED WIN32)
     set(JGE_EXTRAS_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../projects/mtg/extra")
     target_include_directories(jge300 PUBLIC "${JGE_EXTRAS_INCLUDE_DIR}")
-    target_link_libraries(jge300 PUBLIC WotH::fmod WotH::SDL)
+    target_link_libraries(jge300 PUBLIC WotH::fmod)
 endif()
 
 add_library(WotH::jge ALIAS jge300)

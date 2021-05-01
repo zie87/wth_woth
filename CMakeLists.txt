@@ -29,6 +29,11 @@ if(DEFINED PSP)
     
     include(psp_tools) 
     set(WOTH_PSP_BUILD ON)
+elseif(DEFINED UNIX)
+    target_compile_definitions(woth_options INTERFACE "WOTH_PLATFORM_UNIX")
+    target_compile_definitions(woth_options INTERFACE "LINUX")
+
+    target_compile_definitions(woth_options INTERFACE "SDL_CONFIG")
 elseif(DEFINED WIN32)
     target_compile_options(woth_options INTERFACE "/wd4005")
 

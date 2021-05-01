@@ -11,6 +11,9 @@ jobs:
   sdl_build:
     runs-on: windows-latest
 
+    env:
+      VCPKG_DEPS: sdl2
+
     strategy:
       matrix:
         config: [Release, Debug]
@@ -21,12 +24,57 @@ jobs:
       with:
         submodules: true
     
+    - name: init
+      id: init
+      shell: bash
+      run: |
+        # rebuild the deps when the build environment changes
+        # if env.lock changes then the cache will be invalidated
+        echo "${{ runner.os }}" > env.lock
+          
+        # run vcvarsall and save the environment to env.sh:
+        .github/tools/win/vs_env.bat x86
+        source env.sh
+        cl >> env.lock 2>&1
+
+        cmake --version >> env.lock 2>&1
+        echo "==== env.lock ===="
+        cat env.lock
+        
+        echo "$VCPKG_DEPS" >> vcpkg.lock
+
+    - name: vcpkg cache
+      uses: actions/cache@v1
+      id: cache-vcpkg
+      with:
+        path: vcpkg
+        # if the vcpkg hash or the set of dependencies change,
+        # restore the most recently saved cache for the environment
+        # if the build environment changes then start from scratch
+        key: vcpkg-${{ hashFiles('**\env.lock') }}-${{ hashFiles('**\vcpkg.lock') }}
+        restore-keys: vcpkg-${{ hashFiles('**\env.lock') }}-
+        
+    - name: vcpkg install
+      if: steps.cache-vcpkg.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        if cd vcpkg; then
+          git fetch
+        else
+          git clone https://github.com/microsoft/vcpkg.git
+          cd vcpkg
+        fi
+        "$VCPKG_INSTALLATION_ROOT/vcpkg" install ${VCPKG_DEPS} --triplet x86-windows
+        "$VCPKG_INSTALLATION_ROOT/vcpkg" upgrade --no-dry-run
+        rm -rf downloads buildtrees packages
+    
     - name: prepare
       shell: bash
       run: |
+        source env.sh
         mkdir build
         cd build
-        cmake .. -G"Visual Studio 16 2019" -A Win32 -DCMAKE_BUILD_TYPE=${{ matrix.config }}
+        cmake .. -G"Visual Studio 16 2019" -A Win32 -DCMAKE_BUILD_TYPE=${{ matrix.config }} -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake
         
     - name: build
       run : |

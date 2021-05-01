@@ -12,7 +12,7 @@ jobs:
     runs-on: windows-latest
 
     env:
-      VCPKG_DEPS: sdl2 zlib
+      VCPKG_DEPS: sdl2 zlib libjpeg-turbo
 
     strategy:
       matrix:

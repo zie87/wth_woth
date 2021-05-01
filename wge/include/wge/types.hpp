@@ -7,6 +7,7 @@
 namespace wge {
 using byte_t = std::uint8_t;
 using size_t = std::size_t;
+using pixel_t = std::uint32_t;
 
 using i8 = std::int8_t;
 using u8 = std::uint8_t;

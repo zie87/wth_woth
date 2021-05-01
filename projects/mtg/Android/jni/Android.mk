@@ -9,15 +9,12 @@ JGE_PATH := $(MY_WAGIC_ROOT)/JGE
 WGE_PATH := $(MY_WAGIC_ROOT)/wge
 MTG_PATH := $(MY_WAGIC_ROOT)/projects/mtg/
 SDL_PATH := $(JGE_PATH)/Dependencies/SDL
-JPEG_PATH := $(JGE_PATH)/Dependencies/libjpeg
-PNG_PATH := $(JGE_PATH)/Dependencies/libpng
 DEBUG ?= DEBUG
 
 LOCAL_CFLAGS += -DLINUX -DANDROID -DSDL_CONFIG -D_$(DEBUG)
 LOCAL_CFLAGS += -D_STLP_USE_SIMPLE_NODE_ALLOC
 LOCAL_CFLAGS += -D__arm__ -D_REENTRANT -D_GLIBCXX__PTHREADS
-LOCAL_CXXFLAGS += -std=c++11
-LOCAL_STATIC_LIBRARIES := libpng libjpeg
+LOCAL_CXXFLAGS += -std=c++1y
 LOCAL_SHARED_LIBRARIES := SDL
 
 LOCAL_C_INCLUDES := \
@@ -26,8 +23,6 @@ LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/$(WGE_PATH)/include \
 	$(LOCAL_PATH)/$(JGE_PATH)/include \
 	$(LOCAL_PATH)/$(JGE_PATH)/src/zipFS \
-	$(LOCAL_PATH)/$(JPEG_PATH) \
-	$(LOCAL_PATH)/$(PNG_PATH) \
 
 LOCAL_SRC_FILES := $(SDL_PATH)/src/main/android/SDL_android_main.cpp \
         $(MTG_PATH)/src/AbilityParser.cpp \
@@ -138,6 +133,7 @@ LOCAL_SRC_FILES := $(SDL_PATH)/src/main/android/SDL_android_main.cpp \
         $(MTG_PATH)/src/WFont.cpp \
         $(MTG_PATH)/src/WGui.cpp \
         $(MTG_PATH)/src/WResourceManager.cpp \
+        $(WGE_PATH)/src/video/image_loader.cpp \
         $(JGE_PATH)/src/SDLmain.cpp \
         $(JGE_PATH)/src/Encoding.cpp \
         $(JGE_PATH)/src/JAnimator.cpp \
@@ -180,14 +176,6 @@ LOCAL_SRC_FILES := $(SDL_PATH)/src/main/android/SDL_android_main.cpp \
 LOCAL_LDLIBS := -lGLESv1_CM -llog -lz -lOpenSLES
 
 include $(BUILD_SHARED_LIBRARY)
-
-# PNG static lib
-include $(MY_LOCAL_PATH)/$(PNG_PATH)/Android.mk
-include $(CLEAR_VARS)
-
-# JPEG static lib
-include $(MY_LOCAL_PATH)/$(JPEG_PATH)/Android.mk
-include $(CLEAR_VARS)
 
 # SDL dynamic lib
 include $(MY_LOCAL_PATH)/$(SDL_PATH)/Android.mk

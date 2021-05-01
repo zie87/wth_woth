@@ -184,13 +184,6 @@ target_sources(jge300
     )
 endif()
 
-set_target_properties(jge300
-    PROPERTIES
-        CXX_STANDARD 11
-        CXX_STANDARD_REQUIRED YES
-        CXX_EXTENSIONS YES
-)
-
 if(NOT DEFINED WIN32)
 target_compile_options(jge300 PRIVATE "$<$<CONFIG:DEBUG>:-ggdb3>")
 endif()

@@ -7,6 +7,10 @@
 // Copyright (c) 2007 James Hui (a.k.a. Dr.Watson) <jhkhui@gmail.com>
 //
 //-------------------------------------------------------------------------------------
+
+#include <wge/math.hpp>
+#include <wge/video/image_loader.hpp>
+
 #define GL_GLEXT_PROTOTYPES
 
 #if (!defined IOS) && (!defined QT_CONFIG)
@@ -14,18 +18,7 @@
 #pragma warning(disable : 4786)
 #endif
 
-#include <png.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#define XMD_H
-#include <jpeglib.h>
-
-#ifdef __cplusplus
-}
-#endif
 #endif //IOS
 
 #include "../../include/JGE.h"
@@ -1611,368 +1604,15 @@ void JRenderer::PlotArray(float *x, float *y, int count, PIXEL_TYPE color)
 }
 
 
-
 void JRenderer::ScreenShot(const char* filename __attribute__((unused)))
 {
 
 }
 
 
-static int getNextPower2(int width)
-{
-    int b = width;
-    int n;
-    for (n = 0; b != 0; n++) b >>= 1;
-    b = 1 << n;
-    if (b == 2 * width) b >>= 1;
-    return b;
-}
 
 
-#if (!defined IOS) && (!defined QT_CONFIG)
-static void jpg_null(j_decompress_ptr cinfo __attribute__((unused)))
-{
-}
-
-
-static boolean jpg_fill_input_buffer(j_decompress_ptr cinfo __attribute__((unused)))
-{
-    ////    ri.Con_Printf(PRINT_ALL, "Premature end of JPEG data\n");
-    return 1;
-}
-
-static void jpg_skip_input_data(j_decompress_ptr cinfo, long num_bytes)
-{
-
-    cinfo->src->next_input_byte += (size_t) num_bytes;
-    cinfo->src->bytes_in_buffer -= (size_t) num_bytes;
-
-    //// if (cinfo->src->bytes_in_buffer < 0)
-    ////		ri.Con_Printf(PRINT_ALL, "Premature end of JPEG data\n");
-}
-
-static void jpeg_mem_src(j_decompress_ptr cinfo, byte *mem, int len)
-{
-    cinfo->src = (struct jpeg_source_mgr *)(*cinfo->mem->alloc_small)((j_common_ptr) cinfo, JPOOL_PERMANENT, sizeof(struct jpeg_source_mgr));
-    cinfo->src->init_source = jpg_null;
-    cinfo->src->fill_input_buffer = jpg_fill_input_buffer;
-    cinfo->src->skip_input_data = jpg_skip_input_data;
-    cinfo->src->resync_to_restart = jpeg_resync_to_restart;
-    cinfo->src->term_source = jpg_null;
-    cinfo->src->bytes_in_buffer = len;
-    cinfo->src->next_input_byte = mem;
-}
-
-/*
-==============
-LoadJPG
-==============
-*/
-void JRenderer::LoadJPG(TextureInfo &textureInfo, const char *filename, int mode __attribute__((unused)), int TextureFormat __attribute__((unused)))
-{
-    textureInfo.mBits = NULL;
-
-    struct jpeg_decompress_struct	cinfo;
-    struct jpeg_error_mgr jerr;
-    BYTE *rawdata, *rgbadata, *scanline, *p, *q;
-    int	rawsize, i;
-
-    JFileSystem* fileSystem = JFileSystem::GetInstance();
-    if (!fileSystem->OpenFile(filename)) return;
-
-    rawsize = fileSystem->GetFileSize();
-
-    rawdata = new BYTE[rawsize];
-
-    if (!rawdata)
-    {
-        fileSystem->CloseFile();
-        return;
-    }
-
-    fileSystem->ReadFile(rawdata, rawsize);
-    fileSystem->CloseFile();
-
-    // Initialize libJpeg Object
-    cinfo.err = jpeg_std_error(&jerr);
-    jpeg_create_decompress(&cinfo);
-
-    jpeg_mem_src(&cinfo, rawdata, rawsize);
-
-    // Process JPEG header
-    jpeg_read_header(&cinfo, true);
-
-
-
-    // Start Decompression
-    jpeg_start_decompress(&cinfo);
-
-    // Check Colour Components
-    if(cinfo.output_components != 3 && cinfo.output_components != 4)
-    {
-        ////		ri.Con_Printf(PRINT_ALL, "Invalid JPEG colour components\n");
-        jpeg_destroy_decompress(&cinfo);
-        ////		ri.FS_FreeFile(rawdata);
-        return;
-    }
-
-    int tw = getNextPower2(cinfo.output_width);
-    int th = getNextPower2(cinfo.output_height);
-
-
-    // Allocate Memory for decompressed image
-    rgbadata = new BYTE[tw * th * 4];
-    if(!rgbadata)
-    {
-        ////		ri.Con_Printf(PRINT_ALL, "Insufficient RAM for JPEG buffer\n");
-        jpeg_destroy_decompress(&cinfo);
-        ////		ri.FS_FreeFile(rawdata);
-        delete [] rgbadata;
-        return;
-    }
-
-
-    // Pass sizes to output
-
-    // Allocate Scanline buffer
-    scanline = (byte *)malloc(cinfo.output_width * 3);
-    if(!scanline)
-    {
-        ////		ri.Con_Printf(PRINT_ALL, "Insufficient RAM for JPEG scanline buffer\n");
-
-        jpeg_destroy_decompress(&cinfo);
-        ////		ri.FS_FreeFile(rawdata);
-
-        delete [] rgbadata;
-        return;
-    }
-
-    // Read Scanlines, and expand from RGB to RGBA
-    BYTE* currRow = rgbadata;
-
-    while(cinfo.output_scanline < cinfo.output_height)
-    {
-        p = scanline;
-        jpeg_read_scanlines(&cinfo, &scanline, 1);
-
-        q = currRow;
-        for(i=0; i<(int)cinfo.output_width; i++)
-        {
-            q[0] = p[0];
-            q[1] = p[1];
-            q[2] = p[2];
-            q[3] = 255;
-
-            p+=3; q+=4;
-        }
-        currRow += tw*4;
-    }
-
-    // Free the scanline buffer
-    free(scanline);
-
-    textureInfo.mBits = rgbadata;
-    textureInfo.mWidth = cinfo.output_width;
-    textureInfo.mHeight = cinfo.output_height;
-    textureInfo.mTexWidth = tw;
-    textureInfo.mTexHeight = th;
-
-    // Finish Decompression
-    try {
-        jpeg_finish_decompress(&cinfo);
-    } catch(...) {}
-
-    // Destroy JPEG object
-    jpeg_destroy_decompress(&cinfo);
-
-    delete[] rawdata;
-}
-
-
-static void PNGCustomWarningFn(png_structp png_ptr __attribute__((unused)), png_const_charp warning_msg __attribute__((unused)))
-{
-    // ignore PNG warnings
-}
-
-
-static void PNGCustomReadDataFn(png_structp png_ptr, png_bytep data, png_size_t length)
-{
-    png_size_t check;
-
-    JFileSystem *fileSystem = (JFileSystem*)png_ptr->io_ptr;
-
-    check = fileSystem->ReadFile(data, length);
-
-    if (check != length)
-    {
-        png_error(png_ptr, "Read Error!");
-    }
-}
-
-JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureFormat __attribute__((unused)))
-{
-    TextureInfo textureInfo;
-
-    textureInfo.mBits = NULL;
-
-    if (strstr(filename, ".jpg")!=NULL || strstr(filename, ".JPG")!=NULL)
-        LoadJPG(textureInfo, filename);
-    else if(strstr(filename, ".png")!=NULL || strstr(filename, ".PNG")!=NULL)
-        LoadPNG(textureInfo, filename);
-
-    if (textureInfo.mBits == NULL) {
-        printf("Texture %s failed to load\n", filename);
-        return NULL;
-    }
-
-    bool ret = false;
-
-    JTexture *tex = new JTexture();
-
-    if (tex)
-    {
-        if (mImageFilter != NULL)
-            mImageFilter->ProcessImage((PIXEL_TYPE*)textureInfo.mBits, textureInfo.mWidth, textureInfo.mHeight);
-
-        tex->mFilter = TEX_FILTER_LINEAR;
-        tex->mWidth = textureInfo.mWidth;
-        tex->mHeight = textureInfo.mHeight;
-        tex->mTexWidth = textureInfo.mTexWidth;
-        tex->mTexHeight = textureInfo.mTexHeight;
-
-        tex->mBuffer = textureInfo.mBits;
-    }
-
-    return tex;
-}
-
-int JRenderer::LoadPNG(TextureInfo &textureInfo, const char *filename, int mode __attribute__((unused)), int TextureFormat __attribute__((unused)))
-{
-    textureInfo.mBits = NULL;
-
-    DWORD* p32;
-
-    png_structp png_ptr;
-    png_infop info_ptr;
-    unsigned int sig_read = 0;
-    png_uint_32 width, height, tw, th;
-    int bit_depth, color_type, interlace_type, x, y;
-    DWORD* line;
-
-    JFileSystem* fileSystem = JFileSystem::GetInstance();
-    if (!fileSystem->OpenFile(filename))
-        return JGE_ERR_CANT_OPEN_FILE;
-
-    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-    if (png_ptr == NULL)
-    {
-        fileSystem->CloseFile();
-
-        return JGE_ERR_PNG;
-    }
-
-    png_set_error_fn(png_ptr, (png_voidp) NULL, (png_error_ptr) NULL, PNGCustomWarningFn);
-    info_ptr = png_create_info_struct(png_ptr);
-    if (info_ptr == NULL)
-    {
-        //fclose(fp);
-        fileSystem->CloseFile();
-
-        png_destroy_read_struct(&png_ptr, png_infopp_NULL, png_infopp_NULL);
-
-        return JGE_ERR_PNG;
-    }
-    png_init_io(png_ptr, NULL);
-    png_set_read_fn(png_ptr, (png_voidp)fileSystem, PNGCustomReadDataFn);
-
-    png_set_sig_bytes(png_ptr, sig_read);
-    png_read_info(png_ptr, info_ptr);
-    png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, &interlace_type, int_p_NULL, int_p_NULL);
-    png_set_strip_16(png_ptr);
-    png_set_packing(png_ptr);
-    if (color_type == PNG_COLOR_TYPE_PALETTE) png_set_palette_to_rgb(png_ptr);
-    if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8) png_set_gray_1_2_4_to_8(png_ptr);
-    if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)) png_set_tRNS_to_alpha(png_ptr);
-    png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
-
-    line = (DWORD*) malloc(width * 4);
-    if (!line)
-    {
-        //fclose(fp);
-        fileSystem->CloseFile();
-
-        png_destroy_read_struct(&png_ptr, png_infopp_NULL, png_infopp_NULL);
-        return JGE_ERR_MALLOC_FAILED;
-    }
-
-
-    tw = getNextPower2(width);
-    th = getNextPower2(height);
-
-    int size = tw * th * 4;			// RGBA
-
-    BYTE* buffer = new BYTE[size];
-
-    //JTexture *tex = new JTexture();
-
-    if (buffer)
-    {
-
-
-        p32 = (DWORD*) buffer;
-
-        for (y = 0; y < (int)height; y++)
-        {
-            png_read_row(png_ptr, (BYTE*) line, png_bytep_NULL);
-            for (x = 0; x < (int)width; x++)
-            {
-                DWORD color32 = line[x];
-                int a = (color32 >> 24) & 0xff;
-                int r = color32 & 0xff;
-                int g = (color32 >> 8) & 0xff;
-                int b = (color32 >> 16) & 0xff;
-
-                color32 = r | (g << 8) | (b << 16) | (a << 24);
-                *(p32+x) = color32;
-
-            }
-            p32 += tw;
-
-        }
-
-    }
-
-
-    free (line);
-
-    png_read_end(png_ptr, info_ptr);
-    png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
-
-    fileSystem->CloseFile();
-
-
-    textureInfo.mBits = buffer;
-    textureInfo.mWidth = width;
-    textureInfo.mHeight = height;
-    textureInfo.mTexWidth = tw;
-    textureInfo.mTexHeight = th;
-
-    return 1;
-    //return textureInfo;
-
-}
-
-
-// void JRenderer::FreeTexture(JTexture* tex)
-// {
-// 	glDeleteTextures(1, &tex->mTexId);
-//
-// 	delete tex;
-// 	tex = NULL;
-// }
-
-
-#elif (defined IOS)
+#if (defined IOS)
 
 #include <UIKit/UIImage.h>
 
@@ -2018,8 +1658,8 @@ JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureForm
 
         textureInfo.mWidth = CGImageGetWidth(image.CGImage);
         textureInfo.mHeight = CGImageGetHeight(image.CGImage);
-        textureInfo.mTexWidth = getNextPower2(textureInfo.mWidth);
-        textureInfo.mTexHeight = getNextPower2(textureInfo.mHeight);
+        textureInfo.mTexWidth = wge::math::nearest_superior_power_of_2(textureInfo.mWidth);
+        textureInfo.mTexHeight = wge::math::nearest_superior_power_of_2(textureInfo.mHeight);
 
         NSLog(@"Loading Texture : %s : %s : %ux%u", filename, (hasAlpha?"Alpha ":"No Alpha "), textureInfo.mWidth, textureInfo.mHeight);
 
@@ -2112,8 +1752,8 @@ JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureForm
             tex->mFilter = TEX_FILTER_LINEAR;
             tex->mWidth = tmpImage.width();
             tex->mHeight = tmpImage.height();
-            tex->mTexWidth = getNextPower2(tmpImage.width());
-            tex->mTexHeight = getNextPower2(tmpImage.height());;
+            tex->mTexWidth = wge::math::nearest_superior_power_of_2(tmpImage.width());
+            tex->mTexHeight = wge::math::nearest_superior_power_of_2(tmpImage.height());
             tex->mBuffer = new BYTE[tex->mTexWidth*tex->mTexHeight*4];
 
             for(int i=0; i < tex->mHeight; i++)
@@ -2125,6 +1765,44 @@ JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureForm
 
     if(rawdata)
         delete[] rawdata;
+
+    return tex;
+}
+#else
+JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureFormat __attribute__((unused)))
+{
+
+    JFileSystem* fileSystem = JFileSystem::GetInstance();
+    if (!fileSystem->OpenFile(filename)) {
+        printf("Texture %s failed to open\n", filename);
+        return nullptr;
+    }
+
+    auto& filestream = fileSystem->current_file();
+    auto data = wge::video::image_loader::load_image(filestream);
+
+    fileSystem->CloseFile();
+
+  if (data.pixels == nullptr)
+  {
+        printf("Texture %s failed to load\n", filename);
+    return nullptr;
+  }
+
+  if (mImageFilter != nullptr)
+  {
+    mImageFilter->ProcessImage(reinterpret_cast<wge::pixel_t*>(data.pixels.get()), data.width, data.height);
+  }
+
+    auto* tex = new JTexture();
+
+    tex->mFilter = TEX_FILTER_LINEAR;
+    tex->mWidth = data.width;
+    tex->mHeight = data.height;
+    tex->mTexWidth = data.texture_width;
+    tex->mTexHeight = data.texture_height;
+
+    tex->mBuffer = data.pixels.release();
 
     return tex;
 }

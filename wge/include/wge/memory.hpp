@@ -9,6 +9,15 @@ using std::shared_ptr;
 using std::unique_ptr;
 } // namespace wge
 
+
+#include <type_traits>
+
+namespace wge {
+template <class T, class = std::enable_if_t<std::is_pointer<T>::value>>
+using owner_ptr = T;
+}
+
+
 // TODO: scoped_ptr
 namespace wge {
 template <class T> using scoped_ptr = std::unique_ptr<T>;

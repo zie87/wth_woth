@@ -47,7 +47,7 @@ private:
     std::vector<std::string>& scanRealFolder(const std::string& folderName, std::vector<std::string>& results);
 
 public:
-
+    inline izfstream& current_file() noexcept { return mFile; }
 
 	//////////////////////////////////////////////////////////////////////////
 	/// Attach ZIP archive to the file system.

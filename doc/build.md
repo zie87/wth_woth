@@ -10,6 +10,22 @@ docker run --rm -u $UID --init -v $PWD:/opt/workspace -e LANG=$LANG -w /opt/work
 
 ## Linux (Qt4)
 
+### SDL2
+
+```.sh
+# Arch Linux
+sudo pacman -S cmake sdl2 base-devel libpng12
+
+# Ubuntu
+sudo apt install build-essential g++ cmake libz-dev libsdl2-dev
+sudo add-apt-repository ppa:linuxuprising/libpng12
+sudo apt update && sudo apt install libpng12-dev
+
+cmake -S . Bbuild_sdl -DCMAKE_BUILD_TYPE=Debug
+cmake --build build_sdl -- -j $(nproc)
+```
+
+### Qt4 (deprecated)
 ```.sh
 # Arch Linux
 sudo pacman -S cmake gcc boost libpng12

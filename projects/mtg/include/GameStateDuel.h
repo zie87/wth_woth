@@ -8,7 +8,7 @@
 #include "MTGDeck.h"
 #include "GameObserver.h"
 #ifdef AI_CHANGE_TESTING
-#include "Threading.h"
+#include <wge/thread.hpp>
 #endif //AI_CHANGE_TESTING
 
 
@@ -61,8 +61,8 @@ public:
     int totalTestGames;
     int testPlayer2Victories;
     int totalAIDecks;
-    static boost::mutex mMutex;
-    vector<boost::thread> mWorkerThread;
+    static wge::mutex mMutex;
+    vector<wge::thread> mWorkerThread;
     static void ThreadProc(void* inParam);
     void handleResults(GameObserver* aGame){
         mMutex.lock();

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 if [ $1 == "debug" ]; then
  ndk-build -C projects/mtg/Android -B -j $(nproc) NDK_TOOLCHAIN_VERSION=4.9 NDK_DEBUG=1
 else

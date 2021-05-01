@@ -12,7 +12,7 @@ maemo5:QT += dbus
 TARGET = wagic
 TEMPLATE = app
 
-QMAKE_CXXFLAGS += -std=c++03
+QMAKE_CXXFLAGS += -std=c++11
 
 #!macx:CONFIG += precompile_header
 unix|macx:QMAKE_CXXFLAGS += -Wno-unused-parameter
@@ -30,10 +30,10 @@ windows:INCLUDEPATH += ../../JGE/Dependencies/include
 windows:INCLUDEPATH += extra
 unix:!symbian:INCLUDEPATH += /usr/include/GL
 macx:INCLUDEPATH += /opt/include
+INCLUDEPATH += ../../wge/include
 INCLUDEPATH += ../../JGE/include/qt
 INCLUDEPATH += ../../JGE/include
 INCLUDEPATH += ../../JGE/src/zipFS
-INCLUDEPATH += ../../Boost
 INCLUDEPATH += include
 #!symbian:DESTDIR = bin
 
@@ -319,7 +319,6 @@ SOURCES += \
 HEADERS += \
         ../../JGE/include/qt/filedownloader.h\
         ../../JGE/include/qt/corewrapper.h\
-        ../../JGE/include/Threading.h\
         ../../JGE/include/decoder_prx.h\
         ../../JGE/include/DebugRoutines.h\
         ../../JGE/include/Encoding.h\

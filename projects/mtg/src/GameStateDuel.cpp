@@ -281,7 +281,7 @@ void GameStateDuel::setGamePhase(int newGamePhase) {
 }
 
 #ifdef AI_CHANGE_TESTING
-boost::mutex GameStateDuel::mMutex;
+wge::mutex GameStateDuel::mMutex;
 
 void GameStateDuel::ThreadProc(void* inParam)
 {
@@ -487,7 +487,7 @@ void GameStateDuel::Update(float dt)
                         thread_count = QThread::idealThreadCount();
                 #endif
                         for(size_t i = 0; i < (thread_count); i++)
-                            mWorkerThread.push_back(boost::thread(ThreadProc, this));
+                            mWorkerThread.push_back(wge::thread(ThreadProc, this));
                     }
                 }
             }

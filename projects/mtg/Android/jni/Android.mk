@@ -6,9 +6,9 @@ LOCAL_MODULE := main
 
 MY_WAGIC_ROOT := ../../../..
 JGE_PATH := $(MY_WAGIC_ROOT)/JGE
+WGE_PATH := $(MY_WAGIC_ROOT)/wge
 MTG_PATH := $(MY_WAGIC_ROOT)/projects/mtg/
 SDL_PATH := $(JGE_PATH)/Dependencies/SDL
-BOOST_PATH := $(MY_WAGIC_ROOT)/Boost
 JPEG_PATH := $(JGE_PATH)/Dependencies/libjpeg
 PNG_PATH := $(JGE_PATH)/Dependencies/libpng
 DEBUG ?= DEBUG
@@ -16,15 +16,16 @@ DEBUG ?= DEBUG
 LOCAL_CFLAGS += -DLINUX -DANDROID -DSDL_CONFIG -D_$(DEBUG)
 LOCAL_CFLAGS += -D_STLP_USE_SIMPLE_NODE_ALLOC
 LOCAL_CFLAGS += -D__arm__ -D_REENTRANT -D_GLIBCXX__PTHREADS
+LOCAL_CXXFLAGS += -std=c++11
 LOCAL_STATIC_LIBRARIES := libpng libjpeg
 LOCAL_SHARED_LIBRARIES := SDL
 
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/$(SDL_PATH)/include \
 	$(LOCAL_PATH)/$(MTG_PATH)/include \
+	$(LOCAL_PATH)/$(WGE_PATH)/include \
 	$(LOCAL_PATH)/$(JGE_PATH)/include \
 	$(LOCAL_PATH)/$(JGE_PATH)/src/zipFS \
-	$(LOCAL_PATH)/$(BOOST_PATH) \
 	$(LOCAL_PATH)/$(JPEG_PATH) \
 	$(LOCAL_PATH)/$(PNG_PATH) \
 
@@ -174,9 +175,7 @@ LOCAL_SRC_FILES := $(SDL_PATH)/src/main/android/SDL_android_main.cpp \
         $(JGE_PATH)/src/android/JSfx.cpp \
         $(JGE_PATH)/src/pc/JGfx.cpp \
         $(JGE_PATH)/src/JNetwork.cpp \
-        $(JGE_PATH)/src/pc/JSocket.cpp \
-        $(BOOST_PATH)/lib/pthread/thread.cpp \
-        $(BOOST_PATH)/lib/pthread/once.cpp
+        $(JGE_PATH)/src/pc/JSocket.cpp
 
 LOCAL_LDLIBS := -lGLESv1_CM -llog -lz -lOpenSLES
 

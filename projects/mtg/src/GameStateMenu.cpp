@@ -742,9 +742,10 @@ void GameStateMenu::Render()
     }
     else
     {
-        PIXEL_TYPE colors[] = {
-
-        ARGB(255,3,3,0), ARGB(255,8,8,0), ARGB(255,21,21,10), ARGB(255,50,50,30), };
+        PIXEL_TYPE colors[] = { static_cast<PIXEL_TYPE>(ARGB(255,3,3,0)), 
+                                static_cast<PIXEL_TYPE>(ARGB(255,8,8,0)), 
+                                static_cast<PIXEL_TYPE>(ARGB(255,21,21,10)), 
+                                static_cast<PIXEL_TYPE>(ARGB(255,50,50,30)), };
         renderer->FillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, colors);
 
         if (mGuiController)

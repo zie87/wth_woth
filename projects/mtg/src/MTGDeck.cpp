@@ -635,7 +635,7 @@ void MTGAllCards::prefetchCardNameCache()
 
 MTGCard * MTGAllCards::getCardByName(string nameDescriptor)
 {
-    boost::mutex::scoped_lock lock(instance->mMutex);
+    std::lock_guard<wge::mutex> lock(instance->mMutex);
     if (!nameDescriptor.size()) return NULL;
     if (nameDescriptor[0] == '#') return NULL;
 

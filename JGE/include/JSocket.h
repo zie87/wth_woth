@@ -2,7 +2,7 @@
 #define _JSOCKET_H_
 
 #include <queue>
-#include "Threading.h"
+#include <string>
 using namespace std;
 
 class JSocket{
@@ -20,7 +20,7 @@ public:
 
 
   // Server creation
-  JSocket(string ipAddr);
+  JSocket(std::string ipAddr);
   // Client creation
   JSocket();
   ~JSocket();

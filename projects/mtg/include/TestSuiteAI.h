@@ -6,8 +6,9 @@
 #define MAX_TESTSUITE_ACTIONS 100
 #define MAX_TESTUITE_CARDS 100
 
-#include "Threading.h"
 #include "AIPlayerBaka.h"
+
+#include <wge/thread.hpp>
 
 class TestSuiteActions
 {
@@ -54,7 +55,7 @@ protected:
     int currentAction;
     GameObserver* observer;
 
-    static boost::mutex mMutex;
+    static wge::mutex mMutex;
     virtual void handleResults(bool wasAI, int error);
     TestSuite* testsuite;
     bool load();
@@ -82,7 +83,7 @@ private:
     string files[1024];
 
     void cleanup();
-    vector<boost::thread*> mWorkerThread;
+    vector<wge::thread*> mWorkerThread;
     Rules* mRules;
     bool mProcessing;
 
@@ -96,7 +97,7 @@ public:
     void pregameTests();
     int loadNext();
     string getNextFile() {
-        boost::mutex::scoped_lock lock(mMutex);
+        std::lock_guard<wge::mutex> lock(mMutex);
         if (currentfile >= nbfiles) return "";
         currentfile++;
         return files[currentfile - 1];

@@ -7,6 +7,7 @@
 #include <winsock.h>
 #include <fcntl.h>
 #elif LINUX
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -23,7 +24,7 @@
 unsigned char ADRESSE_IP_SERVEUR [4] = {127,0,0,1};
 
 
-JSocket::JSocket(string ipAddr)
+JSocket::JSocket(std::string ipAddr)
 	: state(NOT_AVAILABLE),
 	mfd(-1)
 {

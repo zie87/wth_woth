@@ -178,21 +178,10 @@ target_sources(jge300
     )
 endif()
 
-if(DEFINED UNIX)
+if(DEFINED UNIX OR WIN32)
 target_sources(jge300
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/SDL2main.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JSfx.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JGfx.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JSocket.cpp
-    )
-endif()
-
-
-if(DEFINED WIN32)
-target_sources(jge300
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/SDLmain.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JSfx.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JGfx.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JSocket.cpp

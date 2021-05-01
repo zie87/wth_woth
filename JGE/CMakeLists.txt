@@ -20,12 +20,6 @@ if(DEFINED PSP)
     target_link_libraries(jpeg_old INTERFACE ${JPEG_LIBRARY})
     add_library(WotH::jpeg ALIAS jpeg_old)
 
-    add_library(old_giflib INTERFACE)
-    target_include_directories(old_giflib INTERFACE "${DEPENDENCIES_INCLUDE_DIR}")
-    set(GIFLIB4_LIBRARY "${DEPENDENCIES_LIBRARY_DIR}/libgif.a")
-    target_link_libraries(old_giflib INTERFACE ${GIFLIB4_LIBRARY})
-    add_library(WotH::gif ALIAS old_giflib)
-
     add_library(old_ft INTERFACE)
     target_include_directories(old_ft INTERFACE "${DEPENDENCIES_INCLUDE_DIR}/freetype2")
     set(FREETYPE2_LIBRARY "${DEPENDENCIES_LIBRARY_DIR}/libfreetype.a")
@@ -40,12 +34,6 @@ if(DEFINED UNIX)
     target_include_directories(png_old INTERFACE "/usr/include/libpng12")
     target_link_libraries(png_old INTERFACE png12)
     add_library(WotH::png ALIAS png_old)
-
-    add_library(giflib4 INTERFACE)
-    target_include_directories(giflib4 INTERFACE "/usr/include/giflib4")
-    find_library(GIFLIB4_LIBRARY gif HINTS /usr/lib/giflib4)
-    target_link_libraries(giflib4 INTERFACE ${GIFLIB4_LIBRARY})
-    add_library(WotH::gif ALIAS giflib4)
 
     find_package(JPEG REQUIRED)
     add_library(jpg_alias INTERFACE)
@@ -80,12 +68,6 @@ if(DEFINED WIN32)
     find_library(PNG_LIBRARY NAMES libpng libpngd PATHS "${DEPENDENCIES_LIBRARY_DIR}" "${DEPENDENCIES_SHARED_LIBRARY_DIR}")
     target_link_libraries(png_old INTERFACE ${PNG_LIBRARY})
     add_library(WotH::png ALIAS png_old)
-
-    add_library(old_giflib INTERFACE)
-    target_include_directories(old_giflib INTERFACE "${DEPENDENCIES_INCLUDE_DIR}")
-    find_library(GIFLIB4_LIBRARY NAMES giflib giflib4 HINTS "${DEPENDENCIES_LIBRARY_DIR}" "${DEPENDENCIES_SHARED_LIBRARY_DIR}")
-    target_link_libraries(old_giflib INTERFACE ${GIFLIB4_LIBRARY})
-    add_library(WotH::gif ALIAS old_giflib)
 
     add_library(jpeg_alias INTERFACE)
     target_include_directories(jpeg_alias INTERFACE "${DEPENDENCIES_INCLUDE_DIR}")    
@@ -133,14 +115,12 @@ target_include_directories(hgetools
 )
 
 target_link_libraries(hgetools
-    PUBLIC
-        WotH::gif
     PRIVATE
         woth_options
 )
 
-if(DEFINED UNIX)
-    target_link_libraries(hgetools PUBLIC SDL2::SDL2)
+if(DEFINED UNIX OR DEFINED WIN32)
+    target_link_libraries(hgetools PRIVATE SDL2::SDL2)
 endif()
 
 add_library(WotH::hge ALIAS hgetools)
@@ -242,7 +222,6 @@ target_link_libraries(jge300
         WotH::wge
         WotH::png
         WotH::jpeg
-        WotH::gif
         WotH::freetype
         ZLIB::ZLIB
     PRIVATE

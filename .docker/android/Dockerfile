@@ -35,6 +35,6 @@ RUN sdkmanager --list \
   && /opt/sdk-tools/android-accept-licenses.sh "sdkmanager platforms;android-26" \
   && sdkmanager --list
 
-RUN curl -o ndk.zip https://dl.google.com/android/repository/android-ndk-r14b-linux-x86_64.zip
+RUN curl -o ndk.zip https://dl.google.com/android/repository/android-ndk-r21e-linux-x86_64.zip
 RUN unzip -q ndk.zip
-ENV PATH /android-ndk-r14b:$PATH
+ENV PATH /android-ndk-r21e:$PATH

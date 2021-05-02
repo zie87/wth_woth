@@ -1,5 +1,6 @@
 
 list(APPEND WGE_SOURCES 
+    ${CMAKE_CURRENT_SOURCE_DIR}/log/log_core.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/video/image_loader.cpp
 )
 
@@ -22,7 +23,7 @@ endif()
 add_library(wge STATIC ${WGE_SOURCES})
 target_compile_features(wge PUBLIC cxx_std_14)
 target_include_directories(wge PUBLIC ${WOTH_WGE_ROOT_DIR}/include)
-target_link_libraries(wge PRIVATE woth_options)
+target_link_libraries(wge PUBLIC fmt::fmt PRIVATE woth_options)
 
 if(NOT DEFINED WOTH_PSP_BUILD)
     find_package(Threads REQUIRED)

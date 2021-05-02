@@ -5,7 +5,6 @@
 
 #pragma once
 
-
 // Standard headers
 #include <algorithm>
 #include <cassert>

@@ -47,143 +47,116 @@
 
 #pragma once
 
-
-
-#include "zstream_zlib.h" // Zlib dependencies
+#include "zstream_zlib.h"  // Zlib dependencies
 
 #ifdef PSP
-#define USE_ZBUFFER_POOL
+    #define USE_ZBUFFER_POOL
 #endif
 
 // Zip File System Namespace
 namespace zip_file_system {
 
-
-
-
 // Base buffer class
-class zbuffer : public std::streambuf
-{
+class zbuffer : public std::streambuf {
 public:
-	virtual ~zbuffer() { }
+    virtual ~zbuffer() {}
 
-	virtual zbuffer * open(const char * Filename, std::streamoff Offset, std::streamoff Size) = 0;
-	virtual zbuffer * close() = 0;
+    virtual zbuffer* open(const char* Filename, std::streamoff Offset, std::streamoff Size) = 0;
+    virtual zbuffer* close() = 0;
 
-	bool is_open() const	{ return m_Opened; }
-    bool is_used() const {return m_Used;}
-    void unuse() { m_Used = false;}
+    bool is_open() const { return m_Opened; }
+    bool is_used() const { return m_Used; }
+    void unuse() { m_Used = false; }
     bool use(std::streamoff Offset, std::streamoff Size);
     std::string getFilename() { return m_Filename; }
 
 protected:
-	zbuffer() : m_Size(0), m_Opened(false), m_Used(false) { }
+    zbuffer() : m_Size(0), m_Opened(false), m_Used(false) {}
 
-	static const int BUFFERSIZE = 4092;
+    static const int BUFFERSIZE = 4092;
 
     std::string m_Filename;
 
-
-	std::ifstream	m_ZipFile;
-	std::streamoff	m_Pos;
-	std::streamoff	m_Size;
-	char			m_Buffer[BUFFERSIZE];
-	bool			m_Opened;
+    std::ifstream m_ZipFile;
+    std::streamoff m_Pos;
+    std::streamoff m_Size;
+    char m_Buffer[BUFFERSIZE];
+    bool m_Opened;
     bool m_Used;
 };
 
-
-
 // Buffer class for stored compression method.
-class zbuffer_stored : public zbuffer
-{
+class zbuffer_stored : public zbuffer {
 public:
-	virtual ~zbuffer_stored() { close(); }
+    virtual ~zbuffer_stored() { close(); }
 
-    virtual zbuffer_stored * open(const char * Filename, std::streamoff Offset, std::streamoff Size);
-    virtual zbuffer_stored * close();
+    virtual zbuffer_stored* open(const char* Filename, std::streamoff Offset, std::streamoff Size);
+    virtual zbuffer_stored* close();
 
- 	virtual int overflow(int c = EOF);
-	virtual int underflow();
-	virtual int	sync();
-	virtual std::streambuf * setbuf(char * pr, int nLength);
-	virtual std::streampos seekoff(std::streamoff, std::ios::seekdir, std::ios::openmode);
+    virtual int overflow(int c = EOF);
+    virtual int underflow();
+    virtual int sync();
+    virtual std::streambuf* setbuf(char* pr, int nLength);
+    virtual std::streampos seekoff(std::streamoff, std::ios::seekdir, std::ios::openmode);
 
-	//	Default Implementation is enough
-	//	virtual streampos seekpos(streampos, int);
+    //	Default Implementation is enough
+    //	virtual streampos seekpos(streampos, int);
 };
-
-
-
 
 // Buffer class for deflated compression method.
-class zbuffer_deflated : public zbuffer
-{
+class zbuffer_deflated : public zbuffer {
 public:
+    virtual ~zbuffer_deflated() { close(); }
 
-	virtual ~zbuffer_deflated() {	
-        close();
-	}
+    virtual zbuffer_deflated* open(const char* Filename, std::streamoff Offset, std::streamoff Size);
+    virtual zbuffer_deflated* close();
 
-    virtual zbuffer_deflated * open(const char * Filename, std::streamoff Offset, std::streamoff Size);
-    virtual zbuffer_deflated * close();
+    virtual int overflow(int c = EOF);
+    virtual int underflow();
+    virtual int sync();
+    virtual std::streambuf* setbuf(char* pr, int nLength);
+    virtual std::streampos seekoff(std::streamoff, std::ios::seekdir, std::ios::openmode);
 
- 	virtual int overflow(int c = EOF);
-	virtual int underflow();
-	virtual int sync();
-	virtual std::streambuf * setbuf(char * pr, int nLength);
-	virtual std::streampos seekoff(std::streamoff, std::ios::seekdir, std::ios::openmode);
+    //	Default Implementation is enough
+    //	virtual streampos seekpos(streampos, int);
 
-	//	Default Implementation is enough
-	//	virtual streampos seekpos(streampos, int);
-	
 protected:
-	z_stream		m_ZStream;
-	std::streamoff	m_CompPos;
-	char			m_CompBuffer[BUFFERSIZE];
-	bool			m_StreamEnd;
+    z_stream m_ZStream;
+    std::streamoff m_CompPos;
+    char m_CompBuffer[BUFFERSIZE];
+    bool m_StreamEnd;
 };
 
-
-
-
 // main istream class for reading zipped files
-class izstream : public std::istream
-{
+class izstream : public std::istream {
 public:
-
-	izstream() : std::istream(NULL), m_CompMethod(-1) { setstate(std::ios::badbit); }
-	virtual ~izstream()					{ 
-#ifdef USE_ZBUFFER_POOL 
-        rdbuf(NULL); //This doesn't delete the buffer, deletion is handled by zfsystem;
+    izstream() : std::istream(NULL), m_CompMethod(-1) { setstate(std::ios::badbit); }
+    virtual ~izstream() {
+#ifdef USE_ZBUFFER_POOL
+        rdbuf(NULL);  // This doesn't delete the buffer, deletion is handled by zfsystem;
 #else
-        delete(rdbuf());
+        delete (rdbuf());
 #endif
-    } 
+    }
 
-	void open(const char * Filename, std::streamoff Offset, std::streamoff Size, int CompMethod);
-	void close()						{ SetCompMethod(-1); }
-    
+    void open(const char* Filename, std::streamoff Offset, std::streamoff Size, int CompMethod);
+    void close() { SetCompMethod(-1); }
+
     void _SetCompMethod(int CompMethod) { m_CompMethod = CompMethod; };
 
 protected:
-	static const int STORED = 0;
-	static const int DEFLATED = 8;
+    static const int STORED = 0;
+    static const int DEFLATED = 8;
 
-	zbuffer * GetRightBuffer(int CompMethod) const;
+    zbuffer* GetRightBuffer(int CompMethod) const;
 
-	void SetCompMethod(int CompMethod) {
+    void SetCompMethod(int CompMethod) {
         delete rdbuf(GetRightBuffer(m_CompMethod = CompMethod));
 
-		if (rdbuf() == NULL)
-			setstate(std::ios::badbit);
-	}
+        if (rdbuf() == NULL) setstate(std::ios::badbit);
+    }
 
-	int	m_CompMethod;
+    int m_CompMethod;
 };
 
-
-
-
-} // namespace zip_file_system;
-
+}  // namespace zip_file_system

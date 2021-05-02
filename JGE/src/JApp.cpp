@@ -8,22 +8,15 @@
 //
 //-------------------------------------------------------------------------------------
 
-
-
 #include "../include/JApp.h"
 #include "../include/JGE.h"
 
-
-JApp::JApp()
-{
-	//mEngine = JGE::GetInstance();
-	//mEngine->SetApp(this);
+JApp::JApp() {
+    // mEngine = JGE::GetInstance();
+    // mEngine->SetApp(this);
 }
 
-
-JApp::~JApp()
-{
-}
+JApp::~JApp() {}
 
 //
 // JGE* JApp::GetJGE()

@@ -1,9 +1,12 @@
-name: Windows
+name: windows
 
 on:
   push:
     branches-ignore:
       - 'docker'
+  pull_request:
+    branches:
+      - main
   schedule:
     - cron: '0 4 * * 0' # Weekly on Sundays at 04:00
 
@@ -12,7 +15,7 @@ jobs:
     runs-on: windows-latest
 
     env:
-      VCPKG_DEPS: sdl2 zlib libjpeg-turbo
+      VCPKG_DEPS: sdl2 zlib
 
     strategy:
       matrix:

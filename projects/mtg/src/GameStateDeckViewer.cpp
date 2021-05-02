@@ -690,10 +690,10 @@ void GameStateDeckViewer::renderDeckBackground() {
         maxC2 = maxC1;
     }
     PIXEL_TYPE colors[] = {
-        ARGB(255, Constants::_r[maxC1], Constants::_g[maxC1], Constants::_b[maxC1]),
-        ARGB(255, Constants::_r[maxC1], Constants::_g[maxC1], Constants::_b[maxC1]),
-        ARGB(255, Constants::_r[maxC2], Constants::_g[maxC2], Constants::_b[maxC2]),
-        ARGB(255, Constants::_r[maxC2], Constants::_g[maxC2], Constants::_b[maxC2]),
+        static_cast<PIXEL_TYPE>(ARGB(255, Constants::_r[maxC1], Constants::_g[maxC1], Constants::_b[maxC1])),
+        static_cast<PIXEL_TYPE>(ARGB(255, Constants::_r[maxC1], Constants::_g[maxC1], Constants::_b[maxC1])),
+        static_cast<PIXEL_TYPE>(ARGB(255, Constants::_r[maxC2], Constants::_g[maxC2], Constants::_b[maxC2])),
+        static_cast<PIXEL_TYPE>(ARGB(255, Constants::_r[maxC2], Constants::_g[maxC2], Constants::_b[maxC2])),
     };
 
     JRenderer::GetInstance()->FillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, colors);

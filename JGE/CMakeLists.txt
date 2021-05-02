@@ -2,7 +2,7 @@
 #########################################################################
 # 3rd
 #########################################################################
-
+find_package(ZLIB REQUIRED)
 
 if(DEFINED PSP)
     set(DEPENDENCIES_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/psp")
@@ -26,16 +26,16 @@ if(DEFINED PSP)
     target_link_libraries(old_ft INTERFACE ${FREETYPE2_LIBRARY})
     add_library(WotH::freetype ALIAS old_ft)
 
-    find_package(ZLIB REQUIRED)
 endif()
 
 if(DEFINED UNIX OR DEFINED WIN32)
     find_package(JPEG REQUIRED)
     add_library(jpg_alias INTERFACE)
-    target_link_libraries(jpg_alias INTERFACE JPEG::JPEG)
     add_library(WotH::jpeg ALIAS jpg_alias)
 
-    find_package(ZLIB REQUIRED)
+    add_library(png_old INTERFACE)
+    add_library(WotH::png ALIAS png_old)
+
     find_package(SDL2 REQUIRED)
     find_package(OpenGL COMPONENTS OpenGL REQUIRED)
 
@@ -49,11 +49,6 @@ if(DEFINED UNIX OR DEFINED WIN32)
 endif()
 
 if(DEFINED UNIX)
-    add_library(png_old INTERFACE)
-    target_include_directories(png_old INTERFACE "/usr/include/libpng12")
-    target_link_libraries(png_old INTERFACE png12)
-    add_library(WotH::png ALIAS png_old)
-
     find_package(Freetype REQUIRED)
     add_library(ft_alias INTERFACE)
     target_link_libraries(ft_alias INTERFACE Freetype::Freetype)
@@ -64,12 +59,6 @@ if(DEFINED WIN32)
     set(DEPENDENCIES_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/include/")
     set(DEPENDENCIES_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/lib/")
     set(DEPENDENCIES_SHARED_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/dll/")
-
-    add_library(png_old INTERFACE)
-    target_include_directories(png_old INTERFACE "${DEPENDENCIES_INCLUDE_DIR}")
-    find_library(PNG_LIBRARY NAMES libpng libpngd PATHS "${DEPENDENCIES_LIBRARY_DIR}" "${DEPENDENCIES_SHARED_LIBRARY_DIR}")
-    target_link_libraries(png_old INTERFACE ${PNG_LIBRARY})
-    add_library(WotH::png ALIAS png_old)
 
     add_library(old_ft INTERFACE)
     target_include_directories(old_ft INTERFACE "${DEPENDENCIES_INCLUDE_DIR}/freetype2")
@@ -82,10 +71,6 @@ if(DEFINED WIN32)
     find_library(FMOD_LIBRARY NAMES fmodvc HINTS "${DEPENDENCIES_LIBRARY_DIR}")
     target_link_libraries(fmod INTERFACE ${FMOD_LIBRARY})
     add_library(WotH::fmod ALIAS fmod)
-
-    find_package(ZLIB REQUIRED)
-    find_package(SDL2 REQUIRED)
-    find_package(OpenGL COMPONENTS OpenGL REQUIRED)
 endif()
 
 #########################################################################

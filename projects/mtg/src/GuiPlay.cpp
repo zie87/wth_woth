@@ -12,9 +12,7 @@
 const float GuiPlay::HORZWIDTH = 300.0f;
 const float GuiPlay::VERTHEIGHT = 80.0f;
 
-
-void GuiPlay::CardStack::reset(unsigned total, float x, float y)
-{
+void GuiPlay::CardStack::reset(unsigned total, float x, float y) {
     this->total = total;
     this->x = 0;
     baseX = x;
@@ -22,12 +20,9 @@ void GuiPlay::CardStack::reset(unsigned total, float x, float y)
     baseY = y;
 }
 
-void GuiPlay::CardStack::RenderSpell(MTGCardInstance* card, iterator begin, iterator end, float x, float y)
-{
-    while (begin != end)
-    {
-        if ((*begin)->card->target == card)
-        {
+void GuiPlay::CardStack::RenderSpell(MTGCardInstance* card, iterator begin, iterator end, float x, float y) {
+    while (begin != end) {
+        if ((*begin)->card->target == card) {
             RenderSpell(card, begin + 1, end, x, y - 10);
             (*begin)->x = x;
             (*begin)->y = y;
@@ -38,27 +33,20 @@ void GuiPlay::CardStack::RenderSpell(MTGCardInstance* card, iterator begin, iter
     }
 }
 
-GuiPlay::HorzStack::HorzStack()
-{
-}
-GuiPlay::VertStack::VertStack()
-{
-}
+GuiPlay::HorzStack::HorzStack() {}
+GuiPlay::VertStack::VertStack() {}
 
-void GuiPlay::VertStack::reset(unsigned total, float x, float y)
-{
+void GuiPlay::VertStack::reset(unsigned total, float x, float y) {
     GuiPlay::CardStack::reset(total, x - CARD_WIDTH, y);
     count = 0;
 }
 
-void GuiPlay::HorzStack::Render(CardView* card, iterator begin, iterator end)
-{
+void GuiPlay::HorzStack::Render(CardView* card, iterator begin, iterator end) {
     RenderSpell(card->card, begin, end, card->x, card->y - 10);
     card->Render();
 }
 
-void GuiPlay::HorzStack::Enstack(CardView* card)
-{
+void GuiPlay::HorzStack::Enstack(CardView* card) {
     card->x = x + baseX;
     card->y = y + baseY;
     if (total < 8)
@@ -69,12 +57,10 @@ void GuiPlay::HorzStack::Enstack(CardView* card)
         x += (SCREEN_WIDTH - 50 - baseX) / total;
 }
 
-void GuiPlay::VertStack::Enstack(CardView* card)
-{
+void GuiPlay::VertStack::Enstack(CardView* card) {
     int modulus = total < 10 ? 3 : 5;
     {
-        if (0 == count % modulus)
-        {
+        if (0 == count % modulus) {
             x += CARD_WIDTH;
             y = 0;
         }
@@ -83,125 +69,98 @@ void GuiPlay::VertStack::Enstack(CardView* card)
     card->x = x + baseX;
     card->y = y + baseY;
     y += 12;
-    if (++count == total - 1 && y == 12)
-        y += 12;
+    if (++count == total - 1 && y == 12) y += 12;
 }
 
-void GuiPlay::VertStack::Render(CardView* card, iterator begin, iterator end)
-{
+void GuiPlay::VertStack::Render(CardView* card, iterator begin, iterator end) {
     RenderSpell(card->card, begin, end, card->x + 5, card->y - 10);
     card->Render();
 }
 
-inline float GuiPlay::VertStack::nextX()
-{
+inline float GuiPlay::VertStack::nextX() {
     if (0 == count)
         return x + CARD_WIDTH;
     else
         return x;
 }
 
-GuiPlay::BattleField::BattleField() :
-    attackers(0), blockers(0), height(0.0), red(0), colorFlow(0)
-{
-}
+GuiPlay::BattleField::BattleField() : attackers(0), blockers(0), height(0.0), red(0), colorFlow(0) {}
 const float GuiPlay::BattleField::HEIGHT = 80.0f;
-void GuiPlay::BattleField::addAttacker(MTGCardInstance*)
-{
+void GuiPlay::BattleField::addAttacker(MTGCardInstance*) {
     ++attackers;
     colorFlow = 1;
 }
-void GuiPlay::BattleField::removeAttacker(MTGCardInstance*)
-{
-    --attackers;
-}
-void GuiPlay::BattleField::reset(float x, float y)
-{
+void GuiPlay::BattleField::removeAttacker(MTGCardInstance*) { --attackers; }
+void GuiPlay::BattleField::reset(float x, float y) {
     HorzStack::reset(0, x, y);
     currentAttacker = 1;
 }
-void GuiPlay::BattleField::EnstackAttacker(CardView* card)
-{
-    card->x = CARD_WIDTH + 20 + (currentAttacker * (HORZWIDTH) / (attackers+1));
+void GuiPlay::BattleField::EnstackAttacker(CardView* card) {
+    card->x = CARD_WIDTH + 20 + (currentAttacker * (HORZWIDTH) / (attackers + 1));
     card->y = baseY + (card->card->getObserver()->players[0] == card->card->controller() ? 20 + y : -20 - y);
     ++currentAttacker;
-    //  JRenderer::GetInstance()->RenderQuad(WResourceManager::Instance()->GetQuad("BattleIcon"), card->actX, card->actY, 0, 0.5 + 0.1 * sinf(JGE::GetInstance()->GetTime()), 0.5 + 0.1 * sinf(JGE::GetInstance()->GetTime()));
+    //  JRenderer::GetInstance()->RenderQuad(WResourceManager::Instance()->GetQuad("BattleIcon"), card->actX,
+    //  card->actY, 0, 0.5 + 0.1 * sinf(JGE::GetInstance()->GetTime()), 0.5 + 0.1 *
+    //  sinf(JGE::GetInstance()->GetTime()));
 }
-void GuiPlay::BattleField::EnstackBlocker(CardView* card)
-{
-    MTGCardInstance * c = card->card;
-    if (!c)
-        return;
+void GuiPlay::BattleField::EnstackBlocker(CardView* card) {
+    MTGCardInstance* c = card->card;
+    if (!c) return;
     int offset = 0;
-    if (c->defenser && c->defenser->view)
-    {
+    if (c->defenser && c->defenser->view) {
         offset = c->defenser->getDefenserRank(c);
         card->x = c->defenser->view->x + 5 * offset;
     }
-    card->y = baseY + (card->card->getObserver()->players[0] == card->card->controller() ? 20 + y + 6 * offset : -20 - y + 6 * offset);
+    card->y = baseY + (card->card->getObserver()->players[0] == card->card->controller() ? 20 + y + 6 * offset
+                                                                                         : -20 - y + 6 * offset);
 }
-void GuiPlay::BattleField::Update(float dt)
-{
+void GuiPlay::BattleField::Update(float dt) {
     if (0 == attackers)
         height -= 10 * dt * height;
     else
         height += 10 * dt * (HEIGHT - height);
 
-    if (colorFlow)
-    {
-        red += static_cast<int> (colorFlow * 300 * dt);
-        if (red < 0)
-            red = 0;
-        if (red > 70)
-            red = 70;
+    if (colorFlow) {
+        red += static_cast<int>(colorFlow * 300 * dt);
+        if (red < 0) red = 0;
+        if (red > 70) red = 70;
     }
 }
-void GuiPlay::BattleField::Render()
-{
+void GuiPlay::BattleField::Render() {
     if (height > 3)
         JRenderer::GetInstance()->FillRect(44, SCREEN_HEIGHT / 2 + 10 - height / 2, 318, height, ARGB(127, red, 0, 0));
 }
 
-GuiPlay::GuiPlay(GameObserver* game) :
-    GuiLayer(game)
-{
-    end_spells = cards.end();
-}
+GuiPlay::GuiPlay(GameObserver* game) : GuiLayer(game) { end_spells = cards.end(); }
 
-GuiPlay::~GuiPlay()
-{
-    for (iterator it = cards.begin(); it != cards.end(); ++it)
-    {
+GuiPlay::~GuiPlay() {
+    for (iterator it = cards.begin(); it != cards.end(); ++it) {
         delete (*it);
     }
 }
 
-bool isSpell(CardView* c)
-{
+bool isSpell(CardView* c) {
     return c->card->isSpell() && !c->card->isCreature() && !c->card->hasType(Subtypes::TYPE_PLANESWALKER);
 }
-void GuiPlay::Replace()
-{
-    unsigned opponentSpellsN = 0, selfSpellsN = 0, opponentLandsN = 0, opponentCreaturesN = 0, 
-            battleFieldAttackersN = 0, battleFieldBlockersN = 0, selfCreaturesN = 0, selfLandsN = 0;
+void GuiPlay::Replace() {
+    unsigned opponentSpellsN = 0, selfSpellsN = 0, opponentLandsN = 0, opponentCreaturesN = 0,
+             battleFieldAttackersN = 0, battleFieldBlockersN = 0, selfCreaturesN = 0, selfLandsN = 0;
 
     end_spells = stable_partition(cards.begin(), cards.end(), &isSpell);
 
     for (iterator it = cards.begin(); it != end_spells; ++it)
-        if (!(*it)->card->target)
-        {
-            if((!(*it)->card->hasSubtype(Subtypes::TYPE_AURA)|| ((*it)->card->hasSubtype(Subtypes::TYPE_AURA) && (*it)->card->playerTarget)) && !(*it)->card->hasType(Subtypes::TYPE_PLANESWALKER))
-            {
+        if (!(*it)->card->target) {
+            if ((!(*it)->card->hasSubtype(Subtypes::TYPE_AURA) ||
+                 ((*it)->card->hasSubtype(Subtypes::TYPE_AURA) && (*it)->card->playerTarget)) &&
+                !(*it)->card->hasType(Subtypes::TYPE_PLANESWALKER)) {
                 if (observer->players[0] == (*it)->card->controller())
                     ++selfSpellsN;
                 else
                     ++opponentSpellsN;
             }
         }
-    for (iterator it = end_spells; it != cards.end(); ++it)
-    {
-        if ((*it)->card->isCreature())
-        {
+    for (iterator it = end_spells; it != cards.end(); ++it) {
+        if ((*it)->card->isCreature()) {
             if ((*it)->card->isAttacker())
                 ++battleFieldAttackersN;
             else if ((*it)->card->isDefenser())
@@ -210,9 +169,7 @@ void GuiPlay::Replace()
                 ++selfCreaturesN;
             else
                 ++opponentCreaturesN;
-        }
-        else if ((*it)->card->isLand() || (*it)->card->hasType(Subtypes::TYPE_PLANESWALKER))
-        {
+        } else if ((*it)->card->isLand() || (*it)->card->hasType(Subtypes::TYPE_PLANESWALKER)) {
             if (observer->players[0] == (*it)->card->controller())
                 ++selfLandsN;
             else
@@ -224,10 +181,10 @@ void GuiPlay::Replace()
     selfSpells.reset(selfSpellsN, 18, 215);
 
     for (iterator it = cards.begin(); it != end_spells; ++it)
-        if (!(*it)->card->target)
-        {
-            if((!(*it)->card->hasSubtype(Subtypes::TYPE_AURA)|| ((*it)->card->hasSubtype(Subtypes::TYPE_AURA) && (*it)->card->playerTarget)) && !(*it)->card->hasType(Subtypes::TYPE_PLANESWALKER))
-            {
+        if (!(*it)->card->target) {
+            if ((!(*it)->card->hasSubtype(Subtypes::TYPE_AURA) ||
+                 ((*it)->card->hasSubtype(Subtypes::TYPE_AURA) && (*it)->card->playerTarget)) &&
+                !(*it)->card->hasType(Subtypes::TYPE_PLANESWALKER)) {
                 if (observer->players[0] == (*it)->card->controller())
                     selfSpells.Enstack(*it);
                 else
@@ -235,19 +192,18 @@ void GuiPlay::Replace()
             }
         }
     float x = 24 + opponentSpells.nextX();
-    //seperated the variable X into 2 different variables. There are 2 players here!!
-    //we should not be using a single variable to determine the positioning of cards!!
+    // seperated the variable X into 2 different variables. There are 2 players here!!
+    // we should not be using a single variable to determine the positioning of cards!!
     float myx = 24 + selfSpells.nextX();
-    opponentLands.reset(opponentLandsN,x, 50);
+    opponentLands.reset(opponentLandsN, x, 50);
     opponentCreatures.reset(opponentCreaturesN, x, 95);
-    battleField.reset(x, 145);//what does this variable do? I can comment it out with no repercussions...is this being double handled?
+    battleField.reset(x, 145);  // what does this variable do? I can comment it out with no repercussions...is this
+                                // being double handled?
     selfCreatures.reset(selfCreaturesN, myx, 195);
     selfLands.reset(selfLandsN, myx, 240);
 
-    for (iterator it = end_spells; it != cards.end(); ++it)
-    {
-        if ((*it)->card->isCreature())
-        {
+    for (iterator it = end_spells; it != cards.end(); ++it) {
+        if ((*it)->card->isCreature()) {
             if ((*it)->card->isAttacker())
                 battleField.EnstackAttacker(*it);
             else if ((*it)->card->isDefenser())
@@ -256,21 +212,16 @@ void GuiPlay::Replace()
                 selfCreatures.Enstack(*it);
             else
                 opponentCreatures.Enstack(*it);
-        }
-        else if ((*it)->card->isLand())
-        {
+        } else if ((*it)->card->isLand()) {
             if (observer->players[0] == (*it)->card->controller())
                 selfLands.Enstack(*it);
             else
                 opponentLands.Enstack(*it);
         }
-
     }
-    //rerun the iter reattaching planes walkers to the back of the lands.
-    for (iterator it = end_spells; it != cards.end(); ++it)
-    {
-        if ((*it)->card->hasType(Subtypes::TYPE_PLANESWALKER))
-        {
+    // rerun the iter reattaching planes walkers to the back of the lands.
+    for (iterator it = end_spells; it != cards.end(); ++it) {
+        if ((*it)->card->hasType(Subtypes::TYPE_PLANESWALKER)) {
             if (observer->players[0] == (*it)->card->controller())
                 selfLands.Enstack(*it);
             else
@@ -279,70 +230,52 @@ void GuiPlay::Replace()
     }
 }
 
-void GuiPlay::Render()
-{
+void GuiPlay::Render() {
     battleField.Render();
 
     for (iterator it = cards.begin(); it != cards.end(); ++it)
-        if ((*it)->card->isLand())
-        {
+        if ((*it)->card->isLand()) {
             if (observer->players[0] == (*it)->card->controller())
                 selfLands.Render(*it, cards.begin(), end_spells);
             else
                 opponentLands.Render(*it, cards.begin(), end_spells);
-        }
-        else if ((*it)->card->isCreature())
-        {
+        } else if ((*it)->card->isCreature()) {
             if (observer->players[0] == (*it)->card->controller())
                 selfCreatures.Render(*it, cards.begin(), end_spells);
             else
                 opponentCreatures.Render(*it, cards.begin(), end_spells);
-        }
-        else if(!(*it)->card->hasType(Subtypes::TYPE_PLANESWALKER))
-        {
-            if (!(*it)->card->target)
-            {
+        } else if (!(*it)->card->hasType(Subtypes::TYPE_PLANESWALKER)) {
+            if (!(*it)->card->target) {
                 if (observer->players[0] == (*it)->card->controller())
                     selfSpells.Render(*it, cards.begin(), end_spells);
                 else
                     opponentSpells.Render(*it, cards.begin(), end_spells);
             }
-        }
-        else
-        {
-            if (!(*it)->card->target)
-            {
+        } else {
+            if (!(*it)->card->target) {
                 if (observer->players[0] == (*it)->card->controller())
                     selfPlaneswalker.Render(*it, cards.begin(), end_spells);
                 else
                     opponentPlaneswalker.Render(*it, cards.begin(), end_spells);
             }
         }
-
 }
-void GuiPlay::Update(float dt)
-{
+void GuiPlay::Update(float dt) {
     battleField.Update(dt);
-    for (iterator it = cards.begin(); it != cards.end(); ++it)
-        (*it)->Update(dt);
+    for (iterator it = cards.begin(); it != cards.end(); ++it) (*it)->Update(dt);
 }
 
-int GuiPlay::receiveEventPlus(WEvent * e)
-{
-    if (WEventZoneChange *event = dynamic_cast<WEventZoneChange*>(e))
-    {
-        if ((observer->players[0]->inPlay() == event->to) || (observer->players[1]->inPlay() == event->to))
-        {
-            CardView * card;
-            if (event->card->view)
-            {
-                //fix for http://code.google.com/p/wagic/issues/detail?id=462.
+int GuiPlay::receiveEventPlus(WEvent* e) {
+    if (WEventZoneChange* event = dynamic_cast<WEventZoneChange*>(e)) {
+        if ((observer->players[0]->inPlay() == event->to) || (observer->players[1]->inPlay() == event->to)) {
+            CardView* card;
+            if (event->card->view) {
+                // fix for http://code.google.com/p/wagic/issues/detail?id=462.
                 // We don't want a card in the hand to have an alpha of 0
                 event->card->view->alpha = 255;
 
                 card = NEW CardView(CardView::playZone, event->card, *(event->card->view));
-            }
-            else
+            } else
                 card = NEW CardView(CardView::playZone, event->card, 0, 0);
             cards.push_back(card);
 
@@ -359,62 +292,44 @@ int GuiPlay::receiveEventPlus(WEvent * e)
             observer->getCardSelector()->Add(card);
             return 1;
         }
-    }
-    else if (WEventCreatureAttacker* event = dynamic_cast<WEventCreatureAttacker*>(e))
-    {
+    } else if (WEventCreatureAttacker* event = dynamic_cast<WEventCreatureAttacker*>(e)) {
         if (NULL != event->after)
             battleField.addAttacker(event->card);
         else if (NULL != event->before)
             battleField.removeAttacker(event->card);
         Replace();
-    }
-    else if (dynamic_cast<WEventCreatureBlocker*> (e))
-    {
+    } else if (dynamic_cast<WEventCreatureBlocker*>(e)) {
         Replace();
-    }
-    else if (WEventCardTap* event = dynamic_cast<WEventCardTap*>(e))
-    {
-        if (CardView* cv = dynamic_cast<CardView*>(event->card->view))
-        {
+    } else if (WEventCardTap* event = dynamic_cast<WEventCardTap*>(e)) {
+        if (CardView* cv = dynamic_cast<CardView*>(event->card->view)) {
             if (event->after)
                 gModRules.cards.activateEffect->doEffect(cv);
             else
                 gModRules.cards.activateEffect->undoEffect(cv);
-            //cv->t = event->after ? M_PI / 2 : 0;
-        }
-        else if (event->card->view != NULL)
-        {
+            // cv->t = event->after ? M_PI / 2 : 0;
+        } else if (event->card->view != NULL) {
             if (event->after)
                 gModRules.cards.activateEffect->doEffect(event->card->view);
             else
                 gModRules.cards.activateEffect->undoEffect(event->card->view);
-            //event->card->view->actT = event->after ? M_PI / 2 : 0;
-        }
-        else
-        {
-			// this should never happen, if you have a consistent repro case, ping Wil please
+            // event->card->view->actT = event->after ? M_PI / 2 : 0;
+        } else {
+            // this should never happen, if you have a consistent repro case, ping Wil please
             assert(false);
         }
         return 1;
-    }
-    else if (WEventPhaseChange *event = dynamic_cast<WEventPhaseChange*>(e))
-    {
-        if (MTG_PHASE_COMBATEND == event->to->id)
-            battleField.colorFlow = -1;
-    }
-    else if (dynamic_cast<WEventCardChangeType*> (e))
+    } else if (WEventPhaseChange* event = dynamic_cast<WEventPhaseChange*>(e)) {
+        if (MTG_PHASE_COMBATEND == event->to->id) battleField.colorFlow = -1;
+    } else if (dynamic_cast<WEventCardChangeType*>(e))
         Replace();
     return 0;
 }
 
-int GuiPlay::receiveEventMinus(WEvent * e)
-{
-    if (WEventZoneChange *event = dynamic_cast<WEventZoneChange*>(e))
-    {
+int GuiPlay::receiveEventMinus(WEvent* e) {
+    if (WEventZoneChange* event = dynamic_cast<WEventZoneChange*>(e)) {
         if ((observer->players[0]->inPlay() == event->from) || (observer->players[1]->inPlay() == event->from))
             for (iterator it = cards.begin(); it != cards.end(); ++it)
-                if (event->card->previous == (*it)->card || event->card == (*it)->card)
-                {
+                if (event->card->previous == (*it)->card || event->card == (*it)->card) {
                     if (event->card->previous && event->card->previous->attacker)
                         battleField.removeAttacker(event->card->previous);
                     else if (event->card->attacker)

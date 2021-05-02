@@ -16,27 +16,23 @@ class DuelLayers;
 // hard to understand syntax errors. Not using it, so it's
 // safe to undefine it.
 #ifdef True
-#undef True
+    #undef True
 #endif
 
-template<typename T>
-struct LimitorFunctor
-{
+template <typename T>
+struct LimitorFunctor {
     virtual bool select(T*) = 0;
     virtual bool greyout(T*) = 0;
     typedef T Target;
 };
 
-class CardSelectorBase: public GuiLayer
-{
+class CardSelectorBase : public GuiLayer {
 public:
+    CardSelectorBase(GameObserver* observer, int inDrawMode = DrawMode::kNormal)
+        : GuiLayer(observer),
+          mDrawMode(inDrawMode)
 
-    CardSelectorBase(GameObserver *observer, int inDrawMode = DrawMode::kNormal) :
-        GuiLayer(observer), mDrawMode(inDrawMode)
-
-    {
-    }
-    ;
+              {};
     virtual void Add(PlayGuiObject*) = 0;
     virtual void Remove(PlayGuiObject*) = 0;
     virtual bool CheckUserInput(JButton key) = 0;
@@ -45,20 +41,15 @@ public:
     virtual void Limit(LimitorFunctor<PlayGuiObject>* inLimitor, CardView::SelectorZone inZone) = 0;
     virtual void Push() = 0;
     virtual void Pop() = 0;
-    virtual int GetDrawMode()
-    {
-        return mDrawMode;
-    }
+    virtual int GetDrawMode() { return mDrawMode; }
 
 protected:
     int mDrawMode;
 };
 
-class CardSelector: public CardSelectorBase
-{
+class CardSelector : public CardSelectorBase {
 public:
-    struct SelectorMemory
-    {
+    struct SelectorMemory {
         PlayGuiObject* object;
         float x, y;
         SelectorMemory(PlayGuiObject* object);
@@ -78,7 +69,7 @@ protected:
     PlayGuiObject* fetchMemory(SelectorMemory&);
 
 public:
-    CardSelector(GameObserver *observer, DuelLayers*);
+    CardSelector(GameObserver* observer, DuelLayers*);
     void Add(PlayGuiObject*);
     void Remove(PlayGuiObject*);
     bool CheckUserInput(JButton key);
@@ -96,8 +87,7 @@ public:
 
 typedef LimitorFunctor<CardSelector::Target> Limitor;
 
-struct Exp
-{
+struct Exp {
     static inline bool test(CardSelector::Target*, CardSelector::Target*);
 };
 

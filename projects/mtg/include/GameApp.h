@@ -22,8 +22,8 @@
 
 #include "CardEffect.h"
 #ifdef NETWORK_SUPPORT
-#include "JNetwork.h"
-#endif //NETWORK_SUPPORT
+    #include "JNetwork.h"
+#endif  // NETWORK_SUPPORT
 #include "GameObserver.h"
 
 #include "Wagic_Version.h"
@@ -31,9 +31,7 @@ class Rules;
 class MTGAllCards;
 class TransitionBase;
 
-class GameApp: public JApp
-{
-
+class GameApp : public JApp {
 private:
 #ifdef DEBUG
     int nbUpdates;
@@ -45,14 +43,14 @@ private:
     GameState* mCurrentState;
     GameState* mNextState;
     GameState* mGameStates[GAME_STATE_MAX];
-public:
 
+public:
     GameType gameType;
-    Rules * rules;
-    CardEffect *effect;
+    Rules* rules;
+    CardEffect* effect;
 #ifdef NETWORK_SUPPORT
     JNetwork* mpNetwork;
-#endif //NETWORK_SUPPORT
+#endif  // NETWORK_SUPPORT
 
     GameApp();
     virtual ~GameApp();
@@ -68,10 +66,10 @@ public:
 
     void LoadGameStates();
     void SetNextState(int state);
-    void SetCurrentState(GameState * state);
+    void SetCurrentState(GameState* state);
     void DoTransition(int trans, int tostate, float dur = -1, bool animonly = false);
     void DoAnimation(int trans, float dur = -1);
-    static hgeParticleSystem * Particles[6];
+    static hgeParticleSystem* Particles[6];
     static bool HasMusic;
     static string systemError;
     static JMusic* music;
@@ -81,7 +79,6 @@ public:
     static void pauseMusic();
     static void resumeMusic();
     static PlayerType players[2];
-
 };
 
 extern vector<JQuadPtr> manaIcons;

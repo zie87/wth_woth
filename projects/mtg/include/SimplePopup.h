@@ -14,19 +14,17 @@
 #include <WFont.h>
 #include <DeckMetaData.h>
 
-class SimplePopup: public JGuiController
-{
-
+class SimplePopup : public JGuiController {
 private:
     float mWidth, mX, mY;
     int mMaxLines;
     int mFontId;
-    DeckMetaData * mDeckInformation;
+    DeckMetaData* mDeckInformation;
     string mTitle;
-    WFont *mTextFont;
-    StatsWrapper *mStatsWrapper;
+    WFont* mTextFont;
+    StatsWrapper* mStatsWrapper;
     bool mClosed;
-    MTGAllCards * mCollection;
+    MTGAllCards* mCollection;
 
     void drawHorzPole(string imageName, bool flipX, bool flipY, float x, float y, float width);
     void drawCorner(string imageName, bool flipX, bool flipY, float x, float y);
@@ -35,17 +33,12 @@ private:
 public:
     bool autoTranslate;
 
-    SimplePopup(int id, JGuiListener* listener, const int fontId, const char * _title = "", DeckMetaData* deckInfo = NULL, MTGAllCards * collection = NULL, float x = 364, float y = 235);
+    SimplePopup(int id, JGuiListener* listener, const int fontId, const char* _title = "",
+                DeckMetaData* deckInfo = NULL, MTGAllCards* collection = NULL, float x = 364, float y = 235);
     ~SimplePopup(void);
     void drawBoundingBox(float x, float y, float width, float height);
-    bool isClosed()
-    {
-        return mClosed;
-    }
-    MTGAllCards* getCollection()
-    {
-        return mCollection;
-    }
+    bool isClosed() { return mClosed; }
+    MTGAllCards* getCollection() { return mCollection; }
     void Render();
     void Update(DeckMetaData* deckMetaData);
 

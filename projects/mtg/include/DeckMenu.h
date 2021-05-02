@@ -11,13 +11,11 @@
 #include "TextScroller.h"
 #include "InteractiveButton.h"
 
-class DeckMenu: public JGuiController
-{
+class DeckMenu : public JGuiController {
 private:
-    InteractiveButton *dismissButton;
-    
-protected:
+    InteractiveButton* dismissButton;
 
+protected:
     float mHeight, mWidth, mX, mY;
     float titleX, titleY, titleWidth;
     float descX, descY, descHeight, descWidth;
@@ -32,7 +30,7 @@ protected:
     int fontId;
     string title;
     string displayTitle;
-    WFont * mFont;
+    WFont* mFont;
     float titleFontScale;
 
     int maxItems, startId;
@@ -45,45 +43,44 @@ protected:
     void initMenuItems();
     string getDescription();
     string getMetaInformation();
-    DeckMetaData *mSelectedDeck;
+    DeckMetaData* mSelectedDeck;
     bool mShowDetailsScreen;
     bool mAlwaysShowDetailsButton;
     bool mClosed;
 
 public:
-    VerticalTextScroller * mScroller;
+    VerticalTextScroller* mScroller;
     bool mAutoTranslate;
     float mSelectionTargetY;
-    
-    int getSelectedDeckId() const 
-    {
-        return mSelectedDeck->getDeckId();
-    }
-    
+
+    int getSelectedDeckId() const { return mSelectedDeck->getDeckId(); }
+
     void selectDeck(int deckId, bool isAi);
     void selectRandomDeck(bool isAi);
-    
-    //used for detailed info button
-    JQuadPtr pspIcons[8];
-    JTexture * pspIconsTexture;
 
-    DeckMenu(int id, JGuiListener* listener, int fontId, const string _title = "", const int& startIndex = 0, bool alwaysShowDetailsButton = false);
+    // used for detailed info button
+    JQuadPtr pspIcons[8];
+    JTexture* pspIconsTexture;
+
+    DeckMenu(int id, JGuiListener* listener, int fontId, const string _title = "", const int& startIndex = 0,
+             bool alwaysShowDetailsButton = false);
     ~DeckMenu();
 
-    DeckMetaData * getSelectedDeck();
+    DeckMetaData* getSelectedDeck();
     void enableDisplayDetailsOverride();
     bool showDetailsScreen();
-    
+
     virtual bool isClosed() const { return mClosed; }
 
     virtual void Render();
     virtual void Update(float dt);
-    virtual void Add(int id, const char * Text, string desc = "", bool forceFocus = false, DeckMetaData *deckMetaData = NULL);
+    virtual void Add(int id, const char* Text, string desc = "", bool forceFocus = false,
+                     DeckMetaData* deckMetaData = NULL);
     virtual void Close();
     void updateScroller();
     void RenderBackground();
     void RenderDeckManaColors();
-    
+
     static void destroy();
 };
 

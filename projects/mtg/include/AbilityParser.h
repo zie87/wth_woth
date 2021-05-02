@@ -3,9 +3,9 @@
 
 #include <string>
 #include <vector>
+using std::map;
 using std::string;
 using std::vector;
-using std::map;
 
 class AutoLineMacro {
 private:
@@ -15,8 +15,9 @@ private:
     void parse(const string& s);
     string process(const string& s);
 
-    static vector<AutoLineMacro *> gAutoLineMacros;
+    static vector<AutoLineMacro*> gAutoLineMacros;
     static map<string, bool> gAutoLineMacrosIndex;
+
 public:
     AutoLineMacro(const string& s);
     static void Destroy();

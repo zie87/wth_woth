@@ -7,9 +7,7 @@
 namespace wge {
 
 mutex::mutex() noexcept : m_id(sceKernelCreateSema("Unnamed", 0, 1, 1, 0)) {}
-mutex::~mutex() noexcept {
-    sceKernelDeleteSema(m_id);
-}
+mutex::~mutex() noexcept { sceKernelDeleteSema(m_id); }
 
 void mutex::lock() {
     const auto result = sceKernelWaitSema(m_id, 1, 0);
@@ -24,9 +22,7 @@ void mutex::unlock() {
 }
 
 recursive_mutex::recursive_mutex() noexcept : m_id(sceKernelCreateSema("Unnamed", 0, 1, 1, 0)) {}
-recursive_mutex::~recursive_mutex() noexcept {
-    sceKernelDeleteSema(m_id);
-}
+recursive_mutex::~recursive_mutex() noexcept { sceKernelDeleteSema(m_id); }
 
 void recursive_mutex::lock() {
     const auto thread_id = sceKernelGetThreadId();
@@ -52,4 +48,4 @@ void recursive_mutex::unlock() {
         assert(result >= 0);
     }
 }
-} // namespace wge
+}  // namespace wge

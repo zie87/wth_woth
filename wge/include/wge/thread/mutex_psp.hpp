@@ -17,9 +17,7 @@ public:
     void unlock();
 
     // TODO: try_lock is missing
-    inline native_handle_type native_handle() noexcept {
-        return m_id;
-    }
+    inline native_handle_type native_handle() noexcept { return m_id; }
 
 private:
     native_handle_type m_id = -1;
@@ -41,9 +39,7 @@ public:
     void unlock();
 
     // TODO: try_lock is missing
-    inline native_handle_type native_handle() noexcept {
-        return m_id;
-    }
+    inline native_handle_type native_handle() noexcept { return m_id; }
 
 private:
     thread_type m_thread_id = -1;
@@ -51,7 +47,7 @@ private:
     int m_recursion_count = 0;
 };
 
-} // namespace wge
+}  // namespace wge
 
 #include <mutex>
 
@@ -59,4 +55,4 @@ namespace wge {
 using std::lock_guard;
 }
 
-#endif // WOTH_WGE_THREAD_MUTEXPSP_HPP
+#endif  // WOTH_WGE_THREAD_MUTEXPSP_HPP

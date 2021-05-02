@@ -6,37 +6,28 @@
 #include "GameApp.h"
 #include <dirent.h>
 
-GameStateStory::GameStateStory(GameApp* parent) :
-    GameState(parent, "story")
-{
+GameStateStory::GameStateStory(GameApp* parent) : GameState(parent, "story") {
     flow = NULL;
     menu = NULL;
 }
 
-GameStateStory::~GameStateStory()
-{
-    End();
-}
+GameStateStory::~GameStateStory() { End(); }
 
-void GameStateStory::loadStoriesMenu(const char * root)
-{
+void GameStateStory::loadStoriesMenu(const char* root) {
     SAFE_DELETE(menu);
     stories.clear();
-    vector<string>subFolders = JFileSystem::GetInstance()->scanfolder(root);
+    vector<string> subFolders = JFileSystem::GetInstance()->scanfolder(root);
 
-    for (size_t i = 0; i < subFolders.size(); ++i)
-    {
+    for (size_t i = 0; i < subFolders.size(); ++i) {
         string subfolder = ensureFolder(subFolders[i]);
         string filename = root + subfolder + "story.xml";
-        if (FileExists(filename))
-        {
-            subfolder.resize(subfolder.length() - 1); //remove trailing slash
+        if (FileExists(filename)) {
+            subfolder.resize(subfolder.length() - 1);  // remove trailing slash
             stories.push_back(subfolder);
         }
     }
 
-    switch (stories.size())
-    {
+    switch (stories.size()) {
     case 0:
         mParent->DoTransition(TRANSITION_FADE, GAME_STATE_MENU);
         break;
@@ -45,42 +36,33 @@ void GameStateStory::loadStoriesMenu(const char * root)
         break;
     default:
         menu = NEW SimpleMenu(JGE::GetInstance(), 103, this, Fonts::MENU_FONT, 150, 60);
-        for (size_t i = 0; i < stories.size(); ++i)
-        {
+        for (size_t i = 0; i < stories.size(); ++i) {
             menu->Add(i, stories[i].c_str());
         }
         menu->Add(kCancelMenuID, "Cancel");
     }
 }
 
-void GameStateStory::Start()
-{
+void GameStateStory::Start() {
     flow = NULL;
     menu = NULL;
     loadStoriesMenu("campaigns/");
 }
 
-void GameStateStory::Update(float dt)
-{
-    if (!menu && mEngine->GetButtonClick(JGE_BTN_MENU))
-    {
+void GameStateStory::Update(float dt) {
+    if (!menu && mEngine->GetButtonClick(JGE_BTN_MENU)) {
         menu = NEW SimpleMenu(JGE::GetInstance(), 100, this, Fonts::MENU_FONT, SCREEN_WIDTH / 2 - 100, 25);
         menu->Add(0, "Back to main menu");
         menu->Add(kCancelMenuID, "Cancel");
     }
-    if (menu)
-    {
+    if (menu) {
         menu->Update(dt);
-        if (menu->isClosed())
-            SAFE_DELETE(menu);
-        //return;
+        if (menu->isClosed()) SAFE_DELETE(menu);
+        // return;
     }
-    if (flow)
-    {
-        if (flow->currentPageId == "End")
-        {
-            if (mEngine->GetButtonClick(JGE_BTN_OK) || mEngine->GetButtonClick(JGE_BTN_SEC))
-            {
+    if (flow) {
+        if (flow->currentPageId == "End") {
+            if (mEngine->GetButtonClick(JGE_BTN_OK) || mEngine->GetButtonClick(JGE_BTN_SEC)) {
                 mParent->DoTransition(TRANSITION_FADE, GAME_STATE_MENU);
             }
         }
@@ -88,44 +70,31 @@ void GameStateStory::Update(float dt)
     }
 }
 
-void GameStateStory::Render()
-{
-    if (flow)
-        flow->Render();
-    if (menu)
-        menu->Render();
+void GameStateStory::Render() {
+    if (flow) flow->Render();
+    if (menu) menu->Render();
 }
 
-void GameStateStory::End()
-{
+void GameStateStory::End() {
     SAFE_DELETE(flow);
     SAFE_DELETE(menu);
 }
 
-void GameStateStory::ButtonPressed(int controllerId, int controlId)
-{
+void GameStateStory::ButtonPressed(int controllerId, int controlId) {
     menu->Close();
 
-    switch (controllerId)
-    {
+    switch (controllerId) {
     case 100:
-        if (controlId == -1)
-        {
-        }
-        else
-        {
+        if (controlId == -1) {
+        } else {
             mParent->DoTransition(TRANSITION_FADE, GAME_STATE_MENU);
         }
         break;
     default:
-        if (controlId == -1)
-        {
+        if (controlId == -1) {
             mParent->DoTransition(TRANSITION_FADE, GAME_STATE_MENU);
-        }
-        else
-        {
+        } else {
             flow = NEW StoryFlow(stories[controlId]);
         }
     }
-
 }

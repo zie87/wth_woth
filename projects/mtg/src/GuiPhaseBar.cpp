@@ -24,152 +24,123 @@
  };
  */
 
-namespace
-{
-    const float kWidth = 28;
-    const float kHeight = kWidth;
-    const unsigned kPhases = 12;
+namespace {
+const float kWidth = 28;
+const float kHeight = kWidth;
+const unsigned kPhases = 12;
 
-    const float ICONSCALE = 1.5;
-    const float CENTER = SCREEN_HEIGHT_F / 2 + 10;
+const float ICONSCALE = 1.5;
+const float CENTER = SCREEN_HEIGHT_F / 2 + 10;
 
-    void DrawGlyph(JQuad* inQuad, int inGlyph, float inY, float inAngle, unsigned int inP, float inScale)
-    {
-        float xPos = static_cast<float> ((inP + inGlyph * (int) (kWidth + 1)) % (kPhases * (int) (kWidth + 1)));
-        inQuad->SetTextureRect(xPos, 0, kWidth, kHeight);
-        JRenderer::GetInstance()->RenderQuad(inQuad, 0, inY, 0.0, inScale, inScale);
-    }
+void DrawGlyph(JQuad* inQuad, int inGlyph, float inY, float inAngle, unsigned int inP, float inScale) {
+    float xPos = static_cast<float>((inP + inGlyph * (int)(kWidth + 1)) % (kPhases * (int)(kWidth + 1)));
+    inQuad->SetTextureRect(xPos, 0, kWidth, kHeight);
+    JRenderer::GetInstance()->RenderQuad(inQuad, 0, inY, 0.0, inScale, inScale);
 }
+}  // namespace
 
-GuiPhaseBar::GuiPhaseBar(GameObserver* observer) :
-    GuiLayer(observer), PlayGuiObject(0, 0, 106, 0, false),
-  phase(NULL), angle(0.0f), zoomFactor(ICONSCALE)
-{
+GuiPhaseBar::GuiPhaseBar(GameObserver* observer)
+    : GuiLayer(observer), PlayGuiObject(0, 0, 106, 0, false), phase(NULL), angle(0.0f), zoomFactor(ICONSCALE) {
     JQuadPtr quad = WResourceManager::Instance()->GetQuad("phasebar");
-    if (quad.get() != NULL)
-    {
+    if (quad.get() != NULL) {
         quad->mHeight = kHeight;
         quad->mWidth = kWidth;
-    }
-    else
+    } else
         GameApp::systemError = "Error loading phasebar texture : " __FILE__;
 
     zoom = ICONSCALE;
     observer->getCardSelector()->Add(this);
-
 }
 
-GuiPhaseBar::~GuiPhaseBar()
-{
-}
+GuiPhaseBar::~GuiPhaseBar() {}
 
-void GuiPhaseBar::Update(float dt)
-{
+void GuiPhaseBar::Update(float dt) {
     if (angle > 3 * dt)
         angle -= 3 * dt;
     else
         angle = 0;
 
     if (dt > 0.05f) dt = 0.05f;
-    if(zoomFactor + 0.05f < zoom)
-    {
-      zoomFactor += dt;
-    }
-    else if (zoomFactor - 0.05f > zoom)
-    {
-      zoomFactor -= dt;
+    if (zoomFactor + 0.05f < zoom) {
+        zoomFactor += dt;
+    } else if (zoomFactor - 0.05f > zoom) {
+        zoomFactor -= dt;
     }
 }
 
-void GuiPhaseBar::Entering()
-{
+void GuiPhaseBar::Entering() {
     mHasFocus = true;
-    zoom = 1.4f*ICONSCALE;
+    zoom = 1.4f * ICONSCALE;
 }
 
-bool GuiPhaseBar::Leaving(JButton key)
-{
+bool GuiPhaseBar::Leaving(JButton key) {
     mHasFocus = false;
     zoom = ICONSCALE;
     return true;
 }
 
-void GuiPhaseBar::Render()
-{
+void GuiPhaseBar::Render() {
     JQuadPtr quad = WResourceManager::Instance()->GetQuad("phasebar");
-    //uncomment to draw a hideous line across hires screens.
-   // JRenderer::GetInstance()->DrawLine(0, CENTER, SCREEN_WIDTH, CENTER, ARGB(255, 255, 255, 255));
+    // uncomment to draw a hideous line across hires screens.
+    // JRenderer::GetInstance()->DrawLine(0, CENTER, SCREEN_WIDTH, CENTER, ARGB(255, 255, 255, 255));
 
-    unsigned int p = (phase->id + kPhases - 4) * (int) (kWidth + 1);
+    unsigned int p = (phase->id + kPhases - 4) * (int)(kWidth + 1);
     float centerYPosition = CENTER + (kWidth / 2) * angle * zoomFactor / (M_PI / 6) - zoomFactor * kWidth / 4;
     float yPos = centerYPosition;
     float scale = 0;
-    for (int glyph = 3; glyph < 6; ++glyph)
-    {
+    for (int glyph = 3; glyph < 6; ++glyph) {
         scale = zoomFactor * sinf(angle + glyph * M_PI / 6) / 2;
         DrawGlyph(quad.get(), glyph, yPos, angle, p, scale);
         yPos += kWidth * scale;
     }
 
     yPos = centerYPosition;
-    for (int glyph = 2; glyph > 0; --glyph)
-    {
+    for (int glyph = 2; glyph > 0; --glyph) {
         scale = zoomFactor * sinf(angle + glyph * M_PI / 6) / 2;
         yPos -= kWidth * scale;
         DrawGlyph(quad.get(), glyph, yPos, angle, p, scale);
     }
 
-    if (angle > 0)
-    {
+    if (angle > 0) {
         scale = zoomFactor * sinf(angle) / 2;
         yPos -= kWidth * scale;
-        float xPos = static_cast<float> (p % (kPhases * (int) (kWidth + 1)));
+        float xPos = static_cast<float>(p % (kPhases * (int)(kWidth + 1)));
         quad->SetTextureRect(xPos, kHeight, kWidth, kHeight);
         JRenderer::GetInstance()->RenderQuad(quad.get(), 0, yPos, 0.0, scale, scale);
     }
 
-    //print phase name
-    WFont * font = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
+    // print phase name
+    WFont* font = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
     string currentP = _("your turn");
     string interrupt = "";
-    if (observer->currentPlayer == observer->players[1])
-    {
+    if (observer->currentPlayer == observer->players[1]) {
         currentP = _("opponent's turn");
     }
     font->SetColor(ARGB(255, 255, 255, 255));
-    if (observer->currentlyActing() && observer->currentlyActing()->isAI())
-    {
+    if (observer->currentlyActing() && observer->currentlyActing()->isAI()) {
         font->SetColor(ARGB(255, 128, 128, 128));
     }
-    if (observer->currentlyActing() != observer->currentPlayer)
-    {
-        if (observer->currentPlayer == observer->players[0])
-        {
+    if (observer->currentlyActing() != observer->currentPlayer) {
+        if (observer->currentPlayer == observer->players[0]) {
             interrupt = _(" - ") + _("opponent plays");
-        }
-        else
-        {
+        } else {
             interrupt = _(" - ") + _("you play");
         }
     }
 
     char buf[64];
-    sprintf(buf, _("(%s%s) %s").c_str(), currentP.c_str(), interrupt.c_str(), observer->phaseRing->phaseName(phase->id));
+    sprintf(buf, _("(%s%s) %s").c_str(), currentP.c_str(), interrupt.c_str(),
+            observer->phaseRing->phaseName(phase->id));
     font->DrawString(buf, SCREEN_WIDTH - 5, 2, JGETEXT_RIGHT);
 }
 
-int GuiPhaseBar::receiveEventMinus(WEvent *e)
-{
-    WEventPhaseChange *event = dynamic_cast<WEventPhaseChange*> (e);
-    if (event)
-    {
+int GuiPhaseBar::receiveEventMinus(WEvent* e) {
+    WEventPhaseChange* event = dynamic_cast<WEventPhaseChange*>(e);
+    if (event) {
         angle = M_PI / 6;
         phase = event->to;
     }
     return 1;
 }
 
-ostream& GuiPhaseBar::toString(ostream& out) const
-{
-    return out << "GuiPhaseBar";
-}
+ostream& GuiPhaseBar::toString(ostream& out) const { return out << "GuiPhaseBar"; }

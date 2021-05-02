@@ -14,7 +14,7 @@ inline wge::u64 get_ticks() noexcept {
 }
 
 static const auto startup_ticks = get_ticks();
-} // namespace
+}  // namespace
 
 wge::u64 time_in_ms() noexcept {
     static const auto tick_resolution = sceRtcGetTickResolution();
@@ -22,4 +22,4 @@ wge::u64 time_in_ms() noexcept {
     return (num_ticks * 1000) / tick_resolution;
 }
 
-} // namespace wge
+}  // namespace wge

@@ -1,7 +1,6 @@
 #ifndef _MTGCARD_H_
 #define _MTGCARD_H_
 
-
 #define MTG_IMAGE_WIDTH 200
 #define MTG_IMAGE_HEIGHT 285
 
@@ -31,17 +30,17 @@ protected:
 
 public:
     int setId;
-    CardPrimitive * data;
+    CardPrimitive* data;
 
     MTGCard();
     MTGCard(int set_id);
-    MTGCard(MTGCard * source);
+    MTGCard(MTGCard* source);
     virtual ~MTGCard();
 
     void setMTGId(int id);
     void setRarity(char _rarity);
-    //void setImageName( char * value);
-    void setPrimitive(CardPrimitive * cp);
+    // void setImageName( char * value);
+    void setPrimitive(CardPrimitive* cp);
 
     int getMTGId() const;
     int getId() const;

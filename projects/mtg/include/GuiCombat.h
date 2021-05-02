@@ -7,21 +7,14 @@
 #include "MTGCardInstance.h"
 #include "DamagerDamaged.h"
 
-class GuiCombat: public GuiLayer
-{
+class GuiCombat : public GuiLayer {
 protected:
     DamagerDamaged* active;
     AttackerDamaged* activeAtk;
     static JTexture* ok_tex;
     Pos ok, enemy_avatar;
     DamagerDamaged* current;
-    enum
-    {
-        BLK,
-        ATK,
-        OK,
-        NONE
-    } cursor_pos;
+    enum { BLK, ATK, OK, NONE } cursor_pos;
 
     CombatStep step;
     void validateDamage();
@@ -29,12 +22,11 @@ protected:
     void removeOne(DefenserDamaged* blocker, CombatStep);
     void remaskBlkViews(AttackerDamaged* before, AttackerDamaged* after);
     void shiftLeft();
-    void shiftRight( DamagerDamaged* oldActive );
-    bool didClickOnButton( Pos buttonPosition, int& x, int& y);
+    void shiftRight(DamagerDamaged* oldActive);
+    bool didClickOnButton(Pos buttonPosition, int& x, int& y);
     int resolve();
 
 public:
-
     vector<AttackerDamaged*> attackers;
     void autoaffectDamage(AttackerDamaged* attacker, CombatStep);
 
@@ -49,4 +41,4 @@ public:
     typedef vector<AttackerDamaged*>::iterator inner_iterator;
 };
 
-#endif // _GUICOMBAT_H_
+#endif  // _GUICOMBAT_H_

@@ -1,39 +1,39 @@
 #if 0
 // need a complete rewrite to comply to the new interface
-#ifdef NETWORK_SUPPORT
+    #ifdef NETWORK_SUPPORT
 
-#include <pspkernel.h>
-#include <pspdebug.h>
-#include <pspdisplay.h>
-#include <pspsdk.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <pspnet.h>
-#include <pspnet_inet.h>
-#include <pspnet_apctl.h>
-#include <pspnet_resolver.h>
-#include <psputility_netmodules.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/select.h>
-#include <errno.h>
-#endif
+        #include <pspkernel.h>
+        #include <pspdebug.h>
+        #include <pspdisplay.h>
+        #include <pspsdk.h>
+        #include <stdlib.h>
+        #include <string.h>
+        #include <unistd.h>
+        #include <pspnet.h>
+        #include <pspnet_inet.h>
+        #include <pspnet_apctl.h>
+        #include <pspnet_resolver.h>
+        #include <psputility_netmodules.h>
+        #include <netinet/in.h>
+        #include <arpa/inet.h>
+        #include <sys/select.h>
+        #include <errno.h>
+    #endif
 
-#include "../include/JGE.h"
+    #include "../include/JGE.h"
 
-#include "../include/JSocket.h"
+    #include "../include/JSocket.h"
 JSocket * JSocket::mInstance = NULL;
 
-#define SERVER_PORT 20666
+    #define SERVER_PORT 20666
 
 int JSocket::connected = 0;
 
 void JSocket::init(){
-#ifdef NETWORK_SUPPORT
+    #ifdef NETWORK_SUPPORT
 	sceUtilityLoadNetModule(1);
 	sceUtilityLoadNetModule(3);
-#endif
+    #endif
 }
 
 JSocket::JSocket(){
@@ -41,18 +41,18 @@ JSocket::JSocket(){
 }
 
 JSocket::~JSocket(){
-#ifdef NETWORK_SUPPORT
+    #ifdef NETWORK_SUPPORT
   	pspSdkInetTerm();
 		sceNetApctlDisconnect();
 		sceNetApctlTerm();
-#endif        
+    #endif        
 }
 
 
 int JSocket::make_socket(uint16_t port)
 {
 	int sock = -1;
- #ifdef NETWORK_SUPPORT   
+    #ifdef NETWORK_SUPPORT   
 	int ret;
 	struct sockaddr_in name;
 
@@ -70,13 +70,13 @@ int JSocket::make_socket(uint16_t port)
 	{
 		return -1;
 	}
-#endif
+    #endif
 	return sock;
 }
 
 
 void JSocket::readWrite(int val){
-#ifdef NETWORK_SUPPORT
+    #ifdef NETWORK_SUPPORT
 	char data[1024];
 	int readbytes;
   readbytes = read(val, data, sizeof(data));
@@ -104,12 +104,12 @@ void JSocket::readWrite(int val){
     tosend_data.pop();
   }
   if (size) write(val,data,size);
- #endif 
+    #endif 
 }
 
 /* Start a client */
 int JSocket::start_client(const char *szIpAddr){
-#ifdef NETWORK_SUPPORT
+    #ifdef NETWORK_SUPPORT
  int sock;
   sockaddr_in addrListen;
   int error;
@@ -139,14 +139,14 @@ int JSocket::start_client(const char *szIpAddr){
  while(1){
    readWrite(sock);
  }
- #endif
+    #endif
  return 0;
 }
 
 /* Start a server */
 int JSocket::start_server(const char *szIpAddr)
 {
-#ifdef NETWORK_SUPPORT
+    #ifdef NETWORK_SUPPORT
 	int ret;
 	int sock;
 	int _new = -1;
@@ -221,10 +221,8 @@ int JSocket::start_server(const char *szIpAddr)
 	}
 
 	close(sock);
-#endif    
+    #endif    
 	return 0;
 }
 
-#endif //NETWORK_SUPPORT
-
-
+#endif  // NETWORK_SUPPORT

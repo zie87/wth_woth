@@ -21,21 +21,13 @@ static SLEngineItf engineEngine;
 static SLObjectItf outputMixObject = NULL;
 //////////////////////////////////////////////////////////////////////////
 
-JMusic::JMusic()
-    : playerObject(0), playInterface(0), seekInterface(0), musicVolumeInterface(0)
-{
-}
+JMusic::JMusic() : playerObject(0), playInterface(0), seekInterface(0), musicVolumeInterface(0) {}
 
-void JMusic::Update(){
+void JMusic::Update() {}
 
-}
+int JMusic::getPlayTime() { return 0; }
 
-int JMusic::getPlayTime(){
-  return 0;
-}
-
-JMusic::~JMusic()
-{
+JMusic::~JMusic() {
     // destroy file descriptor audio player object, and invalidate all associated interfaces
     if (playerObject != NULL) {
         (*playerObject)->Destroy(playerObject);
@@ -47,14 +39,9 @@ JMusic::~JMusic()
 }
 
 //////////////////////////////////////////////////////////////////////////
-JSample::JSample()
-    : playerObject(0), playInterface(0)
-{
+JSample::JSample() : playerObject(0), playInterface(0) {}
 
-}
-
-JSample::~JSample()
-{
+JSample::~JSample() {
     // destroy file descriptor audio player object, and invalidate all associated interfaces
     if (playerObject != NULL) {
         (*playerObject)->Destroy(playerObject);
@@ -63,48 +50,35 @@ JSample::~JSample()
     }
 }
 
-unsigned long JSample::fileSize()
-{
-  return 0;
-}
+unsigned long JSample::fileSize() { return 0; }
 
 //////////////////////////////////////////////////////////////////////////
 JSoundSystem* JSoundSystem::mInstance = NULL;
 
-JSoundSystem* JSoundSystem::GetInstance()
-{
-  if (mInstance == NULL)
-    {
-      mInstance = new JSoundSystem();
-      mInstance->InitSoundSystem();
+JSoundSystem* JSoundSystem::GetInstance() {
+    if (mInstance == NULL) {
+        mInstance = new JSoundSystem();
+        mInstance->InitSoundSystem();
     }
-  return mInstance;
+    return mInstance;
 }
 
-
-void JSoundSystem::Destroy()
-{
-  if (mInstance)
-    {
-      mInstance->DestroySoundSystem();
-      delete mInstance;
-      mInstance = NULL;
+void JSoundSystem::Destroy() {
+    if (mInstance) {
+        mInstance->DestroySoundSystem();
+        delete mInstance;
+        mInstance = NULL;
     }
 }
 
-
-JSoundSystem::JSoundSystem()
-{
-  mVolume = 0;
-  mSampleVolume = 0;
+JSoundSystem::JSoundSystem() {
+    mVolume = 0;
+    mSampleVolume = 0;
 }
 
-JSoundSystem::~JSoundSystem()
-{
-}
+JSoundSystem::~JSoundSystem() {}
 
-void JSoundSystem::InitSoundSystem()
-{
+void JSoundSystem::InitSoundSystem() {
     DebugTrace("InitSoundSystem enter");
     SLresult result;
 
@@ -133,9 +107,7 @@ void JSoundSystem::InitSoundSystem()
     DebugTrace("InitSoundSystem leave");
 }
 
-
-void JSoundSystem::DestroySoundSystem()
-{
+void JSoundSystem::DestroySoundSystem() {
     // destroy output mix object, and invalidate all associated interfaces
     if (outputMixObject != NULL) {
         (*outputMixObject)->Destroy(outputMixObject);
@@ -150,12 +122,9 @@ void JSoundSystem::DestroySoundSystem()
     }
 }
 
-
-JMusic *JSoundSystem::LoadMusic(const char *fileName)
-{
+JMusic* JSoundSystem::LoadMusic(const char* fileName) {
     JMusic* music = new JMusic();
-    if (music)
-    {
+    if (music) {
         // we should use the native asset manager instead
         string fullpath = JFileSystem::GetInstance()->GetResourceFile(fileName);
         int fd = open(fullpath.c_str(), O_RDONLY);
@@ -178,8 +147,8 @@ JMusic *JSoundSystem::LoadMusic(const char *fileName)
         // create audio player
         const SLInterfaceID ids[2] = {SL_IID_SEEK, SL_IID_VOLUME};
         const SLboolean req[2] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE};
-        result = (*engineEngine)->CreateAudioPlayer(engineEngine, &music->playerObject, &audioSrc, &audioSnk,
-                2, ids, req);
+        result =
+            (*engineEngine)->CreateAudioPlayer(engineEngine, &music->playerObject, &audioSrc, &audioSnk, 2, ids, req);
         DebugTrace("result " << result);
 
         // realize the player
@@ -195,83 +164,67 @@ JMusic *JSoundSystem::LoadMusic(const char *fileName)
         DebugTrace("result " << result);
 
         // get the volume interface
-        //result = (*music->playerObject)->GetInterface(music->playerObject, SL_IID_VOLUME, (void *)&music->musicVolumeInterface);
-        
+        // result = (*music->playerObject)->GetInterface(music->playerObject, SL_IID_VOLUME, (void
+        // *)&music->musicVolumeInterface);
+
         DebugTrace("result " << result);
     }
-    
+
     mCurrentMusic = music;
-    
+
     return music;
 }
 
-
-void JSoundSystem::PlayMusic(JMusic *music, bool looping)
-{
-    if(music && music->playerObject && music->playInterface && music->seekInterface)
-    {
+void JSoundSystem::PlayMusic(JMusic* music, bool looping) {
+    if (music && music->playerObject && music->playInterface && music->seekInterface) {
         SLresult result;
 
         //(*music->musicVolumeInterface)->SetVolumeLevel(music->musicVolumeInterface, -1 * mVolume);
-        
+
         // enable whole file looping
-        result = (*music->seekInterface)->SetLoop(music->seekInterface,
-                                                  looping?SL_BOOLEAN_TRUE:SL_BOOLEAN_FALSE, 0, SL_TIME_UNKNOWN);
+        result = (*music->seekInterface)
+                     ->SetLoop(music->seekInterface, looping ? SL_BOOLEAN_TRUE : SL_BOOLEAN_FALSE, 0, SL_TIME_UNKNOWN);
         assert(SL_RESULT_SUCCESS == result);
 
-        result = (*music->playInterface)->SetPlayState(music->playInterface,
-                                                       SL_PLAYSTATE_PLAYING);
+        result = (*music->playInterface)->SetPlayState(music->playInterface, SL_PLAYSTATE_PLAYING);
         assert(SL_RESULT_SUCCESS == result);
     }
 }
 
-
-void JSoundSystem::StopMusic(JMusic *music)
-{
-    if(music && music->playerObject && music->playInterface && music->seekInterface)
-    {
+void JSoundSystem::StopMusic(JMusic* music) {
+    if (music && music->playerObject && music->playInterface && music->seekInterface) {
         SLresult result;
 
-        result = (*music->playInterface)->SetPlayState(music->playInterface,
-                                                       SL_PLAYSTATE_STOPPED);
+        result = (*music->playInterface)->SetPlayState(music->playInterface, SL_PLAYSTATE_STOPPED);
         assert(SL_RESULT_SUCCESS == result);
     }
 }
 
-void JSoundSystem::PauseMusic(JMusic *music)
-{
-    StopMusic(music);
-}
+void JSoundSystem::PauseMusic(JMusic* music) { StopMusic(music); }
 
-void JSoundSystem::ResumeMusic(JMusic *music)
-{
-    PlayMusic(music);
-}
+void JSoundSystem::ResumeMusic(JMusic* music) { PlayMusic(music); }
 
-void JSoundSystem::SetVolume(int volume)
-{
+void JSoundSystem::SetVolume(int volume) {
     SetMusicVolume(volume);
     SetSfxVolume(volume);
 }
 
-void JSoundSystem::SetMusicVolume(int volume)
-{
+void JSoundSystem::SetMusicVolume(int volume) {
     mVolume = volume;
     //(*mCurrentMusic->musicVolumeInterface)->SetVolumeLevel(mCurrentMusic->musicVolumeInterface, -1 * mVolume);
 }
 
-void JSoundSystem::SetSfxVolume(int volume){
-  mSampleVolume = volume;
-            
-    //(*mCurrentSample->sampleVolumeInterface)->SetVolumeLevel(mCurrentSample->sampleVolumeInterface, -1 * mSampleVolume);
-  SetMusicVolume(mVolume);
+void JSoundSystem::SetSfxVolume(int volume) {
+    mSampleVolume = volume;
+
+    //(*mCurrentSample->sampleVolumeInterface)->SetVolumeLevel(mCurrentSample->sampleVolumeInterface, -1 *
+    //mSampleVolume);
+    SetMusicVolume(mVolume);
 }
 
-JSample *JSoundSystem::LoadSample(const char *fileName)
-{
+JSample* JSoundSystem::LoadSample(const char* fileName) {
     JSample* sample = new JSample();
-    if (sample)
-    {
+    if (sample) {
         string fullpath = JFileSystem::GetInstance()->GetResourceFile(fileName);
         int fd = open(fullpath.c_str(), O_RDONLY);
         FILE* file = fdopen(fd, "r");
@@ -293,8 +246,8 @@ JSample *JSoundSystem::LoadSample(const char *fileName)
         // create audio player
         const SLInterfaceID ids[1] = {SL_IID_VOLUME};
         const SLboolean req[1] = {SL_BOOLEAN_TRUE};
-        result = (*engineEngine)->CreateAudioPlayer(engineEngine, &sample->playerObject, &audioSrc, &audioSnk,
-              1, ids, req);
+        result =
+            (*engineEngine)->CreateAudioPlayer(engineEngine, &sample->playerObject, &audioSrc, &audioSnk, 1, ids, req);
         DebugTrace("result " << result);
 
         // realize the player
@@ -306,23 +259,19 @@ JSample *JSoundSystem::LoadSample(const char *fileName)
         DebugTrace("result " << result);
 
         // get the volume interface
-        //result = (*sample->playerObject)->GetInterface(sample->playerObject, SL_IID_VOLUME, &sample->sampleVolumeInterface);
+        // result = (*sample->playerObject)->GetInterface(sample->playerObject, SL_IID_VOLUME,
+        // &sample->sampleVolumeInterface);
     }
-    
+
     mCurrentSample = sample;
-    
+
     return sample;
 }
 
-
-void JSoundSystem::PlaySample(JSample *sample)
-{
-    if(sample && sample->playerObject && sample->playInterface)
-    {
+void JSoundSystem::PlaySample(JSample* sample) {
+    if (sample && sample->playerObject && sample->playInterface) {
         SLresult result;
         //(*sample->sampleVolumeInterface)->SetVolumeLevel(sample->sampleVolumeInterface, mSampleVolume);
-        result = (*sample->playInterface)->SetPlayState(sample->playInterface,
-                                                       SL_PLAYSTATE_PLAYING);
+        result = (*sample->playInterface)->SetPlayState(sample->playInterface, SL_PLAYSTATE_PLAYING);
     }
 }
-

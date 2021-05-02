@@ -5,8 +5,7 @@
 #include "PhaseRing.h"
 #include "WEvent.h"
 
-class GuiPhaseBar: public GuiLayer, public PlayGuiObject
-{
+class GuiPhaseBar : public GuiLayer, public PlayGuiObject {
 protected:
     Phase* phase;
     float angle;
@@ -17,10 +16,10 @@ public:
     ~GuiPhaseBar();
     void Update(float dt);
     virtual void Render();
-    virtual int receiveEventMinus(WEvent * e);
+    virtual int receiveEventMinus(WEvent* e);
     virtual ostream& toString(ostream& out) const;
     virtual void Entering();
     virtual bool Leaving(JButton key);
 };
 
-#endif // _GUIPHASEBAR_H_
+#endif  // _GUIPHASEBAR_H_

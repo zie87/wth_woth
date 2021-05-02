@@ -12,49 +12,37 @@
 class GameObserver;
 class Player;
 
-class GuiLayer
-{
+class GuiLayer {
 protected:
     JButton mActionButton;
     GameObserver* observer;
+
 public:
     int mCurr;
-    vector<JGuiObject *> mObjects;
-    vector<JGuiObject *> manaObjects;
-    void Add(JGuiObject * object);
-    int Remove(JGuiObject * object);
+    vector<JGuiObject*> mObjects;
+    vector<JGuiObject*> manaObjects;
+    void Add(JGuiObject* object);
+    int Remove(JGuiObject* object);
     int modal;
     bool hasFocus;
     virtual void resetObjects();
     int getMaxId();
-    GuiLayer(GameObserver *observer);
+    GuiLayer(GameObserver* observer);
     virtual ~GuiLayer();
     virtual void Update(float dt);
-    virtual bool CheckUserInput(JButton key)
-    {
-        return false;
-    }
+    virtual bool CheckUserInput(JButton key) { return false; }
 
-    int getIndexOf(JGuiObject * object);
-    JGuiObject * getByIndex(int index);
+    int getIndexOf(JGuiObject* object);
+    JGuiObject* getByIndex(int index);
     virtual void Render();
-    int empty()
-    {
-        if (mObjects.size())
-            return 0;
+    int empty() {
+        if (mObjects.size()) return 0;
         return 1;
     }
 
-    virtual int receiveEventPlus(WEvent * e)
-    {
-        return 0;
-    }
+    virtual int receiveEventPlus(WEvent* e) { return 0; }
 
-    virtual int receiveEventMinus(WEvent * e)
-    {
-        return 0;
-    }
-
+    virtual int receiveEventMinus(WEvent* e) { return 0; }
 };
 
 #endif

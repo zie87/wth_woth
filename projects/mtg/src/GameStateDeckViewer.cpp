@@ -22,16 +22,12 @@
 #include "utils.h"
 #include "AIPlayer.h"
 
-
-
 //!! helper function; this is probably handled somewhere in the code already.
 // If not, should be placed in general library
-void StringExplode(string str, string separator, vector<string>* results)
-{
+void StringExplode(string str, string separator, vector<string>* results) {
     size_t found;
     found = str.find_first_of(separator);
-    while (found != string::npos)
-    {
+    while (found != string::npos) {
         if (found > 0) results->push_back(str.substr(0, found));
         str = str.substr(found + 1);
         found = str.find_first_of(separator);
@@ -39,9 +35,7 @@ void StringExplode(string str, string separator, vector<string>* results)
     if (str.length() > 0) results->push_back(str);
 }
 
-GameStateDeckViewer::GameStateDeckViewer(GameApp* parent) :
-    GameState(parent, "deckeditor")
-{
+GameStateDeckViewer::GameStateDeckViewer(GameApp* parent) : GameState(parent, "deckeditor") {
     bgMusic = NULL;
     useFilter = 0;
     isAIDeckSave = false;
@@ -58,36 +52,36 @@ GameStateDeckViewer::GameStateDeckViewer(GameApp* parent) :
     mAlpha = 255;
     menu = NULL;
     stw = NULL;
-    
-    statsPrevButton = NEW InteractiveButton(NULL, kPrevStatsButtonId, Fonts::MAIN_FONT, "Stats",  SCREEN_WIDTH_F - 50, SCREEN_HEIGHT_F - 20, JGE_BTN_PREV);
-    toggleDeckButton = NEW InteractiveButton(NULL, kToggleDeckActionId, Fonts::MAIN_FONT, "View Deck", 10, SCREEN_HEIGHT_F - 20, JGE_BTN_PRI);
-    sellCardButton = NEW InteractiveButton(NULL, kSellCardActionId, Fonts::MAIN_FONT, "Sell Card", (SCREEN_WIDTH_F/ 2) - 100, SCREEN_HEIGHT_F - 20, JGE_BTN_SEC);
-    filterButton = NEW InteractiveButton(NULL, kFilterButtonId, Fonts::MAIN_FONT, "filter", (SCREEN_WIDTH_F - 110), SCREEN_HEIGHT_F - 20, JGE_BTN_CTRL);
+
+    statsPrevButton = NEW InteractiveButton(NULL, kPrevStatsButtonId, Fonts::MAIN_FONT, "Stats", SCREEN_WIDTH_F - 50,
+                                            SCREEN_HEIGHT_F - 20, JGE_BTN_PREV);
+    toggleDeckButton = NEW InteractiveButton(NULL, kToggleDeckActionId, Fonts::MAIN_FONT, "View Deck", 10,
+                                             SCREEN_HEIGHT_F - 20, JGE_BTN_PRI);
+    sellCardButton = NEW InteractiveButton(NULL, kSellCardActionId, Fonts::MAIN_FONT, "Sell Card",
+                                           (SCREEN_WIDTH_F / 2) - 100, SCREEN_HEIGHT_F - 20, JGE_BTN_SEC);
+    filterButton = NEW InteractiveButton(NULL, kFilterButtonId, Fonts::MAIN_FONT, "filter", (SCREEN_WIDTH_F - 110),
+                                         SCREEN_HEIGHT_F - 20, JGE_BTN_CTRL);
 }
 
-GameStateDeckViewer::~GameStateDeckViewer()
-{
+GameStateDeckViewer::~GameStateDeckViewer() {
     SAFE_DELETE(bgMusic);
     SAFE_DELETE(toggleDeckButton);
     SAFE_DELETE(sellCardButton);
     SAFE_DELETE(statsPrevButton);
     SAFE_DELETE(filterButton);
-    
-    if (myDeck)
-    {
+
+    if (myDeck) {
         SAFE_DELETE(myDeck->parent);
         SAFE_DELETE(myDeck);
     }
-    if (myCollection)
-    {
+    if (myCollection) {
         SAFE_DELETE(myCollection->parent);
         SAFE_DELETE(myCollection);
     }
     SAFE_DELETE(filterMenu);
 }
 
-void GameStateDeckViewer::rotateCards(int direction)
-{
+void GameStateDeckViewer::rotateCards(int direction) {
     int left = direction;
     if (left)
         displayed_deck->next();
@@ -96,43 +90,36 @@ void GameStateDeckViewer::rotateCards(int direction)
     loadIndexes();
 
     int total = displayed_deck->Size();
-    if (total)
-    {
+    if (total) {
         lastPos = getCurrentPos();
         lastTotal = total;
     }
-
 }
 
-void GameStateDeckViewer::rebuildFilters()
-{
+void GameStateDeckViewer::rebuildFilters() {
     if (!filterMenu) filterMenu = NEW WGuiFilters("Filter by...", NULL);
-    if (source)
-        SAFE_DELETE(source);
+    if (source) SAFE_DELETE(source);
     source = NEW WSrcDeckViewer(myDeck, myCollection);
     filterMenu->setSrc(source);
     if (displayed_deck != myDeck) source->swapSrc();
     filterMenu->Finish(true);
 
-	// no stats need updating if there isn't a deck to update
-	if (stw && myDeck) 
-		stw->updateStats( myDeck );;
+    // no stats need updating if there isn't a deck to update
+    if (stw && myDeck) stw->updateStats(myDeck);
+    ;
 }
 
-void GameStateDeckViewer::updateFilters()
-{
+void GameStateDeckViewer::updateFilters() {
     if (!displayed_deck) return;
 
     filterMenu->recolorFilter(useFilter - 1);
     filterMenu->Finish(true);
     int totalAfter = displayed_deck->Size();
-    if (totalAfter && lastTotal)
-    {
-
-        //This part is a hack. I don't understand why in some cases "displayed_deck's" currentPos is not 0 at this stage
+    if (totalAfter && lastTotal) {
+        // This part is a hack. I don't understand why in some cases "displayed_deck's" currentPos is not 0 at this
+        // stage
         {
-            while (int currentPos = displayed_deck->getOffset())
-            {
+            while (int currentPos = displayed_deck->getOffset()) {
                 if (currentPos > 0)
                     displayed_deck->prev();
                 else
@@ -141,32 +128,26 @@ void GameStateDeckViewer::updateFilters()
         }
 
         int pos = (totalAfter * lastPos) / lastTotal;
-        for (int i = 0; i < pos - 3; ++i)
-        { // "-3" because card "0" is displayed at position 3 initially
+        for (int i = 0; i < pos - 3; ++i) {  // "-3" because card "0" is displayed at position 3 initially
             displayed_deck->next();
         }
     }
-    stw->updateStats( myDeck );;
+    stw->updateStats(myDeck);
+    ;
     return;
 }
 
-void GameStateDeckViewer::loadIndexes()
-{
-    for (int i = 0; i < 7; i++)
-    {
+void GameStateDeckViewer::loadIndexes() {
+    for (int i = 0; i < 7; i++) {
         cardIndex[i] = displayed_deck->getCard(i);
     }
 }
 
-void GameStateDeckViewer::switchDisplay()
-{
-    if (displayed_deck == myCollection)
-    {
+void GameStateDeckViewer::switchDisplay() {
+    if (displayed_deck == myCollection) {
         displayed_deck = myDeck;
         toggleDeckButton->setText("View Collection");
-    }
-    else
-    {
+    } else {
         toggleDeckButton->setText("View Deck");
         displayed_deck = myCollection;
     }
@@ -175,17 +156,17 @@ void GameStateDeckViewer::switchDisplay()
     loadIndexes();
 }
 
-void GameStateDeckViewer::updateDecks()
-{
+void GameStateDeckViewer::updateDecks() {
     SAFE_DELETE(welcome_menu);
     welcome_menu = NEW DeckEditorMenu(MENU_DECK_SELECTION, this, Fonts::OPTION_FONT, "Choose Deck To Edit");
-    DeckManager * deckManager = DeckManager::GetInstance();
-    vector<DeckMetaData *> playerDeckList = fillDeckMenu(welcome_menu, options.profileFile());
+    DeckManager* deckManager = DeckManager::GetInstance();
+    vector<DeckMetaData*> playerDeckList = fillDeckMenu(welcome_menu, options.profileFile());
 
     newDeckname = "";
     welcome_menu->Add(MENU_ITEM_NEW_DECK, "--NEW--");
-    if (options[Options::CHEATMODE].number && (!myCollection || myCollection->getCount(WSrcDeck::UNFILTERED_MIN_COPIES) < 4)) welcome_menu->Add(
-            MENU_ITEM_CHEAT_MODE, "--UNLOCK CARDS--");
+    if (options[Options::CHEATMODE].number &&
+        (!myCollection || myCollection->getCount(WSrcDeck::UNFILTERED_MIN_COPIES) < 4))
+        welcome_menu->Add(MENU_ITEM_CHEAT_MODE, "--UNLOCK CARDS--");
     welcome_menu->Add(MENU_ITEM_CANCEL, "Cancel");
 
     // update the deckmanager with the latest information
@@ -194,15 +175,13 @@ void GameStateDeckViewer::updateDecks()
     playerDeckList.clear();
 }
 
-void GameStateDeckViewer::buildEditorMenu()
-{
+void GameStateDeckViewer::buildEditorMenu() {
     ostringstream deckSummaryInformation;
     deckSummaryInformation << "All changes are final." << endl;
 
-    if (menu)
-        SAFE_DELETE( menu );
-    //Build menu.
-    JRenderer::GetInstance()->FillRoundRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 100, ARGB(0, 0, 0, 0) );
+    if (menu) SAFE_DELETE(menu);
+    // Build menu.
+    JRenderer::GetInstance()->FillRoundRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 100, ARGB(0, 0, 0, 0));
     menu = NEW DeckEditorMenu(MENU_DECK_BUILDER, this, Fonts::OPTION_FONT, "Deck Editor", myDeck, stw);
 
     menu->Add(MENU_ITEM_FILTER_BY, "Filter By...", "Narrow down the list of cards. ");
@@ -212,11 +191,9 @@ void GameStateDeckViewer::buildEditorMenu()
     menu->Add(MENU_ITEM_SAVE_AS_AI_DECK, "Save As AI Deck", deckSummaryInformation.str());
     menu->Add(MENU_ITEM_MAIN_MENU, "Quit Editor", "Do not make any changes to deck.\nReturn to the main menu.");
     menu->Add(MENU_ITEM_EDITOR_CANCEL, "Cancel", "Close menu.");
-
 }
 
-void GameStateDeckViewer::Start()
-{
+void GameStateDeckViewer::Start() {
     hudAlpha = 0;
     mSwitching = false;
     subMenu = NULL;
@@ -237,29 +214,27 @@ void GameStateDeckViewer::Start()
     myCollection->Sort(WSrcCards::SORT_ALPHA);
     displayed_deck = myCollection;
 
-    //Icons
+    // Icons
     mIcons = manaIcons;
-    for (int i = 0; i < Constants::NB_Colors; i++)
-    {
+    for (int i = 0; i < Constants::NB_Colors; i++) {
         mIcons[i]->SetHotSpot(16, 16);
     }
 
-    //Grab a texture in VRAM.
+    // Grab a texture in VRAM.
     pspIconsTexture = WResourceManager::Instance()->RetrieveTexture("iconspsp.png", RETRIEVE_MANAGE);
 
     char buf[512];
-    for (int i = 0; i < 8; i++)
-    {
+    for (int i = 0; i < 8; i++) {
         sprintf(buf, "iconspsp%d", i);
-        pspIcons[i] = WResourceManager::Instance()->RetrieveQuad("iconspsp.png", (float) i * 32, 0, 32, 32, buf);
+        pspIcons[i] = WResourceManager::Instance()->RetrieveQuad("iconspsp.png", (float)i * 32, 0, 32, 32, buf);
         pspIcons[i]->SetHotSpot(16, 16);
     }
 #ifndef TOUCH_ENABLED
-    toggleDeckButton->setImage( pspIcons[6] );
-    sellCardButton->setImage( pspIcons[7] );
+    toggleDeckButton->setImage(pspIcons[6]);
+    sellCardButton->setImage(pspIcons[7]);
 #endif
-    
-    //init welcome menu
+
+    // init welcome menu
     updateDecks();
 
     GameApp::playMusic("Track1.mp3");
@@ -269,8 +244,7 @@ void GameStateDeckViewer::Start()
     JRenderer::GetInstance()->EnableVSync(true);
 }
 
-void GameStateDeckViewer::End()
-{
+void GameStateDeckViewer::End() {
     JRenderer::GetInstance()->EnableVSync(false);
 
     SAFE_DELETE(welcome_menu);
@@ -278,12 +252,10 @@ void GameStateDeckViewer::End()
     SAFE_DELETE(subMenu);
 
     WResourceManager::Instance()->Release(pspIconsTexture);
-    if (myCollection)
-    {
+    if (myCollection) {
         SAFE_DELETE(myCollection);
     }
-    if (myDeck)
-    {
+    if (myDeck) {
         SAFE_DELETE(myDeck->parent);
         SAFE_DELETE(myDeck);
     }
@@ -293,18 +265,13 @@ void GameStateDeckViewer::End()
     SAFE_DELETE(source);
 }
 
-void GameStateDeckViewer::addRemove(MTGCard * card)
-{
+void GameStateDeckViewer::addRemove(MTGCard* card) {
     if (!card) return;
-    if (displayed_deck->Remove(card, 1, (displayed_deck == myDeck)))
-    {
-        if (displayed_deck == myCollection)
-        {
+    if (displayed_deck->Remove(card, 1, (displayed_deck == myDeck))) {
+        if (displayed_deck == myCollection) {
             myDeck->Add(card);
             myDeck->Sort(WSrcCards::SORT_ALPHA);
-        }
-        else
-        {
+        } else {
             myCollection->Add(card);
         }
     }
@@ -314,12 +281,10 @@ void GameStateDeckViewer::addRemove(MTGCard * card)
     loadIndexes();
 }
 
-void GameStateDeckViewer::saveDeck()
-{
-    //update the corresponding meta data object
-    DeckMetaData *metaData = DeckManager::GetInstance()->getDeckMetaDataById( myDeck->parent->meta_id, false );
-    if ( newDeckname.length() > 0 )
-        metaData->setDeckName( newDeckname );
+void GameStateDeckViewer::saveDeck() {
+    // update the corresponding meta data object
+    DeckMetaData* metaData = DeckManager::GetInstance()->getDeckMetaDataById(myDeck->parent->meta_id, false);
+    if (newDeckname.length() > 0) metaData->setDeckName(newDeckname);
     mSwitching = true;
     myDeck->save();
     playerdata->save();
@@ -329,13 +294,11 @@ void GameStateDeckViewer::saveDeck()
 /**
  save the deck in a readable format to allow people to edit the file offline
  */
-void GameStateDeckViewer::saveAsAIDeck(string deckName)
-{
-
+void GameStateDeckViewer::saveAsAIDeck(string deckName) {
     int deckId = AIPlayer::getTotalAIDecks() + 1;
 
     std::ostringstream oss;
-    oss << "deck" <<deckId;
+    oss << "deck" << deckId;
     string aiDeckName = oss.str();
     oss.str("");
     if (myDeck->parent->meta_desc == "")
@@ -347,23 +310,22 @@ void GameStateDeckViewer::saveAsAIDeck(string deckName)
     filepath.append(aiDeckName).append(".txt");
     DebugTrace("saving AI deck " << filepath);
     myDeck->save(filepath, true, deckName, deckDesc);
-    AIPlayer::invalidateTotalAIDecks(); //We added one AI deck, so we need to invalidate the count cache
+    AIPlayer::invalidateTotalAIDecks();  // We added one AI deck, so we need to invalidate the count cache
 }
 
-void GameStateDeckViewer::sellCard()
-{
+void GameStateDeckViewer::sellCard() {
     last_user_activity = 0;
     SAFE_DELETE(subMenu);
     char buffer[4096];
     {
-        MTGCard * card = cardIndex[2];
-        if (card && displayed_deck->count(card))
-        {
+        MTGCard* card = cardIndex[2];
+        if (card && displayed_deck->count(card)) {
             price = pricelist->getSellPrice(card->getMTGId());
             sprintf(buffer, "%s : %i %s", _(card->data->getName()).c_str(), price, _("credits").c_str());
             const float menuXOffset = SCREEN_WIDTH_F - 300;
             const float menuYOffset = SCREEN_HEIGHT_F / 2;
-            subMenu = NEW SimpleMenu(JGE::GetInstance(), MENU_CARD_PURCHASE, this, Fonts::MAIN_FONT, menuXOffset, menuYOffset, buffer);
+            subMenu = NEW SimpleMenu(JGE::GetInstance(), MENU_CARD_PURCHASE, this, Fonts::MAIN_FONT, menuXOffset,
+                                     menuYOffset, buffer);
             subMenu->Add(MENU_ITEM_YES, "Yes");
             subMenu->Add(MENU_ITEM_NO, "No", "", true);
         }
@@ -371,58 +333,42 @@ void GameStateDeckViewer::sellCard()
     stw->needUpdate = true;
 }
 
-bool GameStateDeckViewer::userPressedButton()
-{
-    return (
-            (toggleDeckButton->ButtonPressed()) 
-            || (sellCardButton->ButtonPressed())
-            || (statsPrevButton->ButtonPressed())
-            || (filterButton->ButtonPressed())
-            );
-  }
+bool GameStateDeckViewer::userPressedButton() {
+    return ((toggleDeckButton->ButtonPressed()) || (sellCardButton->ButtonPressed()) ||
+            (statsPrevButton->ButtonPressed()) || (filterButton->ButtonPressed()));
+}
 
-void GameStateDeckViewer::setButtonState(bool state)
-{
+void GameStateDeckViewer::setButtonState(bool state) {
     toggleDeckButton->setIsSelectionValid(state);
     sellCardButton->setIsSelectionValid(state);
     statsPrevButton->setIsSelectionValid(state);
     filterButton->setIsSelectionValid(state);
-    
 }
 
-void GameStateDeckViewer::RenderButtons()
-{
+void GameStateDeckViewer::RenderButtons() {
     toggleDeckButton->Render();
     sellCardButton->Render();
     filterButton->Render();
     statsPrevButton->Render();
 }
 
-void GameStateDeckViewer::Update(float dt)
-{
-
+void GameStateDeckViewer::Update(float dt) {
     int x, y;
     unsigned int distance2;
     unsigned int minDistance2 = -1;
     int n = 0;
-    
-    if (options.keypadActive())
-    {
+
+    if (options.keypadActive()) {
         options.keypadUpdate(dt);
 
-        if (newDeckname != "")
-        {
+        if (newDeckname != "") {
             newDeckname = options.keypadFinish();
 
-            if (newDeckname != "")
-            {
-                if (isAIDeckSave)
-                {
+            if (newDeckname != "") {
+                if (isAIDeckSave) {
                     saveAsAIDeck(newDeckname);
                     isAIDeckSave = false;
-                }
-                else if (myDeck && myDeck->parent)
-                {
+                } else if (myDeck && myDeck->parent) {
                     myDeck->parent->meta_name = newDeckname;
                     saveDeck();
                     updateDecks();
@@ -431,24 +377,20 @@ void GameStateDeckViewer::Update(float dt)
             }
             newDeckname = "";
         }
-        //Prevent screen from updating.
+        // Prevent screen from updating.
         return;
     }
-    hudAlpha = 255 - ((int) last_user_activity * 500);
+    hudAlpha = 255 - ((int)last_user_activity * 500);
     if (hudAlpha < 0) hudAlpha = 0;
-    if (subMenu)
-    {
+    if (subMenu) {
         subMenu->Update(dt);
-        if (subMenu->isClosed())
-        {
+        if (subMenu->isClosed()) {
             SAFE_DELETE(subMenu);
         }
         return;
     }
-    if (mStage == STAGE_WAITING || mStage == STAGE_ONSCREEN_MENU)
-    {
-        switch (mEngine->ReadButton())
-        {
+    if (mStage == STAGE_WAITING || mStage == STAGE_ONSCREEN_MENU) {
+        switch (mEngine->ReadButton()) {
         case JGE_BTN_LEFT:
             last_user_activity = 0;
             mStage = STAGE_TRANSITION_LEFT;
@@ -473,47 +415,42 @@ void GameStateDeckViewer::Update(float dt)
             options[Options::DISABLECARDS].number = !options[Options::DISABLECARDS].number;
             break;
         case JGE_BTN_PRI:
-            if (last_user_activity > 0.2)
-            {
+            if (last_user_activity > 0.2) {
                 last_user_activity = 0;
                 switchDisplay();
             }
             break;
         case JGE_BTN_OK:
-            if (mEngine->GetLeftClickCoordinates(x, y))
-            {
+            if (mEngine->GetLeftClickCoordinates(x, y)) {
                 // verify that none of the buttons fired
-                if (userPressedButton())
-                {
+                if (userPressedButton()) {
                     Update(dt);
                     break;
                 }
 
-                for(int i=0; i < CARDS_DISPLAYED; i++)
-                {
-                    distance2 = static_cast<unsigned int>((cardsCoordinates[i].second - y) * (cardsCoordinates[i].second - y) + (cardsCoordinates[i].first - x) * (cardsCoordinates[i].first - x));
-                    if (distance2 < minDistance2)
-                    {
+                for (int i = 0; i < CARDS_DISPLAYED; i++) {
+                    distance2 =
+                        static_cast<unsigned int>((cardsCoordinates[i].second - y) * (cardsCoordinates[i].second - y) +
+                                                  (cardsCoordinates[i].first - x) * (cardsCoordinates[i].first - x));
+                    if (distance2 < minDistance2) {
                         minDistance2 = distance2;
                         n = i;
                     }
                 }
 
-                if(n != 2) 
-                {
+                if (n != 2) {
                     mSelected = n;
                     last_user_activity = 0;
                     mStage = STAGE_TRANSITION_SELECTED;
                 }
                 mEngine->LeftClickedProcessed();
             }
-                
-            if(mStage != STAGE_TRANSITION_SELECTED && last_user_activity > .05)
-            {
+
+            if (mStage != STAGE_TRANSITION_SELECTED && last_user_activity > .05) {
                 last_user_activity = 0;
                 addRemove(cardIndex[2]);
             }
-                
+
             break;
         case JGE_BTN_SEC:
             sellCard();
@@ -525,11 +462,9 @@ void GameStateDeckViewer::Update(float dt)
             break;
         case JGE_BTN_CTRL:
             mStage = STAGE_FILTERS;
-            if (!filterMenu)
-            {
+            if (!filterMenu) {
                 filterMenu = NEW WGuiFilters("Filter by...", NULL);
-                if (source)
-                    SAFE_DELETE(source);
+                if (source) SAFE_DELETE(source);
                 source = NEW WSrcDeckViewer(myDeck, myCollection);
                 filterMenu->setSrc(source);
                 if (displayed_deck != myDeck) source->swapSrc();
@@ -539,59 +474,47 @@ void GameStateDeckViewer::Update(float dt)
         case JGE_BTN_PREV:
             if (last_user_activity < NO_USER_ACTIVITY_HELP_DELAY)
                 last_user_activity = NO_USER_ACTIVITY_HELP_DELAY + 1;
-            else if ((mStage == STAGE_ONSCREEN_MENU) && (--stw->currentPage < 0)) stw->currentPage = stw->pageCount;
+            else if ((mStage == STAGE_ONSCREEN_MENU) && (--stw->currentPage < 0))
+                stw->currentPage = stw->pageCount;
             break;
         case JGE_BTN_NEXT:
             if (last_user_activity < NO_USER_ACTIVITY_HELP_DELAY)
                 last_user_activity = NO_USER_ACTIVITY_HELP_DELAY + 1;
-            else if ((mStage == STAGE_ONSCREEN_MENU) && (++stw->currentPage > stw->pageCount)) stw->currentPage = 0;
+            else if ((mStage == STAGE_ONSCREEN_MENU) && (++stw->currentPage > stw->pageCount))
+                stw->currentPage = 0;
             break;
-        default: // no keypress
-            if (last_user_activity > NO_USER_ACTIVITY_HELP_DELAY)
-            {
-                if (mStage != STAGE_ONSCREEN_MENU)
-                {
+        default:  // no keypress
+            if (last_user_activity > NO_USER_ACTIVITY_HELP_DELAY) {
+                if (mStage != STAGE_ONSCREEN_MENU) {
                     mStage = STAGE_ONSCREEN_MENU;
                     onScreenTransition = 1;
-                }
-                else
-                {
+                } else {
                     if (onScreenTransition > 0)
                         onScreenTransition -= 0.05f;
                     else
                         onScreenTransition = 0;
                 }
-            }
-            else
+            } else
                 last_user_activity += dt;
-                
+
             break;
         }
-
     }
-    if (mStage == STAGE_TRANSITION_SELECTED)
-    {
-        if (mSelected < 2)
-        {
+    if (mStage == STAGE_TRANSITION_SELECTED) {
+        if (mSelected < 2) {
             mRotation -= dt * MED_SPEED;
-            if (mRotation < mSelected-2)
-            {
-                do
-                {
+            if (mRotation < mSelected - 2) {
+                do {
                     rotateCards(STAGE_TRANSITION_RIGHT);
                     mRotation += 1;
                 } while (mRotation < -1.0f);
                 mStage = STAGE_WAITING;
                 mRotation = 0;
             }
-        }
-        else if (mSelected > 2)
-        {
+        } else if (mSelected > 2) {
             mRotation += dt * MED_SPEED;
-            if (mRotation > mSelected - 2)
-            {
-                do
-                {
+            if (mRotation > mSelected - 2) {
+                do {
                     rotateCards(STAGE_TRANSITION_LEFT);
                     mRotation -= 1;
                 } while (mRotation > 1.0f);
@@ -600,29 +523,21 @@ void GameStateDeckViewer::Update(float dt)
             }
         }
     }
-    if (mStage == STAGE_TRANSITION_RIGHT || mStage == STAGE_TRANSITION_LEFT)
-    {
-        if (mStage == STAGE_TRANSITION_RIGHT)
-        {
+    if (mStage == STAGE_TRANSITION_RIGHT || mStage == STAGE_TRANSITION_LEFT) {
+        if (mStage == STAGE_TRANSITION_RIGHT) {
             mRotation -= dt * MED_SPEED;
-            if (mRotation < -1.0f)
-            {
-                do
-                {
+            if (mRotation < -1.0f) {
+                do {
                     rotateCards(mStage);
                     mRotation += 1;
                 } while (mRotation < -1.0f);
                 mStage = STAGE_WAITING;
                 mRotation = 0;
             }
-        }
-        else if (mStage == STAGE_TRANSITION_LEFT)
-        {
+        } else if (mStage == STAGE_TRANSITION_LEFT) {
             mRotation += dt * MED_SPEED;
-            if (mRotation > 1.0f)
-            {
-                do
-                {
+            if (mRotation > 1.0f) {
+                do {
                     rotateCards(mStage);
                     mRotation -= 1;
                 } while (mRotation > 1.0f);
@@ -631,64 +546,48 @@ void GameStateDeckViewer::Update(float dt)
             }
         }
     }
-    if (mStage == STAGE_TRANSITION_DOWN || mStage == STAGE_TRANSITION_UP)
-    {
-        if (mStage == STAGE_TRANSITION_DOWN)
-        {
+    if (mStage == STAGE_TRANSITION_DOWN || mStage == STAGE_TRANSITION_UP) {
+        if (mStage == STAGE_TRANSITION_DOWN) {
             mSlide -= 0.05f;
-            if (mSlide < -1.0f)
-            {
+            if (mSlide < -1.0f) {
                 updateFilters();
                 loadIndexes();
                 mSlide = 1;
-            }
-            else if (mSlide > 0 && mSlide < 0.05)
-            {
+            } else if (mSlide > 0 && mSlide < 0.05) {
                 mStage = STAGE_WAITING;
                 mSlide = 0;
             }
         }
-        if (mStage == STAGE_TRANSITION_UP)
-        {
+        if (mStage == STAGE_TRANSITION_UP) {
             mSlide += 0.05f;
-            if (mSlide > 1.0f)
-            {
+            if (mSlide > 1.0f) {
                 updateFilters();
                 loadIndexes();
                 mSlide = -1;
-            }
-            else if (mSlide < 0 && mSlide > -0.05)
-            {
+            } else if (mSlide < 0 && mSlide > -0.05) {
                 mStage = STAGE_WAITING;
                 mSlide = 0;
             }
         }
 
-    }
-    else if (mStage == STAGE_WELCOME)
+    } else if (mStage == STAGE_WELCOME)
         welcome_menu->Update(dt);
     else if (mStage == STAGE_MENU)
         menu->Update(dt);
-    else if (mStage == STAGE_FILTERS)
-    {
+    else if (mStage == STAGE_FILTERS) {
         JButton key = mEngine->ReadButton();
-        if (filterMenu)
-        {
-            if (key == JGE_BTN_CTRL)
-            {
-                //useFilter = 0;
+        if (filterMenu) {
+            if (key == JGE_BTN_CTRL) {
+                // useFilter = 0;
                 filterMenu->Finish(true);
                 filterMenu->Update(dt);
                 loadIndexes();
                 return;
             }
-            if (!filterMenu->isFinished())
-            {
+            if (!filterMenu->isFinished()) {
                 filterMenu->CheckUserInput(key);
                 filterMenu->Update(dt);
-            }
-            else
-            {
+            } else {
                 mStage = STAGE_WAITING;
                 updateFilters();
                 loadIndexes();
@@ -697,52 +596,49 @@ void GameStateDeckViewer::Update(float dt)
     }
 }
 
-void GameStateDeckViewer::renderOnScreenBasicInfo()
-{
-    JRenderer *renderer = JRenderer::GetInstance();
-    WFont * mFont = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
+void GameStateDeckViewer::renderOnScreenBasicInfo() {
+    JRenderer* renderer = JRenderer::GetInstance();
+    WFont* mFont = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
     char buffer[256];
 
     float y = 0;
     int allCopies, nowCopies;
     nowCopies = displayed_deck->getCount(WSrcDeck::FILTERED_COPIES);
     allCopies = displayed_deck->getCount(WSrcDeck::UNFILTERED_COPIES);
-    WCardFilter * wc = displayed_deck->getFiltersRoot();
+    WCardFilter* wc = displayed_deck->getFiltersRoot();
 
     if (wc)
-        sprintf(buffer, "%s %i of %i cards (%i unique)", (displayed_deck == myDeck) ? "DECK: " : " ", nowCopies, allCopies,
-                displayed_deck->getCount(WSrcDeck::FILTERED_UNIQUE));
+        sprintf(buffer, "%s %i of %i cards (%i unique)", (displayed_deck == myDeck) ? "DECK: " : " ", nowCopies,
+                allCopies, displayed_deck->getCount(WSrcDeck::FILTERED_UNIQUE));
     else
-        sprintf(buffer, "%s%i cards (%i unique)", (displayed_deck == myDeck) ? "DECK: " : " ", allCopies, displayed_deck->getCount(
-                WSrcDeck::UNFILTERED_UNIQUE));
+        sprintf(buffer, "%s%i cards (%i unique)", (displayed_deck == myDeck) ? "DECK: " : " ", allCopies,
+                displayed_deck->getCount(WSrcDeck::UNFILTERED_UNIQUE));
 
     float w = mFont->GetStringWidth(buffer);
     PIXEL_TYPE backupColor = mFont->GetColor();
 
-    renderer->FillRoundRect(SCREEN_WIDTH - (w + 27), y + 5, w + 10, 15, 5, ARGB(hudAlpha/2,0,0,0));
-    mFont->SetColor(ARGB(hudAlpha,255,255,255));
+    renderer->FillRoundRect(SCREEN_WIDTH - (w + 27), y + 5, w + 10, 15, 5, ARGB(hudAlpha / 2, 0, 0, 0));
+    mFont->SetColor(ARGB(hudAlpha, 255, 255, 255));
     mFont->DrawString(buffer, SCREEN_WIDTH - 22, y + 15, JGETEXT_RIGHT);
     mFont->SetColor(backupColor);
-    
+
     if (useFilter != 0) renderer->RenderQuad(mIcons[useFilter - 1].get(), SCREEN_WIDTH - 10, y + 15, 0.0f, 0.5, 0.5);
 }
 
-//returns position of the current card (cusor) in the currently viewed color/filter
-int GameStateDeckViewer::getCurrentPos()
-{
+// returns position of the current card (cusor) in the currently viewed color/filter
+int GameStateDeckViewer::getCurrentPos() {
     int total = displayed_deck->Size();
 
     int currentPos = displayed_deck->getOffset();
-    currentPos += 2; //we start by displaying card number 3
+    currentPos += 2;  // we start by displaying card number 3
     currentPos = currentPos % total + 1;
     if (currentPos < 0) currentPos = (total + currentPos);
     if (!currentPos) currentPos = total;
     return currentPos;
 }
 
-void GameStateDeckViewer::renderSlideBar()
-{
-    WFont * mFont = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
+void GameStateDeckViewer::renderSlideBar() {
+    WFont* mFont = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
 
     int total = displayed_deck->Size();
     if (total == 0) return;
@@ -750,70 +646,63 @@ void GameStateDeckViewer::renderSlideBar()
     float filler = 15;
     float y = SCREEN_HEIGHT_F - 25;
     float bar_size = SCREEN_WIDTH_F - 2 * filler;
-    JRenderer * r = JRenderer::GetInstance();
+    JRenderer* r = JRenderer::GetInstance();
     int currentPos = getCurrentPos();
 
     float cursor_pos = bar_size * currentPos / total;
 
-    r->FillRoundRect(filler + 5, y + 5, bar_size, 0, 3, ARGB(hudAlpha/2,0,0,0));
-    r->DrawLine(filler + cursor_pos + 5, y + 5, filler + cursor_pos + 5, y + 10, ARGB(hudAlpha/2,0,0,0));
+    r->FillRoundRect(filler + 5, y + 5, bar_size, 0, 3, ARGB(hudAlpha / 2, 0, 0, 0));
+    r->DrawLine(filler + cursor_pos + 5, y + 5, filler + cursor_pos + 5, y + 10, ARGB(hudAlpha / 2, 0, 0, 0));
 
-    r->FillRoundRect(filler, y, bar_size, 0, 3, ARGB(hudAlpha/2,128,128,128));
-    r->DrawLine(filler + cursor_pos, y, filler + cursor_pos, y + 5, ARGB(hudAlpha,255,255,255));
+    r->FillRoundRect(filler, y, bar_size, 0, 3, ARGB(hudAlpha / 2, 128, 128, 128));
+    r->DrawLine(filler + cursor_pos, y, filler + cursor_pos, y + 5, ARGB(hudAlpha, 255, 255, 255));
     char buffer[256];
     string deckname = _("Collection");
-    if (displayed_deck == myDeck)
-    {
+    if (displayed_deck == myDeck) {
         deckname = _("Deck");
     }
     sprintf(buffer, "%s - %i/%i", deckname.c_str(), currentPos, total);
-    mFont->SetColor(ARGB(hudAlpha,255,255,255));
+    mFont->SetColor(ARGB(hudAlpha, 255, 255, 255));
     mFont->DrawString(buffer, SCREEN_WIDTH / 2, y, JGETEXT_CENTER);
 
-    mFont->SetColor(ARGB(255,255,255,255));
+    mFont->SetColor(ARGB(255, 255, 255, 255));
 }
 
-void GameStateDeckViewer::renderDeckBackground()
-{
+void GameStateDeckViewer::renderDeckBackground() {
     int max1 = 0;
     int maxC1 = 4;
     int max2 = 0;
     int maxC2 = 4;
 
-    for (int i = 0; i < Constants::NB_Colors - 1; i++)
-    {
+    for (int i = 0; i < Constants::NB_Colors - 1; i++) {
         int value = myDeck->getCount(i);
-        if (value > max1)
-        {
+        if (value > max1) {
             max2 = max1;
             maxC2 = maxC1;
             max1 = value;
             maxC1 = i;
-        }
-        else if (value > max2)
-        {
+        } else if (value > max2) {
             max2 = value;
             maxC2 = i;
         }
     }
-    if (max2 < max1 / 2)
-    {
+    if (max2 < max1 / 2) {
         maxC2 = maxC1;
     }
-    PIXEL_TYPE colors[] = { ARGB(255, Constants::_r[maxC1], Constants::_g[maxC1], Constants::_b[maxC1]),
-            ARGB(255, Constants::_r[maxC1], Constants::_g[maxC1], Constants::_b[maxC1]),
-            ARGB(255, Constants::_r[maxC2], Constants::_g[maxC2], Constants::_b[maxC2]),
-            ARGB(255, Constants::_r[maxC2], Constants::_g[maxC2], Constants::_b[maxC2]), };
+    PIXEL_TYPE colors[] = {
+        ARGB(255, Constants::_r[maxC1], Constants::_g[maxC1], Constants::_b[maxC1]),
+        ARGB(255, Constants::_r[maxC1], Constants::_g[maxC1], Constants::_b[maxC1]),
+        ARGB(255, Constants::_r[maxC2], Constants::_g[maxC2], Constants::_b[maxC2]),
+        ARGB(255, Constants::_r[maxC2], Constants::_g[maxC2], Constants::_b[maxC2]),
+    };
 
     JRenderer::GetInstance()->FillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, colors);
-
 }
 
-void GameStateDeckViewer::renderOnScreenMenu()
-{
-    WFont * font = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
-    font->SetColor(ARGB(255,255,255,255));
-    JRenderer * r = JRenderer::GetInstance();
+void GameStateDeckViewer::renderOnScreenMenu() {
+    WFont* font = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
+    font->SetColor(ARGB(255, 255, 255, 255));
+    JRenderer* r = JRenderer::GetInstance();
     float pspIconsSize = 0.5;
     float fH = font->GetHeight() + 1;
 
@@ -829,119 +718,107 @@ void GameStateDeckViewer::renderOnScreenMenu()
 #else
     bool renderPSPIcons = true;
 #endif
-    
-    if (stw->currentPage == 0)
-    {
-        //FillRects
-        r->FillRect(0 - (onScreenTransition * 84), 0, 84, SCREEN_HEIGHT, ARGB(128,0,0,0));
-        r->FillRect(SCREEN_WIDTH - 204 + (onScreenTransition * 204), 0, 204, SCREEN_HEIGHT, ARGB(128,0,0,0));
-        if (renderPSPIcons)
-        {
-            //LEFT PSP CIRCLE render
-            r->FillCircle(leftPspX, leftPspY, 40, ARGB(128,50,50,50));
-            
+
+    if (stw->currentPage == 0) {
+        // FillRects
+        r->FillRect(0 - (onScreenTransition * 84), 0, 84, SCREEN_HEIGHT, ARGB(128, 0, 0, 0));
+        r->FillRect(SCREEN_WIDTH - 204 + (onScreenTransition * 204), 0, 204, SCREEN_HEIGHT, ARGB(128, 0, 0, 0));
+        if (renderPSPIcons) {
+            // LEFT PSP CIRCLE render
+            r->FillCircle(leftPspX, leftPspY, 40, ARGB(128, 50, 50, 50));
+
             r->RenderQuad(pspIcons[0].get(), leftPspX, leftPspY - 20, 0, pspIconsSize, pspIconsSize);
             r->RenderQuad(pspIcons[1].get(), leftPspX, leftPspY + 20, 0, pspIconsSize, pspIconsSize);
             r->RenderQuad(pspIcons[2].get(), leftPspX - 20, leftPspY, 0, pspIconsSize, pspIconsSize);
             r->RenderQuad(pspIcons[3].get(), leftPspX + 20, leftPspY, 0, pspIconsSize, pspIconsSize);
-            
+
             font->DrawString(_("Prev."), leftPspX - 35, leftPspY - 15);
             font->DrawString(_("Next"), leftPspX + 15, leftPspY - 15);
             font->DrawString(_("card"), leftPspX - 35, leftPspY);
             font->DrawString(_("card"), leftPspX + 15, leftPspY);
             font->DrawString(_("Next edition"), leftPspX - 33, leftPspY - 35);
             font->DrawString(_("Prev. edition"), leftPspX - 33, leftPspY + 25);
-            
-            //RIGHT PSP CIRCLE render
-            r->FillCircle(rightPspX + (onScreenTransition * 204), rightPspY, 40, ARGB(128,50,50,50));
+
+            // RIGHT PSP CIRCLE render
+            r->FillCircle(rightPspX + (onScreenTransition * 204), rightPspY, 40, ARGB(128, 50, 50, 50));
             r->RenderQuad(pspIcons[4].get(), rightPspX + 20, rightPspY, 0, pspIconsSize, pspIconsSize);
             r->RenderQuad(pspIcons[5].get(), rightPspX, rightPspY - 20, 0, pspIconsSize, pspIconsSize);
             r->RenderQuad(pspIcons[6].get(), rightPspX - 20, rightPspY, 0, pspIconsSize, pspIconsSize);
             r->RenderQuad(pspIcons[7].get(), rightPspX, rightPspY + 20, 0, pspIconsSize, pspIconsSize);
-            
+
             font->DrawString(_("Toggle Images"), rightPspX - 35, rightPspY - 40);
-            
-            if (displayed_deck == myCollection)
-            {
+
+            if (displayed_deck == myCollection) {
                 font->DrawString(_("Add card"), rightPspX + 20, rightPspY - 15);
                 font->DrawString(_("View Deck"), rightPspX - 20, rightPspY - 15, JGETEXT_RIGHT);
-            }
-            else
-            {
+            } else {
                 font->DrawString(_("Remove card"), rightPspX + 20, rightPspY - 15);
                 font->DrawString(_("View Collection"), rightPspX - 20, rightPspY - 15, JGETEXT_RIGHT);
             }
             font->DrawString(_("Sell card"), rightPspX - 30, rightPspY + 20);
-            //Bottom menus
+            // Bottom menus
             font->DrawString(_("menu"), SCREEN_WIDTH - 35 + rightTransition, SCREEN_HEIGHT - 15);
             font->DrawString(_("filter"), SCREEN_WIDTH - 95 + rightTransition, SCREEN_HEIGHT - 15);
 
-            if (displayed_deck == myCollection)
-            {
+            if (displayed_deck == myCollection) {
                 font->DrawString(_("in: collection"), 5 - leftTransition, 5);
                 font->DrawString(_("Use SQUARE to view your deck,"), SCREEN_WIDTH - 200 + rightTransition, 5);
-            }
-            else
-            {
+            } else {
                 font->DrawString(_("in: deck"), 5 - leftTransition, 5);
                 font->DrawString(_("Use SQUARE to view collection,"), SCREEN_WIDTH - 200 + rightTransition, 5);
             }
-            
+
             font->DrawString(_("Press L/R to cycle through"), SCREEN_WIDTH - 200 + rightTransition, 5 + fH);
             font->DrawString(_("deck statistics."), SCREEN_WIDTH - 200 + rightTransition, 5 + fH * 2);
-        }
-        else
-        {
+        } else {
             // print stuff here about the editor commands
-            float textYOffset = SCREEN_HEIGHT_F/2;
-            font->DrawString(_("Click on the card image"), SCREEN_WIDTH - 200 + rightTransition, textYOffset - (2 * fH));
+            float textYOffset = SCREEN_HEIGHT_F / 2;
+            font->DrawString(_("Click on the card image"), SCREEN_WIDTH - 200 + rightTransition,
+                             textYOffset - (2 * fH));
             if (displayed_deck == myCollection)
                 font->DrawString(_("to add card to deck."), SCREEN_WIDTH - 200 + rightTransition, textYOffset - fH);
             else
-                font->DrawString(_("to remove card from deck."), SCREEN_WIDTH - 200 + rightTransition, textYOffset - fH);
+                font->DrawString(_("to remove card from deck."), SCREEN_WIDTH - 200 + rightTransition,
+                                 textYOffset - fH);
         }
-        //Your Deck Information
+        // Your Deck Information
         char buffer[300];
         int nb_letters = 0;
         int value = myDeck->getCount(WSrcDeck::UNFILTERED_COPIES);
-        
+
         sprintf(buffer, _("Your Deck: %i cards").c_str(), value);
         font->DrawString(buffer, SCREEN_WIDTH - 200 + rightTransition, SCREEN_HEIGHT / 2 + 25);
 
-        for (int j = 0; j < Constants::NB_Colors; j++)
-        {
+        for (int j = 0; j < Constants::NB_Colors; j++) {
             int value = myDeck->getCount(j);
-            if (value > 0)
-            {
+            if (value > 0) {
                 sprintf(buffer, "%i", value);
-                font->DrawString(buffer, SCREEN_WIDTH - 190 + rightTransition + nb_letters * 13, SCREEN_HEIGHT / 2 + 40);
-                r->RenderQuad(mIcons[j].get(), SCREEN_WIDTH - 197 + rightTransition + nb_letters * 13, SCREEN_HEIGHT / 2 + 46, 0, 0.5,
-                              0.5);
-                if (value > 9)
-                {
+                font->DrawString(buffer, SCREEN_WIDTH - 190 + rightTransition + nb_letters * 13,
+                                 SCREEN_HEIGHT / 2 + 40);
+                r->RenderQuad(mIcons[j].get(), SCREEN_WIDTH - 197 + rightTransition + nb_letters * 13,
+                              SCREEN_HEIGHT / 2 + 46, 0, 0.5, 0.5);
+                if (value > 9) {
                     nb_letters += 3;
-                }
-                else
-                {
+                } else {
                     nb_letters += 2;
                 }
             }
         }
 
-    }
-    else
-    {
-        stw->updateStats( myDeck );;
+    } else {
+        stw->updateStats(myDeck);
+        ;
 
         char buffer[300];
 
         leftTransition = -(onScreenTransition / 2) * SCREEN_WIDTH;
         rightTransition = -leftTransition;
 
-        r->FillRect(0 + leftTransition, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT, ARGB(128,0,0,0));
-        r->FillRect(SCREEN_WIDTH / 2 + rightTransition, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT, ARGB(128,0,0,0));
-        r->FillRect(10 + leftTransition, 10, SCREEN_WIDTH / 2 - 10, SCREEN_HEIGHT - 20, ARGB(128,0,0,0));
-        r->FillRect(SCREEN_WIDTH / 2 + rightTransition, 10, SCREEN_WIDTH / 2 - 10, SCREEN_HEIGHT - 20, ARGB(128,0,0,0));
+        r->FillRect(0 + leftTransition, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT, ARGB(128, 0, 0, 0));
+        r->FillRect(SCREEN_WIDTH / 2 + rightTransition, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT, ARGB(128, 0, 0, 0));
+        r->FillRect(10 + leftTransition, 10, SCREEN_WIDTH / 2 - 10, SCREEN_HEIGHT - 20, ARGB(128, 0, 0, 0));
+        r->FillRect(SCREEN_WIDTH / 2 + rightTransition, 10, SCREEN_WIDTH / 2 - 10, SCREEN_HEIGHT - 20,
+                    ARGB(128, 0, 0, 0));
 #ifndef TOUCH_ENABLED
         font->DrawString(_("menu"), SCREEN_WIDTH - 35 + rightTransition, SCREEN_HEIGHT - 15);
         font->DrawString(_("filter"), SCREEN_WIDTH - 95 + rightTransition, SCREEN_HEIGHT - 15);
@@ -953,9 +830,8 @@ void GameStateDeckViewer::renderOnScreenMenu()
         graphColor = ARGB(200, 155, 155, 155);
         string STATS_TITLE_FORMAT = _("%i: %s");
 
-        switch (stw->currentPage)
-        {
-        case 1: // Counts, price
+        switch (stw->currentPage) {
+        case 1:  // Counts, price
             // Title
             sprintf(buffer, STATS_TITLE_FORMAT.c_str(), stw->currentPage, _("Statistics Summary").c_str());
             font->DrawString(buffer, 10 + leftTransition, 10);
@@ -967,29 +843,26 @@ void GameStateDeckViewer::renderOnScreenMenu()
             posY += 10;
 
             // Counts by color
-            for (int j = 0; j < Constants::NB_Colors; j++)
-            {
+            for (int j = 0; j < Constants::NB_Colors; j++) {
                 int value = myDeck->getCount(j);
-                if (value > 0)
-                {
+                if (value > 0) {
                     sprintf(buffer, "%i", value);
                     font->DrawString(buffer, 38 + nb_letters * 13 + leftTransition, posY + 5);
                     r->RenderQuad(mIcons[j].get(), 30 + nb_letters * 13 + leftTransition, posY + 11, 0, 0.5, 0.5);
-                    if (value > 9)
-                    {
+                    if (value > 9) {
                         nb_letters += 3;
-                    }
-                    else
-                    {
+                    } else {
                         nb_letters += 2;
                     }
                 }
             }
             posY += 25;
 
-            r->DrawLine(posX - 4 + leftTransition, posY - 1, posX - 4 + leftTransition, posY + 177, ARGB(128, 255, 255, 255));
+            r->DrawLine(posX - 4 + leftTransition, posY - 1, posX - 4 + leftTransition, posY + 177,
+                        ARGB(128, 255, 255, 255));
             r->DrawLine(19 + leftTransition, posY - 1, 19 + leftTransition, posY + 177, ARGB(128, 255, 255, 255));
-            r->DrawLine(posX + 40 + leftTransition, posY - 1, posX + 40 + leftTransition, posY + 177, ARGB(128, 255, 255, 255));
+            r->DrawLine(posX + 40 + leftTransition, posY - 1, posX + 40 + leftTransition, posY + 177,
+                        ARGB(128, 255, 255, 255));
 
             r->DrawLine(20 + leftTransition, posY - 1, posX + 40 + leftTransition, posY - 1, ARGB(128, 255, 255, 255));
 
@@ -1023,8 +896,8 @@ void GameStateDeckViewer::renderOnScreenMenu()
             font->DrawString(_("Sorceries"), 30 + leftTransition, posY);
             sprintf(buffer, _("%i").c_str(), stw->countSorceries);
             font->DrawString(buffer, posX + leftTransition, posY);
-            //sprintf(buffer, "Artifacts: %i", stw->countArtifacts);
-            //mFont->DrawString(buffer, 20, 123);
+            // sprintf(buffer, "Artifacts: %i", stw->countArtifacts);
+            // mFont->DrawString(buffer, 20, 123);
 
             posY += 14;
             r->DrawLine(20 + leftTransition, posY - 1, posX + 40 + leftTransition, posY - 1, ARGB(128, 255, 255, 255));
@@ -1072,11 +945,12 @@ void GameStateDeckViewer::renderOnScreenMenu()
             font->DrawString(_("Total price (credits)"), 20 + leftTransition, posY);
             sprintf(buffer, _("%i ").c_str(), stw->totalPrice);
             font->DrawString(buffer, posX + leftTransition, posY);
-            r->DrawLine(20 + leftTransition, posY + 13, posX + 40 + leftTransition, posY + 13, ARGB(128, 255, 255, 255));
+            r->DrawLine(20 + leftTransition, posY + 13, posX + 40 + leftTransition, posY + 13,
+                        ARGB(128, 255, 255, 255));
 
             break;
 
-        case 5: // Land statistics
+        case 5:  // Land statistics
             sprintf(buffer, STATS_TITLE_FORMAT.c_str(), stw->currentPage, _("Mana production").c_str());
             font->DrawString(buffer, 10 + leftTransition, 10);
 
@@ -1085,29 +959,31 @@ void GameStateDeckViewer::renderOnScreenMenu()
             posY = 70;
 
             // Column titles
-            for (int j = 0; j < Constants::NB_Colors - 1; j++)
-            {
+            for (int j = 0; j < Constants::NB_Colors - 1; j++) {
                 r->RenderQuad(mIcons[j].get(), 52 + j * 15 + leftTransition, posY - 10, 0, 0.5, 0.5);
             }
 
-            //font->DrawString(_("C"), 30 + leftTransition, posY-16);
-            //font->DrawString(_("Ty"), 27 + leftTransition, posY-16);
+            // font->DrawString(_("C"), 30 + leftTransition, posY-16);
+            // font->DrawString(_("Ty"), 27 + leftTransition, posY-16);
 
             // Horizontal table lines
-            r->DrawLine(27 + leftTransition, posY - 20, 60 + (Constants::NB_Colors - 2) * 15 + leftTransition, posY - 20,
-                    ARGB(128, 255, 255, 255));
+            r->DrawLine(27 + leftTransition, posY - 20, 60 + (Constants::NB_Colors - 2) * 15 + leftTransition,
+                        posY - 20, ARGB(128, 255, 255, 255));
             r->DrawLine(27 + leftTransition, posY - 1, 60 + (Constants::NB_Colors - 2) * 15 + leftTransition, posY - 1,
-                    ARGB(128, 255, 255, 255));
-            r->DrawLine(27 + leftTransition, 2 * 10 + posY + 12, 60 + (Constants::NB_Colors - 2) * 15 + leftTransition, 2 * 10
-                    + posY + 12, ARGB(128, 255, 255, 255));
-            r->DrawLine(27 + leftTransition, 3 * 10 + posY + 14, 60 + (Constants::NB_Colors - 2) * 15 + leftTransition, 3 * 10
-                    + posY + 14, ARGB(128, 255, 255, 255));
+                        ARGB(128, 255, 255, 255));
+            r->DrawLine(27 + leftTransition, 2 * 10 + posY + 12, 60 + (Constants::NB_Colors - 2) * 15 + leftTransition,
+                        2 * 10 + posY + 12, ARGB(128, 255, 255, 255));
+            r->DrawLine(27 + leftTransition, 3 * 10 + posY + 14, 60 + (Constants::NB_Colors - 2) * 15 + leftTransition,
+                        3 * 10 + posY + 14, ARGB(128, 255, 255, 255));
 
             // Vertical table lines
-            r->DrawLine(26 + leftTransition, posY - 20, 26 + leftTransition, 3 * 10 + posY + 14, ARGB(128, 255, 255, 255));
-            r->DrawLine(43 + leftTransition, posY - 20, 43 + leftTransition, 3 * 10 + posY + 14, ARGB(128, 255, 255, 255));
-            r->DrawLine(60 + leftTransition + (Constants::NB_Colors - 2) * 15, posY - 20, 60 + leftTransition
-                    + (Constants::NB_Colors - 2) * 15, 3 * 10 + posY + 14, ARGB(128, 255, 255, 255));
+            r->DrawLine(26 + leftTransition, posY - 20, 26 + leftTransition, 3 * 10 + posY + 14,
+                        ARGB(128, 255, 255, 255));
+            r->DrawLine(43 + leftTransition, posY - 20, 43 + leftTransition, 3 * 10 + posY + 14,
+                        ARGB(128, 255, 255, 255));
+            r->DrawLine(60 + leftTransition + (Constants::NB_Colors - 2) * 15, posY - 20,
+                        60 + leftTransition + (Constants::NB_Colors - 2) * 15, 3 * 10 + posY + 14,
+                        ARGB(128, 255, 255, 255));
 
             font->DrawString(_("BL"), 27 + leftTransition, posY);
             font->DrawString(_("NB"), 27 + leftTransition, posY + 10);
@@ -1116,8 +992,7 @@ void GameStateDeckViewer::renderOnScreenMenu()
 
             int curCount;
 
-            for (int j = 0; j < Constants::NB_Colors - 1; j++)
-            {
+            for (int j = 0; j < Constants::NB_Colors - 1; j++) {
                 curCount = stw->countBasicLandsPerColor[j];
                 sprintf(buffer, (curCount == 0 ? "." : "%i"), curCount);
                 font->DrawString(buffer, 49 + leftTransition + j * 15, posY);
@@ -1130,7 +1005,8 @@ void GameStateDeckViewer::renderOnScreenMenu()
                 sprintf(buffer, (curCount == 0 ? "." : "%i"), curCount);
                 font->DrawString(buffer, 49 + leftTransition + j * 15, posY + 20);
 
-                curCount = stw->countLandsPerColor[j] + stw->countBasicLandsPerColor[j] + stw->countNonLandProducersPerColor[j];
+                curCount = stw->countLandsPerColor[j] + stw->countBasicLandsPerColor[j] +
+                           stw->countNonLandProducersPerColor[j];
                 sprintf(buffer, (curCount == 0 ? "." : "%i"), curCount);
                 font->DrawString(buffer, 49 + leftTransition + j * 15, posY + 33);
             }
@@ -1146,35 +1022,34 @@ void GameStateDeckViewer::renderOnScreenMenu()
 
             break;
 
-        case 6: // Land statistics - in symbols
-            sprintf(buffer, STATS_TITLE_FORMAT.c_str(), stw->currentPage, _("Mana production - in mana symbols").c_str());
+        case 6:  // Land statistics - in symbols
+            sprintf(buffer, STATS_TITLE_FORMAT.c_str(), stw->currentPage,
+                    _("Mana production - in mana symbols").c_str());
             font->DrawString(buffer, 10 + leftTransition, 10);
             font->DrawString(_("Total colored manasymbols in lands' production:"), 20 + leftTransition, 30);
 
             int totalProducedSymbols;
             totalProducedSymbols = 0;
-            for (int i = 1; i < Constants::NB_Colors - 1; i++)
-            {
-                totalProducedSymbols += stw->countLandsPerColor[i] + stw->countBasicLandsPerColor[i]; //!! Move to updatestats!
+            for (int i = 1; i < Constants::NB_Colors - 1; i++) {
+                totalProducedSymbols +=
+                    stw->countLandsPerColor[i] + stw->countBasicLandsPerColor[i];  //!! Move to updatestats!
             }
 
             posY = 50;
-            for (int i = 1; i < Constants::NB_Colors - 1; i++)
-            {
-                if (stw->countLandsPerColor[i] + stw->countBasicLandsPerColor[i] > 0)
-                {
+            for (int i = 1; i < Constants::NB_Colors - 1; i++) {
+                if (stw->countLandsPerColor[i] + stw->countBasicLandsPerColor[i] > 0) {
                     sprintf(buffer, _("%i").c_str(), stw->countLandsPerColor[i] + stw->countBasicLandsPerColor[i]);
                     font->DrawString(buffer, 20 + leftTransition, posY);
-                    sprintf(buffer, _("(%i%%)").c_str(), (int) (100 * (float) (stw->countLandsPerColor[i]
-                            + stw->countBasicLandsPerColor[i]) / totalProducedSymbols));
+                    sprintf(buffer, _("(%i%%)").c_str(),
+                            (int)(100 * (float)(stw->countLandsPerColor[i] + stw->countBasicLandsPerColor[i]) /
+                                  totalProducedSymbols));
                     font->DrawString(buffer, 33 + leftTransition, posY);
                     posX = 72;
-                    for (int j = 0; j < stw->countLandsPerColor[i] + stw->countBasicLandsPerColor[i]; j++)
-                    {
+                    for (int j = 0; j < stw->countLandsPerColor[i] + stw->countBasicLandsPerColor[i]; j++) {
                         r->RenderQuad(mIcons[i].get(), posX + leftTransition, posY + 6, 0, 0.5, 0.5);
                         posX += ((j + 1) % 10 == 0) ? 17 : 13;
-                        if ((((j + 1) % 30) == 0) && (j < stw->countLandsPerColor[i] + stw->countBasicLandsPerColor[i] - 1))
-                        {
+                        if ((((j + 1) % 30) == 0) &&
+                            (j < stw->countLandsPerColor[i] + stw->countBasicLandsPerColor[i] - 1)) {
                             posX = 72;
                             posY += 15;
                         }
@@ -1185,16 +1060,15 @@ void GameStateDeckViewer::renderOnScreenMenu()
 
             break;
 
-        case 2: // Mana cost detail
+        case 2:  // Mana cost detail
         case 3:
         case 4:
-            int (*countPerCost)[Constants::STATS_MAX_MANA_COST + 1];
-            int (*countPerCostAndColor)[Constants::STATS_MAX_MANA_COST + 1][Constants::MTG_NB_COLORS + 1];
+            int(*countPerCost)[Constants::STATS_MAX_MANA_COST + 1];
+            int(*countPerCostAndColor)[Constants::STATS_MAX_MANA_COST + 1][Constants::MTG_NB_COLORS + 1];
             float avgCost;
 
-            switch (stw->currentPage)
-            { // Nested switch on the same variable. Oh yes.
-            case 2: // Total counts
+            switch (stw->currentPage) {  // Nested switch on the same variable. Oh yes.
+            case 2:                      // Total counts
                 // Title
                 sprintf(buffer, STATS_TITLE_FORMAT.c_str(), stw->currentPage, _("Mana cost detail").c_str());
                 font->DrawString(buffer, 10 + leftTransition, 10);
@@ -1203,16 +1077,17 @@ void GameStateDeckViewer::renderOnScreenMenu()
                 countPerCost = &stw->countCardsPerCost;
                 countPerCostAndColor = &stw->countCardsPerCostAndColor;
                 break;
-            case 3: // Creature counts
+            case 3:  // Creature counts
                 // Title
-                sprintf(buffer, STATS_TITLE_FORMAT.c_str(), stw->currentPage, _("Mana cost detail - Creatures").c_str());
+                sprintf(buffer, STATS_TITLE_FORMAT.c_str(), stw->currentPage,
+                        _("Mana cost detail - Creatures").c_str());
                 font->DrawString(buffer, 10 + leftTransition, 10);
                 font->DrawString(_("Creature counts per mana cost:"), 20 + leftTransition, 30);
                 avgCost = stw->avgCreatureCost;
                 countPerCost = &stw->countCreaturesPerCost;
                 countPerCostAndColor = &stw->countCreaturesPerCostAndColor;
                 break;
-            case 4: // Spell counts
+            case 4:  // Spell counts
                 // Title
                 sprintf(buffer, STATS_TITLE_FORMAT.c_str(), stw->currentPage, _("Mana cost detail - Spells").c_str());
                 font->DrawString(buffer, 10 + leftTransition, 10);
@@ -1231,8 +1106,7 @@ void GameStateDeckViewer::renderOnScreenMenu()
             posY = 70;
 
             // Column titles
-            for (int j = 0; j < Constants::NB_Colors - 1; j++)
-            {
+            for (int j = 0; j < Constants::NB_Colors - 1; j++) {
                 r->RenderQuad(mIcons[j].get(), 67 + j * 15 + leftTransition, posY - 10, 0, 0.5, 0.5);
             }
 
@@ -1240,37 +1114,37 @@ void GameStateDeckViewer::renderOnScreenMenu()
             font->DrawString(_("#"), 45 + leftTransition, posY - 16);
 
             // Horizontal table lines
-            r->DrawLine(27 + leftTransition, posY - 20, 75 + (Constants::NB_Colors - 2) * 15 + leftTransition, posY - 20,
-                    ARGB(128, 255, 255, 255));
+            r->DrawLine(27 + leftTransition, posY - 20, 75 + (Constants::NB_Colors - 2) * 15 + leftTransition,
+                        posY - 20, ARGB(128, 255, 255, 255));
             r->DrawLine(27 + leftTransition, posY - 1, 75 + (Constants::NB_Colors - 2) * 15 + leftTransition, posY - 1,
-                    ARGB(128, 255, 255, 255));
-            r->DrawLine(27 + leftTransition, Constants::STATS_MAX_MANA_COST * 10 + posY + 12, 75 + (Constants::NB_Colors - 2)
-                    * 15 + leftTransition, Constants::STATS_MAX_MANA_COST * 10 + posY + 12, ARGB(128, 255, 255, 255));
+                        ARGB(128, 255, 255, 255));
+            r->DrawLine(27 + leftTransition, Constants::STATS_MAX_MANA_COST * 10 + posY + 12,
+                        75 + (Constants::NB_Colors - 2) * 15 + leftTransition,
+                        Constants::STATS_MAX_MANA_COST * 10 + posY + 12, ARGB(128, 255, 255, 255));
 
             // Vertical table lines
-            r->DrawLine(26 + leftTransition, posY - 20, 26 + leftTransition, Constants::STATS_MAX_MANA_COST * 10 + posY + 12,
-                    ARGB(128, 255, 255, 255));
-            r->DrawLine(41 + leftTransition, posY - 20, 41 + leftTransition, Constants::STATS_MAX_MANA_COST * 10 + posY + 12,
-                    ARGB(128, 255, 255, 255));
-            r->DrawLine(58 + leftTransition, posY - 20, 58 + leftTransition, Constants::STATS_MAX_MANA_COST * 10 + posY + 12,
-                    ARGB(128, 255, 255, 255));
-            r->DrawLine(75 + leftTransition + (Constants::NB_Colors - 2) * 15, posY - 20, 75 + leftTransition
-                    + (Constants::NB_Colors - 2) * 15, Constants::STATS_MAX_MANA_COST * 10 + posY + 12,
-                    ARGB(128, 255, 255, 255));
+            r->DrawLine(26 + leftTransition, posY - 20, 26 + leftTransition,
+                        Constants::STATS_MAX_MANA_COST * 10 + posY + 12, ARGB(128, 255, 255, 255));
+            r->DrawLine(41 + leftTransition, posY - 20, 41 + leftTransition,
+                        Constants::STATS_MAX_MANA_COST * 10 + posY + 12, ARGB(128, 255, 255, 255));
+            r->DrawLine(58 + leftTransition, posY - 20, 58 + leftTransition,
+                        Constants::STATS_MAX_MANA_COST * 10 + posY + 12, ARGB(128, 255, 255, 255));
+            r->DrawLine(75 + leftTransition + (Constants::NB_Colors - 2) * 15, posY - 20,
+                        75 + leftTransition + (Constants::NB_Colors - 2) * 15,
+                        Constants::STATS_MAX_MANA_COST * 10 + posY + 12, ARGB(128, 255, 255, 255));
 
-            for (int i = 0; i <= Constants::STATS_MAX_MANA_COST; i++)
-            {
+            for (int i = 0; i <= Constants::STATS_MAX_MANA_COST; i++) {
                 sprintf(buffer, _("%i").c_str(), i);
                 font->DrawString(buffer, 30 + leftTransition, posY);
                 sprintf(buffer, ((*countPerCost)[i] > 0) ? _("%i").c_str() : ".", (*countPerCost)[i]);
                 font->DrawString(buffer, 45 + leftTransition, posY);
-                for (int j = 0; j < Constants::NB_Colors - 1; j++)
-                {
-                    sprintf(buffer, ((*countPerCostAndColor)[i][j] > 0) ? _("%i").c_str() : ".", (*countPerCostAndColor)[i][j]);
+                for (int j = 0; j < Constants::NB_Colors - 1; j++) {
+                    sprintf(buffer, ((*countPerCostAndColor)[i][j] > 0) ? _("%i").c_str() : ".",
+                            (*countPerCostAndColor)[i][j]);
                     font->DrawString(buffer, 64 + leftTransition + j * 15, posY);
                 }
-                r->FillRect(77.f + leftTransition + (Constants::NB_Colors - 2) * 15.0f, posY + 2.0f, (*countPerCost)[i] * 5.0f,
-                        8.0f, graphColor);
+                r->FillRect(77.f + leftTransition + (Constants::NB_Colors - 2) * 15.0f, posY + 2.0f,
+                            (*countPerCost)[i] * 5.0f, 8.0f, graphColor);
                 posY += 10;
             }
 
@@ -1298,8 +1172,7 @@ void GameStateDeckViewer::renderOnScreenMenu()
             font->DrawString(_("No lands in first n cards:"), 20 + leftTransition, 30);
 
             posY = 50;
-            for (int i = 0; i < Constants::STATS_FOR_TURNS; i++)
-            {
+            for (int i = 0; i < Constants::STATS_FOR_TURNS; i++) {
                 sprintf(buffer, _("%i:").c_str(), i + 7);
                 font->DrawString(buffer, 30 + leftTransition, posY);
                 sprintf(buffer, _("%2.2f%%").c_str(), stw->noLandsProbInTurn[i]);
@@ -1314,8 +1187,7 @@ void GameStateDeckViewer::renderOnScreenMenu()
             posY += 20;
             graphScale = (stw->noCreaturesProbInTurn[0] == 0) ? 0 : (graphWidth / stw->noCreaturesProbInTurn[0]);
 
-            for (int i = 0; i < Constants::STATS_FOR_TURNS; i++)
-            {
+            for (int i = 0; i < Constants::STATS_FOR_TURNS; i++) {
                 sprintf(buffer, _("%i:").c_str(), i + 7);
                 font->DrawString(buffer, 30 + leftTransition, posY);
                 sprintf(buffer, _("%2.2f%%").c_str(), stw->noCreaturesProbInTurn[i]);
@@ -1326,7 +1198,7 @@ void GameStateDeckViewer::renderOnScreenMenu()
 
             break;
 
-        case 7: // Total mana cost per color
+        case 7:  // Total mana cost per color
             // Title
             sprintf(buffer, STATS_TITLE_FORMAT.c_str(), stw->currentPage, _("Mana cost per color").c_str());
             font->DrawString(buffer, 10 + leftTransition, 10);
@@ -1334,21 +1206,18 @@ void GameStateDeckViewer::renderOnScreenMenu()
             font->DrawString(_("Total colored manasymbols in cards' casting costs:"), 20 + leftTransition, 30);
 
             posY = 50;
-            for (int i = 1; i < Constants::NB_Colors - 1; i++)
-            {
-                if (stw->totalCostPerColor[i] > 0)
-                {
+            for (int i = 1; i < Constants::NB_Colors - 1; i++) {
+                if (stw->totalCostPerColor[i] > 0) {
                     sprintf(buffer, _("%i").c_str(), stw->totalCostPerColor[i]);
                     font->DrawString(buffer, 20 + leftTransition, posY);
-                    sprintf(buffer, _("(%i%%)").c_str(), (int) (100 * (float) stw->totalCostPerColor[i] / stw->totalColoredSymbols));
+                    sprintf(buffer, _("(%i%%)").c_str(),
+                            (int)(100 * (float)stw->totalCostPerColor[i] / stw->totalColoredSymbols));
                     font->DrawString(buffer, 33 + leftTransition, posY);
                     posX = 72;
-                    for (int j = 0; j < stw->totalCostPerColor[i]; j++)
-                    {
+                    for (int j = 0; j < stw->totalCostPerColor[i]; j++) {
                         r->RenderQuad(mIcons[i].get(), posX + leftTransition, posY + 6, 0, 0.5, 0.5);
                         posX += ((j + 1) % 10 == 0) ? 17 : 13;
-                        if ((((j + 1) % 30) == 0) && (j < stw->totalCostPerColor[i] - 1))
-                        {
+                        if ((((j + 1) % 30) == 0) && (j < stw->totalCostPerColor[i] - 1)) {
                             posX = 72;
                             posY += 15;
                         }
@@ -1358,7 +1227,7 @@ void GameStateDeckViewer::renderOnScreenMenu()
             }
             break;
 
-        case 9: // Victory statistics
+        case 9:  // Victory statistics
             // Title
             sprintf(buffer, STATS_TITLE_FORMAT.c_str(), stw->currentPage, _("Victory statistics").c_str());
             font->DrawString(buffer, 10 + leftTransition, 10);
@@ -1375,17 +1244,16 @@ void GameStateDeckViewer::renderOnScreenMenu()
             posX = 20;
 
             // ToDo: Multiple pages when too many AI decks are present
-            for (int i = 0; i < (int) stw->aiDeckStats.size(); i++)
-            {
+            for (int i = 0; i < (int)stw->aiDeckStats.size(); i++) {
                 sprintf(buffer, _("%.14s").c_str(), stw->aiDeckNames.at(i).c_str());
                 font->DrawString(buffer, posX + (i < 2 * AIsPerColumn ? leftTransition : rightTransition), posY);
-                sprintf(buffer, _("%i/%i").c_str(), stw->aiDeckStats.at(i)->victories, stw->aiDeckStats.at(i)->nbgames);
+                sprintf(buffer, _("%i/%i").c_str(), stw->aiDeckStats.at(i)->victories,
+                        stw->aiDeckStats.at(i)->nbgames);
                 font->DrawString(buffer, posX + (i < AIsPerColumn ? leftTransition : rightTransition) + 80, posY);
                 sprintf(buffer, _("%i%%").c_str(), stw->aiDeckStats.at(i)->percentVictories());
                 font->DrawString(buffer, posX + (i < AIsPerColumn ? leftTransition : rightTransition) + 110, posY);
                 posY += 10;
-                if (((i + 1) % AIsPerColumn) == 0)
-                {
+                if (((i + 1) % AIsPerColumn) == 0) {
                     posY = 70;
                     posX += 155;
                 }
@@ -1395,73 +1263,59 @@ void GameStateDeckViewer::renderOnScreenMenu()
     }
 }
 
-
-void GameStateDeckViewer::renderCard(int id, float rotation)
-{
-    WFont * mFont = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
-    MTGCard * card = cardIndex[id];
+void GameStateDeckViewer::renderCard(int id, float rotation) {
+    WFont* mFont = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
+    MTGCard* card = cardIndex[id];
 
     float max_scale = 0.96f;
     float x_center_0 = 180;
     float right_border = SCREEN_WIDTH + 180;
 
     float x_center = x_center_0 + cos((rotation + 8 - id) * M_PI / 12) * (right_border - x_center_0);
-    float scale = max_scale / 1.12f * cos((x_center - x_center_0) * 1.5f / (right_border - x_center_0)) + 0.2f * max_scale * cos(
-            cos((x_center - x_center_0) * 0.15f / (right_border - x_center_0)));
-    float x = x_center; // ;
+    float scale = max_scale / 1.12f * cos((x_center - x_center_0) * 1.5f / (right_border - x_center_0)) +
+                  0.2f * max_scale * cos(cos((x_center - x_center_0) * 0.15f / (right_border - x_center_0)));
+    float x = x_center;  // ;
 
     float y = (SCREEN_HEIGHT_F) / 2.0f + SCREEN_HEIGHT_F * mSlide * (scale + 0.2f);
 
     cardsCoordinates[id] = pair<float, float>(x, y);
 
-    int alpha = (int) (255 * (scale + 1.0 - max_scale));
+    int alpha = (int)(255 * (scale + 1.0 - max_scale));
 
     if (!card) return;
-    
-    if (!WResourceManager::Instance()->IsThreaded())
-    {
+
+    if (!WResourceManager::Instance()->IsThreaded()) {
         JQuadPtr backQuad = WResourceManager::Instance()->GetQuad(kGenericCardID);
         JQuadPtr quad;
 
         int cacheError = CACHE_ERROR_NONE;
 
-        if (!options[Options::DISABLECARDS].number)
-        {
+        if (!options[Options::DISABLECARDS].number) {
             quad = WResourceManager::Instance()->RetrieveCard(card, RETRIEVE_EXISTING);
             cacheError = WResourceManager::Instance()->RetrieveError();
-            if (!quad.get() && cacheError != CACHE_ERROR_404)
-            {
+            if (!quad.get() && cacheError != CACHE_ERROR_404) {
                 if (last_user_activity > (abs(2 - id) + 1) * NO_USER_ACTIVITY_SHOWCARD_DELAY)
                     quad = WResourceManager::Instance()->RetrieveCard(card);
-                else
-                {
+                else {
                     quad = backQuad;
                 }
             }
         }
 
-        if (quad.get())
-        {
-            if (quad == backQuad)
-            {
-                quad->SetColor(ARGB(255,255,255,255));
+        if (quad.get()) {
+            if (quad == backQuad) {
+                quad->SetColor(ARGB(255, 255, 255, 255));
                 float _scale = scale * (285 / quad->mHeight);
                 JRenderer::GetInstance()->RenderQuad(quad.get(), x, y, 0.0f, _scale, _scale);
-            }
-            else
-            {
+            } else {
                 Pos pos = Pos(x, y, scale * 285 / 250, 0.0, 255);
                 CardGui::DrawCard(card, pos);
             }
-        }
-        else
-        {
+        } else {
             Pos pos = Pos(x, y, scale * 285 / 250, 0.0, 255);
             CardGui::DrawCard(card, pos, DrawMode::kText);
         }
-    }
-    else
-    {
+    } else {
         int mode = !options[Options::DISABLECARDS].number ? DrawMode::kNormal : DrawMode::kText;
 
         Pos pos = Pos(x, y, scale * 285 / 250, 0.0, 255);
@@ -1471,56 +1325,46 @@ void GameStateDeckViewer::renderCard(int id, float rotation)
     int quadAlpha = alpha;
     if (!displayed_deck->count(card)) quadAlpha /= 2;
     quadAlpha = 255 - quadAlpha;
-    if (quadAlpha > 0)
-    {
+    if (quadAlpha > 0) {
         JRenderer::GetInstance()->FillRect(x - scale * 100.0f, y - scale * 142.5f, scale * 200.0f, scale * 285.0f,
-                ARGB(quadAlpha,0,0,0));
+                                           ARGB(quadAlpha, 0, 0, 0));
     }
-    if (last_user_activity < 3)
-    {
+    if (last_user_activity < 3) {
         int fontAlpha = alpha;
         float qtY = y - 135 * scale;
         float qtX = x + 40 * scale;
         char buffer[4096];
         sprintf(buffer, "x%i", displayed_deck->count(card));
-        WFont * font = mFont;
-        font->SetColor(ARGB(fontAlpha/2,0,0,0));
-        JRenderer::GetInstance()->FillRect(qtX, qtY, font->GetStringWidth(buffer) + 6, 16, ARGB(fontAlpha/2,0,0,0));
+        WFont* font = mFont;
+        font->SetColor(ARGB(fontAlpha / 2, 0, 0, 0));
+        JRenderer::GetInstance()->FillRect(qtX, qtY, font->GetStringWidth(buffer) + 6, 16,
+                                           ARGB(fontAlpha / 2, 0, 0, 0));
         font->DrawString(buffer, qtX + 4, qtY + 4);
-        font->SetColor(ARGB(fontAlpha,255,255,255));
+        font->SetColor(ARGB(fontAlpha, 255, 255, 255));
         font->DrawString(buffer, qtX + 2, qtY + 2);
-        font->SetColor(ARGB(255,255,255,255));
+        font->SetColor(ARGB(255, 255, 255, 255));
     }
 }
 
-void GameStateDeckViewer::renderCard(int id)
-{
-    renderCard(id, 0);
-}
+void GameStateDeckViewer::renderCard(int id) { renderCard(id, 0); }
 
-void GameStateDeckViewer::Render()
-{
+void GameStateDeckViewer::Render() {
     setButtonState(false);
-    WFont * mFont = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);    
-    JRenderer::GetInstance()->ClearScreen(ARGB(0,0,0,0));
-    if (displayed_deck == myDeck && mStage != STAGE_MENU) 
-		renderDeckBackground();
-    int order[3] = { 1, 2, 3 };
-    if (mRotation < 0.5 && mRotation > -0.5)
-    {
+    WFont* mFont = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
+    JRenderer::GetInstance()->ClearScreen(ARGB(0, 0, 0, 0));
+    if (displayed_deck == myDeck && mStage != STAGE_MENU) renderDeckBackground();
+    int order[3] = {1, 2, 3};
+    if (mRotation < 0.5 && mRotation > -0.5) {
         order[1] = 3;
         order[2] = 2;
-    }
-    else if (mRotation < -0.5)
-    {
+    } else if (mRotation < -0.5) {
         order[0] = 3;
         order[2] = 1;
     }
 
-    // even though we want to draw the cards in a particular z order for layering, we want to prefetch them 
+    // even though we want to draw the cards in a particular z order for layering, we want to prefetch them
     // in a different order, ie the center card should appear first, then the adjacent ones
-    if (WResourceManager::Instance()->IsThreaded())
-    {
+    if (WResourceManager::Instance()->IsThreaded()) {
         WResourceManager::Instance()->RetrieveCard(cardIndex[0]);
         WResourceManager::Instance()->RetrieveCard(cardIndex[3]);
         WResourceManager::Instance()->RetrieveCard(cardIndex[4]);
@@ -1535,63 +1379,49 @@ void GameStateDeckViewer::Render()
     renderCard(4, mRotation);
     renderCard(0, mRotation);
 
-    for (int i = 0; i < 3; i++)
-    {
+    for (int i = 0; i < 3; i++) {
         renderCard(order[i], mRotation);
     }
 
-    if (displayed_deck->Size() > 0)
-    {
+    if (displayed_deck->Size() > 0) {
         setButtonState(true);
         renderSlideBar();
-    }
-    else
-    {
+    } else {
         mFont->DrawString(_("No Card"), SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, JGETEXT_CENTER);
     }
-    if (mStage == STAGE_ONSCREEN_MENU)
-    {
+    if (mStage == STAGE_ONSCREEN_MENU) {
         renderOnScreenMenu();
-    }
-    else if (mStage == STAGE_WELCOME)
-    {
+    } else if (mStage == STAGE_WELCOME) {
         setButtonState(false);
         welcome_menu->Render();
-    }
-    else
-    {
+    } else {
         setButtonState(true);
         renderOnScreenBasicInfo();
     }
-    
-    if (mStage == STAGE_MENU)
-    {
+
+    if (mStage == STAGE_MENU) {
         setButtonState(false);
         menu->Render();
     }
-    
+
     if (subMenu) subMenu->Render();
 
-    if (filterMenu && !filterMenu->isFinished()) 
-    {
+    if (filterMenu && !filterMenu->isFinished()) {
         setButtonState(false);
         filterMenu->Render();
     }
-    
+
     if (options.keypadActive()) options.keypadRender();
 
     RenderButtons();
 }
 
-int GameStateDeckViewer::loadDeck(int deckid)
-{
-
-    if (!stw) 
-    {
-        DeckManager *deckManager = DeckManager::GetInstance();
-        stw = deckManager->getExtendedStatsForDeckId( deckid, MTGCollection(), false );
+int GameStateDeckViewer::loadDeck(int deckid) {
+    if (!stw) {
+        DeckManager* deckManager = DeckManager::GetInstance();
+        stw = deckManager->getExtendedStatsForDeckId(deckid, MTGCollection(), false);
     }
-    
+
     stw->currentPage = 0;
     stw->pageCount = 9;
     stw->needUpdate = true;
@@ -1604,8 +1434,7 @@ int GameStateDeckViewer::loadDeck(int deckid)
 
     char deckname[256];
     sprintf(deckname, "deck%i.txt", deckid);
-    if (myDeck)
-    {
+    if (myDeck) {
         SAFE_DELETE(myDeck->parent);
         SAFE_DELETE(myDeck);
     }
@@ -1614,29 +1443,23 @@ int GameStateDeckViewer::loadDeck(int deckid)
     // Check whether the cards in the deck are actually available in the player's collection:
     int cheatmode = options[Options::CHEATMODE].number;
     bool bPure = true;
-    for (int i = 0; i < myDeck->Size(true); i++)
-    {
-        MTGCard * current = myDeck->getCard(i, true);
+    for (int i = 0; i < myDeck->Size(true); i++) {
+        MTGCard* current = myDeck->getCard(i, true);
         int howmanyinDeck = myDeck->count(current);
-        for (int i = myCollection->count(current); i < howmanyinDeck; i++)
-        {
+        for (int i = myCollection->count(current); i < howmanyinDeck; i++) {
             bPure = false;
-            if (cheatmode)
-            { //Are we cheating?
-                playerdata->collection->add(current); //Yup, add it to collection permanently.
+            if (cheatmode) {                           // Are we cheating?
+                playerdata->collection->add(current);  // Yup, add it to collection permanently.
                 myCollection->Add(current);
-            }
-            else
-            {
-                myDeck->Remove(current,howmanyinDeck-i); //Nope. Remove it from deck.
+            } else {
+                myDeck->Remove(current, howmanyinDeck - i);  // Nope. Remove it from deck.
                 break;
             }
         }
 
         myCollection->Remove(current, myDeck->count(current));
     }
-    if (!bPure)
-    {
+    if (!bPure) {
         myDeck->validate();
         myCollection->validate();
     }
@@ -1648,18 +1471,15 @@ int GameStateDeckViewer::loadDeck(int deckid)
     return 1;
 }
 
-void GameStateDeckViewer::ButtonPressed(int controllerId, int controlId)
-{
+void GameStateDeckViewer::ButtonPressed(int controllerId, int controlId) {
     int deckIdNumber = controlId;
     int deckListSize = 0;
     string defaultAiName;
-    DeckManager *deckManager = DeckManager::GetInstance();
-    vector<DeckMetaData *> * deckList;
-    switch (controllerId)
-    {
-    case MENU_DECK_SELECTION: //Deck menu
-        if (controlId == MENU_ITEM_CANCEL)
-        {
+    DeckManager* deckManager = DeckManager::GetInstance();
+    vector<DeckMetaData*>* deckList;
+    switch (controllerId) {
+    case MENU_DECK_SELECTION:  // Deck menu
+        if (controlId == MENU_ITEM_CANCEL) {
             if (!mSwitching)
                 mParent->DoTransition(TRANSITION_FADE, GAME_STATE_MENU);
             else
@@ -1667,18 +1487,13 @@ void GameStateDeckViewer::ButtonPressed(int controllerId, int controlId)
 
             mSwitching = false;
             break;
-        }
-        else if (controlId == MENUITEM_MORE_INFO)
-        {
+        } else if (controlId == MENUITEM_MORE_INFO) {
             break;
-        }
-        else if (controlId == MENU_ITEM_CHEAT_MODE)
-        { // (PSY) Cheatmode: Complete the collection
-            playerdata->collection->complete(); // Add the cards
-            playerdata->collection->save(); // Save the new collection
-            for (int i = 0; i < setlist.size(); i++)
-            { // Update unlocked sets
-                GameOptionAward * goa = dynamic_cast<GameOptionAward*> (&options[Options::optionSet(i)]);
+        } else if (controlId == MENU_ITEM_CHEAT_MODE) {  // (PSY) Cheatmode: Complete the collection
+            playerdata->collection->complete();          // Add the cards
+            playerdata->collection->save();              // Save the new collection
+            for (int i = 0; i < setlist.size(); i++) {   // Update unlocked sets
+                GameOptionAward* goa = dynamic_cast<GameOptionAward*>(&options[Options::optionSet(i)]);
                 if (goa) goa->giveAward();
             }
             options.save();
@@ -1695,10 +1510,10 @@ void GameStateDeckViewer::ButtonPressed(int controllerId, int controlId)
         deckList = deckManager->getPlayerDeckOrderList();
         deckListSize = deckList->size();
 
-        if (controlId == MENU_ITEM_NEW_DECK) // new deck option selected
+        if (controlId == MENU_ITEM_NEW_DECK)  // new deck option selected
             deckIdNumber = deckList->size() + 1;
         else if (deckListSize > 0 && controlId <= deckListSize)
-            deckIdNumber = deckList->at(controlId - 1)-> getDeckId();
+            deckIdNumber = deckList->at(controlId - 1)->getDeckId();
         else
             deckIdNumber = controlId;
 
@@ -1706,18 +1521,15 @@ void GameStateDeckViewer::ButtonPressed(int controllerId, int controlId)
         mStage = STAGE_WAITING;
         break;
 
-    case MENU_DECK_BUILDER: //Save / exit menu
-        switch (controlId)
-        {
-
+    case MENU_DECK_BUILDER:  // Save / exit menu
+        switch (controlId) {
         case MENU_ITEM_SAVE_RETURN_MAIN_MENU:
             saveDeck();
             mParent->DoTransition(TRANSITION_FADE, GAME_STATE_MENU);
             break;
 
         case MENU_ITEM_SAVE_RENAME:
-            if (myDeck && myDeck->parent)
-            {
+            if (myDeck && myDeck->parent) {
                 options.keypadStart(myDeck->parent->meta_name, &newDeckname);
                 options.keypadTitle("Rename deck");
             }
@@ -1755,14 +1567,11 @@ void GameStateDeckViewer::ButtonPressed(int controllerId, int controlId)
         }
         break;
 
-    case MENU_CARD_PURCHASE: // Yes/ No sub menu.
-        switch (controlId)
-        {
-        case MENU_ITEM_YES:
-        {
-            MTGCard * card = cardIndex[2];
-            if (card)
-            {
+    case MENU_CARD_PURCHASE:  // Yes/ No sub menu.
+        switch (controlId) {
+        case MENU_ITEM_YES: {
+            MTGCard* card = cardIndex[2];
+            if (card) {
                 int rnd = (rand() % 25);
                 playerdata->credits += price;
                 price = price - (rnd * price) / 100;
@@ -1782,41 +1591,35 @@ void GameStateDeckViewer::ButtonPressed(int controllerId, int controlId)
 }
 
 /*
-  to keep actions consistent across the different platforms, we need to branch the way swipes are interpreted.  iOS5 changes
- the way a swipe moves a document on the page.  swipe down is to simulate dragging the page down instead of moving down 
- on a page.
+  to keep actions consistent across the different platforms, we need to branch the way swipes are interpreted.  iOS5
+ changes the way a swipe moves a document on the page.  swipe down is to simulate dragging the page down instead of
+ moving down on a page.
  */
-void GameStateDeckViewer::OnScroll(int inXVelocity, int inYVelocity)
-{
-    int magnitude = static_cast<int>( sqrtf( (float )( (inXVelocity * inXVelocity) + (inYVelocity * inYVelocity))));
-    
+void GameStateDeckViewer::OnScroll(int inXVelocity, int inYVelocity) {
+    int magnitude = static_cast<int>(sqrtf((float)((inXVelocity * inXVelocity) + (inYVelocity * inYVelocity))));
+
     bool flickHorizontal = (abs(inXVelocity) > abs(inYVelocity));
     bool flickUp = !flickHorizontal && (inYVelocity > 0) ? true : false;
     bool flickRight = flickHorizontal && (inXVelocity < 0) ? true : false;
-    
-    if (flickHorizontal)
-    {
-        if(abs(inXVelocity) > 300)
-        {
-            //determine how many cards to move, the faster the velocity the more cards to move.
+
+    if (flickHorizontal) {
+        if (abs(inXVelocity) > 300) {
+            // determine how many cards to move, the faster the velocity the more cards to move.
             // the display is setup so that there is a max of 2 cards to the left and 7 cards to the right
             // of the current card.
             int numCards = (magnitude / 500) % 8;
             int offset = 0;
-            if ( (numCards == 0) && magnitude) numCards = 7;
-            if ( !flickRight)
-            {
-                if (numCards > 1)
-                    offset = 0;
-            }
-            else
+            if ((numCards == 0) && magnitude) numCards = 7;
+            if (!flickRight) {
+                if (numCards > 1) offset = 0;
+            } else
                 offset = 2 + numCards;
 
             mEngine->LeftClickedProcessed();
-            mEngine->LeftClicked(static_cast<int>(cardsCoordinates[offset].first), static_cast<int>(cardsCoordinates[offset].second));
+            mEngine->LeftClicked(static_cast<int>(cardsCoordinates[offset].first),
+                                 static_cast<int>(cardsCoordinates[offset].second));
             mEngine->HoldKey_NoRepeat(JGE_BTN_OK);
         }
-    }
-    else
+    } else
         mEngine->HoldKey_NoRepeat(flickUp ? JGE_BTN_UP : JGE_BTN_DOWN);
 }

@@ -24,54 +24,51 @@
 #define BOOSTER_SLOTS 3
 #define SHOP_SLOTS 11
 
-#define SHOP_ITEMS SHOP_SLOTS+1
+#define SHOP_ITEMS SHOP_SLOTS + 1
 #define LIST_FADEIN 15
 
 class MTGPack;
 class MTGPacks;
 
-class BoosterDisplay: public CardDisplay
-{
+class BoosterDisplay : public CardDisplay {
 public:
-    BoosterDisplay(int id, GameObserver* game, int x, int y, JGuiListener * listener = NULL, TargetChooser * tc = NULL,
-            int nb_displayed_items = 7);
+    BoosterDisplay(int id, GameObserver* game, int x, int y, JGuiListener* listener = NULL, TargetChooser* tc = NULL,
+                   int nb_displayed_items = 7);
     bool CheckUserInput(JButton key);
 };
 
-class ShopBooster
-{
+class ShopBooster {
 public:
     ShopBooster();
     string getName();
-    void randomize(MTGPacks * packlist);
+    void randomize(MTGPacks* packlist);
     int basePrice();
     int maxInventory();
-    void addToDeck(MTGDeck * d, WSrcCards * srcCards);
+    void addToDeck(MTGDeck* d, WSrcCards* srcCards);
     string getSort();
 #ifdef TESTSUITE
     bool unitTest();
 #endif
 private:
-    void randomCustom(MTGPacks * packlist);
+    void randomCustom(MTGPacks* packlist);
     void randomStandard();
-    MTGPack * pack;
-    MTGSetInfo * mainSet;
-    MTGSetInfo * altSet;
+    MTGPack* pack;
+    MTGSetInfo* mainSet;
+    MTGSetInfo* altSet;
 };
 
-class GameStateShop: public GameState, public JGuiListener
-{
+class GameStateShop : public GameState, public JGuiListener {
 private:
     JQuadPtr pspIcons[8];
-    WSrcCards * srcCards;
-    TaskList * taskList;
+    WSrcCards* srcCards;
+    TaskList* taskList;
     float mElapsed;
-    WGuiMenu * shopMenu;
-    WGuiFilters * filterMenu; //Filter menu slides in sideways from right, or up from bottom.
-    WGuiCardImage * bigDisplay;
-    BoosterDisplay * boosterDisplay;
+    WGuiMenu* shopMenu;
+    WGuiFilters* filterMenu;  // Filter menu slides in sideways from right, or up from bottom.
+    WGuiCardImage* bigDisplay;
+    BoosterDisplay* boosterDisplay;
     vector<MTGCardInstance*> subBooster;
-    MTGDeck * booster;
+    MTGDeck* booster;
     bool bListCards;
     InteractiveButton *cycleCardsButton, *showCardListButton;
     bool disablePurchase, clearInput;
@@ -80,12 +77,12 @@ private:
     void deleteDisplay();
     void enableButtons();
     void renderButtons();
-    
+
     WSyncable bigSync;
-    SimpleMenu * menu;
-    PriceList * pricelist;
-    PlayerData * playerdata;
-    MTGPacks * packlist;
+    SimpleMenu* menu;
+    PriceList* pricelist;
+    PlayerData* playerdata;
+    MTGPacks* packlist;
     bool mTouched;
     bool needLoad;
     int mPrices[SHOP_ITEMS];
@@ -95,7 +92,7 @@ private:
     int alphaChange;
     int mBuying;
 
-    DeckDataWrapper * myCollection;
+    DeckDataWrapper* myCollection;
 
     int mStage;
     ShopBooster mBooster[BOOSTER_SLOTS];
@@ -110,6 +107,7 @@ private:
     void cancelBooster(int controlId);
     int purchasePrice(int offset);
     string descPurchase(int controlId, bool tiny = false);
+
 public:
     GameStateShop(GameApp* parent);
     virtual ~GameStateShop();
@@ -125,4 +123,3 @@ public:
 };
 
 #endif
-

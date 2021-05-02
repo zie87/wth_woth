@@ -23,19 +23,16 @@ class StyleManager;
 class Player;
 class GameApp;
 
-
-class Options
-{
+class Options {
 public:
     friend class GameSettings;
-    enum 
-    {
-        //Global settings
+    enum {
+        // Global settings
         ACTIVE_PROFILE,
         LANG,
-        LAST_GLOBAL = LANG, //This must be the value above, to keep ordering.
-        //Values /must/ match ordering in optionNames, or everything loads wrong.
-        //Profile settings        
+        LAST_GLOBAL = LANG,  // This must be the value above, to keep ordering.
+                             // Values /must/ match ordering in optionNames, or everything loads wrong.
+                             // Profile settings
         ACTIVE_THEME,
         ACTIVE_MODE,
         MUSICVOLUME,
@@ -60,11 +57,11 @@ public:
         INTERRUPT_SECONDS,
         KEY_BINDINGS,
         AIDECKS_UNLOCKED,
-        //My interrupts    
+        // My interrupts
         INTERRUPTMYSPELLS,
         INTERRUPTMYABILITIES,
         SAVEDETAILEDDECKINFO,
-        //Other interrupts
+        // Other interrupts
         INTERRUPT_BEFOREBEGIN,
         INTERRUPT_UNTAP,
         INTERRUPT_UPKEEP,
@@ -79,13 +76,13 @@ public:
         INTERRUPT_ENDTURN,
         INTERRUPT_CLEANUP,
         INTERRUPT_AFTEREND,
-        BEGIN_AWARDS, //Options after this use the GameOptionAward struct, which includes a timestamp.
+        BEGIN_AWARDS,  // Options after this use the GameOptionAward struct, which includes a timestamp.
         DIFFICULTY_MODE_UNLOCKED = BEGIN_AWARDS,
         EVILTWIN_MODE_UNLOCKED,
-        RANDOMDECK_MODE_UNLOCKED,    
+        RANDOMDECK_MODE_UNLOCKED,
         AWARD_COLLECTOR,
-        LAST_NAMED, //Any option after this does not look up in optionNames.
-        SET_UNLOCKS = LAST_NAMED + 1, //For sets.
+        LAST_NAMED,                    // Any option after this does not look up in optionNames.
+        SET_UNLOCKS = LAST_NAMED + 1,  // For sets.
     };
 
     static int optionSet(int setID);
@@ -98,21 +95,18 @@ private:
     static const string optionNames[];
 };
 
-class GameOption
-{
+class GameOption {
 public:
-    virtual ~GameOption()
-    {
-    }
+    virtual ~GameOption() {}
 
     int number;
     string str;
-    //All calls to asColor should include a fallback color for people without a theme.
-    PIXEL_TYPE asColor(PIXEL_TYPE fallback = ARGB(255,255,255,255));
+    // All calls to asColor should include a fallback color for people without a theme.
+    PIXEL_TYPE asColor(PIXEL_TYPE fallback = ARGB(255, 255, 255, 255));
 
-    virtual bool isDefault(); //Returns true when number is 0 and string is "" or "Default"
-    virtual string menuStr(); //The string we'll use for GameStateOptions.
-    virtual bool write(std::ofstream * file, string name);
+    virtual bool isDefault();  // Returns true when number is 0 and string is "" or "Default"
+    virtual string menuStr();  // The string we'll use for GameStateOptions.
+    virtual bool write(std::ofstream* file, string name);
     virtual bool read(string input);
 
     GameOption(int value = 0);
@@ -120,236 +114,157 @@ public:
     GameOption(int, string);
 };
 
-struct EnumDefinition
-{
+struct EnumDefinition {
     int findIndex(int value);
 
     typedef pair<int, string> assoc;
     vector<assoc> values;
 };
 
-class GameOptionEnum : public GameOption
-{
+class GameOptionEnum : public GameOption {
 public:
     virtual string menuStr();
-    virtual bool write(std::ofstream * file, string name);
+    virtual bool write(std::ofstream* file, string name);
     virtual bool read(string input);
-    EnumDefinition * def;
+    EnumDefinition* def;
 };
 
-class GameOptionAward : public GameOption
-{
+class GameOptionAward : public GameOption {
 public:
     GameOptionAward();
     virtual string menuStr();
-    virtual bool write(std::ofstream * file, string name);
+    virtual bool write(std::ofstream* file, string name);
     virtual bool read(string input);
-    virtual bool giveAward(); //Returns false if already awarded
+    virtual bool giveAward();  // Returns false if already awarded
     virtual bool isViewed();
 
-    virtual void setViewed(bool v = true)
-    {
-        viewed = v;
-    }
+    virtual void setViewed(bool v = true) { viewed = v; }
 
 private:
-    time_t achieved; //When was it awarded?
-    bool viewed;     //Flag it as "New!" or not.  
+    time_t achieved;  // When was it awarded?
+    bool viewed;      // Flag it as "New!" or not.
 };
 
-class GameOptionKeyBindings : public GameOption
-{
+class GameOptionKeyBindings : public GameOption {
     virtual bool read(string input);
     virtual bool write(std::ofstream*, string);
 };
 
-class OptionVolume : public EnumDefinition
-{
+class OptionVolume : public EnumDefinition {
 public:
-    enum
-    {
-        MUTE = 0, 
-        MAX = 100 
-    };
-    
-    static EnumDefinition * getInstance()
-    {
-        return &mDef;
-    }
+    enum { MUTE = 0, MAX = 100 };
+
+    static EnumDefinition* getInstance() { return &mDef; }
 
 private:
     OptionVolume();
     static OptionVolume mDef;
 };
 
-
-class OptionClosedHand : public EnumDefinition
-{
+class OptionClosedHand : public EnumDefinition {
 public:
-    enum
-    { 
-        INVISIBLE = 0,
-        VISIBLE = 1
-    };
+    enum { INVISIBLE = 0, VISIBLE = 1 };
 
-    static EnumDefinition* getInstance()
-    {
-        return &mDef;
-    }
+    static EnumDefinition* getInstance() { return &mDef; }
 
-private:  
+private:
     OptionClosedHand();
     static OptionClosedHand mDef;
 };
 
-class OptionHandDirection : public EnumDefinition
-{
+class OptionHandDirection : public EnumDefinition {
 public:
-    enum
-    {
-        VERTICAL = 0,
-        HORIZONTAL = 1
-    };
+    enum { VERTICAL = 0, HORIZONTAL = 1 };
 
-    static EnumDefinition * getInstance()
-    {
-        return &mDef;
-    }
+    static EnumDefinition* getInstance() { return &mDef; }
 
 private:
     OptionHandDirection();
     static OptionHandDirection mDef;
 };
 
-class OptionManaDisplay : public EnumDefinition
-{
+class OptionManaDisplay : public EnumDefinition {
 public:
-    enum
-    {
-        DYNAMIC = 0,
-        STATIC = 1,
-        NOSTARSDYNAMIC = 2,
-        BOTH = 3
-    };
-    
-    static EnumDefinition * getInstance()
-    {
-        return &mDef;
-    }
+    enum { DYNAMIC = 0, STATIC = 1, NOSTARSDYNAMIC = 2, BOTH = 3 };
+
+    static EnumDefinition* getInstance() { return &mDef; }
 
 private:
     OptionManaDisplay();
     static OptionManaDisplay mDef;
 };
 
-class OptionMaxGrade : public EnumDefinition
-{
+class OptionMaxGrade : public EnumDefinition {
 public:
-    static EnumDefinition * getInstance()
-    {
-        return &mDef;
-    }
+    static EnumDefinition* getInstance() { return &mDef; }
 
 private:
     OptionMaxGrade();
     static OptionMaxGrade mDef;
 };
 
-class OptionASkipPhase : public EnumDefinition
-{
+class OptionASkipPhase : public EnumDefinition {
 public:
-    static EnumDefinition * getInstance()
-    {
-        return &mDef;
-    }
+    static EnumDefinition* getInstance() { return &mDef; }
 
 private:
     OptionASkipPhase();
     static OptionASkipPhase mDef;
 };
 
-class OptionWhosFirst : public EnumDefinition
-{
+class OptionWhosFirst : public EnumDefinition {
 public:
-    enum
-    {
-        WHO_P = 0,
-        WHO_O = 1, 
-        WHO_R = 2
-    };
-    
-    static EnumDefinition * getInstance()
-    {
-        return &mDef;
-    }
+    enum { WHO_P = 0, WHO_O = 1, WHO_R = 2 };
+
+    static EnumDefinition* getInstance() { return &mDef; }
 
 private:
     OptionWhosFirst();
     static OptionWhosFirst mDef;
 };
 
-class OptionKicker : public EnumDefinition
-{
+class OptionKicker : public EnumDefinition {
 public:
-    enum
-    {
+    enum {
         KICKER_ALWAYS = 0,
-        KICKER_CHOICE = 1, 
+        KICKER_CHOICE = 1,
     };
-    
-    static EnumDefinition * getInstance()
-    {
-        return &mDef;
-    }
+
+    static EnumDefinition* getInstance() { return &mDef; }
 
 private:
     OptionKicker();
     static OptionKicker mDef;
 };
 
-class OptionEconDifficulty : public EnumDefinition
-{
+class OptionEconDifficulty : public EnumDefinition {
 public:
-    static EnumDefinition * getInstance()
-    {
-        return &mDef;
-    }
+    static EnumDefinition* getInstance() { return &mDef; }
 
 private:
     OptionEconDifficulty();
     static OptionEconDifficulty mDef;
 };
 
-class OptionDifficulty: public EnumDefinition
-{
+class OptionDifficulty : public EnumDefinition {
 public:
-    enum
-    { 
-        NORMAL = 0,
-        HARD = 1,
-        HARDER = 2,
-        EVIL = 3
-    };
+    enum { NORMAL = 0, HARD = 1, HARDER = 2, EVIL = 3 };
 
-    static EnumDefinition* getInstance()
-    {
-        return &mDef;
-    }
+    static EnumDefinition* getInstance() { return &mDef; }
 
 private:
     OptionDifficulty();
     static OptionDifficulty mDef;
 };
 
-class GameOptions
-{
+class GameOptions {
 public:
     string mFilename;
     int save();
     int load();
-    
-    GameOption * get(int);
-    GameOption * get(string optionName);
+
+    GameOption* get(int);
+    GameOption* get(string optionName);
     GameOption& operator[](int);
     GameOption& operator[](string);
     GameOptions(string filename);
@@ -357,12 +272,11 @@ public:
 
 private:
     vector<GameOption*> values;
-    map<string,GameOption*> unknownMap;
-    GameOption * factorNewGameOption(string optionName, string value = "");
+    map<string, GameOption*> unknownMap;
+    GameOption* factorNewGameOption(string optionName, string value = "");
 };
 
-class GameSettings
-{
+class GameSettings {
 public:
     friend class GameApp;
 
@@ -370,66 +284,58 @@ public:
     ~GameSettings();
     int save();
 
-    SimplePad * keypadStart(string input, string * _dest = NULL, bool _cancel = true, bool _numpad = false, float _x = SCREEN_WIDTH_F / 2, float _y = SCREEN_HEIGHT_F / 2);
+    SimplePad* keypadStart(string input, string* _dest = NULL, bool _cancel = true, bool _numpad = false,
+                           float _x = SCREEN_WIDTH_F / 2, float _y = SCREEN_HEIGHT_F / 2);
     string keypadFinish();
     void keypadShutdown();
     void keypadTitle(string set);
-    
-    bool keypadActive()
-    {
-        if(keypad)
-            return keypad->isActive();
-        
+
+    bool keypadActive() {
+        if (keypad) return keypad->isActive();
+
         return false;
     }
-    
-    void keypadUpdateText(unsigned char key)
-    {
-        if (keypad)
-        {
-            switch (key)
-            {
-                case 1: // save the current text
-                    keypad->pressKey( key);
-                    break;
-                case 10: // cancel the edit
-                    keypad->CancelEdit();
-                    break;
-                case 32:
-                    keypad->pressKey( KPD_SPACE );
-                    break;
-                case 127: 
-                    keypad->pressKey( KPD_DEL );
-                    break;
-                default:
-                    keypad->pressKey( key );
-                    break;
+
+    void keypadUpdateText(unsigned char key) {
+        if (keypad) {
+            switch (key) {
+            case 1:  // save the current text
+                keypad->pressKey(key);
+                break;
+            case 10:  // cancel the edit
+                keypad->CancelEdit();
+                break;
+            case 32:
+                keypad->pressKey(KPD_SPACE);
+                break;
+            case 127:
+                keypad->pressKey(KPD_DEL);
+                break;
+            default:
+                keypad->pressKey(key);
+                break;
             }
         }
     }
-    
-    void keypadUpdate(float dt)
-    {
-        if(keypad)
-            keypad->Update(dt);
+
+    void keypadUpdate(float dt) {
+        if (keypad) keypad->Update(dt);
     }
-    
-    void keypadRender() 
-    {
-        if(keypad)
-            keypad->Render();
+
+    void keypadRender() {
+        if (keypad) keypad->Render();
     }
 
     bool newAward();
 
-    //These return a filepath accurate to the current mode/profile/theme, and can
-    //optionally fallback to a file within a certain directory. 
-    //The sanity=false option returns the adjusted path even if the file doesn't exist.
-    string profileFile(string filename="", string fallback="", bool sanity=false);
+    // These return a filepath accurate to the current mode/profile/theme, and can
+    // optionally fallback to a file within a certain directory.
+    // The sanity=false option returns the adjusted path even if the file doesn't exist.
+    string profileFile(string filename = "", string fallback = "", bool sanity = false);
 
-    void reloadProfile(); //Reloads profile using current options[ACTIVE_PROFILE]
-    void checkProfile();  //Confirms that a profile is loaded and contains a collection.
-    void createUsersFirstDeck(int setId); 
+    void reloadProfile();  // Reloads profile using current options[ACTIVE_PROFILE]
+    void checkProfile();   // Confirms that a profile is loaded and contains a collection.
+    void createUsersFirstDeck(int setId);
 
     GameOption* get(int);
     GameOption& operator[](int);
@@ -440,14 +346,14 @@ public:
 
     static GameOption invalid_option;
 
-    WStyle * getStyle();
-    StyleManager * getStyleMan();
+    WStyle* getStyle();
+    StyleManager* getStyleMan();
     void automaticStyle(Player* p1, Player* p2);
 
 private:
-    GameApp* theGame;  
+    GameApp* theGame;
     SimplePad* keypad;
-    
+
     StyleManager* styleMan;
     void createProfileFolders();
 };

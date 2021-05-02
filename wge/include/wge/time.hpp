@@ -18,14 +18,12 @@ struct clock {
 
     constexpr static bool is_steady = true;
 
-    static time_point now() noexcept {
-        return time_point{duration{time_in_ms()}};
-    }
+    static time_point now() noexcept { return time_point{duration{time_in_ms()}}; }
 };
 
 using time_point = clock::time_point;
 using duration = clock::duration;
 
-}; // namespace wge
+};  // namespace wge
 
-#endif // WOTH_WGE_TIME_HPP
+#endif  // WOTH_WGE_TIME_HPP

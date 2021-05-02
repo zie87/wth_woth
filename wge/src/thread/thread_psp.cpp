@@ -16,7 +16,7 @@ static int execute_thread_routine([[maybe_unused]] SceSize arg_size, void* funct
     return 0;
 }
 
-} // namespace
+}  // namespace
 
 void thread::start_thread(shared_base_type base_ptr) {
     base_ptr->m_this_ptr = base_ptr;
@@ -41,17 +41,13 @@ void thread::detach() {
 
 namespace detail {
 
-void sleep_for_us(const std::chrono::microseconds sleep_duration) {
-    sceKernelDelayThread(sleep_duration.count());
-}
+void sleep_for_us(const std::chrono::microseconds sleep_duration) { sceKernelDelayThread(sleep_duration.count()); }
 
-} // namespace detail
+}  // namespace detail
 
 namespace this_thread {
 
-thread::id get_id() noexcept {
-    return thread::id(sceKernelGetThreadId());
-}
+thread::id get_id() noexcept { return thread::id(sceKernelGetThreadId()); }
 
-} // namespace this_thread
-} // namespace wge
+}  // namespace this_thread
+}  // namespace wge

@@ -8,9 +8,8 @@
 #include "MTGDeck.h"
 #include "GameObserver.h"
 #ifdef AI_CHANGE_TESTING
-#include <wge/thread.hpp>
-#endif //AI_CHANGE_TESTING
-
+    #include <wge/thread.hpp>
+#endif  // AI_CHANGE_TESTING
 
 #define CHOOSE_OPPONENT 7
 
@@ -22,21 +21,20 @@ class Credits;
 class JNetwork;
 #endif
 
-class GameStateDuel: public GameState, public JGuiListener
-{
+class GameStateDuel : public GameState, public JGuiListener {
 private:
 #ifdef TESTSUITE
-    TestSuite * testSuite;
+    TestSuite* testSuite;
 #endif
 
-    Credits * credits;
+    Credits* credits;
     int mGamePhase;
-    Player * mCurrentPlayer;
-    GameObserver * game;
-    DeckMenu * deckmenu;
-    DeckMenu * opponentMenu;
-    SimpleMenu * menu;
-    SimplePopup * popupScreen; // used for informational screens, modal
+    Player* mCurrentPlayer;
+    GameObserver* game;
+    DeckMenu* deckmenu;
+    DeckMenu* opponentMenu;
+    SimpleMenu* menu;
+    SimplePopup* popupScreen;  // used for informational screens, modal
     static int selectedPlayerDeckId;
     static int selectedAIDeckId;
 
@@ -45,7 +43,7 @@ private:
     string musictrack;
 
     bool MusicExist(string FileName);
-    void ConstructOpponentMenu(); //loads the opponentMenu if it doesn't exist
+    void ConstructOpponentMenu();  // loads the opponentMenu if it doesn't exist
     void initScroller();
     void setGamePhase(int newGamePhase);
 
@@ -64,11 +62,10 @@ public:
     static wge::mutex mMutex;
     vector<wge::thread> mWorkerThread;
     static void ThreadProc(void* inParam);
-    void handleResults(GameObserver* aGame){
+    void handleResults(GameObserver* aGame) {
         mMutex.lock();
         totalTestGames++;
-        if (aGame->didWin(aGame->players[1]))
-            testPlayer2Victories++;
+        if (aGame->didWin(aGame->players[1])) testPlayer2Victories++;
         mMutex.unlock();
     };
 #endif
@@ -82,8 +79,7 @@ public:
 
     void OnScroll(int inXVelocity, int inYVelocity);
 
-    enum ENUM_DUEL_STATE_MENU_ITEM
-    {
+    enum ENUM_DUEL_STATE_MENU_ITEM {
         MENUITEM_CANCEL = kCancelMenuID,
         MENUITEM_NEW_DECK = -10,
         MENUITEM_RANDOM_PLAYER = kRandomPlayerMenuID,
@@ -101,8 +97,6 @@ public:
 #endif
         MENUITEM_MORE_INFO = kInfoMenuID
     };
-
 };
 
 #endif
-

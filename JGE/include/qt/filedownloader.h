@@ -8,47 +8,39 @@
 #include <QNetworkReply>
 #include <QTemporaryFile>
 #ifdef QT_WIDGET
-#include <QProgressDialog>
-#include <QPushButton>
-#include <QCoreApplication>
+    #include <QProgressDialog>
+    #include <QPushButton>
+    #include <QCoreApplication>
 #else
-#include <qdeclarative.h>
-#endif //QT_WIDGET
+    #include <qdeclarative.h>
+#endif  // QT_WIDGET
 
- 
 class FileDownloader :
 #ifdef QT_WIDGET
-        public QProgressDialog
+    public QProgressDialog
 #else
-        public QObject
-#endif //QT_WIDGET
+    public QObject
+#endif  // QT_WIDGET
 {
     Q_OBJECT
 
     Q_PROPERTY(qint64 received READ received NOTIFY receivedChanged)
     Q_PROPERTY(QString status READ getStatus NOTIFY statusChanged)
-    Q_PROPERTY(DownloadState state READ getState NOTIFY stateChanged )
-    Q_PROPERTY(QString state_string READ getStateString NOTIFY stateStringChanged )
+    Q_PROPERTY(DownloadState state READ getState NOTIFY stateChanged)
+    Q_PROPERTY(QString state_string READ getStateString NOTIFY stateStringChanged)
     Q_ENUMS(DownloadState)
 public:
-    enum DownloadState {
-        NETWORK_ERROR,
-        DOWNLOADING_HASH,
-        DOWNLOADING_FILE,
-        DOWNLOADED
-    } ;
+    enum DownloadState { NETWORK_ERROR, DOWNLOADING_HASH, DOWNLOADING_FILE, DOWNLOADED };
 
-    explicit FileDownloader(QString localPath, QString targetFile, QObject *parent = 0);
+    explicit FileDownloader(QString localPath, QString targetFile, QObject* parent = 0);
     virtual ~FileDownloader();
-    qint64 received() const {return m_received;};
-    QString getStatus() {return m_status;};
-    DownloadState getState() {
-        return m_state;
-    };
+    qint64 received() const { return m_received; };
+    QString getStatus() { return m_status; };
+    DownloadState getState() { return m_state; };
     QString getStateString() {
-        if(m_state == DOWNLOADING_HASH )
+        if (m_state == DOWNLOADING_HASH)
             return "DOWNLOADING_HASH";
-        else if(m_state == DOWNLOADING_FILE )
+        else if (m_state == DOWNLOADING_FILE)
             return "DOWNLOADING_FILE";
         else
             return "DOWNLOADED";
@@ -61,43 +53,41 @@ signals:
     void stateStringChanged();
 
 private slots:
-    void fileDownloaded(){
+    void fileDownloaded() {
         // let's check some error
-        if(m_downloadReply->error() != QNetworkReply::NoError) {
+        if (m_downloadReply->error() != QNetworkReply::NoError) {
             m_state = NETWORK_ERROR;
         } else {
-            if(m_tmp.write(m_downloadReply->readAll()) == -1) return;
-            if(QFile(m_localPath).exists())
-                QFile::remove(m_localPath);
+            if (m_tmp.write(m_downloadReply->readAll()) == -1) return;
+            if (QFile(m_localPath).exists()) QFile::remove(m_localPath);
 
             m_tmp.close();
             computeLocalHash(m_tmp);
-            if(m_localHash == m_remoteHash) {
-                if(!m_tmp.rename(m_localPath)) return;
+            if (m_localHash == m_remoteHash) {
+                if (!m_tmp.rename(m_localPath)) return;
                 m_tmp.setAutoRemove(false);
                 m_state = DOWNLOADED;
-            }
-            else {
+            } else {
                 m_state = NETWORK_ERROR;
             }
         }
         emit stateChanged(m_state);
     };
-    void downloadProgress(qint64 bytesReceived, qint64 bytesTotal){
-        if(m_tmp.write(m_downloadReply->readAll()) == -1) return;
-        if(!bytesTotal) return;
-        m_received = bytesReceived*100/bytesTotal;
+    void downloadProgress(qint64 bytesReceived, qint64 bytesTotal) {
+        if (m_tmp.write(m_downloadReply->readAll()) == -1) return;
+        if (!bytesTotal) return;
+        m_received = bytesReceived * 100 / bytesTotal;
         emit receivedChanged(m_received);
     };
     void setDownloadUrl(QUrl url);
     void computeLocalHash(QFile& file);
     void requestHash(QUrl url);
     void computeRemoteHash();
-    void handleStateChange(DownloadState state){
+    void handleStateChange(DownloadState state) {
 #ifdef QT_WIDGET
-        switch(state) {
+        switch (state) {
         case NETWORK_ERROR:
-            if(m_localHash == "") {
+            if (m_localHash == "") {
                 setLabelText("Network Error");
                 setCancelButton(new QPushButton("OK"));
                 show();
@@ -117,14 +107,11 @@ private slots:
 
 #else
         emit stateStringChanged();
-#endif //QT_WIDGET
+#endif  // QT_WIDGET
     };
 #ifdef QT_WIDGET
-    void handleCancel(){
-        QCoreApplication::instance()->exit(1);
-    }
-#endif //QT_WIDGET
-
+    void handleCancel() { QCoreApplication::instance()->exit(1); }
+#endif  // QT_WIDGET
 
 private:
     DownloadState m_state;
@@ -142,6 +129,6 @@ private:
 };
 #ifndef QT_WIDGET
 QML_DECLARE_TYPEINFO(FileDownloader, QML_HAS_ATTACHED_PROPERTIES)
-#endif  //QT_WIDGET
+#endif  // QT_WIDGET
 
-#endif // FILEDOWNLOADER_H
+#endif  // FILEDOWNLOADER_H

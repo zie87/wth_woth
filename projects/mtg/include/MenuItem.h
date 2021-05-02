@@ -7,16 +7,15 @@
 #include <string>
 using namespace std;
 
-#define SCALE_SELECTED		1.2f
-#define SCALE_NORMAL		1.0f
+#define SCALE_SELECTED 1.2f
+#define SCALE_NORMAL 1.0f
 
 class hgeParticleSystem;
 
-class MenuItem: public JGuiObject
-{
+class MenuItem : public JGuiObject {
 protected:
     bool mHasFocus;
-    WFont *mFont;
+    WFont* mFont;
     string mText;
     float mX;
     float mY;
@@ -25,12 +24,13 @@ protected:
 
     float mScale;
     float mTargetScale;
-    JQuad * onQuad;
-    JQuad * offQuad;
+    JQuad* onQuad;
+    JQuad* offQuad;
     hgeParticleSystem* mParticleSys;
 
 public:
-    MenuItem(int id, WFont *font, string text, float x, float y, JQuad * _off, JQuad * _on, const char * particle, JQuad * particleQuad, bool hasFocus = false);
+    MenuItem(int id, WFont* font, string text, float x, float y, JQuad* _off, JQuad* _on, const char* particle,
+             JQuad* particleQuad, bool hasFocus = false);
     ~MenuItem();
     virtual void Render();
     virtual void Update(float dt);
@@ -38,28 +38,26 @@ public:
     virtual void Entering();
     virtual bool Leaving(JButton key);
     virtual bool ButtonPressed();
-    virtual bool getTopLeft(float& top, float& left)
-    {
+    virtual bool getTopLeft(float& top, float& left) {
         top = mY;
         left = mX;
         return true;
-    }
-    ;
+    };
 
     virtual ostream& toString(ostream& out) const;
 };
 
-class OtherMenuItem: public MenuItem
-{
+class OtherMenuItem : public MenuItem {
 private:
-  JButton mKey;
-  float mTimeIndex;
+    JButton mKey;
+    float mTimeIndex;
+
 public:
-  OtherMenuItem(int id, WFont *font, string text, float x, float y, JQuad * _off, JQuad * _on, JButton _key, bool hasFocus = false);
-  ~OtherMenuItem();
-  virtual void Render();
-  virtual void Update(float dt);
+    OtherMenuItem(int id, WFont* font, string text, float x, float y, JQuad* _off, JQuad* _on, JButton _key,
+                  bool hasFocus = false);
+    ~OtherMenuItem();
+    virtual void Render();
+    virtual void Update(float dt);
 };
 
 #endif
-

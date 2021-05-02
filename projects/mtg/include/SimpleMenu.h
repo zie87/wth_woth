@@ -11,8 +11,7 @@ A class for very simple menus structure
 
 #include "WResource_Fwd.h"
 
-class SimpleMenu: public JGuiController
-{
+class SimpleMenu : public JGuiController {
 private:
     float mHeight, mWidth, mX, mY;
     int fontId;
@@ -37,23 +36,21 @@ private:
 public:
     bool autoTranslate;
     bool isMultipleChoice;
-    SimpleMenu(JGE*, int id, JGuiListener* listener, int fontId, float x, float y, const char * _title = "", int _maxItems = 7, bool centerHorizontal = true, bool centerVertical = true);
+    SimpleMenu(JGE*, int id, JGuiListener* listener, int fontId, float x, float y, const char* _title = "",
+               int _maxItems = 7, bool centerHorizontal = true, bool centerVertical = true);
     virtual ~SimpleMenu();
     virtual void Render();
     virtual bool CheckUserInput(JButton key);
     virtual void Update(float dt);
-    virtual void Add(int id, const char * Text, string desc = "", bool forceFocus = false);
-    int getmCurr(){return mCurr;}
-    float getWidth(){return mWidth; }
+    virtual void Add(int id, const char* Text, string desc = "", bool forceFocus = false);
+    int getmCurr() { return mCurr; }
+    float getWidth() { return mWidth; }
     virtual void Close();
 
     void RecenterMenu();
 
     float selectionTargetY;
-    virtual bool isClosed() const
-    {
-        return mClosed;
-    }
+    virtual bool isClosed() const { return mClosed; }
     static void destroy();
 };
 

@@ -7,19 +7,18 @@
 #include <JGui.h>
 #include "WFont.h"
 
-class MTGGamePhase: public ActionElement
-{
+class MTGGamePhase : public ActionElement {
 protected:
     float animation;
     int currentState;
-    WFont * mFont;
+    WFont* mFont;
     GameObserver* observer;
 
 public:
     MTGGamePhase(GameObserver* g, int id);
     virtual void Update(float dt);
     bool CheckUserInput(JButton key);
-    virtual MTGGamePhase * clone() const;
+    virtual MTGGamePhase* clone() const;
     virtual ostream& toString(ostream& out) const;
     bool NextGamePhase();
 };

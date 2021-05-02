@@ -4,64 +4,46 @@
 #include "Player.h"
 #include <JRenderer.h>
 
-void DeckManager::updateMetaDataList(vector<DeckMetaData *> * refList, bool isAI)
-{
-    if (refList)
-    {
-        vector<DeckMetaData *> * inputList = isAI ? &aiDeckOrderList : &playerDeckOrderList;
+void DeckManager::updateMetaDataList(vector<DeckMetaData*>* refList, bool isAI) {
+    if (refList) {
+        vector<DeckMetaData*>* inputList = isAI ? &aiDeckOrderList : &playerDeckOrderList;
         inputList->clear();
-        inputList->assign(refList->begin(), refList -> end());
+        inputList->assign(refList->begin(), refList->end());
     }
 }
 
-vector<DeckMetaData *> * DeckManager::getPlayerDeckOrderList()
-{
-    return &playerDeckOrderList;
-}
+vector<DeckMetaData*>* DeckManager::getPlayerDeckOrderList() { return &playerDeckOrderList; }
 
-vector<DeckMetaData *> * DeckManager::getAIDeckOrderList()
-{
-    return &aiDeckOrderList;
-}
+vector<DeckMetaData*>* DeckManager::getAIDeckOrderList() { return &aiDeckOrderList; }
 
 /*
 ** Predicate helper for getDeckMetadataByID()
 */
-struct DeckIDMatch
-{
-    DeckIDMatch(int id) : mID(id)
-    {
-    }
+struct DeckIDMatch {
+    DeckIDMatch(int id) : mID(id) {}
 
-    bool operator() (DeckMetaData* inPtr)
-    {
-        return inPtr->getDeckId() == mID;
-    }
+    bool operator()(DeckMetaData* inPtr) { return inPtr->getDeckId() == mID; }
 
     int mID;
 };
 
-DeckMetaData* DeckManager::getDeckMetaDataById( int deckId, bool isAI )
-{
+DeckMetaData* DeckManager::getDeckMetaDataById(int deckId, bool isAI) {
     DeckMetaData* deck = NULL;
-    std::vector<DeckMetaData *>& deckList = isAI ? aiDeckOrderList : playerDeckOrderList;
+    std::vector<DeckMetaData*>& deckList = isAI ? aiDeckOrderList : playerDeckOrderList;
 
-    std::vector<DeckMetaData *>::iterator pos = find_if(deckList.begin(), deckList.end(), DeckIDMatch(deckId));
-    if (pos != deckList.end())
-    {
+    std::vector<DeckMetaData*>::iterator pos = find_if(deckList.begin(), deckList.end(), DeckIDMatch(deckId));
+    if (pos != deckList.end()) {
         deck = *pos;
-    }
-    else
-    {
+    } else {
         ostringstream deckFilename;
         string filepath;
-        if ( isAI )
-            filepath = options.profileFile( "ai/baka/"); 
+        if (isAI)
+            filepath = options.profileFile("ai/baka/");
         else
-            filepath = options.profileFile( "" );
-            
+            filepath = options.profileFile("");
+
         deckFilename << filepath << "/deck" << deckId << ".txt";
-        AddMetaData( deckFilename.str(), isAI );
+        AddMetaData(deckFilename.str(), isAI);
         deck = deckList.back();
     }
     return deck;
@@ -70,93 +52,71 @@ DeckMetaData* DeckManager::getDeckMetaDataById( int deckId, bool isAI )
 /*
 ** Predicate helper for getDeckMetadataByFilename()
 */
-struct DeckFilenameMatch
-{
-    DeckFilenameMatch(const std::string& filename) : mFilename(filename)
-    {
-    }
+struct DeckFilenameMatch {
+    DeckFilenameMatch(const std::string& filename) : mFilename(filename) {}
 
-    bool operator() (DeckMetaData* inPtr)
-    {
-        return inPtr->getFilename() == mFilename;
-    }
+    bool operator()(DeckMetaData* inPtr) { return inPtr->getFilename() == mFilename; }
 
     std::string mFilename;
 };
 
-DeckMetaData* DeckManager::getDeckMetaDataByFilename(const string& filename, bool isAI)
-{
+DeckMetaData* DeckManager::getDeckMetaDataByFilename(const string& filename, bool isAI) {
     DeckMetaData* deck = NULL;
-    std::vector<DeckMetaData *>& deckList = isAI ? aiDeckOrderList : playerDeckOrderList;
+    std::vector<DeckMetaData*>& deckList = isAI ? aiDeckOrderList : playerDeckOrderList;
 
-    std::vector<DeckMetaData *>::iterator pos = find_if(deckList.begin(), deckList.end(), DeckFilenameMatch(filename));
-    if (pos != deckList.end())
-    {
+    std::vector<DeckMetaData*>::iterator pos = find_if(deckList.begin(), deckList.end(), DeckFilenameMatch(filename));
+    if (pos != deckList.end()) {
         deck = *pos;
-    }
-    else
-    {
-        if ( FileExists( filename) )
-        {
-            AddMetaData( filename, isAI );
+    } else {
+        if (FileExists(filename)) {
+            AddMetaData(filename, isAI);
             deck = deckList.back();
         }
     }
     return deck;
 }
 
-void DeckManager::AddMetaData( const string& filename, bool isAI )
-{
-    if (isAI)
-    {
-        aiDeckOrderList.push_back ( NEW DeckMetaData( filename, isAI ) );
-        aiDeckStatsMap.insert( make_pair( filename.c_str(), new StatsWrapper( aiDeckOrderList.back()->getDeckId()) ));
-    }
-    else
-    {
-        playerDeckOrderList.push_back ( NEW DeckMetaData( filename, isAI ) );
-        playerDeckStatsMap.insert( make_pair( filename.c_str(), new StatsWrapper( playerDeckOrderList.back()->getDeckId()) ));
+void DeckManager::AddMetaData(const string& filename, bool isAI) {
+    if (isAI) {
+        aiDeckOrderList.push_back(NEW DeckMetaData(filename, isAI));
+        aiDeckStatsMap.insert(make_pair(filename.c_str(), new StatsWrapper(aiDeckOrderList.back()->getDeckId())));
+    } else {
+        playerDeckOrderList.push_back(NEW DeckMetaData(filename, isAI));
+        playerDeckStatsMap.insert(
+            make_pair(filename.c_str(), new StatsWrapper(playerDeckOrderList.back()->getDeckId())));
     }
 }
 
-void DeckManager::DeleteMetaData( const string& filename, bool isAI )
-{
-    map<string, StatsWrapper *>::iterator it;
-    vector<DeckMetaData *>::iterator metaDataIter;
+void DeckManager::DeleteMetaData(const string& filename, bool isAI) {
+    map<string, StatsWrapper*>::iterator it;
+    vector<DeckMetaData*>::iterator metaDataIter;
 
-    if (isAI)
-    {
+    if (isAI) {
         it = aiDeckStatsMap.find(filename);
-        if (it != aiDeckStatsMap.end())
-        {
+        if (it != aiDeckStatsMap.end()) {
             SAFE_DELETE(it->second);
             aiDeckStatsMap.erase(it);
         }
 
-        for( metaDataIter =  mInstance->aiDeckOrderList.begin(); metaDataIter !=  mInstance->aiDeckOrderList.end(); ++metaDataIter)
-        {
-            if ((*metaDataIter)->getFilename() == filename)
-            {
-                SAFE_DELETE( *metaDataIter );
+        for (metaDataIter = mInstance->aiDeckOrderList.begin(); metaDataIter != mInstance->aiDeckOrderList.end();
+             ++metaDataIter) {
+            if ((*metaDataIter)->getFilename() == filename) {
+                SAFE_DELETE(*metaDataIter);
                 aiDeckOrderList.erase(metaDataIter);
                 break;
             }
         }
-    }
-    else 
-    {
+    } else {
         it = playerDeckStatsMap.find(filename);
-        if (it != playerDeckStatsMap.end())
-        {
+        if (it != playerDeckStatsMap.end()) {
             SAFE_DELETE(it->second);
             playerDeckStatsMap.erase(it);
         }
 
-        for( metaDataIter =  mInstance->playerDeckOrderList.begin(); metaDataIter !=  mInstance->playerDeckOrderList.end(); ++metaDataIter)
-        {
-            if ((*metaDataIter)->getFilename() == filename)
-            {
-                SAFE_DELETE( *metaDataIter );
+        for (metaDataIter = mInstance->playerDeckOrderList.begin();
+             metaDataIter != mInstance->playerDeckOrderList.end(); ++metaDataIter) {
+            if ((*metaDataIter)->getFilename() == filename) {
+                SAFE_DELETE(*metaDataIter);
                 playerDeckOrderList.erase(metaDataIter);
                 break;
             }
@@ -164,58 +124,43 @@ void DeckManager::DeleteMetaData( const string& filename, bool isAI )
     }
 }
 
-
-StatsWrapper * DeckManager::getExtendedStatsForDeckId( int deckId, MTGAllCards *collection, bool isAI )
-{
-    DeckMetaData *selectedDeck = getDeckMetaDataById( deckId, isAI );
-    if (selectedDeck == NULL)
-    {
+StatsWrapper* DeckManager::getExtendedStatsForDeckId(int deckId, MTGAllCards* collection, bool isAI) {
+    DeckMetaData* selectedDeck = getDeckMetaDataById(deckId, isAI);
+    if (selectedDeck == NULL) {
         ostringstream deckName;
         deckName << options.profileFile() << "/deck" << deckId << ".txt";
         map<string, StatsWrapper*>* statsMap = isAI ? &aiDeckStatsMap : &playerDeckStatsMap;
-        StatsWrapper * stats = NEW StatsWrapper( deckId );      
-        statsMap->insert( make_pair(deckName.str(), stats));
+        StatsWrapper* stats = NEW StatsWrapper(deckId);
+        statsMap->insert(make_pair(deckName.str(), stats));
         return stats;
     }
-    return getExtendedDeckStats( selectedDeck, collection, isAI);
+    return getExtendedDeckStats(selectedDeck, collection, isAI);
 }
 
-
-StatsWrapper * DeckManager::getExtendedDeckStats( DeckMetaData *selectedDeck, MTGAllCards *collection, bool isAI )
-{
+StatsWrapper* DeckManager::getExtendedDeckStats(DeckMetaData* selectedDeck, MTGAllCards* collection, bool isAI) {
     StatsWrapper* stats = NULL;
 
-    string deckName = selectedDeck?selectedDeck->getFilename():"";
-    int deckId = selectedDeck?selectedDeck->getDeckId():0;
+    string deckName = selectedDeck ? selectedDeck->getFilename() : "";
+    int deckId = selectedDeck ? selectedDeck->getDeckId() : 0;
 
     map<string, StatsWrapper*>* statsMap = isAI ? &aiDeckStatsMap : &playerDeckStatsMap;
-    if ( statsMap->find(deckName) == statsMap->end())
-    {
+    if (statsMap->find(deckName) == statsMap->end()) {
         stats = NEW StatsWrapper(deckId);
-        stats->updateStats( deckName, collection);
-        statsMap->insert( make_pair(deckName, stats));
-    }
-    else
-    {
+        stats->updateStats(deckName, collection);
+        statsMap->insert(make_pair(deckName, stats));
+    } else {
         stats = statsMap->find(deckName)->second;
-        if ( stats->needUpdate )
-            stats->updateStats( deckName, collection );
+        if (stats->needUpdate) stats->updateStats(deckName, collection);
     }
     return stats;
 }
 
+DeckManager* DeckManager::mInstance = NULL;
 
-DeckManager * DeckManager::mInstance = NULL;
+void DeckManager::EndInstance() { SAFE_DELETE(mInstance); }
 
-void DeckManager::EndInstance()
-{
-    SAFE_DELETE(mInstance);
-}
-
-DeckManager* DeckManager::GetInstance()
-{
-    if (!mInstance)
-    {
+DeckManager* DeckManager::GetInstance() {
+    if (!mInstance) {
         mInstance = NEW DeckManager();
     }
 
@@ -224,39 +169,33 @@ DeckManager* DeckManager::GetInstance()
 
 //  p1 is assumed to be the player you want stats for
 //  p2 is the opponent
-int DeckManager::getDifficultyRating(Player *statsPlayer, Player *player)
-{
-    if(player->deckFile != "")
-    {
-        DeckMetaData *meta = getDeckMetaDataByFilename(player->deckFile, (player->isAI() == 1) );
+int DeckManager::getDifficultyRating(Player* statsPlayer, Player* player) {
+    if (player->deckFile != "") {
+        DeckMetaData* meta = getDeckMetaDataByFilename(player->deckFile, (player->isAI() == 1));
         return meta->getDifficulty();
-    }
-    else
+    } else
         return EASY;
 }
 
-DeckManager::~DeckManager()
-{
-    map<string, StatsWrapper *>::iterator it;
-    vector<DeckMetaData *>::iterator metaDataIter;
-    
-    for (it = aiDeckStatsMap.begin(); it != aiDeckStatsMap.end(); it++){
+DeckManager::~DeckManager() {
+    map<string, StatsWrapper*>::iterator it;
+    vector<DeckMetaData*>::iterator metaDataIter;
+
+    for (it = aiDeckStatsMap.begin(); it != aiDeckStatsMap.end(); it++) {
         SAFE_DELETE(it->second);
     }
-    for (it = playerDeckStatsMap.begin(); it != playerDeckStatsMap.end(); it++){
+    for (it = playerDeckStatsMap.begin(); it != playerDeckStatsMap.end(); it++) {
         SAFE_DELETE(it->second);
     }
 
-    for( metaDataIter = aiDeckOrderList.begin(); metaDataIter !=  aiDeckOrderList.end(); ++metaDataIter)
-    {
-        SAFE_DELETE( *metaDataIter );
+    for (metaDataIter = aiDeckOrderList.begin(); metaDataIter != aiDeckOrderList.end(); ++metaDataIter) {
+        SAFE_DELETE(*metaDataIter);
     }
-    
-    for( metaDataIter = playerDeckOrderList.begin(); metaDataIter !=  playerDeckOrderList.end(); ++metaDataIter)
-    {
-        SAFE_DELETE( *metaDataIter );
+
+    for (metaDataIter = playerDeckOrderList.begin(); metaDataIter != playerDeckOrderList.end(); ++metaDataIter) {
+        SAFE_DELETE(*metaDataIter);
     }
-    
+
     aiDeckOrderList.clear();
     playerDeckOrderList.clear();
     aiDeckStatsMap.clear();

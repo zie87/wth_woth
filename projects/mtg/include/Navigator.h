@@ -9,14 +9,12 @@
 #include <map>
 #include <vector>
 
-// private class only used by Navigator, see implementation file  
+// private class only used by Navigator, see implementation file
 class CardZone;
 
-class Navigator: public CardSelectorBase
-{
+class Navigator : public CardSelectorBase {
 public:
-
-    Navigator(GameObserver *observer, DuelLayers* inDuelLayers);
+    Navigator(GameObserver* observer, DuelLayers* inDuelLayers);
     virtual ~Navigator();
 
     // Inherited functions from GuiLayer
@@ -25,7 +23,7 @@ public:
     void Update(float dt);
     void Render();
 
-    //Limitor operations
+    // Limitor operations
     void PushLimitor();
     void PopLimitor();
     void Limit(LimitorFunctor<PlayGuiObject>* inLimitor, CardView::SelectorZone inZone);
@@ -56,4 +54,4 @@ private:
     std::stack<CardZone*> mCurrentZoneStack;
 };
 
-#endif //NAVIGATOR_H
+#endif  // NAVIGATOR_H

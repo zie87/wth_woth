@@ -11,34 +11,32 @@ using std::vector;
 class ManaCost;
 class MTGAbility;
 
-class AIHint
-{
+class AIHint {
 public:
     string mCondition;
     string mAction;
     string mCombatAttackTip;
-    vector<string>castOrder;
+    vector<string> castOrder;
     int mSourceId;
     AIHint(string line);
 };
 
-
-class AIHints
-{
+class AIHints {
 protected:
-    AIPlayerBaka * mPlayer;
-    vector<AIHint *> hints;
-    AIHint * getByCondition (string condition);
-    AIAction * findAbilityRecursive(AIHint * hint, ManaCost * potentialMana);
-    vector<MTGAbility *> findAbilities(AIHint * hint);
-    RankingContainer findActions(AIHint * hint);
-    string constraintsNotFulfilled(AIAction * a, AIHint * hint, ManaCost * potentialMana);
+    AIPlayerBaka* mPlayer;
+    vector<AIHint*> hints;
+    AIHint* getByCondition(string condition);
+    AIAction* findAbilityRecursive(AIHint* hint, ManaCost* potentialMana);
+    vector<MTGAbility*> findAbilities(AIHint* hint);
+    RankingContainer findActions(AIHint* hint);
+    string constraintsNotFulfilled(AIAction* a, AIHint* hint, ManaCost* potentialMana);
     bool findSource(int sourceId);
-    bool abilityMatches(MTGAbility * a, AIHint * hint);
+    bool abilityMatches(MTGAbility* a, AIHint* hint);
+
 public:
-    AIHints (AIPlayerBaka * player);
-    AIAction * suggestAbility(ManaCost * potentialMana);
-    bool HintSaysDontAttack(GameObserver* observer,MTGCardInstance * card = NULL);
+    AIHints(AIPlayerBaka* player);
+    AIAction* suggestAbility(ManaCost* potentialMana);
+    bool HintSaysDontAttack(GameObserver* observer, MTGCardInstance* card = NULL);
     vector<string> mCastOrder();
     void add(string line);
     ~AIHints();

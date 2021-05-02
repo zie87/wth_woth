@@ -13,33 +13,25 @@ class MTGCard;
 class MTGCardInstance;
 class PlayGuiObject;
 
-namespace DrawMode
-{
-    enum
-    {
-        kNormal  = 0,
-        kText,
-        kHidden
-    };
-    const int kNumDrawModes = 3;
-}
+namespace DrawMode {
+enum { kNormal = 0, kText, kHidden };
+const int kNumDrawModes = 3;
+}  // namespace DrawMode
 
-struct CardGui: public PlayGuiObject
-{
+struct CardGui : public PlayGuiObject {
 protected:
-
-    static map<string, string>counterGraphics;
+    static map<string, string> counterGraphics;
 
     /*
     ** Tries to render the Big version of a card picture, backups to text version in case of failure
     */
-    static void RenderBig(MTGCard * card, const Pos& pos);
+    static void RenderBig(MTGCard* card, const Pos& pos);
 
-    static void RenderCountersBig(MTGCard * card, const Pos& pos, int drawMode = DrawMode::kNormal);
-    static void AlternateRender(MTGCard * card, const Pos& pos);
-    static void TinyCropRender(MTGCard * card, const Pos& pos, JQuad * quad);
-    static string FormattedData (string data, string replace, string value);
-    static bool FilterCard (MTGCard * card,string filter);
+    static void RenderCountersBig(MTGCard* card, const Pos& pos, int drawMode = DrawMode::kNormal);
+    static void AlternateRender(MTGCard* card, const Pos& pos);
+    static void TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad);
+    static string FormattedData(string data, string replace, string value);
+    static bool FilterCard(MTGCard* card, string filter);
 
 public:
     static const float Width;
@@ -58,76 +50,61 @@ public:
     void DrawCard(const Pos& inPosition, int inMode = DrawMode::kNormal);
     static void DrawCard(MTGCard* inCard, const Pos& inPosition, int inMode = DrawMode::kNormal);
 
-    static JQuadPtr AlternateThumbQuad(MTGCard * card);
+    static JQuadPtr AlternateThumbQuad(MTGCard* card);
     virtual ostream& toString(ostream&) const;
 };
 
-class CardView: public CardGui
-{
+class CardView : public CardGui {
 public:
-
-    typedef enum
-    {
-        nullZone, handZone, playZone
-    } SelectorZone;
+    typedef enum { nullZone, handZone, playZone } SelectorZone;
 
     const SelectorZone owner;
 
-    MTGCardInstance* getCard(); // remove this when possible
+    MTGCardInstance* getCard();  // remove this when possible
     CardView(const SelectorZone, MTGCardInstance* card, float x, float y);
     CardView(const SelectorZone, MTGCardInstance* card, const Pos& ref);
     virtual ~CardView();
 
-    void Render()
-    {
-        CardGui::Render();
-    }
-    
-    void Render(JQuad* q)
-    {
-        Pos::Render(q);
-    }
-    
+    void Render() { CardGui::Render(); }
+
+    void Render(JQuad* q) { Pos::Render(q); }
+
     virtual ostream& toString(ostream&) const;
 
     float GetCenterX();
     float GetCenterY();
 };
 
-class TransientCardView: public CardGui
-{
+class TransientCardView : public CardGui {
 public:
     TransientCardView(MTGCardInstance* card, float x, float y);
     TransientCardView(MTGCardInstance* card, const Pos& ref);
 };
 
-
-class SimpleCardEffect 
-{
+class SimpleCardEffect {
 public:
-    virtual void doEffect(Pos * card) = 0;
-    virtual void undoEffect(Pos * card) = 0;
+    virtual void doEffect(Pos* card) = 0;
+    virtual void undoEffect(Pos* card) = 0;
 };
 
-class SimpleCardEffectRotate:public SimpleCardEffect 
-{
+class SimpleCardEffectRotate : public SimpleCardEffect {
 protected:
     float mRotation;
+
 public:
     SimpleCardEffectRotate(float rotation);
-    void doEffect(Pos * card);
-    void undoEffect(Pos * card);
+    void doEffect(Pos* card);
+    void undoEffect(Pos* card);
 };
 
-class SimpleCardEffectMask:public SimpleCardEffect 
-{
+class SimpleCardEffectMask : public SimpleCardEffect {
 protected:
     PIXEL_TYPE mMask;
+
 public:
     SimpleCardEffectMask(PIXEL_TYPE mask);
-    void doEffect(Pos * card);
-    void undoEffect(Pos * card);
+    void doEffect(Pos* card);
+    void undoEffect(Pos* card);
 };
-
 
 #endif

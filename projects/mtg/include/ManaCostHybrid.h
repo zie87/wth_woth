@@ -1,9 +1,7 @@
 #ifndef _MANACOST_HYBRID_H_
 #define _MANACOST_HYBRID_H_
 
-class ManaCostHybrid
-{
-
+class ManaCostHybrid {
 public:
     uint8_t color1;
     uint8_t color2;
@@ -18,10 +16,9 @@ public:
     int hasColor(int color);
     string toString();
     int getConvertedCost();
-    
+
     friend std::ostream& operator<<(std::ostream& out, ManaCostHybrid& m);
     friend std::ostream& operator<<(std::ostream& out, ManaCostHybrid* m);
-
 };
 
 #endif

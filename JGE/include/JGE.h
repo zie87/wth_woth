@@ -25,38 +25,38 @@
 #define DEBUG_PRINT
 
 #if defined(QT_CONFIG)
-#include <Qt>
+    #include <Qt>
 typedef u32 LocalKeySym;
-#define LOCAL_KEY_NONE Qt::Key_unknown
+    #define LOCAL_KEY_NONE Qt::Key_unknown
 
 #elif defined(SDL_CONFIG)
-#include <SDL.h>
+    #include <SDL.h>
 typedef SDL_Keycode LocalKeySym;
-#define LOCAL_KEY_NONE SDLK_UNKNOWN
+    #define LOCAL_KEY_NONE SDLK_UNKNOWN
 
 #elif defined(WIN32)
-#include <windows.h>
+    #include <windows.h>
 typedef WPARAM LocalKeySym;
-#define LOCAL_KEY_NONE ((WPARAM)-1)
+    #define LOCAL_KEY_NONE ((WPARAM)-1)
 
 #elif defined(LINUX)
-#include <X11/XKBlib.h>
-#include <X11/keysym.h>
+    #include <X11/XKBlib.h>
+    #include <X11/keysym.h>
 typedef KeySym LocalKeySym;
-#define LOCAL_KEY_NONE XK_VoidSymbol
+    #define LOCAL_KEY_NONE XK_VoidSymbol
 
-#elif defined(ANDROID) // This is temporary until we understand how to send real key events from Java
+#elif defined(ANDROID)  // This is temporary until we understand how to send real key events from Java
 typedef long unsigned int LocalKeySym;
-#define LOCAL_KEY_NONE 0
+    #define LOCAL_KEY_NONE 0
 
 #else
 typedef u32 LocalKeySym;
-#define LOCAL_KEY_NONE ((u32)-1)
+    #define LOCAL_KEY_NONE ((u32)-1)
 
 #endif
 
 #if defined(ANDROID)
-#include <jni.h>
+    #include <jni.h>
 #endif
 
 bool JGEGetButtonState(const JButton button);
@@ -67,38 +67,37 @@ u8 JGEGetAnalogX();
 u8 JGEGetAnalogY();
 bool JGEToggleFullscreen();
 
-#if defined (PSP)
+#if defined(PSP)
 
-// hack to fix a typedef definition of u32 inside of newlib's stdint.h
-// this used to be defined as an unsigned long, but as of minpspw 11.1, it's 
-// now an unsigned int:
+    // hack to fix a typedef definition of u32 inside of newlib's stdint.h
+    // this used to be defined as an unsigned long, but as of minpspw 11.1, it's
+    // now an unsigned int:
 
-// from stdint.h 
-// /* Check if "long" is 64bit or 32bit wide */
-// #if __STDINT_EXP(LONG_MAX) > 0x7fffffff
-// #define __have_long64 1
-// #elif __STDINT_EXP(LONG_MAX) == 0x7fffffff && !defined(__SPU__) && !defined(__psp__)
-// #define __have_long32 1
-// #endif
+    // from stdint.h
+    // /* Check if "long" is 64bit or 32bit wide */
+    // #if __STDINT_EXP(LONG_MAX) > 0x7fffffff
+    // #define __have_long64 1
+    // #elif __STDINT_EXP(LONG_MAX) == 0x7fffffff && !defined(__SPU__) && !defined(__psp__)
+    // #define __have_long32 1
+    // #endif
 
-// Note the dependency on the definition of __psp__, which isn't defined in JGE.  This probably
-// usually comes in via a makefile, but I couldn't unravel what setting it comes from...
-#if !defined(__psp__)
-#define __psp__ 1
+    // Note the dependency on the definition of __psp__, which isn't defined in JGE.  This probably
+    // usually comes in via a makefile, but I couldn't unravel what setting it comes from...
+    #if !defined(__psp__)
+        #define __psp__ 1
+    #endif
+
+    #include <pspgu.h>
+    #include <pspkernel.h>
+    #include <pspdisplay.h>
+    #include <pspdebug.h>
+    #include <pspctrl.h>
+    #include <time.h>
+    #include <string.h>
+    #include <pspaudiolib.h>
+    #include <psprtc.h>
+
 #endif
-
-#include <pspgu.h>
-#include <pspkernel.h>
-#include <pspdisplay.h>
-#include <pspdebug.h>
-#include <pspctrl.h>
-#include <time.h>
-#include <string.h>
-#include <pspaudiolib.h>
-#include <psprtc.h>
-
-#endif
-
 
 #include "Vector2D.h"
 
@@ -112,285 +111,275 @@ class JMusic;
 //////////////////////////////////////////////////////////////////////////
 /// Game engine main interface.
 //////////////////////////////////////////////////////////////////////////
-class JGE
-{
- private:
-  JApp *mApp;
+class JGE {
+private:
+    JApp* mApp;
 
-#if defined (WIN32) || defined (LINUX)
-  JMusic *mCurrentMusic;
+#if defined(WIN32) || defined(LINUX)
+    JMusic* mCurrentMusic;
 #else
- public:
-  void Run();
- private:
+public:
+    void Run();
+
+private:
 #endif
 
-#if defined (ANDROID)
-    JavaVM * mJavaVM;
-    JNIEnv * mJNIEnv;
+#if defined(ANDROID)
+    JavaVM* mJavaVM;
+    JNIEnv* mJNIEnv;
     jclass mJNIClass;
     jmethodID midSendCommand;
 #endif
 
-  bool mDone;
-  float mDeltaTime;
-  bool mDebug;
-  bool mPaused;
-  char mDebuggingMsg[256];
-  bool mCriticalAssert;
-  const char *mAssertFile;
-  int mAssertLine;
-  std::vector<std::string> mArgv;
+    bool mDone;
+    float mDeltaTime;
+    bool mDebug;
+    bool mPaused;
+    char mDebuggingMsg[256];
+    bool mCriticalAssert;
+    const char* mAssertFile;
+    int mAssertLine;
+    std::vector<std::string> mArgv;
 
-  static JGE* mInstance;
+    static JGE* mInstance;
 
+    static std::queue<std::pair<std::pair<LocalKeySym, JButton>, bool> > keyBuffer;
+    static std::multimap<LocalKeySym, JButton> keyBinds;
+    typedef std::multimap<LocalKeySym, JButton>::iterator keycodes_it;
 
-  static std::queue< std::pair<std::pair<LocalKeySym, JButton>, bool> > keyBuffer;
-  static std::multimap<LocalKeySym, JButton> keyBinds;
-  typedef std::multimap<LocalKeySym, JButton>::iterator keycodes_it;
+    // Mouse attributes
+    int mLastLeftClickX;
+    int mlastLeftClickY;
 
-  // Mouse attributes
-  int mLastLeftClickX;
-  int mlastLeftClickY;
+    friend void Run();
 
-  friend void Run();
-
- public:
-
-  //////////////////////////////////////////////////////////////////////////
-  /// Get JGE instance.
-  ///
-  /// @return JGE instance.
-  //////////////////////////////////////////////////////////////////////////
-  static JGE* GetInstance();
-  static void Destroy();
+public:
+    //////////////////////////////////////////////////////////////////////////
+    /// Get JGE instance.
+    ///
+    /// @return JGE instance.
+    //////////////////////////////////////////////////////////////////////////
+    static JGE* GetInstance();
+    static void Destroy();
 
 #ifdef ANDROID
-    JNIEnv * getJNIEnv();
-  void setJVM (JavaVM * vm);
+    JNIEnv* getJNIEnv();
+    void setJVM(JavaVM* vm);
 #endif
-  void Init();
-  void End();
+    void Init();
+    void End();
 
-  void Update(float);
-  void Render();
+    void Update(float);
+    void Render();
 
-  void Pause();
-  void Resume();
+    void Pause();
+    void Resume();
 
-  //////////////////////////////////////////////////////////////////////////
-  /// Return argv.
-  ///
-  /// @return argv vector.
-  //////////////////////////////////////////////////////////////////////////
-  std::vector<std::string> GetARGV();
-  
-  //////////////////////////////////////////////////////////////////////////
-  /// Return system timer in milliseconds.
-  ///
-  /// @return System time in milliseconds.
-  //////////////////////////////////////////////////////////////////////////
-  int GetTime(void);
+    //////////////////////////////////////////////////////////////////////////
+    /// Return argv.
+    ///
+    /// @return argv vector.
+    //////////////////////////////////////////////////////////////////////////
+    std::vector<std::string> GetARGV();
 
-  //////////////////////////////////////////////////////////////////////////
-  /// Return elapsed time since last frame update.
-  ///
-  /// @return Elapsed time in seconds.
-  //////////////////////////////////////////////////////////////////////////
-  float GetDelta();
+    //////////////////////////////////////////////////////////////////////////
+    /// Return system timer in milliseconds.
+    ///
+    /// @return System time in milliseconds.
+    //////////////////////////////////////////////////////////////////////////
+    int GetTime(void);
 
-  // override the current delta time.
-  void SetDelta(float delta);
+    //////////////////////////////////////////////////////////////////////////
+    /// Return elapsed time since last frame update.
+    ///
+    /// @return Elapsed time in seconds.
+    //////////////////////////////////////////////////////////////////////////
+    float GetDelta();
 
-  //////////////////////////////////////////////////////////////////////////
-  /// Return frame rate.
-  ///
-  /// @note This is just 1.0f/GetDelta().
-  ///
-  /// @return Number of frames per second.
-  //////////////////////////////////////////////////////////////////////////
-  float GetFPS();
+    // override the current delta time.
+    void SetDelta(float delta);
 
-  //////////////////////////////////////////////////////////////////////////
-  /// Check the current state of a button.
-  ///
-  /// @param button - Button id.
-  ///
-  /// @return Button state.
-  //////////////////////////////////////////////////////////////////////////
-  bool GetButtonState(JButton button);
+    //////////////////////////////////////////////////////////////////////////
+    /// Return frame rate.
+    ///
+    /// @note This is just 1.0f/GetDelta().
+    ///
+    /// @return Number of frames per second.
+    //////////////////////////////////////////////////////////////////////////
+    float GetFPS();
 
-  //////////////////////////////////////////////////////////////////////////
-  /// Check if a button is down the first time.
-  /// THIS DOES NOT WORK RELIABLY. DO NOT USE THIS.
-  /// USE ReadButton() INSTEAD.
-  ///
-  /// @param button - Button id.
-  ///
-  /// @return Button state.
-  //////////////////////////////////////////////////////////////////////////
-  bool GetButtonClick(JButton button);
+    //////////////////////////////////////////////////////////////////////////
+    /// Check the current state of a button.
+    ///
+    /// @param button - Button id.
+    ///
+    /// @return Button state.
+    //////////////////////////////////////////////////////////////////////////
+    bool GetButtonState(JButton button);
 
-  //////////////////////////////////////////////////////////////////////////
-  /// Get the next keypress.
-  ///
-  /// @return Next pressed button, or 0 if none.
-  //////////////////////////////////////////////////////////////////////////
-  JButton ReadButton();
-  LocalKeySym ReadLocalKey();
+    //////////////////////////////////////////////////////////////////////////
+    /// Check if a button is down the first time.
+    /// THIS DOES NOT WORK RELIABLY. DO NOT USE THIS.
+    /// USE ReadButton() INSTEAD.
+    ///
+    /// @param button - Button id.
+    ///
+    /// @return Button state.
+    //////////////////////////////////////////////////////////////////////////
+    bool GetButtonClick(JButton button);
 
-  //////////////////////////////////////////////////////////////////////////
-  /// Bind an actual key to a symbolic button. A key can be bound to
-  /// several buttons and even several times to the same button (for
-  /// double clicks on one button, for example.
-  ///
-  /// @param keycode - The local code of the key
-  /// @param button - The button to bind it to
-  ///
-  /// @return The number of bound keys so far
-  //////////////////////////////////////////////////////////////////////////
-  static u32 BindKey(LocalKeySym keycode, JButton button);
+    //////////////////////////////////////////////////////////////////////////
+    /// Get the next keypress.
+    ///
+    /// @return Next pressed button, or 0 if none.
+    //////////////////////////////////////////////////////////////////////////
+    JButton ReadButton();
+    LocalKeySym ReadLocalKey();
 
-  //////////////////////////////////////////////////////////////////////////
-  /// Undo a binding.
-  /// If the second parameter is omitted, remove all bindings to this key ;
-  /// else, remove exactly once the binding from this key to this button.
-  ///
-  /// @param keycode - The local code of the key
-  /// @param button - The button
-  ///
-  /// @return The number of still bound keys
-  //////////////////////////////////////////////////////////////////////////
-  u32 UnbindKey(LocalKeySym keycode, JButton button);
-  u32 UnbindKey(LocalKeySym keycode);
+    //////////////////////////////////////////////////////////////////////////
+    /// Bind an actual key to a symbolic button. A key can be bound to
+    /// several buttons and even several times to the same button (for
+    /// double clicks on one button, for example.
+    ///
+    /// @param keycode - The local code of the key
+    /// @param button - The button to bind it to
+    ///
+    /// @return The number of bound keys so far
+    //////////////////////////////////////////////////////////////////////////
+    static u32 BindKey(LocalKeySym keycode, JButton button);
 
-  //////////////////////////////////////////////////////////////////////////
-  /// Clear bindings.
-  /// This removes ALL bindings. Take care to re-bind keys after doing it.
-  ///
-  //////////////////////////////////////////////////////////////////////////
-  void ClearBindings();
+    //////////////////////////////////////////////////////////////////////////
+    /// Undo a binding.
+    /// If the second parameter is omitted, remove all bindings to this key ;
+    /// else, remove exactly once the binding from this key to this button.
+    ///
+    /// @param keycode - The local code of the key
+    /// @param button - The button
+    ///
+    /// @return The number of still bound keys
+    //////////////////////////////////////////////////////////////////////////
+    u32 UnbindKey(LocalKeySym keycode, JButton button);
+    u32 UnbindKey(LocalKeySym keycode);
 
-  //////////////////////////////////////////////////////////////////////////
-  /// Reset bindings.
-  /// This resets ALL bindings to their default value.
-  ///
-  //////////////////////////////////////////////////////////////////////////
-  void ResetBindings();
+    //////////////////////////////////////////////////////////////////////////
+    /// Clear bindings.
+    /// This removes ALL bindings. Take care to re-bind keys after doing it.
+    ///
+    //////////////////////////////////////////////////////////////////////////
+    void ClearBindings();
 
-  //////////////////////////////////////////////////////////////////////////
-  /// Iterators for bindings.
-  //////////////////////////////////////////////////////////////////////////
-  typedef std::multimap<LocalKeySym, JButton>::const_iterator keybindings_it;
-  keybindings_it KeyBindings_begin();
-  keybindings_it KeyBindings_end();
+    //////////////////////////////////////////////////////////////////////////
+    /// Reset bindings.
+    /// This resets ALL bindings to their default value.
+    ///
+    //////////////////////////////////////////////////////////////////////////
+    void ResetBindings();
 
+    //////////////////////////////////////////////////////////////////////////
+    /// Iterators for bindings.
+    //////////////////////////////////////////////////////////////////////////
+    typedef std::multimap<LocalKeySym, JButton>::const_iterator keybindings_it;
+    keybindings_it KeyBindings_begin();
+    keybindings_it KeyBindings_end();
 
-  //////////////////////////////////////////////////////////////////////////
-  /// Reset the input buffer.
-  /// This is necessary because there might be phases when only
-  /// GetButtonState is used, thereby accumulating keypresses
-  /// in the key buffer.
-  ///
-  //////////////////////////////////////////////////////////////////////////
-  void ResetInput();
+    //////////////////////////////////////////////////////////////////////////
+    /// Reset the input buffer.
+    /// This is necessary because there might be phases when only
+    /// GetButtonState is used, thereby accumulating keypresses
+    /// in the key buffer.
+    ///
+    //////////////////////////////////////////////////////////////////////////
+    void ResetInput();
 
-  //////////////////////////////////////////////////////////////////////////
-  /// Get x value of the analog pad.
-  ///
-  /// @return X value (0 to 255).
-  //////////////////////////////////////////////////////////////////////////
-  u8 GetAnalogX();
+    //////////////////////////////////////////////////////////////////////////
+    /// Get x value of the analog pad.
+    ///
+    /// @return X value (0 to 255).
+    //////////////////////////////////////////////////////////////////////////
+    u8 GetAnalogX();
 
-  //////////////////////////////////////////////////////////////////////////
-  /// Get y value of the analog pad.
-  ///
-  /// @return Y value (0 to 255).
-  //////////////////////////////////////////////////////////////////////////
-  u8 GetAnalogY();
+    //////////////////////////////////////////////////////////////////////////
+    /// Get y value of the analog pad.
+    ///
+    /// @return Y value (0 to 255).
+    //////////////////////////////////////////////////////////////////////////
+    u8 GetAnalogY();
 
-  //////////////////////////////////////////////////////////////////////////
-  /// Simulate a keypress, or a keyhold/release.
-  ///
-  //////////////////////////////////////////////////////////////////////////
-  void PressKey(const LocalKeySym);
-  void PressKey(const JButton);
-  void HoldKey(const LocalKeySym);
-  void HoldKey(const JButton);
-  void HoldKey_NoRepeat(const LocalKeySym);
-  void HoldKey_NoRepeat(const JButton);
-  void ReleaseKey(const LocalKeySym);
-  void ReleaseKey(const JButton);
+    //////////////////////////////////////////////////////////////////////////
+    /// Simulate a keypress, or a keyhold/release.
+    ///
+    //////////////////////////////////////////////////////////////////////////
+    void PressKey(const LocalKeySym);
+    void PressKey(const JButton);
+    void HoldKey(const LocalKeySym);
+    void HoldKey(const JButton);
+    void HoldKey_NoRepeat(const LocalKeySym);
+    void HoldKey_NoRepeat(const JButton);
+    void ReleaseKey(const LocalKeySym);
+    void ReleaseKey(const JButton);
 
-  //////////////////////////////////////////////////////////////////////////
-  /// Mouse events
-  ///  x and y are int coordinates relative to SCREEN_WIDTH and SCREEN_HEIGHT
-  //////////////////////////////////////////////////////////////////////////
-  void LeftClicked(int x, int y);
+    //////////////////////////////////////////////////////////////////////////
+    /// Mouse events
+    ///  x and y are int coordinates relative to SCREEN_WIDTH and SCREEN_HEIGHT
+    //////////////////////////////////////////////////////////////////////////
+    void LeftClicked(int x, int y);
 
-  void LeftClickedProcessed();
+    void LeftClickedProcessed();
 
-  // Getter, may have to move that in the JGuiListener
-  // Returns false if nothing has been clicked, true otherwise
-  bool GetLeftClickCoordinates(int& x, int& y);
+    // Getter, may have to move that in the JGuiListener
+    // Returns false if nothing has been clicked, true otherwise
+    bool GetLeftClickCoordinates(int& x, int& y);
 
+    // Scroll events - currently triggered by SDL JOYBALL events
+    void Scroll(int inXVelocity, int inYVelocity);
 
-  // Scroll events - currently triggered by SDL JOYBALL events
-  void Scroll(int inXVelocity, int inYVelocity);
+    //////////////////////////////////////////////////////////////////////////
+    /// Get if the system is ended/paused or not.
+    ///
+    /// @return Status of the system.
+    //////////////////////////////////////////////////////////////////////////
+    bool IsDone() { return mDone; }
+    bool IsPaused() { return mPaused; }
 
-  //////////////////////////////////////////////////////////////////////////
-  /// Get if the system is ended/paused or not.
-  ///
-  /// @return Status of the system.
-  //////////////////////////////////////////////////////////////////////////
-  bool IsDone() { return mDone; }
-  bool IsPaused() { return mPaused; }
+    //////////////////////////////////////////////////////////////////////////
+    /// Set the user's core application class.
+    ///
+    /// @param app - User defined application class.
+    //////////////////////////////////////////////////////////////////////////
+    void SetApp(JApp* app);
 
+    //////////////////////////////////////////////////////////////////////////
+    /// Setsn argv.
+    ///
+    ///
+    //////////////////////////////////////////////////////////////////////////
+    void SetARGV(int argc, char* argv[]);
 
-  //////////////////////////////////////////////////////////////////////////
-  /// Set the user's core application class.
-  ///
-  /// @param app - User defined application class.
-  //////////////////////////////////////////////////////////////////////////
-  void SetApp(JApp *app);
+    //////////////////////////////////////////////////////////////////////////
+    /// Print debug message.
+    ///
+    //////////////////////////////////////////////////////////////////////////
+    void printf(const char* format, ...);
 
-  
-  //////////////////////////////////////////////////////////////////////////
-  /// Setsn argv.
-  ///
-  /// 
-  //////////////////////////////////////////////////////////////////////////
-  void SetARGV(int argc, char * argv[]);  
+    void Assert(const char* filename, long lineNumber);
 
-  //////////////////////////////////////////////////////////////////////////
-  /// Print debug message.
-  ///
-  //////////////////////////////////////////////////////////////////////////
-  void printf(const char *format, ...);
+    /// Sends a message through JGE
+    /// Currently used only to communicate with the JNI Layer in Android
+    /// and in IOS to communicate with the EAGL layer
+    void SendCommand(std::string command);
+    void SendCommand(std::string command, std::string parameter);
+    void SendCommand(std::string command, float& x, float& y, float& width, float& height);
 
+#if defined(ANDROID)
+    /// Access to JNI Environment
+    void SetJNIEnv(JNIEnv* env, jclass cls);
+    void sendJNICommand(std::string command);
+    std::string getFileSystemLocation();
+#endif
 
-  void Assert(const char *filename, long lineNumber);
-
-  /// Sends a message through JGE
-  /// Currently used only to communicate with the JNI Layer in Android
-  /// and in IOS to communicate with the EAGL layer
-  void SendCommand(std::string command);
-  void SendCommand(std::string command, std::string parameter);
-  void SendCommand(std::string command, float& x, float& y, float& width, float& height);
-
- #if defined (ANDROID)
-   /// Access to JNI Environment
-   void SetJNIEnv(JNIEnv * env, jclass cls);
-   void sendJNICommand(std::string command);
-   std::string getFileSystemLocation();
-#endif 
-  
- protected:
-  JGE();
-  ~JGE();
-
-
+protected:
+    JGE();
+    ~JGE();
 };
-
 
 #endif

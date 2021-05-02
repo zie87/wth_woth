@@ -5,7 +5,7 @@
 #include <string>
 using namespace std;
 
-class JSocket{
+class JSocket {
 public:
     typedef enum {
         // no network available currently from the device
@@ -18,32 +18,31 @@ public:
         FATAL_ERROR,
     } SOCKET_STATE;
 
+    // Server creation
+    JSocket(std::string ipAddr);
+    // Client creation
+    JSocket();
+    ~JSocket();
 
-  // Server creation
-  JSocket(std::string ipAddr);
-  // Client creation
-  JSocket();
-  ~JSocket();
-
-  JSocket* Accept();
-  int Read(char* buff, int size);
-  int Write(char* buff, int size);
-  bool isConnected() { return state == CONNECTED; };
-  void Disconnect();
+    JSocket* Accept();
+    int Read(char* buff, int size);
+    int Write(char* buff, int size);
+    bool isConnected() { return state == CONNECTED; };
+    void Disconnect();
 
 private:
-  // socket creation when server accepts a connection
-  JSocket(int fd);
-  // convert the socket into non-blocking state
-  bool SetNonBlocking(int sock);
-  // socket handle
+    // socket creation when server accepts a connection
+    JSocket(int fd);
+    // convert the socket into non-blocking state
+    bool SetNonBlocking(int sock);
+    // socket handle
 #ifdef WIN32
-  SOCKET mfd;
+    SOCKET mfd;
 #elif LINUX
-  int mfd;
+    int mfd;
 #endif
-  // socket state
-  SOCKET_STATE state;
+    // socket state
+    SOCKET_STATE state;
 };
 
 #endif

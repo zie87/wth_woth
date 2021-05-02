@@ -7,17 +7,16 @@ struct GuiAvatar;
 class GuiGraveyard;
 class GuiLibrary;
 class GuiOpponentHand;
-class GuiAvatars: public GuiLayer
-{
+class GuiAvatars : public GuiLayer {
 protected:
-    GuiAvatar* self, *opponent;
-    GuiGraveyard* selfGraveyard, *opponentGraveyard;
-    GuiLibrary* selfLibrary, *opponentLibrary;
-    GuiOpponentHand *opponentHand;
+    GuiAvatar *self, *opponent;
+    GuiGraveyard *selfGraveyard, *opponentGraveyard;
+    GuiLibrary *selfLibrary, *opponentLibrary;
+    GuiOpponentHand* opponentHand;
     GuiAvatar* active;
 
 public:
-    GuiAvatars(GameObserver *observer);
+    GuiAvatars(GameObserver* observer);
     ~GuiAvatars();
 
     GuiAvatar* GetSelf();
@@ -32,4 +31,4 @@ public:
     float LeftBoundarySelf();
 };
 
-#endif // _GUIAVATARS_H_
+#endif  // _GUIAVATARS_H_

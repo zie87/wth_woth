@@ -17,7 +17,7 @@ jobs:
       matrix:
         cxx: [g++-10, clang++-11]
         build_type: [Debug, Release]
-        std: [14, 17]
+        std: [14]
         os: [ubuntu-20.04]
         include:
           - cxx: g++-10

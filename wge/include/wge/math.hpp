@@ -3,4 +3,4 @@
 
 #include "math/utils.hpp"
 
-#endif // WGE_MATh_HPP
+#endif  // WGE_MATh_HPP

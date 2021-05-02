@@ -10,7 +10,6 @@
 namespace wge {
 
 class thread {
-
 public:
     using native_handle_type = SceUID;
 
@@ -23,9 +22,7 @@ public:
         id() noexcept : m_thread(invalid_id) {}
         explicit id(native_handle_type handle) : m_thread(handle) {}
 
-        inline bool is_valid() const noexcept {
-            return m_thread > invalid_id;
-        }
+        inline bool is_valid() const noexcept { return m_thread > invalid_id; }
 
     private:
         friend class thread;
@@ -46,36 +43,32 @@ public:
         virtual void run() = 0;
     };
 
-    template <typename Function> struct impl : public impl_base {
+    template <typename Function>
+    struct impl : public impl_base {
         Function function_obj;
         impl(Function&& func) : function_obj(std::forward<Function>(func)) {}
-        void run() {
-            function_obj();
-        }
+        void run() { function_obj(); }
     };
 
 public:
     thread() noexcept = default;
 
-    template <typename Function, typename... Args> explicit thread(Function&& func, Args&&... args) {
+    template <typename Function, typename... Args>
+    explicit thread(Function&& func, Args&&... args) {
         start_thread(make_routine(std::bind(std::forward<Function>(func), std::forward<Args>(args)...)));
     }
 
     ~thread() noexcept {
-        if (joinable())
-            std::terminate();
+        if (joinable()) std::terminate();
     }
 
     thread(const thread&) = delete;
     thread& operator=(const thread&) = delete;
 
-    thread(thread&& other) noexcept {
-        swap(other);
-    }
+    thread(thread&& other) noexcept { swap(other); }
 
     thread& operator=(thread&& other) noexcept {
-        if (joinable())
-            std::terminate();
+        if (joinable()) std::terminate();
         swap(other);
         return *this;
     }
@@ -85,29 +78,22 @@ public:
         swap(m_id, other.m_id);
     }
 
-    bool joinable() const noexcept {
-        return m_id.is_valid();
-    }
+    bool joinable() const noexcept { return m_id.is_valid(); }
 
     void join();
     void detach();
 
-    id get_id() const noexcept {
-        return m_id;
-    }
+    id get_id() const noexcept { return m_id; }
 
-    native_handle_type native_handle() const noexcept {
-        return m_id.m_thread;
-    }
+    native_handle_type native_handle() const noexcept { return m_id.m_thread; }
 
-    static constexpr unsigned int hardware_concurrency() noexcept {
-        return 1u;
-    }
+    static constexpr unsigned int hardware_concurrency() noexcept { return 1u; }
 
 private:
     void start_thread(shared_base_type base_ptr);
 
-    template <typename function> auto make_routine(function&& func) -> shared_ptr<impl<function>> {
+    template <typename function>
+    auto make_routine(function&& func) -> shared_ptr<impl<function>> {
         return std::make_shared<impl<function>>(std::forward<function>(func));
     }
 };
@@ -120,15 +106,11 @@ inline bool operator==(thread::id lhs, thread::id rhs) noexcept {
     return lhs.m_thread == rhs.m_thread;
 }
 
-inline bool operator!=(thread::id lhs, thread::id rhs) noexcept {
-    return !(lhs == rhs);
-}
+inline bool operator!=(thread::id lhs, thread::id rhs) noexcept { return !(lhs == rhs); }
 
-inline void swap(thread& lhs, thread& rhs) noexcept {
-    lhs.swap(rhs);
-}
+inline void swap(thread& lhs, thread& rhs) noexcept { lhs.swap(rhs); }
 
-} // namespace wge
+}  // namespace wge
 
 #include <chrono>
 
@@ -142,13 +124,14 @@ namespace this_thread {
 
 wge::thread::id get_id() noexcept;
 
-template <class Rep, class Period> void sleep_for(const std::chrono::duration<Rep, Period>& sleep_duration) {
+template <class Rep, class Period>
+void sleep_for(const std::chrono::duration<Rep, Period>& sleep_duration) {
     const std::chrono::microseconds time(sleep_duration);
     detail::sleep_for_us(time);
 }
 
-} // namespace this_thread
+}  // namespace this_thread
 
-} // namespace wge
+}  // namespace wge
 
-#endif // WOTH_WGE_THREAD_THREADPSP_HPP
+#endif  // WOTH_WGE_THREAD_THREADPSP_HPP

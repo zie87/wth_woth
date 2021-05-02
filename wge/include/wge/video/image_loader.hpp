@@ -7,35 +7,32 @@
 #include <wge/memory.hpp>
 #include <wge/types.hpp>
 
-namespace wge
-{
-  namespace video
-  {
-    struct texture_data
-    {
-      explicit texture_data(wge::size_t w, wge::size_t h, wge::size_t tw, wge::size_t th, wge::owner_ptr<wge::byte_t*> buf, wge::size_t channels) noexcept;
+namespace wge {
+namespace video {
+struct texture_data {
+    explicit texture_data(wge::size_t w, wge::size_t h, wge::size_t tw, wge::size_t th,
+                          wge::owner_ptr<wge::byte_t*> buf, wge::size_t channels) noexcept;
 
-      wge::size_t width = 0;
-      wge::size_t height = 0;
+    wge::size_t width = 0;
+    wge::size_t height = 0;
 
-      wge::size_t texture_width = 0;
-      wge::size_t texture_height = 0;
+    wge::size_t texture_width = 0;
+    wge::size_t texture_height = 0;
 
-      wge::unique_ptr<wge::byte_t[]> pixels;
-      wge::size_t channels = 0;
-    };
+    wge::unique_ptr<wge::byte_t[]> pixels;
+    wge::size_t channels = 0;
+};
 
-    struct image_loader
-    {
-      static const int number_of_channels;
-      static texture_data load_image(const wge::byte_t* const buffer, wge::size_t buffer_size);
-      static texture_data load_image(std::istream& stream);
+struct image_loader {
+    static const int number_of_channels;
+    static texture_data load_image(const wge::byte_t* const buffer, wge::size_t buffer_size);
+    static texture_data load_image(std::istream& stream);
 
-    private:
-        static wge::byte_t*
-        convert_pixel_buffer(const wge::byte_t* const buffer, const int width, const int height, const int channels, int& new_width, int& new_height);
-    };
-  } // namespace gfx
-} // namespace wge
+private:
+    static wge::byte_t* convert_pixel_buffer(const wge::byte_t* const buffer, const int width, const int height,
+                                             const int channels, int& new_width, int& new_height);
+};
+}  // namespace video
+}  // namespace wge
 
-#endif // WGE_GRAPHIC_IMAGE_LOADER_HPP
+#endif  // WGE_GRAPHIC_IMAGE_LOADER_HPP

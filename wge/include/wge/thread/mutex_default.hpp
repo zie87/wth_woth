@@ -8,6 +8,6 @@ using std::mutex;
 using std::recursive_mutex;
 
 using std::lock_guard;
-} // namespace wge
+}  // namespace wge
 
-#endif // WOTH_WGE_THREAD_MUTEXDEFAULT_HPP
+#endif  // WOTH_WGE_THREAD_MUTEXDEFAULT_HPP

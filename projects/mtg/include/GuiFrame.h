@@ -3,8 +3,7 @@
 
 #include "GuiLayers.h"
 
-class GuiFrame : public GuiLayer
-{
+class GuiFrame : public GuiLayer {
 protected:
     JQuadPtr wood;
     JQuadPtr gold1, gold2, goldGlow;
@@ -17,4 +16,4 @@ public:
     void Update(float dt);
 };
 
-#endif // _GUIFRAME_H_
+#endif  // _GUIFRAME_H_

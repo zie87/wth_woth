@@ -3,8 +3,7 @@
 
 #include "JGE.h"
 
-struct Pos
-{
+struct Pos {
     float actX, actY, actZ, actT, actA;
     float x, y, zoom, t, alpha;
     float width, height;
@@ -16,4 +15,4 @@ struct Pos
     void Render(JQuad*);
 };
 
-#endif // _POS_H_
+#endif  // _POS_H_

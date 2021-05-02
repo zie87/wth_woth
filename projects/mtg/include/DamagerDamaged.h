@@ -6,10 +6,9 @@
 
 class Player;
 
-struct DamagerDamaged: TransientCardView
-{
+struct DamagerDamaged : TransientCardView {
     bool show;
-    Player * damageSelecter;
+    Player* damageSelecter;
     vector<Damage> damages;
     int damageToDeal;
 
@@ -27,8 +26,7 @@ struct DamagerDamaged: TransientCardView
 };
 
 typedef DamagerDamaged DefenserDamaged;
-struct AttackerDamaged: DamagerDamaged
-{
+struct AttackerDamaged : DamagerDamaged {
     vector<DefenserDamaged*> blockers;
     AttackerDamaged(MTGCardInstance* card, float x, float y, bool show, Player* damageSelecter);
     AttackerDamaged(MTGCardInstance* card, const Pos& ref, bool show, Player* damageSelecter);

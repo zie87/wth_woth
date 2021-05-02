@@ -7,12 +7,10 @@
 
 using namespace std;
 
-class Subtypes
-{
+class Subtypes {
 public:
-    //A list of commonly used types
-    enum
-    {
+    // A list of commonly used types
+    enum {
         TYPE_CREATURE = 1,
         TYPE_ENCHANTMENT = 2,
         TYPE_SORCERY = 3,
@@ -37,6 +35,7 @@ protected:
     map<string, int> values;
     vector<string> valuesById;
     vector<unsigned int> subtypesToType;
+
 public:
     vector<string> subtypesCreature;
     Subtypes();

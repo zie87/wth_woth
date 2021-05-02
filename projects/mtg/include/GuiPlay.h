@@ -4,16 +4,14 @@
 #include "GuiLayers.h"
 #include "CardGui.h"
 
-class GuiPlay: public GuiLayer
-{
+class GuiPlay : public GuiLayer {
 public:
     static const float HORZWIDTH;
     static const float VERTHEIGHT;
     typedef vector<CardView*>::iterator iterator;
 
 protected:
-    class CardStack
-    {
+    class CardStack {
     protected:
         unsigned total;
         float baseX, baseY;
@@ -25,17 +23,16 @@ protected:
         void RenderSpell(MTGCardInstance*, iterator begin, iterator end, float x, float y);
     };
 
-    class HorzStack: public CardStack
-    {
+    class HorzStack : public CardStack {
     public:
         HorzStack();
         void Render(CardView*, iterator begin, iterator end);
         void Enstack(CardView*);
     };
-    class VertStack: public CardStack
-    {
+    class VertStack : public CardStack {
     protected:
         unsigned count;
+
     public:
         VertStack();
         void reset(unsigned total, float x, float y);
@@ -43,8 +40,7 @@ protected:
         void Enstack(CardView*);
         inline float nextX();
     };
-    class BattleField: public HorzStack
-    {
+    class BattleField : public HorzStack {
         static const float HEIGHT;
         unsigned attackers;
         unsigned blockers;
@@ -65,17 +61,17 @@ protected:
         void Render();
     };
 
-    class Lands: public HorzStack {};
-    class Creatures: public HorzStack {};
-    class Planeswalker: public HorzStack {};
-    class Spells: public VertStack {};
+    class Lands : public HorzStack {};
+    class Creatures : public HorzStack {};
+    class Planeswalker : public HorzStack {};
+    class Spells : public VertStack {};
 
 protected:
     Creatures selfCreatures, opponentCreatures;
     BattleField battleField;
     Lands selfLands, opponentLands;
     Spells selfSpells, opponentSpells;
-    Planeswalker selfPlaneswalker,opponentPlaneswalker;
+    Planeswalker selfPlaneswalker, opponentPlaneswalker;
     iterator end_spells;
 
     vector<CardView*> cards;
@@ -86,8 +82,8 @@ public:
     virtual void Render();
     void Replace();
     void Update(float dt);
-    virtual int receiveEventPlus(WEvent * e);
-    virtual int receiveEventMinus(WEvent * e);
+    virtual int receiveEventPlus(WEvent* e);
+    virtual int receiveEventMinus(WEvent* e);
 };
 
-#endif // _GUIPLAY_H_
+#endif  // _GUIPLAY_H_

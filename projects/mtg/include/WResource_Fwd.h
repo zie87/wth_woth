@@ -5,4 +5,4 @@
 
 typedef wge::shared_ptr<JQuad> JQuadPtr;
 
-#endif 
+#endif

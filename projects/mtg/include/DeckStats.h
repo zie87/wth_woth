@@ -12,8 +12,7 @@ using namespace std;
 class Player;
 class GameObserver;
 
-class DeckStat
-{
+class DeckStat {
 public:
     DeckStat(int _nbgames = 0, int _victories = 0, string manaColorIndex = "");
 
@@ -23,31 +22,30 @@ public:
     int percentVictories();
 };
 
-class DeckStats
-{
+class DeckStats {
 protected:
-    static DeckStats * mInstance;
+    static DeckStats* mInstance;
+
 public:
     string currentDeck;
     map<string, map<string, DeckStat*> > masterDeckStats;
-    
-    static DeckStats * GetInstance();
+
+    static DeckStats* GetInstance();
     static void EndInstance();
-    void saveStats(Player * player, Player * opponent, GameObserver * game);
+    void saveStats(Player* player, Player* opponent, GameObserver* game);
     void save(const std::string& filename);
     void load(const std::string& filename);
 
     ~DeckStats();
     int percentVictories(string opponentsDeckFile);
     int percentVictories();
-    DeckStat * getDeckStat(string opponentsFile);
+    DeckStat* getDeckStat(string opponentsFile);
 
-    //returns the total number of games played with this deck
+    // returns the total number of games played with this deck
     int nbGames();
 };
 
-class StatsWrapper
-{
+class StatsWrapper {
 private:
     void initValues();
 
@@ -94,11 +92,11 @@ public:
     int countNonLandProducersPerColor[Constants::MTG_NB_COLORS + 1];
     int totalCostPerColor[Constants::MTG_NB_COLORS + 1];
     int totalColoredSymbols;
-    
+
     string getManaColorIndex();
-    void updateStats(string filename, MTGAllCards * collection);
-    void updateStats(DeckDataWrapper *mtgDeck);
-    int countCardsByType(const char * _type, DeckDataWrapper * myDeck);
+    void updateStats(string filename, MTGAllCards* collection);
+    void updateStats(DeckDataWrapper* mtgDeck);
+    int countCardsByType(const char* _type, DeckDataWrapper* myDeck);
     float noLuck(int n, int a, int x);
 
     vector<string> aiDeckNames;

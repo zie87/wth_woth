@@ -5,28 +5,26 @@
 
 using namespace std;
 
-class DeckManager
-{
+class DeckManager {
 private:
     vector<DeckMetaData*> playerDeckOrderList;
     vector<DeckMetaData*> aiDeckOrderList;
     map<string, StatsWrapper*> playerDeckStatsMap;
     map<string, StatsWrapper*> aiDeckStatsMap;
 
-    static DeckManager *mInstance;
+    static DeckManager* mInstance;
 
 public:
-    DeckManager()
-    {
-        //private constructor
+    DeckManager() {
+        // private constructor
     }
 
     void updateMetaDataList(vector<DeckMetaData*>* refList, bool isAI);
-    vector<DeckMetaData*> * getPlayerDeckOrderList();
-    vector<DeckMetaData*> * getAIDeckOrderList();
+    vector<DeckMetaData*>* getPlayerDeckOrderList();
+    vector<DeckMetaData*>* getAIDeckOrderList();
 
-    void AddMetaData( const std::string& filename, bool isAI);
-    void DeleteMetaData( const std::string& filename, bool isAI);
+    void AddMetaData(const std::string& filename, bool isAI);
+    void DeleteMetaData(const std::string& filename, bool isAI);
     DeckMetaData* getDeckMetaDataById(int deckId, bool isAI);
     DeckMetaData* getDeckMetaDataByFilename(const std::string& filename, bool isAI);
     StatsWrapper* getExtendedStatsForDeckId(int deckId, MTGAllCards* collection, bool isAI);
@@ -35,11 +33,10 @@ public:
     static DeckManager* GetInstance();
     static void EndInstance();
 
-    //convenience method to get the difficulty rating between two decks.  This should be refined a little more
-    //since the eventual move of all deck meta data should be managed by this class
+    // convenience method to get the difficulty rating between two decks.  This should be refined a little more
+    // since the eventual move of all deck meta data should be managed by this class
 
-    int getDifficultyRating(Player *statsPlayer, Player *player);
-    
+    int getDifficultyRating(Player* statsPlayer, Player* player);
+
     ~DeckManager();
-
 };

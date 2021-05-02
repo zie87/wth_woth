@@ -3,18 +3,10 @@
 #include "../include/GameOptions.h"
 #include "../include/CardEffect.h"
 
-CardEffect::CardEffect(CardGui* target) :
-    target(target)
-{
+CardEffect::CardEffect(CardGui* target) : target(target) {}
 
-}
+CardEffect::~CardEffect() {}
 
-CardEffect::~CardEffect()
-{
-
-}
-
-void CardEffect::Render()
-{
+void CardEffect::Render() {
     //  std::cout << "Rendering effect" << std::endl;
 }

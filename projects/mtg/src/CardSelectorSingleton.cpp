@@ -8,28 +8,22 @@
 /*
  **
  */
-namespace CardSelectorSingleton
-{
-    static CardSelectorBase* sCardSelectorInstance = NULL;
+namespace CardSelectorSingleton {
+static CardSelectorBase* sCardSelectorInstance = NULL;
 
-    CardSelectorBase* Create(GameObserver* observer, DuelLayers* inDuelLayers)
-    {
-        if (sCardSelectorInstance == NULL)
-            sCardSelectorInstance = NEW CardSelector(observer, inDuelLayers);
+CardSelectorBase* Create(GameObserver* observer, DuelLayers* inDuelLayers) {
+    if (sCardSelectorInstance == NULL) sCardSelectorInstance = NEW CardSelector(observer, inDuelLayers);
 
-        return sCardSelectorInstance;
-    }
-
-    CardSelectorBase* Instance()
-    {
-        assert(sCardSelectorInstance);
-        return sCardSelectorInstance;
-    }
-
-    void Terminate()
-    {
-        SAFE_DELETE(sCardSelectorInstance);
-        sCardSelectorInstance = NULL;
-    }
+    return sCardSelectorInstance;
 }
 
+CardSelectorBase* Instance() {
+    assert(sCardSelectorInstance);
+    return sCardSelectorInstance;
+}
+
+void Terminate() {
+    SAFE_DELETE(sCardSelectorInstance);
+    sCardSelectorInstance = NULL;
+}
+}  // namespace CardSelectorSingleton

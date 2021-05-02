@@ -7,10 +7,9 @@
 #include "SimpleMenu.h"
 #include "TextScroller.h"
 
-class GameStateMenu: public GameState, public JGuiListener
-{
+class GameStateMenu : public GameState, public JGuiListener {
 private:
-    TextScroller * scroller;
+    TextScroller* scroller;
     int scrollerSet;
     int mPercentComplete;
     JGuiController* mGuiController;
@@ -18,9 +17,9 @@ private:
     SimpleMenu* gameTypeMenu;
     bool hasChosenGameType;
     JQuadPtr mIcons[10];
-    JTexture * bgTexture;
+    JTexture* bgTexture;
     JQuadPtr mBg;
-    JTexture * splashTex;
+    JTexture* splashTex;
     float mCreditsYPos;
     int currentState;
     int mVolume;
@@ -44,16 +43,17 @@ private:
     string getLang(string s);
     void loadLangMenu();
     bool langChoices;
-    void runTest(); //!!
+    void runTest();  //!!
     void listPrimitives();
-    void genNbCardsStr(); //computes the contents of nbCardsStr
-    void ensureMGuiController(); //creates the MGuiController if it doesn't exist
-    string loadRandomWallpaper(); //loads a list of string of textures that can be randolmy shown on the loading screen
+    void genNbCardsStr();         // computes the contents of nbCardsStr
+    void ensureMGuiController();  // creates the MGuiController if it doesn't exist
+    string
+    loadRandomWallpaper();  // loads a list of string of textures that can be randolmy shown on the loading screen
 
     void RenderTopMenu();
     int gamePercentComplete();
-public:
 
+public:
     GameStateMenu(GameApp* parent);
     virtual ~GameStateMenu();
     virtual void Create();
@@ -64,12 +64,11 @@ public:
     virtual void Render();
     virtual void ButtonPressed(int controllerId, int controlId);
 
-    int nextSetFolder(const string & root, const string & file); // Retrieves the next directory to have matching file
+    int nextSetFolder(const string& root, const string& file);  // Retrieves the next directory to have matching file
     void createUsersFirstDeck(int setId);
     virtual ostream& toString(ostream& out) const;
 
-    enum
-    {
+    enum {
         MENU_CARD_PURCHASE = 2,
         MENU_DECK_SELECTION = 10,
         MENU_DECK_BUILDER = 11,

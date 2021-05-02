@@ -16,8 +16,7 @@ class CardSelectorBase;
 struct Pos;
 class MTGGamePhase;
 
-class DuelLayers
-{
+class DuelLayers {
 protected:
     int nbitems;
     vector<GuiLayer*> objects;
@@ -25,8 +24,8 @@ protected:
     GuiCombat* combat;
     ActionLayer* action;
     ActionStack* stack;
-    GuiHandSelf *hand;
-    GuiAvatars * avatars;
+    GuiHandSelf* hand;
+    GuiAvatars* avatars;
     GameObserver* observer;
     MTGGamePhase* phaseHandler;
 
@@ -34,18 +33,18 @@ public:
     DuelLayers();
     ~DuelLayers();
 
-    ActionLayer * actionLayer();
-    ActionStack * stackLayer();
-    GuiCombat * combatLayer();
-    GuiAvatars * GetAvatars();
-    MTGGamePhase* getPhaseHandler() {return phaseHandler;};
+    ActionLayer* actionLayer();
+    ActionStack* stackLayer();
+    GuiCombat* combatLayer();
+    GuiAvatars* GetAvatars();
+    MTGGamePhase* getPhaseHandler() { return phaseHandler; };
     void init(GameObserver* go);
-    virtual void Update(float dt, Player * player);
+    virtual void Update(float dt, Player* player);
     void CheckUserInput(int isAI);
     void Render();
-    void Add(GuiLayer * layer);
+    void Add(GuiLayer* layer);
     void Remove();
-    int receiveEvent(WEvent * e);
+    int receiveEvent(WEvent* e);
     float RightBoundary();
 
     CardSelectorBase* mCardSelector;

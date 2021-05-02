@@ -3,11 +3,11 @@
 
 #include <JGui.h>
 
-class Effect: public JGuiObject
-{
+class Effect : public JGuiObject {
     static int id_counter;
+
 public:
-    Effect() : JGuiObject(++id_counter) {};
+    Effect() : JGuiObject(++id_counter){};
 };
 
-#endif // _EFFECTS_H_
+#endif  // _EFFECTS_H_

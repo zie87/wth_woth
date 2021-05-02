@@ -2,9 +2,7 @@
 
 #include "Token.h"
 
-Token::Token(string _name, MTGCardInstance * source, int _power, int _toughness) :
-    MTGCardInstance()
-{
+Token::Token(string _name, MTGCardInstance* source, int _power, int _toughness) : MTGCardInstance() {
     isToken = true;
     tokenSource = source;
     power = _power;
@@ -15,7 +13,8 @@ Token::Token(string _name, MTGCardInstance * source, int _power, int _toughness)
     origtoughness = _toughness;
     rarity = Constants::RARITY_T;
     name = _name;
-    if (name.size() && name[0] >= 97 && name[0] <= 122) name[0] -= 32; //Poor man's camelcase. We assume strings we get are either Camelcased or lowercase
+    if (name.size() && name[0] >= 97 && name[0] <= 122)
+        name[0] -= 32;  // Poor man's camelcase. We assume strings we get are either Camelcased or lowercase
     setMTGId(-source->getMTGId());
     setId = source->setId;
     model = this;
@@ -27,17 +26,13 @@ Token::Token(string _name, MTGCardInstance * source, int _power, int _toughness)
     banding = NULL;
 }
 
-Token::Token(int id) :
-    MTGCardInstance()
-{
+Token::Token(int id) : MTGCardInstance() {
     isToken = true;
     name = "dummyToken";
     setMTGId(id);
 }
 
-Token::Token(const Token& source) :
-    MTGCardInstance(source.model, source.owner->game)
-{
+Token::Token(const Token& source) : MTGCardInstance(source.model, source.owner->game) {
     isToken = source.isToken;
     tokenSource = source.tokenSource;
     power = source.power;
@@ -58,8 +53,4 @@ Token::Token(const Token& source) :
     banding = source.banding;
 }
 
-
-MTGCardInstance* Token::clone()
-{
-    return new Token(*this);
-}
+MTGCardInstance* Token::clone() { return new Token(*this); }

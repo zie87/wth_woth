@@ -9,23 +9,22 @@
 
 using std::string;
 
-#define SCALE_SELECTED		1.2f
-#define SCALE_NORMAL		1.0f
+#define SCALE_SELECTED 1.2f
+#define SCALE_NORMAL 1.0f
 
-class SimpleMenuItem: public SimpleButton
-{
+class SimpleMenuItem : public SimpleButton {
 private:
     string mDescription;
 
 public:
     SimpleMenuItem(int id);
-    SimpleMenuItem(SimpleMenu* _parent, int id, int fontId, string text, float x, float y, bool hasFocus = false, bool autoTranslate = false);
+    SimpleMenuItem(SimpleMenu* _parent, int id, int fontId, string text, float x, float y, bool hasFocus = false,
+                   bool autoTranslate = false);
 
     virtual void Entering();
-    virtual void setDescription( const string& desc );
+    virtual void setDescription(const string& desc);
     virtual string getDescription() const;
     virtual ostream& toString(ostream& out) const;
-
 };
 
 #endif

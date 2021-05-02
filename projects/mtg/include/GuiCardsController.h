@@ -3,13 +3,9 @@
 
 #include "PlayGuiObjectController.h"
 
-class GuiCardsController: public PlayGuiObjectController
-{
+class GuiCardsController : public PlayGuiObjectController {
 public:
-    GuiCardsController(GameObserver*observer)
-        : PlayGuiObjectController(observer)
-    {
-    };
+    GuiCardsController(GameObserver* observer) : PlayGuiObjectController(observer){};
 };
 
 #endif

@@ -8,31 +8,25 @@
 #include "StyleManager.h"
 #include <dirent.h>
 
-//OptionItem
-OptionItem::OptionItem(int _id, string _displayValue) :
-    WGuiItem(_displayValue)
-{
+// OptionItem
+OptionItem::OptionItem(int _id, string _displayValue) : WGuiItem(_displayValue) {
     id = _id;
     mFocus = false;
 }
 
-//OptionInteger
-void OptionInteger::Render()
-{
-    WFont * mFont = WResourceManager::Instance()->GetWFont(Fonts::OPTION_FONT);
+// OptionInteger
+void OptionInteger::Render() {
+    WFont* mFont = WResourceManager::Instance()->GetWFont(Fonts::OPTION_FONT);
     mFont->SetColor(getColor(WGuiColor::TEXT));
     mFont->DrawString(_(displayValue).c_str(), x + 2, y + 3);
     char buf[512];
 
-    if (maxValue == 1)
-    {
+    if (maxValue == 1) {
         if (value)
             sprintf(buf, "%s", _("Yes").c_str());
         else
             sprintf(buf, "%s", _("No").c_str());
-    }
-    else
-    {
+    } else {
         if (value == defValue && strDefault.size())
             sprintf(buf, "%s", _(strDefault).c_str());
         else
@@ -41,9 +35,9 @@ void OptionInteger::Render()
     mFont->DrawString(buf, width - 5, y + 3, JGETEXT_RIGHT);
 }
 
-OptionInteger::OptionInteger(int _id, string _displayValue, int _maxValue, int _increment, int _defV, string _sDef, int _minValue) :
-    OptionItem(_id, _displayValue)
-{
+OptionInteger::OptionInteger(int _id, string _displayValue, int _maxValue, int _increment, int _defV, string _sDef,
+                             int _minValue)
+    : OptionItem(_id, _displayValue) {
     defValue = _defV;
     strDefault = _sDef;
     maxValue = _maxValue;
@@ -54,30 +48,24 @@ OptionInteger::OptionInteger(int _id, string _displayValue, int _maxValue, int _
     y = 0;
 }
 
-void OptionInteger::setData()
-{
-    if (id != INVALID_OPTION)
-        options[id] = GameOption(value);
+void OptionInteger::setData() {
+    if (id != INVALID_OPTION) options[id] = GameOption(value);
 }
 
-//Option Select
-void OptionSelect::initSelections()
-{
-    //Find currently active bit in the list.
+// Option Select
+void OptionSelect::initSelections() {
+    // Find currently active bit in the list.
     for (size_t i = 0; i < selections.size(); ++i)
-        if (selections[i] == options[id].str)
-            value = i;
+        if (selections[i] == options[id].str) value = i;
 }
 
-void OptionSelect::Entering(JButton key)
-{
+void OptionSelect::Entering(JButton key) {
     OptionItem::Entering(key);
     prior_value = value;
 }
 
-void OptionSelect::Render()
-{
-    WFont * mFont = WResourceManager::Instance()->GetWFont(Fonts::OPTION_FONT);
+void OptionSelect::Render() {
+    WFont* mFont = WResourceManager::Instance()->GetWFont(Fonts::OPTION_FONT);
     mFont->SetColor(getColor(WGuiColor::TEXT));
     mFont->DrawString(_(displayValue).c_str(), x, y + 2);
 
@@ -87,29 +75,19 @@ void OptionSelect::Render()
         mFont->DrawString(_("Unset").c_str(), x + width - 10, y + 2, JGETEXT_RIGHT);
 }
 
-void OptionSelect::setData()
-{
-    if (id == INVALID_OPTION)
-        return;
+void OptionSelect::setData() {
+    if (id == INVALID_OPTION) return;
 
-    if (value < selections.size())
-        options[id] = GameOption(selections[value]);
+    if (value < selections.size()) options[id] = GameOption(selections[value]);
 }
-bool OptionSelect::Selectable()
-{
-    return (selections.size() > 1);
-}
+bool OptionSelect::Selectable() { return (selections.size() > 1); }
 
-void OptionSelect::addSelection(string s)
-{
-    selections.push_back(s);
-}
+void OptionSelect::addSelection(string s) { selections.push_back(s); }
 
-//OptionProfile
+// OptionProfile
 const string OptionProfile::DIRTESTER = "collection.dat";
-OptionProfile::OptionProfile(GameApp * _app, JGuiListener * jgl) :
-    OptionDirectory("profiles/", Options::ACTIVE_PROFILE, "Profile", DIRTESTER)
-{
+OptionProfile::OptionProfile(GameApp* _app, JGuiListener* jgl)
+    : OptionDirectory("profiles/", Options::ACTIVE_PROFILE, "Profile", DIRTESTER) {
     app = _app;
     listener = jgl;
     height = 60;
@@ -118,62 +96,50 @@ OptionProfile::OptionProfile(GameApp * _app, JGuiListener * jgl) :
     mFocus = false;
     initSelections();
     populate();
-}
-;
+};
 
-void OptionProfile::initSelections()
-{
+void OptionProfile::initSelections() {
     OptionSelect::initSelections();
     initialValue = value;
 }
 
-void OptionProfile::addSelection(string s)
-{
+void OptionProfile::addSelection(string s) {
     OptionDirectory::addSelection(s);
 
-    //Check how many options... if 1, we're not selectable.
+    // Check how many options... if 1, we're not selectable.
     if (selections.size() > 1)
         canSelect = true;
     else
         canSelect = false;
-
 }
 
-void OptionProfile::updateValue()
-{
+void OptionProfile::updateValue() {
     value++;
-    if (value > selections.size() - 1)
-        value = 0;
+    if (value > selections.size() - 1) value = 0;
 
     populate();
 }
 
-void OptionProfile::Reload()
-{
+void OptionProfile::Reload() {
     OptionDirectory::Reload();
     populate();
 }
 
-void OptionProfile::populate()
-{
+void OptionProfile::populate() {
     string temp = options[Options::ACTIVE_PROFILE].str;
-    if (value >= selections.size())
-    { //TODO fail gracefully.
+    if (value >= selections.size()) {  // TODO fail gracefully.
         return;
     }
     options[Options::ACTIVE_PROFILE].str = selections[value];
-    PlayerData * pdata = NEW PlayerData(MTGCollection());
+    PlayerData* pdata = NEW PlayerData(MTGCollection());
 
     int unlocked = 0, sets = setlist.size();
     std::string contents;
-    if (JFileSystem::GetInstance()->readIntoString(options.profileFile(PLAYER_SETTINGS), contents))
-    {
+    if (JFileSystem::GetInstance()->readIntoString(options.profileFile(PLAYER_SETTINGS), contents)) {
         std::stringstream stream(contents);
         std::string s;
-        while (std::getline(stream, s))
-        {
-            if (s.substr(0, 9) == "unlocked_")
-                unlocked++;
+        while (std::getline(stream, s)) {
+            if (s.substr(0, 9) == "unlocked_") unlocked++;
         }
     }
 
@@ -187,12 +153,11 @@ void OptionProfile::populate()
     SAFE_DELETE(pdata);
 }
 
-void OptionProfile::Render()
-{
-    JRenderer * renderer = JRenderer::GetInstance();
-    WFont * mFont = WResourceManager::Instance()->GetWFont(Fonts::OPTION_FONT);
+void OptionProfile::Render() {
+    JRenderer* renderer = JRenderer::GetInstance();
+    WFont* mFont = WResourceManager::Instance()->GetWFont(Fonts::OPTION_FONT);
     mFont->SetScale(1);
-    int spacing = 2 + (int) mFont->GetHeight();
+    int spacing = 2 + (int)mFont->GetHeight();
 
     float pX, pY;
     pX = x;
@@ -205,8 +170,7 @@ void OptionProfile::Render()
     string filename = buf;
     JQuadPtr avatar = WResourceManager::Instance()->RetrieveTempQuad(filename, TEXTURE_SUB_EXACT);
 
-    if (avatar)
-    {
+    if (avatar) {
         renderer->RenderQuad(avatar.get(), x, pY);
         pX += 40;
     }
@@ -217,19 +181,15 @@ void OptionProfile::Render()
     mFont->SetColor(getColor(WGuiColor::TEXT_BODY));
     mFont->DrawString(preview.c_str(), pX, pY + spacing + 2, JGETEXT_LEFT);
     mFont->SetScale(1.0f);
-
 }
 
-void OptionProfile::Entering(JButton key)
-{
+void OptionProfile::Entering(JButton key) {
     mFocus = true;
     initialValue = value;
 }
 
-void OptionProfile::confirmChange(bool confirmed)
-{
-    if (initialValue >= selections.size())
-        return;
+void OptionProfile::confirmChange(bool confirmed) {
+    if (initialValue >= selections.size()) return;
 
     int result;
 
@@ -242,58 +202,41 @@ void OptionProfile::confirmChange(bool confirmed)
     value = result;
 
     populate();
-    if (listener && confirmed)
-    {
+    if (listener && confirmed) {
         listener->ButtonPressed(-102, 5);
         initialValue = value;
     }
     return;
 }
 
-//OptionThemeStyle
-OptionThemeStyle::OptionThemeStyle(string _displayValue) :
-    OptionSelect(Options::GUI_STYLE, _displayValue)
-{
+// OptionThemeStyle
+OptionThemeStyle::OptionThemeStyle(string _displayValue) : OptionSelect(Options::GUI_STYLE, _displayValue) {
     Reload();
     initSelections();
 }
 
-bool OptionThemeStyle::Visible()
-{
-    return (selections.size() > 1);
-}
+bool OptionThemeStyle::Visible() { return (selections.size() > 1); }
 
-void OptionThemeStyle::confirmChange(bool confirmed)
-{
-    options.getStyleMan()->determineActive(NULL, NULL);
-}
+void OptionThemeStyle::confirmChange(bool confirmed) { options.getStyleMan()->determineActive(NULL, NULL); }
 
-void OptionThemeStyle::Reload()
-{
+void OptionThemeStyle::Reload() {
     selections.clear();
     addSelection("Dynamic");
     map<string, WStyle*>::iterator it;
 
-    StyleManager * sm = options.getStyleMan();
-    for (it = sm->styles.begin(); it != sm->styles.end(); it++)
-        addSelection(it->first);
+    StyleManager* sm = options.getStyleMan();
+    for (it = sm->styles.begin(); it != sm->styles.end(); it++) addSelection(it->first);
 }
-//OptionLanguage
-OptionLanguage::OptionLanguage(string _displayValue) :
-    OptionSelect(Options::LANG, _displayValue)
-{
+// OptionLanguage
+OptionLanguage::OptionLanguage(string _displayValue) : OptionSelect(Options::LANG, _displayValue) {
     Reload();
     initSelections();
-}
-;
+};
 
-void OptionLanguage::setData()
-{
-    if (id == INVALID_OPTION)
-        return;
+void OptionLanguage::setData() {
+    if (id == INVALID_OPTION) return;
 
-    if (value < selections.size())
-    {
+    if (value < selections.size()) {
         options[id] = GameOption(actual_data[value]);
         Translator::EndInstance();
         Translator::GetInstance()->init();
@@ -301,15 +244,12 @@ void OptionLanguage::setData()
     }
 }
 
-void OptionLanguage::confirmChange(bool confirmed)
-{
+void OptionLanguage::confirmChange(bool confirmed) {
     if (!confirmed)
         value = prior_value;
-    else
-    {
+    else {
         setData();
-        if (Changed())
-        {
+        if (Changed()) {
             options[id] = GameOption(actual_data[value]);
             Translator::EndInstance();
             Translator::GetInstance()->init();
@@ -319,31 +259,22 @@ void OptionLanguage::confirmChange(bool confirmed)
     }
 }
 
-void OptionLanguage::Reload()
-{
-
+void OptionLanguage::Reload() {
     vector<string> langFiles = JFileSystem::GetInstance()->scanfolder("lang/");
-    for (size_t i = 0; i < langFiles.size(); ++i)
-    {
+    for (size_t i = 0; i < langFiles.size(); ++i) {
         izfstream file;
         string filePath = "lang/";
         filePath.append(langFiles[i]);
-        if (! JFileSystem::GetInstance()->openForRead(file, filePath))
-            continue;
+        if (!JFileSystem::GetInstance()->openForRead(file, filePath)) continue;
 
         string s;
         string lang;
 
-        if (std::getline(file, s))
-        {
-            if (!s.size())
-            {
+        if (std::getline(file, s)) {
+            if (!s.size()) {
                 lang = "";
-            }
-            else
-            {
-                if (s[s.size() - 1] == '\r')
-                    s.erase(s.size() - 1); //Handle DOS files
+            } else {
+                if (s[s.size() - 1] == '\r') s.erase(s.size() - 1);  // Handle DOS files
                 size_t found = s.find("#LANG:");
                 if (found != 0)
                     lang = "";
@@ -353,8 +284,7 @@ void OptionLanguage::Reload()
         }
         file.close();
 
-        if (lang.size())
-        {
+        if (lang.size()) {
             string filen = langFiles[i];
             addSelection(filen.substr(0, filen.size() - 4), lang);
         }
@@ -362,75 +292,59 @@ void OptionLanguage::Reload()
     initSelections();
 }
 
-void OptionLanguage::addSelection(string s, string show)
-{
+void OptionLanguage::addSelection(string s, string show) {
     selections.push_back(show);
     actual_data.push_back(s);
 }
 
-void OptionLanguage::initSelections()
-{
-    //Find currently active bit in the list.
-    for (size_t i = 0; i < actual_data.size(); i++)
-    {
-        if (actual_data[i] == options[id].str)
-            value = i;
+void OptionLanguage::initSelections() {
+    // Find currently active bit in the list.
+    for (size_t i = 0; i < actual_data.size(); i++) {
+        if (actual_data[i] == options[id].str) value = i;
     }
 }
 
-bool OptionLanguage::Visible()
-{
-    if (selections.size() > 1)
-        return true;
+bool OptionLanguage::Visible() {
+    if (selections.size() > 1) return true;
     return false;
 }
 
-bool OptionLanguage::Selectable()
-{
-    if (selections.size() > 1)
-        return true;
+bool OptionLanguage::Selectable() {
+    if (selections.size() > 1) return true;
     return false;
 }
 
-//OptionDirectory
-void OptionDirectory::Reload()
-{
+// OptionDirectory
+void OptionDirectory::Reload() {
     vector<string> subfolders = JFileSystem::GetInstance()->scanfolder(root);
-    for (size_t i = 0; i < subfolders.size(); ++i)
-    {
+    for (size_t i = 0; i < subfolders.size(); ++i) {
         string filename = root + "/" + subfolders[i] + "/" + type;
-        if (!JFileSystem::GetInstance()->FileExists(filename))
-            continue;
-        if (find(selections.begin(), selections.end(), subfolders[i]) == selections.end())
-            addSelection(subfolders[i]);
+        if (!JFileSystem::GetInstance()->FileExists(filename)) continue;
+        if (find(selections.begin(), selections.end(), subfolders[i]) == selections.end()) addSelection(subfolders[i]);
     }
     initSelections();
 }
 
-OptionDirectory::OptionDirectory(string root, int id, string displayValue, string type) :
-    OptionSelect(id, displayValue), root(root), type(type)
-{
+OptionDirectory::OptionDirectory(string root, int id, string displayValue, string type)
+    : OptionSelect(id, displayValue), root(root), type(type) {
     vector<string> subfolders = JFileSystem::GetInstance()->scanfolder(root);
-    
-    for (size_t i = 0; i < subfolders.size(); ++i)
-    {
+
+    for (size_t i = 0; i < subfolders.size(); ++i) {
         string subfolder = subfolders[i].substr(0, subfolders[i].length());
-        if(subfolder[subfolders[i].length()-1] == '/')
-        subfolder = subfolders[i].substr(0, subfolders[i].length() - 1); //remove trailing "/" 
+        if (subfolder[subfolders[i].length() - 1] == '/')
+            subfolder = subfolders[i].substr(0, subfolders[i].length() - 1);  // remove trailing "/"
         vector<string> path;
         path.push_back(root);
         path.push_back(subfolder);
         string filePath = buildFilePath(path, type);
-        if (JFileSystem::GetInstance()->FileExists(filePath))
-            addSelection(subfolder);
+        if (JFileSystem::GetInstance()->FileExists(filePath)) addSelection(subfolder);
     }
     initSelections();
 }
 
 const string OptionTheme::DIRTESTER = "preview.png";
-OptionTheme::OptionTheme(OptionThemeStyle * style) :
-    OptionDirectory("themes", Options::ACTIVE_THEME, "Current Theme", DIRTESTER)
-{
+OptionTheme::OptionTheme(OptionThemeStyle* style)
+    : OptionDirectory("themes", Options::ACTIVE_THEME, "Current Theme", DIRTESTER) {
     addSelection("Default");
     sort(selections.begin(), selections.end());
     initSelections();
@@ -439,8 +353,7 @@ OptionTheme::OptionTheme(OptionThemeStyle * style) :
     ts = style;
 }
 
-JQuadPtr OptionTheme::getImage()
-{
+JQuadPtr OptionTheme::getImage() {
     char buf[512];
     string val = selections[value];
     if (val == "Default")
@@ -451,23 +364,17 @@ JQuadPtr OptionTheme::getImage()
     return WResourceManager::Instance()->RetrieveTempQuad(filename, TEXTURE_SUB_EXACT);
 }
 
-float OptionTheme::getHeight()
-{
-    return 130;
-}
+float OptionTheme::getHeight() { return 130; }
 
-void OptionTheme::updateValue()
-{
+void OptionTheme::updateValue() {
     OptionDirectory::updateValue();
     bChecked = false;
 }
 
-void OptionTheme::Render()
-{
-    JRenderer * renderer = JRenderer::GetInstance();
+void OptionTheme::Render() {
+    JRenderer* renderer = JRenderer::GetInstance();
     char buf[512];
-    if (!bChecked)
-    {
+    if (!bChecked) {
         author = "";
         bChecked = true;
         if (selections[value] == "Default")
@@ -475,14 +382,12 @@ void OptionTheme::Render()
         else
             sprintf(buf, "themes/%s/themeinfo.txt", selections[value].c_str());
         string contents;
-        if (JFileSystem::GetInstance()->readIntoString(buf, contents))
-        {
+        if (JFileSystem::GetInstance()->readIntoString(buf, contents)) {
             std::stringstream stream(contents);
             string temp;
             std::getline(stream, temp);
-            for (unsigned int x = 0; x < 17 && x < temp.size(); x++)
-            {
-                if (isprint(temp[x])) //Clear stuff that breaks mFont->DrawString, cuts to 16 chars.
+            for (unsigned int x = 0; x < 17 && x < temp.size(); x++) {
+                if (isprint(temp[x]))  // Clear stuff that breaks mFont->DrawString, cuts to 16 chars.
                     author += temp[x];
             }
         }
@@ -490,17 +395,15 @@ void OptionTheme::Render()
     sprintf(buf, _("Theme: %s").c_str(), selections[value].c_str());
 
     JQuadPtr q = getImage();
-    if (q)
-    {
+    if (q) {
         float scale = 128 / q->mHeight;
         renderer->RenderQuad(q.get(), x, y, 0, scale, scale);
     }
 
-    WFont * mFont = WResourceManager::Instance()->GetWFont(Fonts::OPTION_FONT);
+    WFont* mFont = WResourceManager::Instance()->GetWFont(Fonts::OPTION_FONT);
     mFont->SetColor(getColor(WGuiColor::TEXT_HEADER));
     mFont->DrawString(buf, x + 2, y + 2);
-    if (bChecked && author.size())
-    {
+    if (bChecked && author.size()) {
         mFont->SetColor(getColor(WGuiColor::TEXT_BODY));
         mFont->SetScale(0.8f);
         float hi = mFont->GetHeight();
@@ -510,77 +413,60 @@ void OptionTheme::Render()
     }
 }
 
-bool OptionTheme::Visible()
-{
-    if (selections.size() <= 1)
-        return false;
+bool OptionTheme::Visible() {
+    if (selections.size() <= 1) return false;
 
     return true;
 }
 
-void OptionTheme::confirmChange(bool confirmed)
-{
+void OptionTheme::confirmChange(bool confirmed) {
     bChecked = false;
     if (!confirmed)
         value = prior_value;
-    else
-    {
+    else {
         setData();
         options.getStyleMan()->loadRules();
         options.getStyleMan()->determineActive(NULL, NULL);
-        if (ts)
-            ts->Reload();
+        if (ts) ts->Reload();
 
-        WResourceManager::Instance()->Refresh(); //Update images
+        WResourceManager::Instance()->Refresh();  // Update images
         prior_value = value;
     }
 }
 
-OptionKey::OptionKey(GameStateOptions* g, LocalKeySym from, JButton to) :
-    WGuiItem(""), from(from), to(to), grabbed(false), g(g), btnMenu(NULL)
-{
-}
+OptionKey::OptionKey(GameStateOptions* g, LocalKeySym from, JButton to)
+    : WGuiItem(""), from(from), to(to), grabbed(false), g(g), btnMenu(NULL) {}
 
-void OptionKey::Update(float dt)
-{
-    if (btnMenu)
-        btnMenu->Update(dt);
+void OptionKey::Update(float dt) {
+    if (btnMenu) btnMenu->Update(dt);
 }
-void OptionKey::Render()
-{
-    WFont * mFont = WResourceManager::Instance()->GetWFont(Fonts::OPTION_FONT);
+void OptionKey::Render() {
+    WFont* mFont = WResourceManager::Instance()->GetWFont(Fonts::OPTION_FONT);
     mFont->SetColor(getColor(WGuiColor::TEXT));
-    JRenderer * renderer = JRenderer::GetInstance();
+    JRenderer* renderer = JRenderer::GetInstance();
 
-    if (LOCAL_KEY_NONE == from)
-    {
+    if (LOCAL_KEY_NONE == from) {
         string msg = _("New binding...");
         mFont->DrawString(msg, (SCREEN_WIDTH - mFont->GetStringWidth(msg.c_str())) / 2, y + 2);
-    }
-    else
-    {
+    } else {
         const KeyRep& rep = translateKey(from);
         if (rep.second)
-            renderer->RenderQuad(rep.second, x + 4, y + 3, 0, 16.0f / rep.second->mHeight, 16.0f / rep.second->mHeight);
+            renderer->RenderQuad(rep.second, x + 4, y + 3, 0, 16.0f / rep.second->mHeight,
+                                 16.0f / rep.second->mHeight);
         else
             mFont->DrawString(rep.first, x + 4, y + 3, JGETEXT_LEFT);
         const KeyRep& rep2 = translateKey(to);
-        if (rep2.second)
-        {
+        if (rep2.second) {
             float ratio = 16.0f / rep2.second->mHeight;
             renderer->RenderQuad(rep2.second, x + width - (ratio * rep2.second->mWidth) - 2, y + 3, 0, ratio, ratio);
-        }
-        else
+        } else
             mFont->DrawString(rep2.first, width - 4, y + 3, JGETEXT_RIGHT);
     }
 }
 
-bool OptionKey::CheckUserInput(JButton key)
-{
-    if (btnMenu)
-        return btnMenu->CheckUserInput(key);
-    if (JGE_BTN_OK == key)
-    {
+bool OptionKey::CheckUserInput(JButton key) {
+    if (btnMenu) return btnMenu->CheckUserInput(key);
+    if (JGE_BTN_OK == key) {
         grabbed = true;
         g->GrabKeyboard(this);
         return true;
@@ -588,73 +474,46 @@ bool OptionKey::CheckUserInput(JButton key)
     return false;
 }
 
-static const JButton btnList[] =
-{
-                JGE_BTN_MENU,
-                JGE_BTN_CTRL,
-                JGE_BTN_RIGHT,
-                JGE_BTN_LEFT,
-                JGE_BTN_UP,
-                JGE_BTN_DOWN,
-                JGE_BTN_OK,
-                JGE_BTN_CANCEL,
-                JGE_BTN_PRI,
-                JGE_BTN_SEC,
-                JGE_BTN_PREV,
-                JGE_BTN_NEXT,
+static const JButton btnList[] = {JGE_BTN_MENU,       JGE_BTN_CTRL, JGE_BTN_RIGHT, JGE_BTN_LEFT,
+                                  JGE_BTN_UP,         JGE_BTN_DOWN, JGE_BTN_OK,    JGE_BTN_CANCEL,
+                                  JGE_BTN_PRI,        JGE_BTN_SEC,  JGE_BTN_PREV,  JGE_BTN_NEXT,
 #ifdef LINUX
-                JGE_BTN_FULLSCREEN,
+                                  JGE_BTN_FULLSCREEN,
 #endif
-                JGE_BTN_NONE
-};
+                                  JGE_BTN_NONE};
 
-void OptionKey::KeyPressed(LocalKeySym key)
-{
+void OptionKey::KeyPressed(LocalKeySym key) {
     from = key;
     g->UngrabKeyboard(this);
     grabbed = false;
 
     btnMenu = NEW SimpleMenu(JGE::GetInstance(), 0, this, Fonts::MENU_FONT, 80, 10);
-    for (int i = sizeof(btnList) / sizeof(btnList[0]) - 1; i >= 0; --i)
-    {
+    for (int i = sizeof(btnList) / sizeof(btnList[0]) - 1; i >= 0; --i) {
         const KeyRep& rep = translateKey(btnList[i]);
         btnMenu->Add(i, rep.first.c_str());
     }
 }
-bool OptionKey::isModal()
-{
-    return grabbed || btnMenu;
-}
+bool OptionKey::isModal() { return grabbed || btnMenu; }
 
-void OptionKey::Overlay()
-{
-    JRenderer * renderer = JRenderer::GetInstance();
-    WFont * mFont = WResourceManager::Instance()->GetWFont(Fonts::OPTION_FONT);
+void OptionKey::Overlay() {
+    JRenderer* renderer = JRenderer::GetInstance();
+    WFont* mFont = WResourceManager::Instance()->GetWFont(Fonts::OPTION_FONT);
     mFont->SetColor(ARGB(255, 0, 0, 0));
-    if (grabbed)
-    {
+    if (grabbed) {
         static const float x = 30, y = 45;
         renderer->FillRoundRect(x, y, SCREEN_WIDTH - 2 * x, 50, 2, ARGB(200, 200, 200, 255));
         string msg = _("Press a key to associate.");
         mFont->DrawString(msg, (SCREEN_WIDTH - mFont->GetStringWidth(msg.c_str())) / 2, y + 20);
-    }
-    else if (btnMenu)
+    } else if (btnMenu)
         btnMenu->Render();
 }
 
-void OptionKey::ButtonPressed(int controllerId, int controlId)
-{
+void OptionKey::ButtonPressed(int controllerId, int controlId) {
     to = btnList[controlId];
     SAFE_DELETE(btnMenu);
     btnMenu = NULL;
 }
 
-bool OptionKey::Visible()
-{
-    return JGE_BTN_NONE != to || LOCAL_KEY_NONE == from || btnMenu != NULL;
-}
+bool OptionKey::Visible() { return JGE_BTN_NONE != to || LOCAL_KEY_NONE == from || btnMenu != NULL; }
 
-bool OptionKey::Selectable()
-{
-    return JGE_BTN_NONE != to || LOCAL_KEY_NONE == from || btnMenu != NULL;
-}
+bool OptionKey::Selectable() { return JGE_BTN_NONE != to || LOCAL_KEY_NONE == from || btnMenu != NULL; }

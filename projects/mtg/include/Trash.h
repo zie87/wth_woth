@@ -11,21 +11,20 @@ struct AttackerDamaged;
 struct DamagerDamaged;
 typedef DamagerDamaged DefenserDamaged;
 
-template<class T> void trash(T*);
+template <class T>
+void trash(T*);
 
-template<class T>
-class TrashBin
-{
+template <class T>
+class TrashBin {
     std::vector<T> bin;
     void put_out();
     int receiveEvent(WEvent* e);
-    template<class Q> friend void trash(Q*);
+    template <class Q>
+    friend void trash(Q*);
     friend class Trash;
 };
 
-
-class Trash
-{
+class Trash {
 private:
     TrashBin<CardView*> CardViewTrash;
     TrashBin<DefenserDamaged*> DefenserDamagedTrash;
@@ -39,4 +38,4 @@ public:
     void trash(AttackerDamaged* garbage);
 };
 
-#endif // _TRASH_H_
+#endif  // _TRASH_H_

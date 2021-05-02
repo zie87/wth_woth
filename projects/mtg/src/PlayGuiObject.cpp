@@ -5,8 +5,7 @@
 using namespace std;
 
 PlayGuiObject::PlayGuiObject(float desiredHeight, float x, float y, int inID, bool hasFocus)
-    : JGuiObject(inID), Pos(x, y, 1.0, 0.0, 255)
-{
+    : JGuiObject(inID), Pos(x, y, 1.0, 0.0, 255) {
     defaultHeight = desiredHeight;
     mHeight = desiredHeight;
     mHasFocus = hasFocus;
@@ -14,8 +13,7 @@ PlayGuiObject::PlayGuiObject(float desiredHeight, float x, float y, int inID, bo
     wave = 0;
 }
 PlayGuiObject::PlayGuiObject(float desiredHeight, const Pos& ref, int inID, bool hasFocus)
-    : JGuiObject(inID), Pos(ref)
-{
+    : JGuiObject(inID), Pos(ref) {
     defaultHeight = desiredHeight;
     mHeight = desiredHeight;
     mHasFocus = hasFocus;
@@ -23,28 +21,21 @@ PlayGuiObject::PlayGuiObject(float desiredHeight, const Pos& ref, int inID, bool
     wave = 0;
 }
 
-void PlayGuiObject::Update(float dt)
-{
-    if (mHasFocus && mHeight < defaultHeight * 1.2f)
-    {
+void PlayGuiObject::Update(float dt) {
+    if (mHasFocus && mHeight < defaultHeight * 1.2f) {
         mHeight += defaultHeight * 0.8f * dt;
         //      fprintf(stderr, "increasing size to %f - %d", mHeight, GetId() );
 
         if (mHeight > defaultHeight * 1.2f) mHeight = defaultHeight * 1.2f;
-    }
-    else if (!mHasFocus && mHeight > defaultHeight)
-    {
+    } else if (!mHasFocus && mHeight > defaultHeight) {
         mHeight -= defaultHeight * 0.8f * dt;
         if (mHeight < defaultHeight) mHeight = defaultHeight;
     }
-    wave = (wave + 2 * (int) (100 * dt)) % 255;
-    for (vector<Effect*>::iterator it = effects.begin(); it != effects.end(); ++it)
-        (*it)->Update(dt);
+    wave = (wave + 2 * (int)(100 * dt)) % 255;
+    for (vector<Effect*>::iterator it = effects.begin(); it != effects.end(); ++it) (*it)->Update(dt);
     Pos::Update(dt);
 }
 
-void PlayGuiObject::Render()
-{
-    for (vector<Effect*>::iterator it = effects.begin(); it != effects.end(); ++it)
-        (*it)->Render();
+void PlayGuiObject::Render() {
+    for (vector<Effect*>::iterator it = effects.begin(); it != effects.end(); ++it) (*it)->Render();
 }

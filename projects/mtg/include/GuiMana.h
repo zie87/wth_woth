@@ -6,8 +6,7 @@
 #include "GameApp.h"
 #include "GuiLayers.h"
 
-class ManaIcon : public Pos
-{
+class ManaIcon : public Pos {
     hgeParticleSystem* particleSys;
     JQuadPtr icon;
 
@@ -17,14 +16,9 @@ class ManaIcon : public Pos
     float tP1;
     float f;
     float destx, desty;
+
 public:
-    enum
-    {
-        ALIVE,
-        WITHERING,
-        DROPPING,
-        DEAD
-    } mode;
+    enum { ALIVE, WITHERING, DROPPING, DEAD } mode;
 
     int color;
     void Render();
@@ -35,18 +29,18 @@ public:
     ~ManaIcon();
 };
 
-class GuiMana : public GuiLayer
-{
+class GuiMana : public GuiLayer {
 protected:
     vector<ManaIcon*> manas;
     float x, y;
-    Player * owner;
+    Player* owner;
     void RenderStatic();
+
 public:
-    GuiMana(float x, float y, Player *p);
+    GuiMana(float x, float y, Player* p);
     ~GuiMana();
     virtual void Render();
     virtual void Update(float dt);
-    virtual int receiveEventPlus(WEvent * e);
-    virtual int receiveEventMinus(WEvent * e);
+    virtual int receiveEventPlus(WEvent* e);
+    virtual int receiveEventMinus(WEvent* e);
 };

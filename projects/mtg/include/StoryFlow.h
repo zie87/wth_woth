@@ -11,42 +11,24 @@ class GameObserver;
 class MTGDeck;
 #define CAMPAIGNS_FOLDER "campaigns/"
 
-class StoryDialogElement: public JGuiObject
-{
+class StoryDialogElement : public JGuiObject {
 public:
     float mX;
     float mY;
     StoryDialogElement(float x, float y, int id = 0);
-    void Entering()
-    {
-    }
-    ;
-    bool Leaving(JButton key)
-    {
-        return false;
-    }
-    ;
-    bool ButtonPressed()
-    {
-        return false;
-    }
-    ;
-    bool hasFocus()
-    {
-        return false;
-    }
-    ;
+    void Entering(){};
+    bool Leaving(JButton key) { return false; };
+    bool ButtonPressed() { return false; };
+    bool hasFocus() { return false; };
     virtual float getHeight() = 0;
-    virtual bool getTopLeft(float& top, float& left)
-    {
+    virtual bool getTopLeft(float& top, float& left) {
         top = mY;
         left = mX;
         return true;
     }
 };
 
-class StoryText: public StoryDialogElement
-{
+class StoryText : public StoryDialogElement {
 public:
     string text;
     int align;
@@ -58,8 +40,7 @@ public:
     virtual ostream& toString(ostream& out) const;
     float getHeight();
 };
-class StoryImage: public StoryDialogElement
-{
+class StoryImage : public StoryDialogElement {
 public:
     string img;
     StoryImage(string img, float mX, float mY);
@@ -69,11 +50,9 @@ public:
     float getHeight();
 };
 
-class StoryReward: public StoryText
-{
+class StoryReward : public StoryText {
 public:
-    enum
-    {
+    enum {
         STORY_REWARD_CREDITS,
         STORY_REWARD_SET,
         STORY_REWARD_CARD,
@@ -83,17 +62,17 @@ public:
     string value;
     int type;
 
-    StoryReward(string _type, string _value, string text, float _mX, float _mY, string align = "center", int font = 0, int id = 0);
+    StoryReward(string _type, string _value, string text, float _mX, float _mY, string align = "center", int font = 0,
+                int id = 0);
     void Update(float dt);
     void Render();
 
     static bool rewardSoundPlayed;
     static bool rewardsEnabled;
-    static MTGDeck * collection;
+    static MTGDeck* collection;
 };
 
-class StoryChoice: public StoryText
-{
+class StoryChoice : public StoryText {
 public:
     string pageId;
 
@@ -113,30 +92,27 @@ public:
 };
 
 class StoryFlow;
-class StoryPage
-{
+class StoryPage {
 protected:
     string safeAttribute(TiXmlElement* element, string attribute);
+
 public:
-    StoryFlow * mParent;
+    StoryFlow* mParent;
     string musicFile;
-    StoryPage(StoryFlow * mParent);
-    virtual void Update(float dt)=0;
-    virtual void Render()=0;
-    virtual ~StoryPage()
-    {
-    }
-    ;
+    StoryPage(StoryFlow* mParent);
+    virtual void Update(float dt) = 0;
+    virtual void Render() = 0;
+    virtual ~StoryPage(){};
     int loadElement(TiXmlElement* element);
 };
 
-class StoryDialog: public StoryPage, public JGuiListener, public JGuiController
-{
+class StoryDialog : public StoryPage, public JGuiListener, public JGuiController {
 private:
-    vector<StoryDialogElement *> graphics;
-    void RenderElement(StoryDialogElement * elmt);
+    vector<StoryDialogElement*> graphics;
+    void RenderElement(StoryDialogElement* elmt);
+
 public:
-    StoryDialog(TiXmlElement* el, StoryFlow * mParent);
+    StoryDialog(TiXmlElement* el, StoryFlow* mParent);
     ~StoryDialog();
     void Update(float dt);
     void Render();
@@ -147,28 +123,27 @@ public:
 };
 
 class Rules;
-class StoryDuel: public StoryPage
-{
+class StoryDuel : public StoryPage {
 public:
     string pageId;
     string onWin, onLose;
-    string bg; //background file
-    GameObserver * game;
-    Rules * rules;
-    StoryDuel(TiXmlElement* el, StoryFlow * mParent);
+    string bg;  // background file
+    GameObserver* game;
+    Rules* rules;
+    StoryDuel(TiXmlElement* el, StoryFlow* mParent);
     virtual ~StoryDuel();
     void Update(float dt);
     void Render();
     void init();
 };
 
-class StoryFlow
-{
+class StoryFlow {
 private:
-    map<string, StoryPage *> pages;
+    map<string, StoryPage*> pages;
     bool parse(string filename);
-    StoryPage * loadPage(TiXmlElement* element);
+    StoryPage* loadPage(TiXmlElement* element);
     bool _gotoPage(string id);
+
 public:
     string currentPageId;
     string folder;

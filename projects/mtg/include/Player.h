@@ -11,29 +11,23 @@ class MTGPlayerCards;
 class MTGInPlay;
 class ManaPool;
 
-class Player: public Damageable
-{
+class Player : public Damageable {
 protected:
-    ManaPool * manaPool;
-    JTexture * mAvatarTex;
+    ManaPool* manaPool;
+    JTexture* mAvatarTex;
     JQuadPtr mAvatar;
     bool loadAvatar(string file, string resName = "playerAvatar");
     bool premade;
 
 public:
-    enum Mode
-    {
-        MODE_TEST_SUITE,
-        MODE_HUMAN,
-        MODE_AI
-    };
+    enum Mode { MODE_TEST_SUITE, MODE_HUMAN, MODE_AI };
 
     int deckId;
     string mAvatarName;
     Mode playMode;
     bool nomaxhandsize;
-    MTGPlayerCards * game;
-    MTGDeck * mDeck;
+    MTGPlayerCards* game;
+    MTGDeck* mDeck;
     string deckFile;
     string deckFileSmall;
     string deckName;
@@ -41,15 +35,12 @@ public:
     int offerInterruptOnPhase;
     int skippingTurn;
     int extraTurn;
-    vector<MTGCardInstance*>curses;
-    Player(GameObserver *observer, string deckFile, string deckFileSmall, MTGDeck * deck = NULL);
+    vector<MTGCardInstance*> curses;
+    Player(GameObserver* observer, string deckFile, string deckFileSmall, MTGDeck* deck = NULL);
     virtual ~Player();
-    virtual void setObserver(GameObserver*g);
+    virtual void setObserver(GameObserver* g);
     virtual void End();
-    virtual int displayStack()
-    {
-        return 1;
-    }
+    virtual int displayStack() { return 1; }
     const string getDisplayName() const;
 
     int afterDamage();
@@ -58,46 +49,32 @@ public:
     int loseLife(int value);
     int gainOrLoseLife(int value);
 
-    bool isPoisoned() {return (poisonCount > 0);}
+    bool isPoisoned() { return (poisonCount > 0); }
     int poisoned();
     int damaged();
     int prevented();
     void unTapPhase();
-    MTGInPlay * inPlay();
-    ManaPool * getManaPool();
+    MTGInPlay* inPlay();
+    ManaPool* getManaPool();
     void takeMulligan();
-    
+
     void cleanupPhase();
-    virtual int Act(float dt)
-    {
-        return 0;
-    }
+    virtual int Act(float dt) { return 0; }
 
-    virtual int isAI()
-    {
-        return 0;
-    }
+    virtual int isAI() { return 0; }
 
-    bool isHuman()
-    {
-        return (playMode == MODE_HUMAN);
-    }
+    bool isHuman() { return (playMode == MODE_HUMAN); }
 
-    Player * opponent();
+    Player* opponent();
     int getId();
     JQuadPtr getIcon();
 
-    virtual int receiveEvent(WEvent * event)
-    {
-        return 0;
-    }
+    virtual int receiveEvent(WEvent* event) { return 0; }
 
-    virtual void Render()
-    {
-    }
+    virtual void Render() {}
 
     /**
-    ** Returns the path to the stats file of currently selected deck. 
+    ** Returns the path to the stats file of currently selected deck.
     */
     std::string GetCurrentDeckStatsFile();
     virtual bool parseLine(const string& s);
@@ -106,10 +83,10 @@ public:
     bool isDead();
 };
 
-class HumanPlayer: public Player
-{
+class HumanPlayer : public Player {
 public:
-    HumanPlayer(GameObserver *observer, string deckFile, string deckFileSmall, bool premade = false, MTGDeck * deck = NULL);
+    HumanPlayer(GameObserver* observer, string deckFile, string deckFileSmall, bool premade = false,
+                MTGDeck* deck = NULL);
     void End();
     friend ostream& operator<<(ostream&, const HumanPlayer&);
 };

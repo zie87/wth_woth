@@ -9,13 +9,12 @@ class WGuiList;
 class WGuiMenu;
 class WSrcCards;
 
-class GameStateAwards: public GameState, public JGuiListener
-{
+class GameStateAwards : public GameState, public JGuiListener {
 private:
-    WGuiList * listview;
-    WGuiMenu * detailview;
-    WSrcCards * setSrc;
-    SimpleMenu * menu;
+    WGuiList* listview;
+    WGuiMenu* detailview;
+    WSrcCards* setSrc;
+    SimpleMenu* menu;
     bool showMenu;
     bool showAlt;
     bool saveMe;

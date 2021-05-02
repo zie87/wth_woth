@@ -10,175 +10,174 @@
 #include "MTGCardInstance.h"
 #include "CardDescriptor.h"
 
-class ThisDescriptor{
- public:
-   int comparisonMode;
-   int comparisonCriterion;
-   virtual int match(MTGCardInstance * card) = 0;
-   int matchValue(int value);  
-   virtual ~ThisDescriptor();
-   virtual ThisDescriptor * clone() const = 0;
-};
-
-class ThisDescriptorFactory{
+class ThisDescriptor {
 public:
-  ThisDescriptor * createThisDescriptor(GameObserver* observer, string s);
+    int comparisonMode;
+    int comparisonCriterion;
+    virtual int match(MTGCardInstance* card) = 0;
+    int matchValue(int value);
+    virtual ~ThisDescriptor();
+    virtual ThisDescriptor* clone() const = 0;
 };
 
-class ThisTargetCompare:public ThisDescriptor{
- public:
-  TargetChooser * targetComp;
-  virtual int match(MTGCardInstance * card);
-  ThisTargetCompare(TargetChooser * tcc = NULL);
-  ~ThisTargetCompare();
-  ThisTargetCompare * clone() const;
+class ThisDescriptorFactory {
+public:
+    ThisDescriptor* createThisDescriptor(GameObserver* observer, string s);
 };
 
-class ThisCounter:public ThisDescriptor{
- public:
-  Counter * counter;
-  virtual int match(MTGCardInstance * card);
-
-  ThisCounter(Counter * _counter);
-  ThisCounter(int power, int toughness, int nb, const char * name);
-  ~ThisCounter();
-  ThisCounter * clone() const;
+class ThisTargetCompare : public ThisDescriptor {
+public:
+    TargetChooser* targetComp;
+    virtual int match(MTGCardInstance* card);
+    ThisTargetCompare(TargetChooser* tcc = NULL);
+    ~ThisTargetCompare();
+    ThisTargetCompare* clone() const;
 };
 
-class ThisCounterAny:public ThisDescriptor{
- public:
-  virtual int match(MTGCardInstance *card);
+class ThisCounter : public ThisDescriptor {
+public:
+    Counter* counter;
+    virtual int match(MTGCardInstance* card);
 
-  ThisCounterAny(int nb);
-  ThisCounterAny * clone() const;
+    ThisCounter(Counter* _counter);
+    ThisCounter(int power, int toughness, int nb, const char* name);
+    ~ThisCounter();
+    ThisCounter* clone() const;
 };
 
-class ThisControllerlife:public ThisDescriptor{
- public:
-    virtual int match(MTGCardInstance * card);
-  
+class ThisCounterAny : public ThisDescriptor {
+public:
+    virtual int match(MTGCardInstance* card);
+
+    ThisCounterAny(int nb);
+    ThisCounterAny* clone() const;
+};
+
+class ThisControllerlife : public ThisDescriptor {
+public:
+    virtual int match(MTGCardInstance* card);
+
     ThisControllerlife(int life);
-    ThisControllerlife * clone() const;
+    ThisControllerlife* clone() const;
 };
 
-class ThisOpponentlife:public ThisDescriptor{
- public:
-    virtual int match(MTGCardInstance * card);
-  
+class ThisOpponentlife : public ThisDescriptor {
+public:
+    virtual int match(MTGCardInstance* card);
+
     ThisOpponentlife(int olife);
-    ThisOpponentlife * clone() const;
+    ThisOpponentlife* clone() const;
 };
 
-class ThisEquip:public ThisDescriptor{
- public:
-    virtual int match(MTGCardInstance * card);
-  
+class ThisEquip : public ThisDescriptor {
+public:
+    virtual int match(MTGCardInstance* card);
+
     ThisEquip(int equipment);
-    ThisEquip * clone() const;
+    ThisEquip* clone() const;
 };
 
-class ThisAuras:public ThisDescriptor{
- public:
-    virtual int match(MTGCardInstance * card);
-  
+class ThisAuras : public ThisDescriptor {
+public:
+    virtual int match(MTGCardInstance* card);
+
     ThisAuras(int auras);
-    ThisAuras * clone() const;
+    ThisAuras* clone() const;
 };
 
-class ThisOpponentDamageAmount:public ThisDescriptor{
- public:
-    virtual int match(MTGCardInstance * card);
-  
+class ThisOpponentDamageAmount : public ThisDescriptor {
+public:
+    virtual int match(MTGCardInstance* card);
+
     ThisOpponentDamageAmount(int damagecount);
-    ThisOpponentDamageAmount * clone() const;
+    ThisOpponentDamageAmount* clone() const;
 };
 
-class ThisUntapped:public ThisDescriptor{
- public:
-    virtual int match(MTGCardInstance * card);
-  
+class ThisUntapped : public ThisDescriptor {
+public:
+    virtual int match(MTGCardInstance* card);
+
     ThisUntapped(int untapped);
-    ThisUntapped * clone() const;
+    ThisUntapped* clone() const;
 };
 
-class ThisTapped:public ThisDescriptor{
- public:
-    virtual int match(MTGCardInstance * card);
-  
+class ThisTapped : public ThisDescriptor {
+public:
+    virtual int match(MTGCardInstance* card);
+
     ThisTapped(int tapped);
-    ThisTapped * clone() const;
+    ThisTapped* clone() const;
 };
 
+class ThisAttacked : public ThisDescriptor {
+public:
+    virtual int match(MTGCardInstance* card);
 
-class ThisAttacked:public ThisDescriptor{
- public:
-    virtual int match(MTGCardInstance * card);
-
-	ThisAttacked(int attack);
-    ThisAttacked * clone() const;
+    ThisAttacked(int attack);
+    ThisAttacked* clone() const;
 };
 
-class ThisBlocked:public ThisDescriptor{
- public:
-    virtual int match(MTGCardInstance * card);
+class ThisBlocked : public ThisDescriptor {
+public:
+    virtual int match(MTGCardInstance* card);
 
-	ThisBlocked(int block);
-    ThisBlocked * clone() const;
+    ThisBlocked(int block);
+    ThisBlocked* clone() const;
 };
 
-class ThisNotBlocked:public ThisDescriptor{
- public:
-    virtual int match(MTGCardInstance * card);
+class ThisNotBlocked : public ThisDescriptor {
+public:
+    virtual int match(MTGCardInstance* card);
 
-	ThisNotBlocked(int unblocked);
-    ThisNotBlocked * clone() const;
+    ThisNotBlocked(int unblocked);
+    ThisNotBlocked* clone() const;
 };
 
-class ThisDamaged:public ThisDescriptor{
- public:
-    virtual int match(MTGCardInstance * card);
+class ThisDamaged : public ThisDescriptor {
+public:
+    virtual int match(MTGCardInstance* card);
 
-	ThisDamaged(int wasDealtDamage);
-    ThisDamaged * clone() const;
+    ThisDamaged(int wasDealtDamage);
+    ThisDamaged* clone() const;
 };
 
-class ThisDualWield:public ThisDescriptor{
- public:
-    virtual int match(MTGCardInstance * card);
+class ThisDualWield : public ThisDescriptor {
+public:
+    virtual int match(MTGCardInstance* card);
 
-	ThisDualWield(int dualWield);
-    ThisDualWield * clone() const;
+    ThisDualWield(int dualWield);
+    ThisDualWield* clone() const;
 };
 
-class ThisPower:public ThisDescriptor{
- public:
-    virtual int match(MTGCardInstance * card);
-  
+class ThisPower : public ThisDescriptor {
+public:
+    virtual int match(MTGCardInstance* card);
+
     ThisPower(int power);
-    ThisPower * clone() const;
+    ThisPower* clone() const;
 };
 
-class ThisToughness:public ThisDescriptor{
- public:
-    virtual int match(MTGCardInstance * card);
-  
+class ThisToughness : public ThisDescriptor {
+public:
+    virtual int match(MTGCardInstance* card);
+
     ThisToughness(int toughness);
-    ThisToughness * clone() const;
+    ThisToughness* clone() const;
 };
 
-class ThisX:public ThisDescriptor{
-  public:
-    virtual int match(MTGCardInstance * card);
+class ThisX : public ThisDescriptor {
+public:
+    virtual int match(MTGCardInstance* card);
     ThisX(int x);
-    ThisX * clone() const;
+    ThisX* clone() const;
 };
 
-class ThisVariable:public ThisDescriptor{
-  public:
-      string vWord;
-      virtual int match(MTGCardInstance * card);
-      ThisVariable(int comp,string vWord = "");
-      ThisVariable * clone() const;
+class ThisVariable : public ThisDescriptor {
+public:
+    string vWord;
+    virtual int match(MTGCardInstance* card);
+    ThisVariable(int comp, string vWord = "");
+    ThisVariable* clone() const;
 };
 
 #endif

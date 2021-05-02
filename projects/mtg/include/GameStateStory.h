@@ -7,13 +7,13 @@
 class StoryFlow;
 class SimpleMenu;
 
-class GameStateStory: public GameState, public JGuiListener
-{
+class GameStateStory : public GameState, public JGuiListener {
 private:
-    StoryFlow * flow;
-    SimpleMenu * menu;
+    StoryFlow* flow;
+    SimpleMenu* menu;
     vector<string> stories;
-    void loadStoriesMenu(const char * root);
+    void loadStoriesMenu(const char* root);
+
 public:
     GameStateStory(GameApp* parent);
     ~GameStateStory();
@@ -22,7 +22,6 @@ public:
     void Update(float dt);
     void Render();
     void ButtonPressed(int controllerId, int controlId);
-
 };
 
 #endif

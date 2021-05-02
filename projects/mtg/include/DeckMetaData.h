@@ -7,15 +7,9 @@
 #include "DeckStats.h"
 
 using namespace std;
-enum DECK_DIFFICULTY
-{
-    HARD = -1,
-    NORMAL = 0,
-    EASY = 1
-};
+enum DECK_DIFFICULTY { HARD = -1, NORMAL = 0, EASY = 1 };
 
-class DeckMetaData
-{
+class DeckMetaData {
 private:
     string mFilename;
     string mDescription;
@@ -23,8 +17,8 @@ private:
     vector<int> mUnlockRequirements;
     int mDeckId;
     string mAvatarFilename;
-    string  mColorIndex;
-    
+    string mColorIndex;
+
     // statistical information
     int mGamesPlayed, mVictories, mPercentVictories, mDifficulty;
     int getAvatarId();
@@ -32,8 +26,6 @@ private:
     DeckMetaData();
 
 public:
-
-
     DeckMetaData(const string& filename, bool isAI = false);
     void LoadDeck();
     void LoadStats();
@@ -56,7 +48,7 @@ public:
 
     // setters
     void setColorIndex(const string& colorIndex);
-    void setDeckName( const string& newDeckTitle );
+    void setDeckName(const string& newDeckTitle);
     void Invalidate();
 
     string mStatsFilename;
@@ -65,6 +57,5 @@ public:
     bool mStatsLoaded;
     bool mIsAI;
 };
-
 
 #endif

@@ -22,9 +22,7 @@ using namespace std;
 
 class TiXmlElement;
 
-
-enum
-{
+enum {
     SUBMENUITEM_CANCEL = kCancelMenuID,
     MENUITEM_PLAY,
     MENUITEM_DECKEDITOR,
@@ -37,69 +35,65 @@ enum
     SUBMENUITEM_2PLAYERS,
     SUBMENUITEM_HOST_GAME,
     SUBMENUITEM_JOIN_GAME,
-#endif //NETWORK_SUPPORT
+#endif  // NETWORK_SUPPORT
     SUBMENUITEM_DEMO,
     SUBMENUITEM_TESTSUITE,
     SUBMENUITEM_TESTAI,
     SUBMENUITEM_END_OFFSET
 };
 
-class ModRulesMenuItem
-{
+class ModRulesMenuItem {
 protected:
     static int strToAction(string str);
+
 public:
     int mActionId;
     string mDisplayName;
     ModRulesMenuItem(string actionIdStr, string displayName);
-    //most actionIds are associated to a game state. e.g. MENUITEM_DECKEDITOR <--> GAME_STATE_DECK_VIEWER
-    //This function returns the game state that matches the actionId, if any
+    // most actionIds are associated to a game state. e.g. MENUITEM_DECKEDITOR <--> GAME_STATE_DECK_VIEWER
+    // This function returns the game state that matches the actionId, if any
     int getMatchingGameState();
     static int getMatchingGameState(int actionId);
 };
 
-class ModRulesMainMenuItem: public ModRulesMenuItem
-{
+class ModRulesMainMenuItem : public ModRulesMenuItem {
 public:
     int mIconId;
     string mParticleFile;
     ModRulesMainMenuItem(string actionIdStr, string displayName, int iconId, string particleFile);
 };
 
-class ModRulesOtherMenuItem: public ModRulesMenuItem
-{
+class ModRulesOtherMenuItem : public ModRulesMenuItem {
 public:
     JButton mKey;
     ModRulesOtherMenuItem(string actionIdStr, string displayName, string keyStr);
     static JButton strToJButton(string keyStr);
 };
 
-class ModRulesMenu
-{
+class ModRulesMenu {
 public:
-    vector<ModRulesMainMenuItem *> main;
-    vector<ModRulesOtherMenuItem *> other;
+    vector<ModRulesMainMenuItem*> main;
+    vector<ModRulesOtherMenuItem*> other;
 
     void parse(TiXmlElement* element);
     ~ModRulesMenu();
 };
 
-
-class ModRulesBackGroundCardGuiItem
-{
+class ModRulesBackGroundCardGuiItem {
 protected:
     static int strToint(string str);
+
 public:
     int mColorId;
     string MColorName;
     string mDisplayImg;
     string mDisplayThumb;
     int mMenuIcon;
-    ModRulesBackGroundCardGuiItem(string ColorId,string ColorName, string DisplayImg, string DisplayThumb,string MenuIcon);
+    ModRulesBackGroundCardGuiItem(string ColorId, string ColorName, string DisplayImg, string DisplayThumb,
+                                  string MenuIcon);
 };
 
-class ModRulesRenderCardGuiItem
-{
+class ModRulesRenderCardGuiItem {
 public:
     string mName;
     int mPosX;
@@ -109,59 +103,57 @@ public:
     int mFontSize;
     bool mFont;
     PIXEL_TYPE mFontColor;
-	/*Icons attributes*/
+    /*Icons attributes*/
     int mSizeIcon;
-	int mIconPosX;
-	int mIconPosY;
-	string mFileName;
-    ModRulesRenderCardGuiItem(string name, int posX, int posY, string formattedData, string filter, bool font, int fontSize, PIXEL_TYPE fontColor, int SizeIcon,int IconPosX,int IconPosY,string FileName);
-   
+    int mIconPosX;
+    int mIconPosY;
+    string mFileName;
+    ModRulesRenderCardGuiItem(string name, int posX, int posY, string formattedData, string filter, bool font,
+                              int fontSize, PIXEL_TYPE fontColor, int SizeIcon, int IconPosX, int IconPosY,
+                              string FileName);
 };
 
-class ModRulesCardGui
-{
+class ModRulesCardGui {
 public:
-    vector<ModRulesBackGroundCardGuiItem *> background;
-    vector<ModRulesRenderCardGuiItem *> renderbig;
-    vector<ModRulesRenderCardGuiItem *> rendertinycrop;
+    vector<ModRulesBackGroundCardGuiItem*> background;
+    vector<ModRulesRenderCardGuiItem*> renderbig;
+    vector<ModRulesRenderCardGuiItem*> rendertinycrop;
     void parse(TiXmlElement* element);
     ~ModRulesCardGui();
 };
 
-class ModRulesGame
-{
+class ModRulesGame {
 public:
     bool mCanInterrupt;
+
 public:
-    bool canInterrupt() {return mCanInterrupt;};
+    bool canInterrupt() { return mCanInterrupt; };
     ModRulesGame();
     void parse(TiXmlElement* element);
 };
 
-class ModRulesGeneral
-{
+class ModRulesGeneral {
 protected:
     bool mHasDeckEditor;
     bool mHasShop;
+
 public:
-    bool hasDeckEditor() {return mHasDeckEditor;};
-    bool hasShop() {return mHasShop;};
+    bool hasDeckEditor() { return mHasDeckEditor; };
+    bool hasShop() { return mHasShop; };
     ModRulesGeneral();
     void parse(TiXmlElement* element);
 };
 
-class ModRulesCards
-{
+class ModRulesCards {
 public:
-    SimpleCardEffect * activateEffect;
-    static SimpleCardEffect * parseEffect(string str);
+    SimpleCardEffect* activateEffect;
+    static SimpleCardEffect* parseEffect(string str);
     ModRulesCards();
     ~ModRulesCards();
     void parse(TiXmlElement* element);
 };
 
-class ModRules
-{
+class ModRules {
 public:
     ModRulesGeneral general;
     ModRulesCards cards;
@@ -170,10 +162,8 @@ public:
     ModRulesCardGui cardgui;
     bool load(string filename);
     static int getValueAsInt(TiXmlElement* element, string childName);
-
 };
 
 extern ModRules gModRules;
-
 
 #endif

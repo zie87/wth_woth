@@ -6,59 +6,55 @@
 #include "utils.h"
 #include "Translate.h"
 
-//Possible improvements:
-//Merge this with DeckStats
-//Have this class handle all the Meta Data rather than relying on MTGDeck. Then MTGDeck would have a MetaData object...
+// Possible improvements:
+// Merge this with DeckStats
+// Have this class handle all the Meta Data rather than relying on MTGDeck. Then MTGDeck would have a MetaData
+// object...
 
 DeckMetaData::DeckMetaData(const string& filename, bool isAI)
-    : mFilename(filename), mGamesPlayed(0), mVictories(0), mPercentVictories(0), mDifficulty(0),
-      mDeckLoaded(false), mStatsLoaded(false), mIsAI(isAI)
-{
-    // TODO, figure out how we can defer this to later - currently, 
+    : mFilename(filename),
+      mGamesPlayed(0),
+      mVictories(0),
+      mPercentVictories(0),
+      mDifficulty(0),
+      mDeckLoaded(false),
+      mStatsLoaded(false),
+      mIsAI(isAI) {
+    // TODO, figure out how we can defer this to later - currently,
     // there's a catch 22, as we sort the deck list alphabetically, so we need to open the deck file
     // to get its name.  This means that for the opponent list, we crack open 106 files just to read the deck name
-    //, which is the bulk of the remaining 4 second delay we see the first time we try to pick an opponent on the first match
+    //, which is the bulk of the remaining 4 second delay we see the first time we try to pick an opponent on the first
+    //match
     LoadDeck();
 }
 
-
-void DeckMetaData::LoadDeck()
-{
-    if (!mDeckLoaded)
-    {
+void DeckMetaData::LoadDeck() {
+    if (!mDeckLoaded) {
         MTGDeck deck(mFilename.c_str(), NULL, 1);
         mName = trim(deck.meta_name);
         mDescription = trim(deck.meta_desc);
         mDeckId = atoi((mFilename.substr(mFilename.find("deck") + 4, mFilename.find(".txt"))).c_str());
 
         vector<string> requirements = split(deck.meta_unlockRequirements, ',');
-        for(size_t i = 0; i < requirements.size(); ++i)
-        {
+        for (size_t i = 0; i < requirements.size(); ++i) {
             mUnlockRequirements.push_back(Options::getID(requirements[i]));
         }
 
         mDeckLoaded = true;
         if (!mIsAI)
             mAvatarFilename = "avatar.jpg";
-        else
-        {
+        else {
             ostringstream avatarFilename;
             avatarFilename << "avatar" << getAvatarId() << ".jpg";
             mAvatarFilename = avatarFilename.str();
-        }        
+        }
     }
-
-
 }
 
-
-void DeckMetaData::LoadStats()
-{
-    if (!mStatsLoaded)
-    {
-        DeckStats * stats = DeckStats::GetInstance();
-        if (mIsAI)
-        {
+void DeckMetaData::LoadStats() {
+    if (!mStatsLoaded) {
+        DeckStats* stats = DeckStats::GetInstance();
+        if (mIsAI) {
             mPercentVictories = 0;
             mVictories = 0;
             mGamesPlayed = 0;
@@ -66,109 +62,62 @@ void DeckMetaData::LoadStats()
             mDifficulty = 0;
 
             stats->load(mPlayerDeck);
-            DeckStat * opponentDeckStats = stats->getDeckStat(mStatsFilename);
-            if (opponentDeckStats)
-            {
+            DeckStat* opponentDeckStats = stats->getDeckStat(mStatsFilename);
+            if (opponentDeckStats) {
                 mPercentVictories = opponentDeckStats->percentVictories();
                 mVictories = opponentDeckStats->victories;
                 mGamesPlayed = opponentDeckStats->nbgames;
                 mColorIndex = opponentDeckStats->manaColorIndex;
- 
-                if (mPercentVictories < 34)
-                {
+
+                if (mPercentVictories < 34) {
                     mDifficulty = HARD;
-                }
-                else if (mPercentVictories < 55)
-                {
+                } else if (mPercentVictories < 55) {
                     mDifficulty = NORMAL;
-                }
-                else
-                {
+                } else {
                     mDifficulty = EASY;
                 }
                 mStatsLoaded = true;
             }
-        }
-        else
-        {
-            if (FileExists(mStatsFilename))
-            {
+        } else {
+            if (FileExists(mStatsFilename)) {
                 stats->load(mStatsFilename);
-                mGamesPlayed = stats->nbGames();               
+                mGamesPlayed = stats->nbGames();
                 mPercentVictories = stats->percentVictories();
                 mVictories = static_cast<int>(mGamesPlayed * (mPercentVictories / 100.0f));
                 mStatsLoaded = true;
             }
         }
-
     }
-
 }
 
 // since we only have 100 stock avatar images, we need to recycle the images for deck numbers > 99
-int DeckMetaData::getAvatarId()
-{
-    return mDeckId % 100;
-}
+int DeckMetaData::getAvatarId() { return mDeckId % 100; }
 
-//Accessors
+// Accessors
 
-string DeckMetaData::getFilename()
-{
-    return mFilename;
-}
+string DeckMetaData::getFilename() { return mFilename; }
 
-string DeckMetaData::getName()
-{
-    return mName;
-}
+string DeckMetaData::getName() { return mName; }
 
-int DeckMetaData::getDeckId()
-{
-    return mDeckId;
-}
+int DeckMetaData::getDeckId() { return mDeckId; }
 
-vector<int> DeckMetaData::getUnlockRequirements()
-{
-    return mUnlockRequirements;
-}
+vector<int> DeckMetaData::getUnlockRequirements() { return mUnlockRequirements; }
 
+string DeckMetaData::getAvatarFilename() { return mAvatarFilename; }
 
-string DeckMetaData::getAvatarFilename()
-{
-    return mAvatarFilename;
-}
+string DeckMetaData::getColorIndex() { return mColorIndex; }
 
-string DeckMetaData::getColorIndex()
-{
-    return mColorIndex;
-}
+int DeckMetaData::getGamesPlayed() { return mGamesPlayed; }
 
-int DeckMetaData::getGamesPlayed()
-{
-    return mGamesPlayed;
-}
+int DeckMetaData::getVictories() { return mVictories; }
 
-int DeckMetaData::getVictories()
-{
-    return mVictories;
-}
+int DeckMetaData::getVictoryPercentage() { return mPercentVictories; }
 
-int DeckMetaData::getVictoryPercentage()
-{
-    return mPercentVictories;
-}
+int DeckMetaData::getDifficulty() { return mDifficulty; }
 
-int DeckMetaData::getDifficulty()
-{
-    return mDifficulty;
-}
-
-string DeckMetaData::getDifficultyString()
-{
+string DeckMetaData::getDifficultyString() {
     string difficultyString = "Normal";
-    switch (mDifficulty)
-    {
+    switch (mDifficulty) {
     case HARD:
         difficultyString = "Hard";
         break;
@@ -180,34 +129,21 @@ string DeckMetaData::getDifficultyString()
     return difficultyString;
 }
 
-string DeckMetaData::getDescription()
-{
-    return mDescription;
-}
+string DeckMetaData::getDescription() { return mDescription; }
 
-string DeckMetaData::getStatsSummary()
-{
+string DeckMetaData::getStatsSummary() {
     LoadStats();
 
     ostringstream statsSummary;
     statsSummary << _("Difficulty: ") << _(getDifficultyString()) << endl
-                    << _("Victory %: ") << getVictoryPercentage() << endl
-                    << _("Games Played: ") << getGamesPlayed() << endl;
+                 << _("Victory %: ") << getVictoryPercentage() << endl
+                 << _("Games Played: ") << getGamesPlayed() << endl;
 
     return statsSummary.str();
 }
 
-void DeckMetaData::setColorIndex(const string& colorIndex)
-{
-    mColorIndex = colorIndex;
-}
+void DeckMetaData::setColorIndex(const string& colorIndex) { mColorIndex = colorIndex; }
 
-void DeckMetaData::setDeckName(const string& newDeckTitle)
-{
-    mName = newDeckTitle;
-}
+void DeckMetaData::setDeckName(const string& newDeckTitle) { mName = newDeckTitle; }
 
-void DeckMetaData::Invalidate()
-{
-    mStatsLoaded = false;
-}
+void DeckMetaData::Invalidate() { mStatsLoaded = false; }

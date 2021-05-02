@@ -21,11 +21,11 @@
 
 #endif //IOS
 
-#include "../../include/JGE.h"
-#include "../../include/JRenderer.h"
-#include "../../include/JResourceManager.h"
-#include "../../include/JFileSystem.h"
-#include "../../include/JAssert.h"
+#include "JGE.h"
+#include "JRenderer.h"
+#include "JResourceManager.h"
+#include "JFileSystem.h"
+#include "JAssert.h"
 
 #if (defined WIN32) && (!defined QT_CONFIG)
 #ifndef __attribute__

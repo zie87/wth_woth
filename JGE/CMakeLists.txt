@@ -111,6 +111,8 @@ target_include_directories(hgetools
 )
 
 target_link_libraries(hgetools
+    PUBLIC
+        WotH::wge
     PRIVATE
         woth_options
 )

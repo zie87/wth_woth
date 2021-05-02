@@ -111,6 +111,8 @@ target_include_directories(hgetools
 )
 
 target_link_libraries(hgetools
+    PUBLIC
+        WotH::wge
     PRIVATE
         woth_options
 )
@@ -183,13 +185,6 @@ target_sources(jge300
         ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JSocket.cpp
     )
 endif()
-
-set_target_properties(jge300
-    PROPERTIES
-        CXX_STANDARD 11
-        CXX_STANDARD_REQUIRED YES
-        CXX_EXTENSIONS YES
-)
 
 if(NOT DEFINED WIN32)
 target_compile_options(jge300 PRIVATE "$<$<CONFIG:DEBUG>:-ggdb3>")

@@ -11,6 +11,8 @@
 #ifndef _JTYPES_H
 #define _JTYPES_H
 
+#include <wge/types.hpp>
+
 #if defined (PSP)
 
 #include <pspgu.h>
@@ -23,6 +25,7 @@
 #include <string.h>
 #include <pspaudiolib.h>
 #include <psprtc.h>
+
 #include "JAudio.h"
 
 #else
@@ -243,7 +246,7 @@ typedef uint32_t u32;
   #define GU_PSM_5551 0
   #define GU_PSM_4444 0
   #define GU_PSM_5650 0
-	#define PIXEL_TYPE				DWORD
+#define PIXEL_TYPE				wge::pixel_t
 
 #endif
 

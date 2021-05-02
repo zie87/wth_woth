@@ -12,7 +12,7 @@ maemo5:QT += dbus
 TARGET = wagic
 TEMPLATE = app
 
-QMAKE_CXXFLAGS += -std=c++11
+QMAKE_CXXFLAGS += -std=c++14
 
 #!macx:CONFIG += precompile_header
 unix|macx:QMAKE_CXXFLAGS += -Wno-unused-parameter

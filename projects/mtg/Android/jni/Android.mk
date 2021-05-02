@@ -14,13 +14,14 @@ DEBUG ?= DEBUG
 LOCAL_CFLAGS += -DLINUX -DANDROID -DSDL_CONFIG -D_$(DEBUG)
 LOCAL_CFLAGS += -D_STLP_USE_SIMPLE_NODE_ALLOC
 LOCAL_CFLAGS += -D__arm__ -D_REENTRANT -D_GLIBCXX__PTHREADS
-LOCAL_CXXFLAGS += -std=c++1y
+LOCAL_CXXFLAGS += -std=c++14 -DFMT_HEADER_ONLY=1
 LOCAL_SHARED_LIBRARIES := SDL
 
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/$(SDL_PATH)/include \
 	$(LOCAL_PATH)/$(MTG_PATH)/include \
 	$(LOCAL_PATH)/$(WGE_PATH)/include \
+	$(LOCAL_PATH)/$(WGE_PATH)/extern/fmt/include \
 	$(LOCAL_PATH)/$(JGE_PATH)/include \
 	$(LOCAL_PATH)/$(JGE_PATH)/src/zipFS \
 
@@ -133,6 +134,7 @@ LOCAL_SRC_FILES := $(SDL_PATH)/src/main/android/SDL_android_main.cpp \
         $(MTG_PATH)/src/WFont.cpp \
         $(MTG_PATH)/src/WGui.cpp \
         $(MTG_PATH)/src/WResourceManager.cpp \
+        $(WGE_PATH)/src/log/log_core.cpp \
         $(WGE_PATH)/src/video/image_loader.cpp \
         $(JGE_PATH)/src/SDLmain.cpp \
         $(JGE_PATH)/src/Encoding.cpp \

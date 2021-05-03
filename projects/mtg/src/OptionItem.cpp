@@ -262,7 +262,7 @@ void OptionLanguage::confirmChange(bool confirmed) {
 void OptionLanguage::Reload() {
     vector<string> langFiles = JFileSystem::GetInstance()->scanfolder("lang/");
     for (size_t i = 0; i < langFiles.size(); ++i) {
-        izfstream file;
+        zfs::izfstream file;
         string filePath = "lang/";
         filePath.append(langFiles[i]);
         if (!JFileSystem::GetInstance()->openForRead(file, filePath)) continue;

@@ -4,9 +4,6 @@ on:
   push:
     branches-ignore:
       - 'docker'
-  pull_request:
-    branches:
-      - main
   schedule:
     - cron: '0 4 * * 0' # Weekly on Sundays at 04:00
 

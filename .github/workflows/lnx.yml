@@ -4,9 +4,6 @@ on:
   push:
     branches-ignore:
       - 'docker'
-  pull_request:
-    branches:
-      - main
   schedule:
     - cron: '0 4 * * 0' # Weekly on Sundays at 04:00
 
@@ -17,7 +14,7 @@ jobs:
       matrix:
         cxx: [g++-10, clang++-11]
         build_type: [Debug, Release]
-        std: [14]
+        std: [14, 17, 20]
         os: [ubuntu-20.04]
         include:
           - cxx: g++-10

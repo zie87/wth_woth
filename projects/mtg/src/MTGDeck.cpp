@@ -286,7 +286,7 @@ int MTGAllCards::load(const char* config_file, const char* set_name, int autoloa
 
     int lineNumber = 0;
     std::string contents;
-    izfstream file;
+    zfs::izfstream file;
     if (!JFileSystem::GetInstance()->openForRead(file, config_file)) return total_cards;
 
     string s;

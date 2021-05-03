@@ -1581,7 +1581,7 @@ JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureForm
 }
 #else
 JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureFormat __attribute__((unused))) {
-    JFileSystem* fileSystem = JFileSystem::GetInstance();
+    auto* fileSystem = JFileSystem::GetInstance();
     if (!fileSystem->OpenFile(filename)) {
         printf("Texture %s failed to open\n", filename);
         return nullptr;

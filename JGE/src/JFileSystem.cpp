@@ -30,9 +30,10 @@ necessary but provides a nice way to distinguish The content that users should n
     #define MAKEDIR(name) mkdir(name, 0777)
 #endif
 
-#include "../include/JGE.h"
-#include "../include/JFileSystem.h"
-#include "../include/JLogger.h"
+#include "JGE.h"
+#include "JFileSystem.h"
+#include "JLogger.h"
+
 #include <dirent.h>
 
 JFileSystem* JFileSystem::mInstance = NULL;
@@ -41,7 +42,7 @@ JZipCache::JZipCache() {}
 
 JZipCache::~JZipCache() { dir.clear(); }
 
-void JFileSystem::Pause() { filesystem::closeTempFiles(); }
+void JFileSystem::Pause() { zfs::filesystem::closeTempFiles(); }
 
 void JFileSystem::preloadZip(const string& filename) {
     map<string, JZipCache*>::iterator it = mZipCache.find(filename);
@@ -155,9 +156,9 @@ JFileSystem::JFileSystem(const string& _userPath, const string& _systemPath)
 
     mSystemFSPath = systemPath;
 
-    mUserFS = new filesystem(userPath.c_str());
+    mUserFS = new zfs::filesystem(userPath.c_str());
     mSystemFS = (mSystemFSPath.size() && (mSystemFSPath.compare(mUserFSPath) != 0))
-                    ? new filesystem(systemPath.c_str())
+                    ? new zfs::filesystem(systemPath.c_str())
                     : NULL;
 
     mZipAvailable = false;
@@ -192,7 +193,7 @@ bool JFileSystem::MakeDir(const string& dir) {
 
 JFileSystem::~JFileSystem() {
     clearZipCache();
-    filesystem::closeTempFiles();
+    zfs::filesystem::closeTempFiles();
     SAFE_DELETE(mUserFS);
     SAFE_DELETE(mSystemFS);
 }
@@ -226,8 +227,8 @@ bool JFileSystem::AttachZipFile(const string& zipfile, char* password /* = NULL 
     // A hack for a zip inside a zip: instead we open the zip containing it
     if (mZipFile.Zipped()) {
         mZipFile.close();
-        assert(filesystem::getCurrentFS());
-        mZipFile.open(filesystem::getCurrentZipName().c_str(), filesystem::getCurrentFS());
+        assert(zfs::filesystem::getCurrentFS());
+        mZipFile.open(zfs::filesystem::getCurrentZipName().c_str(), zfs::filesystem::getCurrentFS());
         assert(mZipFile);
     }
     mZipAvailable = true;
@@ -242,7 +243,7 @@ void JFileSystem::DetachZipFile() {
     mZipAvailable = false;
 }
 
-bool JFileSystem::openForRead(izfstream& File, const string& FilePath) {
+bool JFileSystem::openForRead(zfs::izfstream& File, const string& FilePath) {
     File.open(FilePath.c_str(), mUserFS);
     if (File) return true;
 
@@ -255,7 +256,7 @@ bool JFileSystem::openForRead(izfstream& File, const string& FilePath) {
 }
 
 bool JFileSystem::readIntoString(const string& FilePath, string& target) {
-    izfstream file;
+    zfs::izfstream file;
     if (!openForRead(file, FilePath)) return false;
 
     int fileSize = GetFileSize(file);
@@ -296,7 +297,7 @@ bool JFileSystem::OpenFile(const string& filename) {
         return openForRead(mFile, filename);
     }
     JZipCache* zc = it->second;
-    map<string, filesystem::limited_file_info>::iterator it2 = zc->dir.find(filename);
+    map<string, zfs::filesystem::limited_file_info>::iterator it2 = zc->dir.find(filename);
     if (it2 == zc->dir.end()) {
         /*DetachZipFile();
         return OpenFile(filename); */
@@ -322,7 +323,7 @@ int JFileSystem::ReadFile(void* buffer, int size) {
         assert(mZipFile);
         if ((size_t)size > mCurrentFileInZip->m_Size)  // only support "store" method for zip inside zips
             return 0;
-        std::streamoff offset = filesystem::SkipLFHdr(mZipFile, mCurrentFileInZip->m_Offset);
+        std::streamoff offset = zfs::filesystem::SkipLFHdr(mZipFile, mCurrentFileInZip->m_Offset);
         if (!mZipFile.seekg(offset)) return 0;
         mZipFile.read((char*)buffer, size);
         // TODO what if can't read
@@ -434,7 +435,7 @@ bool JFileSystem::Rename(string _from, string _to) {
     return rename(from.c_str(), to.c_str()) ? true : false;
 }
 
-int JFileSystem::GetFileSize(izfstream& file) {
+int JFileSystem::GetFileSize(zfs::izfstream& file) {
     if (!file) return 0;
 
     if (file.Zipped()) {
@@ -461,7 +462,7 @@ it to the user Filesystem, assuming that whoever called this needs to access the
 As a result, this function isvery inefficient and shouldn't be used in the general case.
 */
 string JFileSystem::GetResourceFile(string filename) {
-    izfstream temp;
+    zfs::izfstream temp;
     bool result = openForRead(temp, filename);
 
     if (!temp || !result) return "";

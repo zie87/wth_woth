@@ -2,10 +2,8 @@
 #define _J_FILE_SYSTEM_H_
 
 #include "zfsystem.h"
-#include <string>
-using zip_file_system::filesystem;
-using zip_file_system::izfstream;
-using namespace std;
+
+namespace zfs = zip_file_system;
 
 #include "unzip/unzip.h"
 
@@ -23,15 +21,15 @@ class JZipCache {
 public:
     JZipCache();
     ~JZipCache();
-    map<string, filesystem::limited_file_info> dir;
+    map<string, zfs::filesystem::limited_file_info> dir;
 };
 
 class JFileSystem {
 private:
     string mSystemFSPath, mUserFSPath;
-    filesystem *mSystemFS, *mUserFS;
+    zfs::filesystem *mSystemFS, *mUserFS;
     static JFileSystem* mInstance;
-    izfstream mFile;
+    zfs::izfstream mFile;
 
     map<string, JZipCache*> mZipCache;
     unsigned int mZipCachedElementsCount;
@@ -40,13 +38,13 @@ private:
     char* mPassword;
     bool mZipAvailable;
     void preloadZip(const string& filename);
-    izfstream mZipFile;
-    filesystem::limited_file_info* mCurrentFileInZip;
+    zfs::izfstream mZipFile;
+    zfs::filesystem::limited_file_info* mCurrentFileInZip;
 
     std::vector<std::string>& scanRealFolder(const std::string& folderName, std::vector<std::string>& results);
 
 public:
-    inline izfstream& current_file() noexcept { return mFile; }
+    inline zfs::izfstream& current_file() noexcept { return mFile; }
 
     //////////////////////////////////////////////////////////////////////////
     /// Attach ZIP archive to the file system.
@@ -103,7 +101,7 @@ public:
     ///
     //////////////////////////////////////////////////////////////////////////
     int GetFileSize();
-    int GetFileSize(izfstream& file);
+    int GetFileSize(zfs::izfstream& file);
 
     //////////////////////////////////////////////////////////////////////////
     /// Close file.
@@ -123,9 +121,9 @@ public:
     void SetUSerRoot(const string& resourceRoot);
     string GetUserRoot() { return mUserFSPath; };
 
-    bool openForRead(izfstream& File, const string& FilePath);
+    bool openForRead(zfs::izfstream& File, const string& FilePath);
     bool readIntoString(const string& FilePath, string& target);
-    bool openForWrite(ofstream& File, const string& FilePath, ios_base::openmode mode = ios_base::out);
+    bool openForWrite(std::ofstream& File, const string& FilePath, ios_base::openmode mode = ios_base::out);
     bool Rename(string from, string to);
 
     // Returns true if strFilename exists somewhere in the fileSystem

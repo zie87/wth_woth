@@ -1,4 +1,4 @@
-name: Android
+name: android
 
 on:
   push:
@@ -22,6 +22,6 @@ jobs:
         submodules: true
 
     - name: build
-      uses: docker://zie87/wth_woth_android:latest
+      uses: docker://zie87/wth_woth_android:main
       with:
         args: /bin/sh -c ".github/tools/ndk/build.sh" ${{ matrix.config }}

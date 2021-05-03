@@ -265,7 +265,7 @@ string GameStateMenu::loadRandomWallpaper() {
     if (wallpaper.size()) return wallpaper;
 
     vector<string> wallpapers;
-    izfstream file;
+    zfs::izfstream file;
     if (!JFileSystem::GetInstance()->openForRead(file, "graphics/wallpapers.txt")) return wallpaper;
 
     string s;
@@ -303,7 +303,7 @@ void GameStateMenu::loadLangMenu() {
 
     vector<string> langFiles = JFileSystem::GetInstance()->scanfolder("lang/");
     for (size_t i = 0; i < langFiles.size(); ++i) {
-        izfstream file;
+        zfs::izfstream file;
         string filePath = "lang/";
         filePath.append(langFiles[i]);
         if (!JFileSystem::GetInstance()->openForRead(file, filePath)) continue;

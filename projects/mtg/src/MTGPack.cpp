@@ -9,7 +9,10 @@
 #include "WFilter.h"
 #include "DeckDataWrapper.h"
 #include "MTGPack.h"
+
 #include "../../../JGE/src/tinyxml/tinyxml.h"
+
+#include <wge/algorithms.hpp>
 
 MTGPack MTGPacks::defaultBooster;
 
@@ -39,7 +42,7 @@ int MTGPackSlot::add(WSrcCards* ocean, MTGDeck* to, int carryover) {
     if (!myPool) myPool = ocean;
 
     for (int i = 0; i < amt; i++) {
-        std::random_shuffle(entries.begin(), entries.end());
+        wge::shuffle(entries.begin(), entries.end());
         size_t pos = 0;
         while (pos < entries.size() && entries[pos]->addCard(myPool, to)) pos++;
         if (pos == entries.size()) fails++;

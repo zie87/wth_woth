@@ -6,6 +6,8 @@
 #include "PriceList.h"
 #include "Subtypes.h"
 
+#include <wge/algorithms.hpp>
+
 // WSyncable
 bool WSyncable::Hook(WSyncable* s) {
     if (hooked) return false;
@@ -235,7 +237,7 @@ bool WSrcCards::setOffset(int pos) {
 }
 
 void WSrcCards::Shuffle() {
-    std::random_shuffle(cards.begin(), cards.end());
+    wge::shuffle(cards.begin(), cards.end());
     validate();
 }
 

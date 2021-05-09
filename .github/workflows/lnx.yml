@@ -17,11 +17,15 @@ jobs:
         std: [14, 17, 20]
         os: [ubuntu-20.04]
         include:
+          - cxx: g++
+            install: sudo apt update && sudo apt install libsdl2-dev libz-dev
+            os: [ubuntu-21.04]
+            std: [17]
           - cxx: g++-10
-            install: sudo apt install libsdl2-dev libz-dev
+            install: sudo apt update && sudo apt install libsdl2-dev libz-dev
           - cxx: clang++-11
             cxxflags: -stdlib=libc++
-            install: sudo apt install libc++-11-dev libc++abi-11-dev libsdl2-dev libz-dev
+            install: sudo apt update && sudo apt install libc++-11-dev libc++abi-11-dev libsdl2-dev libz-dev
 
     steps:
     - uses: actions/checkout@v2

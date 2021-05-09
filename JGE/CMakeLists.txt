@@ -29,7 +29,6 @@ if(DEFINED PSP)
 endif()
 
 if(DEFINED UNIX OR DEFINED WIN32)
-    find_package(JPEG REQUIRED)
     add_library(jpg_alias INTERFACE)
     add_library(WotH::jpeg ALIAS jpg_alias)
 

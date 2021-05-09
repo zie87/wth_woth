@@ -18,10 +18,10 @@ jobs:
         os: [ubuntu-20.04]
         include:
           - cxx: g++-10
-            install: sudo apt install libsdl2-dev libz-dev
+            install: sudo apt update && sudo apt install libsdl2-dev libz-dev
           - cxx: clang++-11
             cxxflags: -stdlib=libc++
-            install: sudo apt install libc++-11-dev libc++abi-11-dev libsdl2-dev libz-dev
+            install: sudo apt update && sudo apt install libc++-11-dev libc++abi-11-dev libsdl2-dev libz-dev
 
     steps:
     - uses: actions/checkout@v2

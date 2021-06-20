@@ -1,0 +1,4 @@
+#ifndef WGE_WTEST_WTEST_HPP
+#define WGE_WTEST_WTEST_HPP
+
+#endif // WGE_WTEST_WTEST_HPP

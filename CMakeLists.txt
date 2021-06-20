@@ -46,6 +46,8 @@ else()
     message(FATAL_ERROR "Platform can not be detected!")
 endif()
 
+add_library(WotH::options ALIAS woth_options)
+
 add_subdirectory(wge)
 add_subdirectory(JGE)
 add_subdirectory(projects)

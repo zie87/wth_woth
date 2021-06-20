@@ -19,11 +19,10 @@ jobs:
         config: [Release, Debug]
 
     steps:
-    - name: checkout
-      uses: actions/checkout@v1
+    - uses: actions/checkout@v2
       with:
         submodules: true
-    
+   
     - name: init
       id: init
       shell: bash

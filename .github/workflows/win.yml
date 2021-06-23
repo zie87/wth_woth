@@ -66,18 +66,17 @@ jobs:
         "$VCPKG_INSTALLATION_ROOT/vcpkg" install ${VCPKG_DEPS} --triplet x86-windows
         "$VCPKG_INSTALLATION_ROOT/vcpkg" upgrade --no-dry-run
         rm -rf downloads buildtrees packages
-    
-    - name: Create Build Environment
-      run: |
-        ${{matrix.install}}
-        cmake -E make_directory ${{runner.workspace}}/build
     - name: Configure
-      working-directory: ${{runner.workspace}}/build
       run: |
-        cmake -G"Visual Studio 16 2019" -A Win32 -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_TOOLCHAIN_FILE="$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" ${{runner.workspace}}
+        source env.sh
+        mkdir build
+        cd build
+        cmake .. -G"Visual Studio 16 2019" -A Win32 -DCMAKE_BUILD_TYPE=${{ matrix.config }} -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake
     - name: Build
-      working-directory: ${{runner.workspace}}/build
-      run: cmake --build . --config ${{ matrix.build_type }}
+      run: |
+        cd build
+        cmake --build . --config ${{ matrix.build_type }}
     - name: Tests
-      working-directory: ${{runner.workspace}}/build
-      run: ctest ${{ matrix.build_type }}
+      run: |
+        cd build
+        ctest ${{ matrix.build_type }}

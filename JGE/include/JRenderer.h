@@ -61,7 +61,7 @@ typedef struct {
 class JRenderer {
 protected:
     JRenderer();
-    ~JRenderer();
+    virtual ~JRenderer();
     void InitRenderer();
     void DestroyRenderer();
 

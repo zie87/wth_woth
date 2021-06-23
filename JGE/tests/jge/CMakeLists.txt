@@ -2,6 +2,7 @@ set(TEST_NAME "jge_unittests")
 
 add_executable(${TEST_NAME} 
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/jrenderer_tests.cpp
 )
 
 target_link_libraries(${TEST_NAME} PUBLIC WotH::jge WotH::wtest)

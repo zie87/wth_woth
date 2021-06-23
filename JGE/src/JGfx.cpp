@@ -33,9 +33,9 @@ extern "C" {
 }
 #endif
 
-#include "../include/JGE.h"
-#include "../include/JRenderer.h"
-#include "../include/JFileSystem.h"
+#include "JGE.h"
+#include "JRenderer.h"
+#include "JFileSystem.h"
 
 static unsigned int __attribute__((aligned(16))) list[262144];
 

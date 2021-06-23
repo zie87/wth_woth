@@ -1,8 +1,8 @@
 #if defined(WOTH_PLATFORM_PSP)
-#include <pspkernel.h>
-#include <pspdebug.h>
-#include <pspctrl.h>
-#include <pspdisplay.h>
+    #include <pspkernel.h>
+    #include <pspdebug.h>
+    #include <pspctrl.h>
+    #include <pspdisplay.h>
 
 /* Define the module info section */
 PSP_MODULE_INFO("WGE_UNITTEST", 0, 1, 1);
@@ -55,10 +55,10 @@ void close_sys() {
 
 #elif defined(WOTH_PLATFORM_WII)
 
-#include <stdlib.h>
-#include <ogcsys.h>
-#include <gccore.h>
-#include <wiiuse/wpad.h>
+    #include <stdlib.h>
+    #include <ogcsys.h>
+    #include <gccore.h>
+    #include <wiiuse/wpad.h>
 
 void start_sys() {
     VIDEO_Init();
@@ -74,13 +74,11 @@ void start_sys() {
     VIDEO_SetBlack(FALSE);
     VIDEO_Flush();
     VIDEO_WaitVSync();
-    if (rmode->viTVMode & VI_NON_INTERLACE)
-        VIDEO_WaitVSync();
+    if (rmode->viTVMode & VI_NON_INTERLACE) VIDEO_WaitVSync();
 }
 
 void close_sys() {
     while (1) {
-
         VIDEO_WaitVSync();
         PAD_ScanPads();
 
@@ -94,7 +92,7 @@ void close_sys() {
 
 #elif defined(WOTH_PLATFORM_N3DS)
 
-#include <3ds.h>
+    #include <3ds.h>
 
 void start_sys() {
     gfxInitDefault();
@@ -106,8 +104,7 @@ void close_sys() {
         hidScanInput();
 
         u32 kDown = hidKeysDown();
-        if (kDown & KEY_START)
-            break; // break in order to return to hbmenu
+        if (kDown & KEY_START) break;  // break in order to return to hbmenu
 
         // Flush and swap framebuffers
         gfxFlushBuffers();
@@ -123,13 +120,9 @@ void close_sys() {}
 
 #endif
 
-extern "C" {
-#include <unity_fixture.h>
-}
+#include <wtest/wtest.hpp>
 
-static void RunAllTests() {
-    RUN_TEST_GROUP(WgeMath);
-}
+static void RunAllTests() { RUN_TEST_GROUP(WgeMath); }
 
 int main(int argc, const char* argv[]) {
     start_sys();

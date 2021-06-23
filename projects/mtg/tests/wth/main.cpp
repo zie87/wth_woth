@@ -123,9 +123,10 @@ void close_sys() {}
 
 #endif
 
-extern "C" {
-#include <unity_fixture.h>
-}
+#include <wtest/wtest.hpp>
+
+bool JGEToggleFullscreen() { return true; }
+void JGECreateDefaultBindings() {}
 
 static void RunAllTests() {
     //RUN_TEST_GROUP(WgeMath);

@@ -1,7 +1,8 @@
 
-add_executable(wth_woth)
 
-target_sources(wth_woth
+add_library(wth STATIC)
+
+target_sources(wth
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/InteractiveButton.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/AbilityParser.cpp
@@ -117,27 +118,48 @@ target_sources(wth_woth
     )
 
 if(NOT DEFINED WIN32)
-    target_compile_options(wth_woth PRIVATE "-DUSE_PRECOMPILED_HEADERS=1")
-    target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-ggdb3>")
+    target_compile_options(wth PUBLIC "-DUSE_PRECOMPILED_HEADERS=1")
+    target_compile_options(wth PUBLIC "$<$<CONFIG:DEBUG>:-ggdb3>")
 endif()
 
-target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-D_DEBUG>")
-target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-DDEBUG>")
-target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-DDEBUG_CACHE>")
+target_compile_options(wth PUBLIC "$<$<CONFIG:DEBUG>:-D_DEBUG>")
+target_compile_options(wth PUBLIC "$<$<CONFIG:DEBUG>:-DDEBUG>")
+target_compile_options(wth PUBLIC "$<$<CONFIG:DEBUG>:-DDEBUG_CACHE>")
 
-target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-DAI_CHANGE_TESTING>")
+target_compile_options(wth PUBLIC "$<$<CONFIG:DEBUG>:-DAI_CHANGE_TESTING>")
 
-target_include_directories(wth_woth 
-    PRIVATE
+target_include_directories(wth 
+    PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-target_link_libraries(wth_woth
+target_link_libraries(wth
     PUBLIC
         WotH::wge
         WotH::jge
+        WotH::options
+)
+
+add_library(WotH::wth ALIAS wth)
+
+add_executable(wth_woth)
+
+if(DEFINED PSP)
+target_sources(wth_woth
     PRIVATE
-        woth_options
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
+)
+elseif(DEFINED UNIX OR WIN32)
+target_sources(wth_woth
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/SDL2main.cpp
+)
+endif()
+
+
+target_link_libraries(wth_woth
+    PUBLIC
+        WotH::wth
 )
 
 
@@ -149,3 +171,5 @@ create_pbp_file(TARGET wth_woth
                 PREVIEW_PATH ${CMAKE_CURRENT_SOURCE_DIR}/pic0.png
 )
 endif()
+
+add_subdirectory(tests)

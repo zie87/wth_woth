@@ -1528,45 +1528,18 @@ void JRenderer::TransferTextureToGLContext(JTexture& inTexture) {
         inTexture.mTexId = texid;
         mCurrentTex = texid;
 
-        //    glError = glGetError();
+        // OpenGL texture has (0,0) at lower-left
+        // Pay attention when doing texture mapping!!!
 
-        if (1)  ///*texid*/ glError == 0)
-        {
-            // OpenGL texture has (0,0) at lower-left
-            // Pay attention when doing texture mapping!!!
+        glBindTexture(GL_TEXTURE_2D, mCurrentTex);  // Bind To The Texture ID
 
-            glBindTexture(GL_TEXTURE_2D, mCurrentTex);  // Bind To The Texture ID
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, inTexture.mTexWidth, inTexture.mTexHeight, 0, GL_RGBA,
+                     GL_UNSIGNED_BYTE, inTexture.mBuffer);
 
-            /* NOT USED
-            if (mode == TEX_TYPE_MIPMAP)			// generate mipmaps
-            {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR_MIPMAP_LINEAR);
-            gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, textureInfo.mTexWidth, textureInfo.mTexHeight, GL_RGBA,
-            GL_UNSIGNED_BYTE, textureInfo.mBits);
-            }
-            else if (mode == TEX_TYPE_SKYBOX)		// for skybox
-            {
-            #define GL_CLAMP_TO_EDGE	0x812F
-
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, textureInfo.mTexWidth, textureInfo.mTexHeight, GL_RGBA,
-            GL_UNSIGNED_BYTE, textureInfo.mBits);
-            }
-            else									// single texture
-            */
-            {
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, inTexture.mTexWidth, inTexture.mTexHeight, 0, GL_RGBA,
-                             GL_UNSIGNED_BYTE, inTexture.mBuffer);
-            }
-        }
         delete[] inTexture.mBuffer;
         inTexture.mBuffer = NULL;
 
@@ -1694,25 +1667,25 @@ void JRenderer::Enable2D() {
     checkGlError();
 }
 
-void JRenderer::
-    Enable3D() { /* NOT USED
-                 if (!m3DEnabled)
-                 return;
+void JRenderer::Enable3D() { /* NOT USED
+                             if (!m3DEnabled)
+                             return;
 
-                 if (mCurrentRenderMode == MODE_3D)
-                 return;
+                             if (mCurrentRenderMode == MODE_3D)
+                             return;
 
-                 mCurrentRenderMode = MODE_3D;
+                             mCurrentRenderMode = MODE_3D;
 
-                 glViewport (0, 0, (GLsizei)SCREEN_WIDTH, (GLsizei)SCREEN_HEIGHT);		// Reset The Current
-                 Viewport glMatrixMode (GL_PROJECTION);
-                 // Select The Projection Matrix glLoadIdentity ();
-                 // Reset The Projection Matrix gluPerspective (mFOV, (GLfloat)SCREEN_WIDTH/(GLfloat)SCREEN_HEIGHT,
-                 // Calculate The Aspect Ratio Of The Window 0.5f, 1000.0f); glMatrixMode (GL_MODELVIEW);
-                 // Select The Modelview Matrix glLoadIdentity ();
-                 // Reset The Modelview Matrix
+                             glViewport (0, 0, (GLsizei)SCREEN_WIDTH, (GLsizei)SCREEN_HEIGHT);		// Reset The
+                             Current Viewport glMatrixMode (GL_PROJECTION);
+                             // Select The Projection Matrix glLoadIdentity ();
+                             // Reset The Projection Matrix gluPerspective (mFOV,
+                             (GLfloat)SCREEN_WIDTH/(GLfloat)SCREEN_HEIGHT,
+                             // Calculate The Aspect Ratio Of The Window 0.5f, 1000.0f); glMatrixMode (GL_MODELVIEW);
+                             // Select The Modelview Matrix glLoadIdentity ();
+                             // Reset The Modelview Matrix
 
-                 glEnable (GL_DEPTH_TEST); */
+                             glEnable (GL_DEPTH_TEST); */
 }
 
 void JRenderer::SetClip(int x, int y, int width, int height) {  // NOT USED

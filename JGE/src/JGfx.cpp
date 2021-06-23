@@ -19,7 +19,6 @@
 #include <pspdisplay.h>
 #include <png.h>
 #include "../include/vram.h"
-#include "../include/JLogger.h"
 
 #include <sstream>
 
@@ -33,19 +32,73 @@ extern "C" {
 }
 #endif
 
+#include "JLogger.h"
 #include "JGE.h"
 #include "JRenderer.h"
 #include "JFileSystem.h"
 
+#include <wge/math.hpp>
+
+/*
+** Alternate swizzle function that can handle any number of lines (as opposed to swizzle_fast, which is
+** hardcoded to do 8 at a time)
+*/
+static constexpr void swizzle_lines(const u8* inSrc, u8* inDst, unsigned int inWidth, unsigned int inLines) noexcept {
+    const auto rowblocks = (inWidth * sizeof(u32) / 16);
+    for (unsigned int j = 0; j < inLines; ++j) {
+        for (unsigned int i = 0; i < inWidth * sizeof(u32); ++i) {
+            unsigned int blockx = i / 16;
+            unsigned int blocky = j / 8;
+
+            unsigned int x = (i - blockx * 16);
+            unsigned int y = (j - blocky * 8);
+            unsigned int block_index = blockx + ((blocky)*rowblocks);
+            unsigned int block_address = block_index * 16 * 8;
+
+            inDst[block_address + x + y * 16] = inSrc[i + j * inWidth * sizeof(u32)];
+        }
+    }
+}
+
+typedef u32* u32_ptr;
+static void swizzle_row(const u32* inSrc, u32_ptr& inDst, unsigned int inBlockWidth, unsigned int inPitch) noexcept {
+    for (unsigned int blockx = 0; blockx < inBlockWidth; ++blockx) {
+        const auto* src = inSrc;
+        for (unsigned int j = 0; j < 8; ++j) {
+            *(inDst++) = *(src++);
+            *(inDst++) = *(src++);
+            *(inDst++) = *(src++);
+            *(inDst++) = *(src++);
+            src += inPitch;
+        }
+        inSrc += 4;
+    }
+}
+
+static void swizzle_row(const u8* src, u32_ptr& dst, unsigned int block_width, unsigned int pitch) noexcept {
+    swizzle_row(reinterpret_cast<const u32*>(src), dst, block_width, pitch);
+}
+
+static void swizzle_fast(u8* out, const u8* in, unsigned int width, unsigned int height) noexcept {
+    const auto width_blocks = (width / 16);
+    const auto height_blocks = (height / 8);
+
+    const auto src_pitch = (width - 16) / 4;
+    const auto src_row = width * 8;
+
+    const u8* ysrc = in;
+    auto* dst = reinterpret_cast<u32*>(out);
+
+    for (unsigned int blocky = 0; blocky < height_blocks; ++blocky) {
+        const u8* xsrc = ysrc;
+        swizzle_row(xsrc, dst, width_blocks, src_pitch);
+        ysrc += src_row;
+    }
+}
+
 static unsigned int __attribute__((aligned(16))) list[262144];
 
 extern void SwizzlePlot(u8* out, PIXEL_TYPE color, int i, int j, unsigned int width);
-
-void Swap(float* a, float* b) {
-    float n = *a;
-    *a = *b;
-    *b = n;
-}
 
 JQuad::JQuad(JTexture* tex, float x, float y, float width, float height)
     : mTex(tex), mX(x), mY(y), mWidth(width), mHeight(height) {
@@ -541,8 +594,8 @@ void JRenderer::RenderQuad(JQuad* quad, float xo, float yo, float angle, float x
             vertices[3].z = 0.0f;
 
             if (quad->mVFlipped) {
-                Swap(&vertices[0].v, &vertices[2].v);
-                Swap(&vertices[1].v, &vertices[3].v);
+                std::swap(vertices[0].v, vertices[2].v);
+                std::swap(vertices[1].v, vertices[3].v);
             }
 
             if (angle != 0.0f) {
@@ -602,8 +655,8 @@ void JRenderer::RenderQuad(JQuad* quad, float xo, float yo, float angle, float x
             vertices[3].z = 0.0f;
 
             if (quad->mVFlipped) {
-                Swap(&vertices[0].v, &vertices[2].v);
-                Swap(&vertices[1].v, &vertices[3].v);
+                std::swap(vertices[0].v, vertices[2].v);
+                std::swap(vertices[1].v, vertices[3].v);
             }
 
             if (angle != 0.0f) {
@@ -784,68 +837,6 @@ static void PNGCustomReadDataFn(png_structp png_ptr, png_bytep data, png_size_t 
     }
 }
 
-static int getNextPower2(int width) {
-    int b = width;
-    int n;
-    for (n = 0; b != 0; n++) b >>= 1;
-    b = 1 << n;
-    if (b == 2 * width) b >>= 1;
-    return b;
-}
-
-/*
-** Alternate swizzle function that can handle any number of lines (as opposed to swizzle_fast, which is
-** hardcoded to do 8 at a time)
-*/
-static void swizzle_lines(const u8* inSrc, u8* inDst, unsigned int inWidth, unsigned int inLines) {
-    unsigned int rowblocks = (inWidth * sizeof(u32) / 16);
-    for (unsigned int j = 0; j < inLines; ++j) {
-        for (unsigned int i = 0; i < inWidth * sizeof(u32); ++i) {
-            unsigned int blockx = i / 16;
-            unsigned int blocky = j / 8;
-
-            unsigned int x = (i - blockx * 16);
-            unsigned int y = (j - blocky * 8);
-            unsigned int block_index = blockx + ((blocky)*rowblocks);
-            unsigned int block_address = block_index * 16 * 8;
-
-            inDst[block_address + x + y * 16] = inSrc[i + j * inWidth * sizeof(u32)];
-        }
-    }
-}
-
-typedef u32* u32_ptr;
-static void swizzle_row(const u8* inSrc, u32_ptr& inDst, unsigned int inBlockWidth, unsigned int inPitch) {
-    for (unsigned int blockx = 0; blockx < inBlockWidth; ++blockx) {
-        const u32* src = (u32*)inSrc;
-        for (unsigned int j = 0; j < 8; ++j) {
-            *(inDst++) = *(src++);
-            *(inDst++) = *(src++);
-            *(inDst++) = *(src++);
-            *(inDst++) = *(src++);
-            src += inPitch;
-        }
-        inSrc += 16;
-    }
-}
-
-static void swizzle_fast(u8* out, const u8* in, unsigned int width, unsigned int height) {
-    unsigned int width_blocks = (width / 16);
-    unsigned int height_blocks = (height / 8);
-
-    unsigned int src_pitch = (width - 16) / 4;
-    unsigned int src_row = width * 8;
-
-    const u8* ysrc = in;
-    u32* dst = (u32*)out;
-
-    for (unsigned int blocky = 0; blocky < height_blocks; ++blocky) {
-        const u8* xsrc = ysrc;
-        swizzle_row(xsrc, dst, width_blocks, src_pitch);
-        ysrc += src_row;
-    }
-}
-
 static void jpg_null(j_decompress_ptr cinfo) {}
 
 static boolean jpg_fill_input_buffer(j_decompress_ptr cinfo) { return 1; }
@@ -883,7 +874,7 @@ void JRenderer::LoadJPG(TextureInfo& textureInfo, const char* filename, int mode
     JLOG("JRenderer::LoadJPG");
     textureInfo.mBits = NULL;
 
-    bool useVideoRAM = (mode == TEX_TYPE_USE_VRAM);
+    const bool useVideoRAM = (mode == TEX_TYPE_USE_VRAM);
 
     struct jpeg_decompress_struct cinfo;
     struct jpeg_error_mgr jerr;
@@ -926,8 +917,8 @@ void JRenderer::LoadJPG(TextureInfo& textureInfo, const char* filename, int mode
         return;
     }
 
-    int tw = getNextPower2(cinfo.output_width);
-    int th = getNextPower2(cinfo.output_height);
+    int tw = wge::math::nearest_superior_power_of_2(cinfo.output_width);
+    int th = wge::math::nearest_superior_power_of_2(cinfo.output_height);
 
     bool videoRAMUsed = false;
 
@@ -992,6 +983,7 @@ void JRenderer::LoadJPG(TextureInfo& textureInfo, const char* filename, int mode
     u32* currRow32 = rgbadata32;
     u16 color16;
     u32 color32;
+
     while (cinfo.output_scanline < cinfo.output_height) {
         p = scanline;
         jpeg_read_scanlines(&cinfo, &scanline, 1);
@@ -1003,6 +995,7 @@ void JRenderer::LoadJPG(TextureInfo& textureInfo, const char* filename, int mode
             int r = p[0];
             int g = p[1];
             int b = p[2];
+
             switch (textureMode) {
             case GU_PSM_5650:
                 color16 = (r >> 3) | ((g >> 2) << 5) | ((b >> 3) << 11);
@@ -1023,6 +1016,7 @@ void JRenderer::LoadJPG(TextureInfo& textureInfo, const char* filename, int mode
             }
 
             p += 3;
+
             if (q16) q16 += 1;
             if (q32) q32 += 1;
         }
@@ -1039,11 +1033,11 @@ void JRenderer::LoadJPG(TextureInfo& textureInfo, const char* filename, int mode
 
     if (mSwizzle) {
         if (rgbadata16) {
-            swizzle_fast((u8*)bits16, (const u8*)rgbadata16, tw * pixelSize, th /*cinfo.output_height*/);
+            swizzle_fast((u8*)bits16, (const u8*)rgbadata16, tw * pixelSize, th);
             free(rgbadata16);
         }
         if (rgbadata32) {
-            swizzle_fast((u8*)bits32, (const u8*)rgbadata32, tw * pixelSize, th /*cinfo.output_height*/);
+            swizzle_fast((u8*)bits32, (const u8*)rgbadata32, tw * pixelSize, th);
             free(rgbadata32);
         }
     }
@@ -1052,6 +1046,7 @@ void JRenderer::LoadJPG(TextureInfo& textureInfo, const char* filename, int mode
         textureInfo.mBits = (u8*)bits16;
     else
         textureInfo.mBits = (u8*)bits32;
+
     textureInfo.mWidth = cinfo.output_width;
     textureInfo.mHeight = cinfo.output_height;
     textureInfo.mTexWidth = tw;
@@ -1202,8 +1197,8 @@ int JRenderer::LoadPNG(TextureInfo& textureInfo, const char* filename, int mode,
         return JGE_ERR_MALLOC_FAILED;
     }
 
-    int texWidth = getNextPower2(width);
-    int texHeight = getNextPower2(height);
+    int texWidth = wge::math::nearest_superior_power_of_2(width);
+    int texHeight = wge::math::nearest_superior_power_of_2(height);
 
     bool done = false;
     PIXEL_TYPE* bits = NULL;
@@ -1332,8 +1327,8 @@ JTexture* JRenderer::CreateTexture(int width, int height, int mode) {
         tex->mWidth = width;
         tex->mHeight = height;
 
-        tex->mTexWidth = getNextPower2(width);
-        tex->mTexHeight = getNextPower2(height);
+        tex->mTexWidth = wge::math::nearest_superior_power_of_2(width);
+        tex->mTexHeight = wge::math::nearest_superior_power_of_2(height);
 
         int size = tex->mTexWidth * tex->mTexHeight * sizeof(PIXEL_TYPE);
         if (useVideoRAM) {

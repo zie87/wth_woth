@@ -1,0 +1,5 @@
+distribution/
+.gradle/
+.idea/
+?/
+local.properties

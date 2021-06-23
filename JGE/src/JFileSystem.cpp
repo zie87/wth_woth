@@ -18,7 +18,7 @@ necessary but provides a nice way to distinguish The content that users should n
 */
 
 #if defined(ANDROID)
-    #include "../../include/PrecompiledHeader.h"
+    #include "PrecompiledHeader.h"
 #endif
 
 #ifdef WIN32

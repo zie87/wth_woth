@@ -1,5 +1,15 @@
 
-add_executable(wth_woth)
+if(DEFINED ANDROID)
+    add_library(wth_woth SHARED)
+
+    target_sources(wth_woth 
+        PRIVATE
+            ${EXTERN_SDL_DIR}/src/main/android/SDL_android_main.cpp
+    )
+
+else()
+    add_executable(wth_woth)
+endif()
 
 target_sources(wth_woth
     PRIVATE

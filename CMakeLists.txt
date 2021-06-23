@@ -29,6 +29,12 @@ if(DEFINED PSP)
     
     include(psp_tools) 
     set(WOTH_PSP_BUILD ON)
+elseif(DEFINED ANDROID)
+    target_compile_definitions(woth_options INTERFACE "WOTH_PLATFORM_ANDROID")
+    target_compile_definitions(woth_options INTERFACE "ANDROID")
+    target_compile_definitions(woth_options INTERFACE "LINUX")
+
+    target_compile_definitions(woth_options INTERFACE "SDL_CONFIG")
 elseif(DEFINED UNIX)
     target_compile_definitions(woth_options INTERFACE "WOTH_PLATFORM_UNIX")
     target_compile_definitions(woth_options INTERFACE "LINUX")
@@ -47,6 +53,9 @@ else()
 endif()
 
 add_library(WotH::options ALIAS woth_options)
+
+
+add_subdirectory(extern)
 
 enable_testing()
 add_subdirectory(wge)

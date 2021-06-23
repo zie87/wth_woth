@@ -1,13 +1,15 @@
 #!/bin/bash
-
 set -e
 
-if [ $1 == "debug" ]; then
- ndk-build -C projects/mtg/Android -B -j $(nproc) NDK_TOOLCHAIN_VERSION=4.9 NDK_DEBUG=1
-else
- ndk-build -C projects/mtg/Android -B -j $(nproc) NDK_TOOLCHAIN_VERSION=4.9 NDK_DEBUG=0
-fi
+#WAGIC_APK_PATH='distribution/android/wagic/outputs/apk'
 
-android list targets
-android update project -t 1 -p projects/mtg/Android
-ant $1 -f projects/mtg/Android/build.xml
+cd cmake/android
+  if [ "$1" == "Release" ]
+  then
+    ./gradlew assembleRelease
+    #mv ${WAGIC_APK_PATH}/release/wagic-release-unsigned.apk ../../wagic_woth_release.apk
+  else
+    ./gradlew assembleDebug
+    #mv ${WAGIC_APK_PATH}/debug/wagic-debug.apk ../../wagic_woth_debug.apk
+  fi
+cd ../..

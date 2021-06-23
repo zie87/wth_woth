@@ -34,20 +34,9 @@ if(DEFINED UNIX OR DEFINED WIN32)
 
     add_library(png_old INTERFACE)
     add_library(WotH::png ALIAS png_old)
-
-    find_package(SDL2 REQUIRED)
-    find_package(OpenGL COMPONENTS OpenGL REQUIRED)
-
-    # on ubuntu target is not defined
-    if(NOT TARGET SDL2::SDL2)
-        add_library(sdl_wrapper INTERFACE)
-        target_include_directories(sdl_wrapper INTERFACE ${SDL2_INCLUDE_DIRS})
-        target_link_libraries(sdl_wrapper INTERFACE ${SDL2_LIBRARIES})
-        add_library(SDL2::SDL2 ALIAS sdl_wrapper)
-    endif()
 endif()
 
-if(DEFINED UNIX)
+if(NOT DEFINED ANDROID AND DEFINED UNIX)
     find_package(Freetype REQUIRED)
     add_library(ft_alias INTERFACE)
     target_link_libraries(ft_alias INTERFACE Freetype::Freetype)
@@ -98,10 +87,12 @@ target_link_libraries(hgetools
     PUBLIC
         WotH::wge
     PRIVATE
-        woth_options
+        WotH::options
 )
 
-if(DEFINED UNIX OR DEFINED WIN32)
+if(DEFINED ANDROID)
+    target_link_libraries(hgetools PRIVATE SDL::SDL)
+elseif(DEFINED UNIX OR DEFINED WIN32)
     target_link_libraries(hgetools PRIVATE SDL2::SDL2)
 endif()
 
@@ -141,7 +132,6 @@ target_sources(jge300
         ${CMAKE_CURRENT_SOURCE_DIR}/src/tinyxml/tinyxmlparser.cpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/tinyxml/tinyxmlerror.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Encoding.cpp 
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/JTTFont.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/JMD2Model.cpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/JOBJModel.cpp
     )
@@ -149,6 +139,7 @@ target_sources(jge300
 if(DEFINED PSP)
 target_sources(jge300
     PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/JTTFont.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/JSocket.cpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/JGfx.cpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/JSfx.cpp 
@@ -160,9 +151,19 @@ target_sources(jge300
     )
 endif()
 
-if(DEFINED UNIX OR WIN32)
+if(DEFINED ANDROID)
 target_sources(jge300
     PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/SDLmain.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/android/JSfx.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JGfx.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JSocket.cpp
+    )
+
+elseif(DEFINED UNIX OR WIN32)
+target_sources(jge300
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/JTTFont.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/SDL2main.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JSfx.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JGfx.cpp
@@ -186,14 +187,34 @@ target_link_libraries(jge300
         WotH::wge
         WotH::png
         WotH::jpeg
-        WotH::freetype
         ZLIB::ZLIB
     PRIVATE
-        woth_options
+        WotH::options
 )
 
+if(NOT DEFINED ANDROID)
+target_link_libraries(jge300
+    PUBLIC
+        WotH::freetype
+)
+endif()
 
-if(DEFINED UNIX OR DEFINED WIN32)
+if(DEFINED ANDROID)        
+    target_include_directories(jge300 PUBLIC "${CMAKE_SOURCE_DIR}/projects/mtg/include")
+    target_link_libraries(jge300 PUBLIC android log EGL GLESv1_CM GLESv2 OpenSLES)
+    target_link_libraries(jge300 PUBLIC SDL::SDL)
+elseif(DEFINED UNIX OR DEFINED WIN32)
+    find_package(SDL2 REQUIRED)
+    find_package(OpenGL COMPONENTS OpenGL REQUIRED)
+
+    # on ubuntu target is not defined
+    if(NOT TARGET SDL2::SDL2)
+        add_library(sdl_wrapper INTERFACE)
+        target_include_directories(sdl_wrapper INTERFACE ${SDL2_INCLUDE_DIRS})
+        target_link_libraries(sdl_wrapper INTERFACE ${SDL2_LIBRARIES})
+        add_library(SDL2::SDL2 ALIAS sdl_wrapper)
+    endif()
+
     target_link_libraries(jge300 PUBLIC SDL2::SDL2 OpenGL::GL OpenGL::GLU )
 endif()
 

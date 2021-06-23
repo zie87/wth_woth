@@ -202,3 +202,4 @@ if(DEFINED WIN32)
 endif()
 
 add_library(WotH::jge ALIAS jge300)
+add_subdirectory(tests)

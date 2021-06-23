@@ -10,7 +10,7 @@ target_include_directories(wtest
         ${WOTH_WGE_ROOT_DIR}/include/wtest/detail
 )
 
-target_link_libraries(wtest PRIVATE woth_options)
+target_link_libraries(wtest PUBLIC WotH::wge PRIVATE WotH::options)
 target_compile_definitions(wtest PUBLIC "UNITY_FIXTURE_NO_EXTRAS")
 
 if(DEFINED WOTH_PSP_BUILD)

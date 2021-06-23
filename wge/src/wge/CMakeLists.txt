@@ -29,7 +29,7 @@ endif()
 
 target_compile_features(wge PUBLIC cxx_std_14)
 target_include_directories(wge PUBLIC ${WOTH_WGE_ROOT_DIR}/include)
-target_link_libraries(wge PRIVATE WotH::options)
+target_link_libraries(wge PUBLIC WotH::options)
 
 if(NOT DEFINED WOTH_PSP_BUILD)
     find_package(Threads REQUIRED)

@@ -2,9 +2,9 @@
 #define WGE_WTEST_WTEST_HPP
 
 extern "C" {
-#include "unity.h"
-#include "unity_internals.h"
-#include "unity_fixture.h"
+#include "detail/unity.h"
+#include "detail/unity_internals.h"
+#include "detail/unity_fixture.h"
 }
 
 #include "wge/types.hpp"
@@ -13,6 +13,8 @@ extern "C" {
 #define WTEST_SETUP(group) TEST_SETUP(group)
 #define WTEST_TEAR_DOWN(group) TEST_TEAR_DOWN(group)
 #define WTEST_CASE(group, name) TEST(group, name)
+
+#define WTEST_SUITE_RUNNER(group) TEST_GROUP_RUNNER(group)
 
 namespace wge {
 namespace test {

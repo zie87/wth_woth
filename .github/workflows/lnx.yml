@@ -25,6 +25,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: true
 
     - name: Create Build Environment
       run: |
@@ -42,3 +44,6 @@ jobs:
     - name: Build
       working-directory: ${{runner.workspace}}/build
       run: cmake --build . --config ${{matrix.build_type}} -- -j $(nproc)
+    - name: Tests
+      working-directory: ${{runner.workspace}}/build
+      run: ctest ${{matrix.build_type}}

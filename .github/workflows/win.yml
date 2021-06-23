@@ -16,14 +16,13 @@ jobs:
 
     strategy:
       matrix:
-        config: [Release, Debug]
+        build_type: [Debug, Release]
 
     steps:
-    - name: checkout
-      uses: actions/checkout@v1
+    - uses: actions/checkout@v2
       with:
         submodules: true
-    
+   
     - name: init
       id: init
       shell: bash
@@ -67,16 +66,20 @@ jobs:
         "$VCPKG_INSTALLATION_ROOT/vcpkg" install ${VCPKG_DEPS} --triplet x86-windows
         "$VCPKG_INSTALLATION_ROOT/vcpkg" upgrade --no-dry-run
         rm -rf downloads buildtrees packages
-    
-    - name: prepare
+    - name: Configure
       shell: bash
       run: |
         source env.sh
         mkdir build
         cd build
         cmake .. -G"Visual Studio 16 2019" -A Win32 -DCMAKE_BUILD_TYPE=${{ matrix.config }} -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake
-        
-    - name: build
-      run : |
+    - name: Build
+      shell: bash
+      run: |
         cd build
-        cmake --build . --config ${{ matrix.config }}
+        cmake --build . --config ${{ matrix.build_type }}
+    - name: Tests
+      shell: bash
+      run: |
+        cd build
+        ctest ${{ matrix.build_type }}

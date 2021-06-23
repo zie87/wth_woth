@@ -1,0 +1,63 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+    buildToolsVersion "28.0.3"
+
+    signingConfigs {
+        release {
+            storeFile file('.keystore/wagic-release.keystore')
+            storePassword 'password'
+            keyAlias = 'wagic_release'
+            keyPassword 'password'
+        }
+        debug {
+            storeFile file('.keystore/wagic-release.keystore')
+            storePassword 'password'
+            keyAlias = 'wagic_release'
+            keyPassword 'password'
+        }
+
+    }
+
+    defaultConfig {
+        applicationId "org.libsdl.app.SDLActivity"
+        minSdkVersion 21
+        targetSdkVersion 28
+        versionCode 1
+        versionName "0.0.1"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++17 -frtti -fexceptions"
+            }
+        }
+	ndk {
+            abiFilters 'armeabi-v7a', 'x86', 'x86_64'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "../../../CMakeLists.txt"
+        }
+    }
+}
+tasks.withType(Sign)*.enabled = false
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+	api project(':SDL')
+    testImplementation 'junit:junit:4.12'
+}

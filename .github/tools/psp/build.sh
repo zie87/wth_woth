@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 echo PSPDEV = $PSPDEV
 echo psp-config = `psp-config --psp-prefix`

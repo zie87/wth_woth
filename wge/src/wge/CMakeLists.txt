@@ -1,6 +1,3 @@
-
-
-
 add_library(wge STATIC)
 
 target_sources(wge 
@@ -20,6 +17,13 @@ target_sources(wge
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/time_sdl.cpp
 )
+
+    if(NOT DEFINED ANDROID)
+        target_link_libraries(wge PUBLIC SDL2::SDL2)
+    else()
+         target_link_libraries(wge PUBLIC SDL::SDL)
+    endif()
+
 else()
 target_sources(wge 
     PRIVATE
@@ -35,6 +39,5 @@ if(NOT DEFINED WOTH_PSP_BUILD)
     find_package(Threads REQUIRED)
     target_link_libraries(wge PUBLIC Threads::Threads) 
 endif()
-
 
 add_library(WotH::wge ALIAS wge)

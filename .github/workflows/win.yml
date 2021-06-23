@@ -67,15 +67,21 @@ jobs:
         "$VCPKG_INSTALLATION_ROOT/vcpkg" upgrade --no-dry-run
         rm -rf downloads buildtrees packages
     
-    - name: prepare
-      shell: bash
+    - name: Create Build Environment
       run: |
-        source env.sh
-        mkdir build
-        cd build
-        cmake .. -G"Visual Studio 16 2019" -A Win32 -DCMAKE_BUILD_TYPE=${{ matrix.config }} -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake
-        
-    - name: build
-      run : |
-        cd build
-        cmake --build . --config ${{ matrix.config }}
+        ${{matrix.install}}
+        cmake -E make_directory ${{runner.workspace}}/build
+    - name: Configure
+      working-directory: ${{runner.workspace}}/build
+      run: |
+        cmake -G"Visual Studio 16 2019" -A Win32 \ 
+              -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
+              -DCMAKE_CXX_STANDARD=${{matrix.std}} \
+              -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake \
+              $GITHUB_WORKSPACE
+    - name: Build
+      working-directory: ${{runner.workspace}}/build
+      run: cmake --build . --config ${{matrix.build_type}}
+    - name: Tests
+      working-directory: ${{runner.workspace}}/build
+      run: ctest ${{matrix.build_type}}

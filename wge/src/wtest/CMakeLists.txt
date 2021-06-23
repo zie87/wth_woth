@@ -1,6 +1,7 @@
 
 add_library(wtest STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/unity.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/unity_fixture.c
 )
 
 target_include_directories(wtest 
@@ -10,6 +11,10 @@ target_include_directories(wtest
 )
 
 target_link_libraries(wtest PRIVATE woth_options)
-target_compile_definitions(wtest PUBLIC "UNITY_INCLUDE_CONFIG_H")
+target_compile_definitions(wtest PUBLIC "UNITY_FIXTURE_NO_EXTRAS")
+
+if(DEFINED WOTH_PSP_BUILD)
+    target_compile_definitions(wtest PUBLIC "UNITY_INCLUDE_CONFIG_H")
+endif()
 
 add_library(WotH::wtest ALIAS wtest)

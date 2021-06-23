@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        config: [Release, Debug]
+        build_type: [Debug, Release]
 
     steps:
     - uses: actions/checkout@v2
@@ -76,7 +76,6 @@ jobs:
       run: |
         cmake -G"Visual Studio 16 2019" -A Win32 \ 
               -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
-              -DCMAKE_CXX_STANDARD=${{matrix.std}} \
               -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake \
               $GITHUB_WORKSPACE
     - name: Build

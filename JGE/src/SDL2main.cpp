@@ -1,21 +1,18 @@
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
-#if (defined ANDROID)
-    #include <SDL_opengles.h>
-#else
-    #include <SDL_opengl.h>
-    #ifdef WIN32
-        #undef GL_VERSION_2_0
-    #endif
+#include <SDL_opengl.h>
+#ifdef WIN32
+    #undef GL_VERSION_2_0
 #endif
 
-#include "../include/JGE.h"
-#include "../include/JTypes.h"
-#include "../include/JApp.h"
-#include "../include/JFileSystem.h"
-#include "../include/JRenderer.h"
-#include "../include/JGameLauncher.h"
+#include "JGE.h"
+#include "JTypes.h"
+#include "JApp.h"
+#include "JFileSystem.h"
+#include "JRenderer.h"
+#include "JGameLauncher.h"
 #include "DebugRoutines.h"
+
 #include <stdexcept>
 #include <iostream>
 #include <math.h>
@@ -45,39 +42,10 @@ uint64_t lastTickCount;
 JGE* g_engine = NULL;
 JApp* g_app = NULL;
 JGameLauncher* g_launcher = NULL;
-#ifdef ANDROID
-JNIEnv* mJNIEnv = NULL;
-jclass* mJNIClass = NULL;
-#endif
 
 class SdlApp;
 
 SdlApp* g_SdlApp = NULL;
-
-#ifdef ANDROID
-// Pause
-extern "C" void Java_org_libsdl_app_SDLActivity_nativePause(JNIEnv* env, jclass cls) {
-    DebugTrace("Attempt pause");
-    if (!g_engine) return;
-    g_engine->Pause();
-    DebugTrace("Pause done");
-}
-
-// Resume
-extern "C" void Java_org_libsdl_app_SDLActivity_nativeResume(JNIEnv* env, jclass cls) {
-    if (!g_engine) return;
-    g_engine->Resume();
-}
-
-    #include "Wagic_Version.h"
-extern "C" jstring Java_org_libsdl_app_SDLActivity_getResourceName(JNIEnv* env, jclass cls) {
-    return env->NewStringUTF(WAGIC_RESOURCE_NAME);
-}
-
-extern "C" jstring Java_org_libsdl_app_SDLActivity_getResourceUrl(JNIEnv* env, jclass cls) {
-    return env->NewStringUTF(WAGIC_RESOURCE_URL);
-}
-#endif
 
 class SdlApp {
 public: /* For easy interfacing with JGE static functions */
@@ -350,14 +318,6 @@ bool InitGame(void) {
     g_app = g_launcher->GetGameApp();
     g_app->Create();
     g_engine->SetApp(g_app);
-#ifdef ANDROID
-    DebugTrace("Can I Set JNI Params ?");
-    if (mJNIEnv) DebugTrace("mJNIEnv is ok");
-    if (mJNIEnv && mJNIClass) {
-        DebugTrace("Setting JNI Params");
-        g_engine->SetJNIEnv(mJNIEnv, *mJNIClass);
-    }
-#endif
 
     JRenderer::GetInstance()->Enable2D();
     lastTickCount = JGEGetTime();
@@ -424,14 +384,7 @@ void SdlApp::OnMouseMoved(const SDL_MouseMotionEvent& event) {
     }
 }
 
-void SdlApp::OnMouseDoubleClicked(const SDL_MouseButtonEvent& event) {
-#if (defined ANDROID) || (defined IOS)
-    if (event.button == SDL_BUTTON_LEFT) /* Left button */
-    {
-        g_engine->HoldKey_NoRepeat(JGE_BTN_OK);
-    }
-#endif
-}
+void SdlApp::OnMouseDoubleClicked(const SDL_MouseButtonEvent& event) {}
 
 void SdlApp::OnMouseWheel(int x, int y) {
     if (!x && y) {  // Vertical wheel
@@ -460,9 +413,7 @@ void SdlApp::OnMouseClicked(const SDL_MouseButtonEvent& event) {
                 event.x <= viewPort.x + viewPort.w) {
                 g_engine->LeftClicked(((event.x - viewPort.x) * SCREEN_WIDTH) / actualWidth,
                                       ((event.y - viewPort.y) * SCREEN_HEIGHT) / actualHeight);
-#if (!defined ANDROID) && (!defined IOS)
                 g_engine->HoldKey_NoRepeat(JGE_BTN_OK);
-#endif
             } else if (event.y < viewPort.y) {
                 g_engine->HoldKey_NoRepeat(JGE_BTN_MENU);
             } else if (event.y > viewPort.y + viewPort.h) {
@@ -479,9 +430,7 @@ void SdlApp::OnMouseClicked(const SDL_MouseButtonEvent& event) {
         if (event.button == SDL_BUTTON_LEFT) {
             if (event.y >= viewPort.y && event.y <= viewPort.y + viewPort.h && event.x >= viewPort.x &&
                 event.x <= viewPort.x + viewPort.w) {
-#if (!defined ANDROID) && (!defined IOS)
                 g_engine->ReleaseKey(JGE_BTN_OK);
-#endif
             } else if (event.y < viewPort.y) {
                 g_engine->ReleaseKey(JGE_BTN_MENU);
             } else if (event.y > viewPort.y + viewPort.h) {
@@ -512,19 +461,8 @@ void SdlApp::OnTouchEvent(const SDL_TouchFingerEvent& event) {
                 lastFingerDownTime = eventTime;
             }
 
-#if (defined ANDROID) || (defined IOS)
-            if (event.type == SDL_FINGERUP) {
-                if (eventTime - lastFingerDownTime <= kTapEventTimeout) {
-                    // treat an up finger within 50 pixels of the down finger coords as a double click event
-                    if (abs(mMouseDownX - event.x) < kHitzonePliancy && abs(mMouseDownY - event.y) < kHitzonePliancy) {
-                        DebugTrace("Pressing OK BUtton");
-                        g_engine->HoldKey_NoRepeat(JGE_BTN_OK);
-                    }
-                }
-            } else
-#endif
-                g_engine->LeftClicked(((event.x - viewPort.x) * SCREEN_WIDTH) / actualWidth,
-                                      ((event.y - viewPort.y) * SCREEN_HEIGHT) / actualHeight);
+            g_engine->LeftClicked(((event.x - viewPort.x) * SCREEN_WIDTH) / actualWidth,
+                                  ((event.y - viewPort.y) * SCREEN_HEIGHT) / actualHeight);
         }
     }
 }
@@ -533,12 +471,7 @@ bool SdlApp::OnInit() {
     int window_w, window_h;
 
     DebugTrace("I R in da OnInit()");
-#ifndef __EMSCRIPTEN__
-    if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
-#else
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
-#endif  //__EMSCRIPTEN__
-    {
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         return false;
     }
 
@@ -546,13 +479,8 @@ bool SdlApp::OnInit() {
     SDL_GetCurrentDisplayMode(0, &currentDisplayMode);
     DebugTrace("Video Display : h " << currentDisplayMode.h << ", w " << currentDisplayMode.w);
 
-#if (defined ANDROID) || (defined IOS) || (defined __EMSCRIPTEN__)
-    window_w = currentDisplayMode.w;
-    window_h = currentDisplayMode.h;
-#else
     window_w = SCREEN_WIDTH;
     window_h = SCREEN_HEIGHT;
-#endif
 
     int buffers, samples;
 
@@ -579,24 +507,13 @@ bool SdlApp::OnInit() {
         SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
     }
 
-#ifndef __EMSCRIPTEN__
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-#else
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
     SDL_DisplayMode current;
     SDL_GetCurrentDisplayMode(0, &current);
-#endif
 
-#if (defined ANDROID)
-    Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN | SDL_WINDOW_BORDERLESS;
-#elif defined __EMSCRIPTEN__
-    Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN | SDL_WINDOW_BORDERLESS;
-#else
     Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
-#endif
     window = SDL_CreateWindow(g_launcher->GetName(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_w,
                               window_h, flags);
     if (window == NULL) {
@@ -609,7 +526,7 @@ bool SdlApp::OnInit() {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);  // Black Background (yes that's the way fuckers)
 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
-    #if (defined GL_ES_VERSION_2_0) && (!defined __EMSCRIPTEN__)
+    #if (defined GL_ES_VERSION_2_0)
     glClearDepthf(1.0f);  // Depth Buffer Setup
     #else
     glClearDepth(1.0f);  // Depth Buffer Setup
@@ -655,20 +572,8 @@ bool SdlApp::OnInit() {
     return true;
 };
 
-#if (defined ANDROID)
-int SDL_main(int argc, char* argv[])
-#else
 int main(int argc, char* argv[])
-#endif  // ANDROID
 {
-
-#if (defined ANDROID)
-    if (argc > 2) {
-        mJNIEnv = (JNIEnv*)argv[1];
-        mJNIClass = (jclass*)argv[2];
-    }
-#endif
-
     DebugTrace("I R in da native");
 
     g_launcher = new JGameLauncher();

@@ -1027,7 +1027,7 @@ void ActionStack::Render() {
     }
 }
 
-#if defined(WIN32) || defined(LINUX) || defined(IOS)
+#if defined(WIN32) || defined(LINUX)
 
 void Interruptible::Dump() {
     string stype, sstate, sdisplay = "";

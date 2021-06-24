@@ -711,13 +711,7 @@ void GameSettings::keypadTitle(string set) {
 SimplePad* GameSettings::keypadStart(string input, string* _dest, bool _cancel, bool _numpad, float _x, float _y) {
     if (keypad == NULL) keypad = NEW SimplePad();
         // show keyboard
-#ifdef IOS
-    JGE* engine = JGE::GetInstance();
-    engine->SendCommand("displayKeyboard", input);
-#elif ANDROID
-    JGE* engine = JGE::GetInstance();
-    engine->SendCommand("displayKeyboard:" + input);
-#endif
+
     keypad->bShowCancel = _cancel;
     keypad->bShowNumpad = _numpad;
     keypad->mX = _x;

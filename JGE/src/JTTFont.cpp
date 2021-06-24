@@ -12,9 +12,9 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "../include/JFileSystem.h"
-#include "../include/JTTFont.h"
-#include "../include/Encoding.h"
+#include "JFileSystem.h"
+#include "JTTFont.h"
+#include "Encoding.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -23,8 +23,8 @@
     #pragma comment(lib, "freetype.lib")
 #endif
 
-#include "../include/JGE.h"
-#include "../include/JRenderer.h"
+#include "JGE.h"
+#include "JRenderer.h"
 
 #ifndef WIN32
 
@@ -203,7 +203,7 @@ int JTTFont::PreCacheChar(u16 ch, u16 cachedCode) {
 
     FT_GlyphSlot slot = mFace->glyph;
 
-#if defined(WIN32) || defined(LINUX) || defined(IOS)
+#if defined(WIN32) || defined(LINUX)
     DWORD* texBuffer = new DWORD[mMaxCharWidth * mMaxCharHeight];
     memset(texBuffer, 0, mMaxCharWidth * mMaxCharHeight * sizeof(DWORD));
 #else
@@ -221,7 +221,7 @@ int JTTFont::PreCacheChar(u16 ch, u16 cachedCode) {
     if (FT_Load_Char(mFace, ch, renderFlag) == 0) {
         int top = mSize - slot->bitmap_top + 1;
 
-#if defined(WIN32) || defined(LINUX) || defined(IOS)
+#if defined(WIN32) || defined(LINUX)
         int offset = top * mMaxCharWidth + slot->bitmap_left + 2;
 #else
         int xx = x + slot->bitmap_left + 2;
@@ -241,7 +241,7 @@ int JTTFont::PreCacheChar(u16 ch, u16 cachedCode) {
                 for (int j = 0; j < slot->bitmap.width; j++) {
                     grey = slot->bitmap.buffer[i * slot->bitmap.width + j];
 
-#if defined(WIN32) || defined(LINUX) || defined(IOS)
+#if defined(WIN32) || defined(LINUX)
                     texBuffer[i * mMaxCharWidth + j + offset] = RGBA(255, 255, 255, grey);
 #else
                     SwizzlePlot(pTexture, ARGB(grey, 255, 255, 255), (xx + j) * PIXEL_SIZE, yy + i,
@@ -258,7 +258,7 @@ int JTTFont::PreCacheChar(u16 ch, u16 cachedCode) {
                     mask = 0x80;
                     for (int k = 0; k < 8; k++) {
                         if (bits & mask) {
-#if defined(WIN32) || defined(LINUX) || defined(IOS)
+#if defined(WIN32) || defined(LINUX)
                             texBuffer[i * mMaxCharWidth + j * 8 + k + offset] = RGBA(255, 255, 255, 255);
 #else
                             SwizzlePlot(pTexture, ARGB(255, 255, 255, 255), (xx + j * 8 + k) * PIXEL_SIZE, yy + i,
@@ -276,7 +276,7 @@ int JTTFont::PreCacheChar(u16 ch, u16 cachedCode) {
 
     mXAdvance[mCurr] = (u8)(slot->advance.x >> 6);
 
-#if defined(WIN32) || defined(LINUX) || defined(IOS)
+#if defined(WIN32) || defined(LINUX)
     glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, mMaxCharWidth, mMaxCharHeight, GL_RGBA, GL_UNSIGNED_BYTE, texBuffer);
 #else
     sceKernelDcacheWritebackAll();

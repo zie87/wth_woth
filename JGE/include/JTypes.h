@@ -98,25 +98,15 @@ enum {
 #if (defined WIN32) && (!defined LINUX)
     #include <windows.h>
 #endif
-#if defined(LINUX) || defined(IOS) || defined(ANDROID)
+#if defined(LINUX)
 typedef uint8_t byte;
 typedef uint32_t DWORD;
 typedef uint8_t BYTE;
-    #ifndef IOS
 typedef bool BOOL;
-    #endif
 #endif
 
 #ifndef QT_CONFIG
-    #if defined(IOS)
-        #import <OpenGLES/ES2/gl.h>
-        #import <OpenGLES/ES2/glext.h>
-        #import <OpenGLES/ES1/gl.h>
-        #import <OpenGLES/ES1/glext.h>
-    #elif defined(ANDROID)
-        #include <GLES/gl.h>
-        #include <GLES/glext.h>
-    #elif defined(WIN32) || defined(LINUX)
+    #if defined(WIN32) || defined(LINUX)
         #include <GL/gl.h>
         #include <GL/glu.h>
     #endif

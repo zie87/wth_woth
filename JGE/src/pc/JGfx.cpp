@@ -13,12 +13,11 @@
 
 #define GL_GLEXT_PROTOTYPES
 
-#if (!defined IOS) && (!defined QT_CONFIG)
+#if (!defined QT_CONFIG)
     #ifdef WIN32
         #pragma warning(disable : 4786)
     #endif
-
-#endif  // IOS
+#endif
 
 #include "JGE.h"
 #include "JRenderer.h"
@@ -747,7 +746,7 @@ void JRenderer::BeginScene() {
     esMatrixLoadIdentity(&theMvpMatrix);
     esOrtho(&theMvpMatrix, 0.0f, SCREEN_WIDTH_F, 0.0f, SCREEN_HEIGHT_F - 1.0f, -1.0f, 1.0f);
 #endif  //(!defined GL_ES_VERSION_2_0) && (!defined GL_VERSION_2_0)
-#if (defined WIN32) || ((defined GL_VERSION_ES_CM_1_1) && (!defined IOS))
+#if (defined WIN32) || ((defined GL_VERSION_ES_CM_1_1))
     float scaleH = mActualHeight / SCREEN_HEIGHT_F;
     float scaleW = mActualWidth / SCREEN_WIDTH_F;
     if (scaleH != 1.0f || scaleW != 1.0f) glScalef(scaleW, scaleH, 1.f);
@@ -1435,102 +1434,7 @@ void JRenderer::PlotArray(float* x, float* y, int count, PIXEL_TYPE color) {
 
 void JRenderer::ScreenShot(const char* filename __attribute__((unused))) {}
 
-#if (defined IOS)
-
-    #include <UIKit/UIImage.h>
-
-JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureFormat __attribute__((unused))) {
-    TextureInfo textureInfo;
-    JTexture* tex = NULL;
-    textureInfo.mBits = NULL;
-    int rawsize = 0;
-    BYTE* rawdata = NULL;
-    JFileSystem* fileSystem = JFileSystem::GetInstance();
-    NSData* texData = NULL;
-    UIImage* image = NULL;
-
-    do {
-        if (!fileSystem->OpenFile(filename)) break;
-
-        rawsize = fileSystem->GetFileSize();
-        rawdata = new BYTE[rawsize];
-
-        if (!rawdata) {
-            fileSystem->CloseFile();
-            break;
-        }
-
-        fileSystem->ReadFile(rawdata, rawsize);
-        fileSystem->CloseFile();
-
-        texData = [[NSData alloc] initWithBytes:rawdata length:rawsize];
-        image = [[UIImage alloc] initWithData:texData];
-        CGImageAlphaInfo info;
-        BOOL hasAlpha;
-
-        info = CGImageGetAlphaInfo(image.CGImage);
-        hasAlpha = ((info == kCGImageAlphaPremultipliedLast) || (info == kCGImageAlphaPremultipliedFirst) ||
-                            (info == kCGImageAlphaLast) || (info == kCGImageAlphaFirst)
-                        ? YES
-                        : NO);
-
-        if (image == nil) {
-            NSLog(@"Loading Texture : %s failed", filename);
-            break;
-        }
-
-        textureInfo.mWidth = CGImageGetWidth(image.CGImage);
-        textureInfo.mHeight = CGImageGetHeight(image.CGImage);
-        textureInfo.mTexWidth = wge::math::nearest_superior_power_of_2(textureInfo.mWidth);
-        textureInfo.mTexHeight = wge::math::nearest_superior_power_of_2(textureInfo.mHeight);
-
-        NSLog(@"Loading Texture : %s : %s : %ux%u", filename, (hasAlpha ? "Alpha " : "No Alpha "), textureInfo.mWidth,
-              textureInfo.mHeight);
-
-        textureInfo.mBits = new u8[textureInfo.mTexHeight * textureInfo.mTexWidth * 4];
-        if (textureInfo.mBits == NULL) {
-            NSLog(@"Texture %s failed to load\n", filename);
-            break;
-        }
-
-        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-        info = /*hasAlpha ?*/ kCGImageAlphaPremultipliedLast /*: kCGImageAlphaNoneSkipLast*/;
-
-        CGContextRef context =
-            CGBitmapContextCreate(textureInfo.mBits, textureInfo.mTexWidth, textureInfo.mTexHeight, 8,
-                                  4 * textureInfo.mTexWidth, colorSpace, info /*| kCGBitmapByteOrder32Big*/);
-        CGColorSpaceRelease(colorSpace);
-        CGContextClearRect(context, CGRectMake(0, 0, textureInfo.mTexWidth, textureInfo.mTexHeight));
-        CGContextTranslateCTM(context, 0, textureInfo.mTexHeight - textureInfo.mHeight);
-        CGContextDrawImage(context, CGRectMake(0, 0, textureInfo.mWidth, textureInfo.mHeight), image.CGImage);
-
-        tex = new JTexture();
-
-        if (tex) {
-            if (mImageFilter != NULL)
-                mImageFilter->ProcessImage((PIXEL_TYPE*)textureInfo.mBits, textureInfo.mWidth, textureInfo.mHeight);
-
-            tex->mFilter = TEX_FILTER_LINEAR;
-            tex->mWidth = textureInfo.mWidth;
-            tex->mHeight = textureInfo.mHeight;
-            tex->mTexWidth = textureInfo.mTexWidth;
-            tex->mTexHeight = textureInfo.mTexHeight;
-            tex->mBuffer = textureInfo.mBits;
-        } else {
-            NSLog(@"JTexture for %s not created\n", filename);
-        }
-
-        CGContextRelease(context);
-    } while (0);
-
-    if (rawdata) delete[] rawdata;
-
-    [image release];
-    [texData release];
-
-    return tex;
-}
-#elif (defined QT_CONFIG)
+#if (defined QT_CONFIG)
 JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureFormat __attribute__((unused))) {
     JTexture* tex = NULL;
     int rawsize = 0;
@@ -1613,7 +1517,7 @@ JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureForm
 
     return tex;
 }
-#endif  // IOS
+#endif
 
 void JRenderer::TransferTextureToGLContext(JTexture& inTexture) {
     if (inTexture.mBuffer != NULL) {
@@ -1789,25 +1693,25 @@ void JRenderer::Enable2D() {
     checkGlError();
 }
 
-void JRenderer::
-    Enable3D() { /* NOT USED
-                 if (!m3DEnabled)
-                 return;
+void JRenderer::Enable3D() { /* NOT USED
+                             if (!m3DEnabled)
+                             return;
 
-                 if (mCurrentRenderMode == MODE_3D)
-                 return;
+                             if (mCurrentRenderMode == MODE_3D)
+                             return;
 
-                 mCurrentRenderMode = MODE_3D;
+                             mCurrentRenderMode = MODE_3D;
 
-                 glViewport (0, 0, (GLsizei)SCREEN_WIDTH, (GLsizei)SCREEN_HEIGHT);		// Reset The Current
-                 Viewport glMatrixMode (GL_PROJECTION);
-                 // Select The Projection Matrix glLoadIdentity ();
-                 // Reset The Projection Matrix gluPerspective (mFOV, (GLfloat)SCREEN_WIDTH/(GLfloat)SCREEN_HEIGHT,
-                 // Calculate The Aspect Ratio Of The Window 0.5f, 1000.0f); glMatrixMode (GL_MODELVIEW);
-                 // Select The Modelview Matrix glLoadIdentity ();
-                 // Reset The Modelview Matrix
+                             glViewport (0, 0, (GLsizei)SCREEN_WIDTH, (GLsizei)SCREEN_HEIGHT);		// Reset The
+                             Current Viewport glMatrixMode (GL_PROJECTION);
+                             // Select The Projection Matrix glLoadIdentity ();
+                             // Reset The Projection Matrix gluPerspective (mFOV,
+                             (GLfloat)SCREEN_WIDTH/(GLfloat)SCREEN_HEIGHT,
+                             // Calculate The Aspect Ratio Of The Window 0.5f, 1000.0f); glMatrixMode (GL_MODELVIEW);
+                             // Select The Modelview Matrix glLoadIdentity ();
+                             // Reset The Modelview Matrix
 
-                 glEnable (GL_DEPTH_TEST); */
+                             glEnable (GL_DEPTH_TEST); */
 }
 
 void JRenderer::SetClip(int x, int y, int width, int height) {  // NOT USED

@@ -23,7 +23,7 @@
     #include "NetworkPlayer.h"
 #endif
 
-#if defined(WIN32) || defined(LINUX) || defined(IOS)
+#if defined(WIN32) || defined(LINUX)
     #include <time.h>
 #endif
 

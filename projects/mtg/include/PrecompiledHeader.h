@@ -23,7 +23,7 @@
 
 #include <wge/memory.hpp>
 
-#if defined(IOS) || defined(ANDROID) || defined(QT_CONFIG) || defined(SDL_CONFIG)
+#if defined(QT_CONFIG) || defined(SDL_CONFIG)
     #define TOUCH_ENABLED
 #endif
 

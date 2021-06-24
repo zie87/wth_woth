@@ -9,22 +9,17 @@ target_sources(wge
 )
 
 if(DEFINED WOTH_PSP_BUILD)
-target_sources(wge 
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/time_psp.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/thread/mutex_psp.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/thread/thread_psp.cpp
-)
+    target_sources(wge 
+        PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/time_psp.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/thread/mutex_psp.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/thread/thread_psp.cpp
+    )
 elseif(DEFINED WOTH_SDL_BUILD)
-target_sources(wge 
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/time_sdl.cpp
-)
+    target_sources(wge PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/time_sdl.cpp)
+    target_link_libraries(wge PUBLIC SDL2::SDL2)
 else()
-target_sources(wge 
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/time_default.cpp
-)
+    target_sources(wge PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/time_default.cpp)
 endif()
 
 target_compile_features(wge PUBLIC cxx_std_14)
@@ -35,6 +30,5 @@ if(NOT DEFINED WOTH_PSP_BUILD)
     find_package(Threads REQUIRED)
     target_link_libraries(wge PUBLIC Threads::Threads) 
 endif()
-
 
 add_library(WotH::wge ALIAS wge)

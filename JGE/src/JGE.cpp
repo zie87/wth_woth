@@ -8,28 +8,18 @@
 //
 //-------------------------------------------------------------------------------------
 
-// Should we add PrecompiledHeader.h to more platforms here? PSP Doesn't support it in JGE (erwan 2011/12/11)
-#if defined(IOS) || defined(ANDROID)
-    #include "PrecompiledHeader.h"
-#endif
-
 #include <iostream>
 #include <map>
 #include <set>
 #include <limits>
 
-#include "../include/JGE.h"
-#include "../include/JApp.h"
-#include "../include/JRenderer.h"
-#include "../include/JSoundSystem.h"
-#include "../include/Vector2D.h"
-#include "../include/JResourceManager.h"
-#include "../include/JFileSystem.h"
-//#include "../include/JParticleSystem.h"
-
-#if defined(IOS)
-    #import "wagicAppDelegate.h"
-#endif
+#include "JGE.h"
+#include "JApp.h"
+#include "JRenderer.h"
+#include "JSoundSystem.h"
+#include "Vector2D.h"
+#include "JResourceManager.h"
+#include "JFileSystem.h"
 
 //////////////////////////////////////////////////////////////////////////
 #if defined(WIN32)  // WIN32 specific code
@@ -270,12 +260,7 @@ JGE::JGE() {
 #if defined(WIN32) || defined(LINUX)
     strcpy(mDebuggingMsg, "");
     mCurrentMusic = NULL;
-#endif
-
-#if defined(ANDROID)
-    mJNIEnv = NULL;
-#endif
-
+#endif 
     Init();
 }
 
@@ -466,109 +451,12 @@ void JGE::Scroll(int inXVelocity, int inYVelocity) {
     }
 }
 
-void JGE::SendCommand(string command) {
-#if defined(ANDROID)
-    sendJNICommand(command);
-#elif defined(IOS)
-    SendCommand(command, "");
-#endif
-}
+void JGE::SendCommand(string command) {}
 
-void JGE::SendCommand(std::string command, std::string parameter) {
-#if defined(IOS)
-    // get the app delegate and have it handle the command
-    wagicAppDelegate* delegate = [[UIApplication sharedApplication] delegate];
-    [delegate handleWEngineCommand:[NSString stringWithCString:command.c_str() encoding:NSUTF8StringEncoding]
-                     withParameter:[NSString stringWithCString:parameter.c_str() encoding:NSUTF8StringEncoding]];
-
-#endif
-}
+void JGE::SendCommand(std::string command, std::string parameter) {}
 
 // this controls commands meant to modify/interact with UI
-void JGE::SendCommand(std::string command, float& x, float& y, float& width, float& height) {
-#ifdef ANDROID
-
-#elif IOS
-    wagicAppDelegate* delegate = [[UIApplication sharedApplication] delegate];
-    [delegate handleWEngineCommand:[NSString stringWithCString:command.c_str() encoding:NSUTF8StringEncoding]
-                  withUIParameters:x
-                       yCoordinate:y
-                             width:width
-                            height:height];
-#endif
-}
-
-#if defined(ANDROID)
-JNIEnv* JGE::getJNIEnv() {
-    JNIEnv* env;
-    int status = mJavaVM->GetEnv((void**)&env, JNI_VERSION_1_4);
-    if (status == JNI_ERR) {
-        DebugTrace("Failed to get JNI environment, assuming native thread");
-        status = mJavaVM->AttachCurrentThread(&env, NULL);
-        if (status == JNI_ERR) {
-            DebugTrace("callback_handler: failed to attach current thread");
-            return NULL;
-        }
-    } else if (status == JNI_EDETACHED) {
-        DebugTrace("env is detached.  trying to attach it to the current thread");
-        jint attachSuccess = mJavaVM->AttachCurrentThread(&env, NULL);
-        if (attachSuccess == 0) {
-            return env;
-        } else {
-            return NULL;
-        }  // end if/els
-    } else if (status == JNI_OK) {
-        return env;
-    }
-
-    return NULL;
-}
-
-string JGE::getFileSystemLocation() {
-    char result[512];
-    JNIEnv* env = getJNIEnv();
-    if (env == NULL) {
-        DebugTrace(
-            "An Error Occurred in getting the JNI Environment whie trying to get the system folder location.  "
-            "Defaulting to /mnt/sdcard/net.wagic.app/Wagic");
-        return "/mnt/sdcard/Wagic";
-    };
-
-    jclass jniClass = env->FindClass("org/libsdl/app/SDLActivity");
-    jmethodID methodId = env->GetStaticMethodID(jniClass, "getSystemFolderPath", "()Ljava/lang/String;");
-
-    if (methodId == 0) {
-        DebugTrace(
-            "An Error Occurred in getting the JNI methodID for getSystemFolderPath. Defaulting to /mnt/sdcard/Wagic");
-        return "/mnt/sdcard/Wagic";
-    };
-
-    jstring systemPath = (jstring)env->CallStaticObjectMethod(jniClass, methodId);
-
-    // Now convert the Java String to C++ char array
-    const char* cstr = env->GetStringUTFChars(systemPath, 0);
-    string retVal(cstr);
-    env->ReleaseStringUTFChars(systemPath, cstr);
-    env->DeleteLocalRef(systemPath);
-
-    return retVal;
-}
-
-/// Access to JNI Environment
-void JGE::SetJNIEnv(JNIEnv* env, jclass cls) {
-    mJNIEnv = env;
-    mJNIClass = cls;
-    midSendCommand = mJNIEnv->GetStaticMethodID(mJNIClass, "jgeSendCommand", "(Ljava/lang/String;)V");
-}
-
-void JGE::setJVM(JavaVM* vm) { mJavaVM = vm; }
-
-void JGE::sendJNICommand(string command) {
-    if (midSendCommand) {
-        mJNIEnv->CallStaticVoidMethod(mJNIClass, midSendCommand, mJNIEnv->NewStringUTF(command.c_str()));
-    }
-}
-#endif
+void JGE::SendCommand(std::string command, float& x, float& y, float& width, float& height) {}
 
 std::queue<pair<pair<LocalKeySym, JButton>, bool> > JGE::keyBuffer;
 std::multimap<LocalKeySym, JButton> JGE::keyBinds;

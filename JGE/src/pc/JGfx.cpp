@@ -1438,14 +1438,14 @@ void JRenderer::ScreenShot(const char* filename __attribute__((unused))) {}
 JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureFormat __attribute__((unused))) {
     JTexture* tex = NULL;
     int rawsize = 0;
-    BYTE* rawdata = NULL;
+    wge::byte_t* rawdata = NULL;
     JFileSystem* fileSystem = JFileSystem::GetInstance();
 
     do {
         if (!fileSystem->OpenFile(filename)) break;
 
         rawsize = fileSystem->GetFileSize();
-        rawdata = new BYTE[rawsize];
+        rawdata = new wge::byte_t[rawsize];
 
         if (!rawdata) {
             fileSystem->CloseFile();
@@ -1591,7 +1591,7 @@ JTexture* JRenderer::CreateTexture(int width, int height, int mode __attribute__
 
     if (tex) {
         int size = width * height * sizeof(PIXEL_TYPE);  // RGBA
-        BYTE* buffer = new BYTE[size];
+        auto* buffer = new wge::byte_t[size];
         if (buffer) {
             tex->mFilter = TEX_FILTER_LINEAR;
             tex->mWidth = width;

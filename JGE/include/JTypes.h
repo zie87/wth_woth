@@ -99,9 +99,7 @@ enum {
     #include <windows.h>
 #endif
 #if defined(LINUX)
-typedef uint8_t byte;
 typedef uint32_t DWORD;
-typedef uint8_t BYTE;
 typedef bool BOOL;
 #endif
 

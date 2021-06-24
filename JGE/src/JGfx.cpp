@@ -38,15 +38,11 @@ extern "C" {
 #include "JRenderer.h"
 #include "JFileSystem.h"
 
+#include <utility>
+
 static unsigned int __attribute__((aligned(16))) list[262144];
 
 extern void SwizzlePlot(u8* out, PIXEL_TYPE color, int i, int j, unsigned int width);
-
-void Swap(float* a, float* b) {
-    float n = *a;
-    *a = *b;
-    *b = n;
-}
 
 JQuad::JQuad(JTexture* tex, float x, float y, float width, float height)
     : mTex(tex), mX(x), mY(y), mWidth(width), mHeight(height) {
@@ -542,8 +538,8 @@ void JRenderer::RenderQuad(JQuad* quad, float xo, float yo, float angle, float x
             vertices[3].z = 0.0f;
 
             if (quad->mVFlipped) {
-                Swap(&vertices[0].v, &vertices[2].v);
-                Swap(&vertices[1].v, &vertices[3].v);
+                std::swap(vertices[0].v, vertices[2].v);
+                std::swap(vertices[1].v, vertices[3].v);
             }
 
             if (angle != 0.0f) {
@@ -603,8 +599,8 @@ void JRenderer::RenderQuad(JQuad* quad, float xo, float yo, float angle, float x
             vertices[3].z = 0.0f;
 
             if (quad->mVFlipped) {
-                Swap(&vertices[0].v, &vertices[2].v);
-                Swap(&vertices[1].v, &vertices[3].v);
+                std::swap(vertices[0].v, vertices[2].v);
+                std::swap(vertices[1].v, vertices[3].v);
             }
 
             if (angle != 0.0f) {
@@ -776,7 +772,7 @@ static void PNGCustomWarningFn(png_structp png_ptr, png_const_charp warning_msg)
 static void PNGCustomReadDataFn(png_structp png_ptr, png_bytep data, png_size_t length) {
     png_voidp io_ptr = png_get_io_ptr(png_ptr);
     if (io_ptr == nullptr) return;  // add custom error handling here
-    
+
     auto* fileSystem = (JFileSystem*)io_ptr;
 
     const auto check = fileSystem->ReadFile(data, length);

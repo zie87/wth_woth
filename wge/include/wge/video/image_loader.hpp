@@ -26,14 +26,14 @@ struct texture_data {
 
 struct image_loader {
     static const int number_of_channels;
-    static texture_data load_image(const wge::byte_t* const buffer, wge::size_t buffer_size);
-    //static texture_data load_image(std::istream& stream);
+ 
+    static texture_data load_image(std::istream& stream) noexcept;
+    static texture_data load_png(std::istream& stream) noexcept;
+    static texture_data load_jpeg(std::istream& stream) noexcept;
 
-    static texture_data load_png(const wge::byte_t* const buffer, wge::size_t buffer_size);
-    static texture_data load_jpeg(const wge::byte_t* const buffer, wge::size_t buffer_size);
-private:
-    static wge::byte_t* convert_pixel_buffer(const wge::byte_t* const buffer, const int width, const int height,
-                                             const int channels, int& new_width, int& new_height);
+    static texture_data load_image(const wge::byte_t* const buffer, wge::size_t buffer_size) noexcept;
+    static texture_data load_png(const wge::byte_t* const buffer, wge::size_t buffer_size) noexcept;
+    static texture_data load_jpeg(const wge::byte_t* const buffer, wge::size_t buffer_size) noexcept;
 };
 }  // namespace video
 }  // namespace wge

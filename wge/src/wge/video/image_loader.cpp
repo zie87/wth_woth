@@ -81,43 +81,28 @@ texture_data::texture_data(wge::size_t w, wge::size_t h, wge::size_t tw, wge::si
                            wge::size_t channels) noexcept
     : width(w), height(h), texture_width(tw), texture_height(th), pixels(buf), channels(channels) {}
 
-namespace {
-static int stbi_cb_read(void* user, char* data, int size) {
-    auto* fs = reinterpret_cast<std::istream*>(user);
-    fs->read(data, size);
-    return fs->gcount();
+texture_data image_loader::load_image(std::istream& stream) noexcept {
+    const auto pos = stream.tellg();
+
+    constexpr std::size_t min_check_size = 16U;
+    wge::byte_t check_buf[min_check_size];
+
+    stream.get(reinterpret_cast<char*>(check_buf), min_check_size);
+    const auto img_type = ::get_image_type(check_buf, min_check_size);
+    stream.seekg(pos);
+
+    if (img_type == image_types::jpg) {
+        return load_jpeg(stream);
+    }
+
+    if (img_type == image_types::png) {
+        return load_png(stream);
+    }
+
+    return {};
 }
 
-static void stbi_cb_skip(void* user, int n) {
-    auto* fs = reinterpret_cast<std::istream*>(user);
-    fs->seekg(n, std::ios_base::cur);
-}
-
-static int stbi_cb_eof(void* user) {
-    auto* fs = reinterpret_cast<std::istream*>(user);
-    return fs->eof() ? 1 : 0;
-}
-}  // namespace
-
-//texture_data image_loader::load_image(std::istream& stream) {
-//    int width = 0;
-//    int height = 0;
-//    int channels = 0;
-//
-//    stbi_io_callbacks cb = {stbi_cb_read, stbi_cb_skip, stbi_cb_eof};
-//
-//    auto* pixels = stbi_load_from_callbacks(&cb, &stream, &width, &height, &channels, 0);
-//
-//    int new_width = 0;
-//    int new_height = 0;
-//    auto* texture_buffer = convert_pixel_buffer(pixels, width, height, channels, new_width, new_height);
-//
-//    stbi_image_free(pixels);
-//
-//    return texture_data(width, height, new_width, new_height, texture_buffer, number_of_channels);
-//}
-
-texture_data image_loader::load_image(const wge::byte_t* const buffer, wge::size_t buffer_size) {
+texture_data image_loader::load_image(const wge::byte_t* const buffer, wge::size_t buffer_size) noexcept {
     const auto img_type = ::get_image_type(buffer, buffer_size);
     if (img_type == image_types::jpg) {
         return load_jpeg(buffer, buffer_size);
@@ -135,6 +120,27 @@ texture_data image_loader::load_image(const wge::byte_t* const buffer, wge::size
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <algorithm>
+
+namespace {
+struct stream_wrapper {
+    stream_wrapper(const wge::byte_t* buf, wge::size_t size) noexcept : length(size), buffer(buf) {}
+
+    wge::size_t read(wge::byte_t* in_buf, wge::size_t size) noexcept {
+        size = std::min(size, (length - offset));
+        std::copy_n(buffer + offset, size, in_buf);
+        offset += size;
+        return size;
+    }
+
+private:
+    wge::size_t offset = 0U;
+    wge::size_t length = 0U;
+    const wge::byte_t* buffer = nullptr;
+};
+}  // namespace
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -161,16 +167,9 @@ static void jpg_skip_input_data(j_decompress_ptr cinfo, long num_bytes) {
     ////		ri.Con_Printf(PRINT_ALL, "Premature end of JPEG data\n");
 }
 
-texture_data image_loader::load_jpeg(const wge::byte_t* const buffer, wge::size_t buffer_size) {
-    struct jpeg_decompress_struct cinfo;
-    struct jpeg_error_mgr jerr;
-    wge::byte_t *p, *q;
-    int i;
+namespace {
 
-    // Initialize libJpeg Object
-    cinfo.err = jpeg_std_error(&jerr);
-    jpeg_create_decompress(&cinfo);
-
+void fill_jpeg_info(jpeg_decompress_struct& cinfo, const wge::byte_t* const buffer, wge::size_t buffer_size) noexcept {
     cinfo.src = (struct jpeg_source_mgr*)(*cinfo.mem->alloc_small)((j_common_ptr)&cinfo, JPOOL_PERMANENT,
                                                                    sizeof(struct jpeg_source_mgr));
     cinfo.src->init_source = jpg_null;
@@ -180,6 +179,20 @@ texture_data image_loader::load_jpeg(const wge::byte_t* const buffer, wge::size_
     cinfo.src->term_source = jpg_null;
     cinfo.src->bytes_in_buffer = buffer_size;
     cinfo.src->next_input_byte = buffer;
+}
+}  // namespace
+
+texture_data image_loader::load_jpeg(const wge::byte_t* const buffer, wge::size_t buffer_size) noexcept {
+    struct jpeg_decompress_struct cinfo;
+    struct jpeg_error_mgr jerr;
+    wge::byte_t *p, *q;
+    int i;
+
+    // Initialize libJpeg Object
+    cinfo.err = jpeg_std_error(&jerr);
+    jpeg_create_decompress(&cinfo);
+
+    fill_jpeg_info(cinfo, buffer, buffer_size);
 
     // Process JPEG header
     jpeg_read_header(&cinfo, true);
@@ -234,6 +247,7 @@ texture_data image_loader::load_jpeg(const wge::byte_t* const buffer, wge::size_
 
     return data;
 }
+texture_data image_loader::load_jpeg(std::istream& stream) noexcept { return {}; }
 
 }  // namespace video
 }  // namespace wge
@@ -253,7 +267,6 @@ texture_data image_loader::load_jpeg(const wge::byte_t* const buffer, wge::size_
 #include <wge/memory.hpp>
 #include <wge/math/utils.hpp>
 
-#include <algorithm>
 
 namespace wge {
 namespace video {
@@ -261,55 +274,12 @@ static void PNGCustomWarningFn([[maybe_unused]] png_structp png_ptr, [[maybe_unu
     // ignore PNG warnings
 }
 
-struct stream_wrapper {
-    stream_wrapper(const wge::byte_t* buf, wge::size_t size) noexcept : length(size), buffer(buf) {}
+namespace {
 
-    wge::size_t read(wge::byte_t* in_buf, wge::size_t size) noexcept {
-        size = std::min(size, (length - offset));
-        std::copy_n(buffer + offset, size, in_buf);
-        offset += size;
-        return size;
-    }
-
-private:
-    wge::size_t offset = 0U;
-    wge::size_t length = 0U;
-    const wge::byte_t* buffer = nullptr;
-};
-
-static void png_read_from_stream(png_structp png_ptr, png_bytep outBytes, png_size_t byteCountToRead) {
-    png_voidp io_ptr = png_get_io_ptr(png_ptr);
-    if (io_ptr == nullptr) return;  // add custom error handling here
-
-    // using pulsar::InputStream
-    // -> replace with your own data source interface
-    auto& input_stream = *(stream_wrapper*)io_ptr;
-    const auto bytesRead = input_stream.read(outBytes, byteCountToRead);
-
-    if ((png_size_t)bytesRead != byteCountToRead) {
-        png_error(png_ptr, "Read Error!");
-    }
-}
-
-texture_data image_loader::load_png(const wge::byte_t* const buffer, wge::size_t buffer_size) {
+texture_data read_png_data(png_structp& png_ptr, png_infop& info_ptr) noexcept {
     unsigned int sig_read = 0;
     png_uint_32 width, height;
     int bit_depth, color_type, interlace_type, x, y;
-
-    png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-    if (png_ptr == NULL) {
-        return {};
-    }
-
-    png_set_error_fn(png_ptr, nullptr, nullptr, PNGCustomWarningFn);
-    png_infop info_ptr = png_create_info_struct(png_ptr);
-    if (info_ptr == NULL) {
-        return {};
-    }
-    png_init_io(png_ptr, NULL);
-
-    stream_wrapper input_stream(buffer, buffer_size);
-    png_set_read_fn(png_ptr, &input_stream, png_read_from_stream);
 
     png_set_sig_bytes(png_ptr, sig_read);
     png_read_info(png_ptr, info_ptr);
@@ -356,11 +326,82 @@ texture_data image_loader::load_png(const wge::byte_t* const buffer, wge::size_t
 
     free(line);
 
+    return texture_data{width, height, tw, th, rgba_data.release(), 4};
+}
+
+}  // namespace
+
+static void read_png_from_buffer(png_structp png_ptr, png_bytep outBytes, png_size_t byteCountToRead) {
+    png_voidp io_ptr = png_get_io_ptr(png_ptr);
+    if (io_ptr == nullptr) return;  // add custom error handling here
+
+    auto& input_stream = *(stream_wrapper*)io_ptr;
+    const auto bytesRead = input_stream.read(outBytes, byteCountToRead);
+
+    if ((png_size_t)bytesRead != byteCountToRead) {
+        png_error(png_ptr, "Read Error!");
+    }
+}
+
+static void read_png_from_stream(png_structp png_ptr, png_bytep outBytes, png_size_t byteCountToRead) {
+    png_voidp io_ptr = png_get_io_ptr(png_ptr);
+    if (io_ptr == nullptr) return;  // add custom error handling here
+
+    auto& input_stream = *(std::istream*)io_ptr;
+    input_stream.get(reinterpret_cast<char*>(outBytes), byteCountToRead);
+
+    const auto bytesRead = input_stream.gcount();
+    if ((png_size_t)bytesRead != byteCountToRead) {
+        png_error(png_ptr, "Read Error!");
+    }
+}
+
+texture_data image_loader::load_png(const wge::byte_t* const buffer, wge::size_t buffer_size) noexcept {
+    png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    if (png_ptr == NULL) {
+        return {};
+    }
+
+    png_set_error_fn(png_ptr, nullptr, nullptr, PNGCustomWarningFn);
+    png_infop info_ptr = png_create_info_struct(png_ptr);
+    if (info_ptr == NULL) {
+        return {};
+    }
+    png_init_io(png_ptr, NULL);
+
+    stream_wrapper input_stream(buffer, buffer_size);
+    png_set_read_fn(png_ptr, &input_stream, read_png_from_buffer);
+
+    auto texture_data = read_png_data(png_ptr, info_ptr);
+
     png_read_end(png_ptr, info_ptr);
     png_destroy_read_struct(&png_ptr, &info_ptr, nullptr);
 
-    texture_data data{width, height, tw, th, rgba_data.release(), 4};
-    return data;
+    return texture_data;
 }
+
+texture_data image_loader::load_png(std::istream& stream) noexcept {
+    png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    if (png_ptr == NULL) {
+        return {};
+    }
+
+    png_set_error_fn(png_ptr, nullptr, nullptr, PNGCustomWarningFn);
+    png_infop info_ptr = png_create_info_struct(png_ptr);
+    if (info_ptr == NULL) {
+        return {};
+    }
+    png_init_io(png_ptr, NULL);
+
+    png_set_read_fn(png_ptr, &stream, read_png_from_stream);
+
+    auto texture_data = read_png_data(png_ptr, info_ptr);
+
+    png_read_end(png_ptr, info_ptr);
+    png_destroy_read_struct(&png_ptr, &info_ptr, nullptr);
+
+    return texture_data;
+}
+
 }  // namespace video
 }  // namespace wge

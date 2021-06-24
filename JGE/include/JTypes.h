@@ -294,9 +294,7 @@ struct JColor {
 };
 
 enum { TEX_TYPE_NONE, TEX_TYPE_USE_VRAM, TEX_TYPE_MIPMAP, TEX_TYPE_NORMAL, TEX_TYPE_SKYBOX };
-
 enum { MODE_UNKNOWN, MODE_2D, MODE_3D };
-
 enum { TEX_FILTER_NONE, TEX_FILTER_LINEAR, TEX_FILTER_NEAREST };
 
 //------------------------------------------------------------------------------------------------

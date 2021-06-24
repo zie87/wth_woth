@@ -191,7 +191,7 @@ namespace video {
 
 static void jpg_null([[maybe_unused]] j_decompress_ptr cinfo) {}
 
-static int jpg_fill_input_buffer([[maybe_unused]] j_decompress_ptr cinfo) {
+static boolean jpg_fill_input_buffer([[maybe_unused]] j_decompress_ptr cinfo) {
     ////    ri.Con_Printf(PRINT_ALL, "Premature end of JPEG data\n");
     return 1;
 }

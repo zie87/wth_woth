@@ -22,7 +22,7 @@ else()
     target_sources(wge PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/time_default.cpp)
 endif()
 
-target_compile_features(wge PUBLIC cxx_std_14)
+target_compile_features(wge PUBLIC cxx_std_17)
 target_include_directories(wge PUBLIC ${WOTH_WGE_ROOT_DIR}/include)
 target_link_libraries(wge PUBLIC JPEG::JPEG PNG::PNG WotH::options)
 

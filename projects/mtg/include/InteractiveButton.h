@@ -43,7 +43,7 @@ public:
     virtual void setImage(const JQuadPtr imagePtr);
     virtual void checkUserClick();
     virtual void Render();
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
 };
 
 #endif

@@ -4,7 +4,10 @@
 #include <JLBFont.h>
 #include <JRenderer.h>
 #include <JSprite.h>
+
 #include "config.h"
+
+#include <vector>
 
 namespace Fonts {
 enum Font_Type { MAIN_FONT = 0, MENU_FONT = 1, OPTION_FONT = 1, MAGIC_FONT = 2, SMALLFACE_FONT = 3 };
@@ -46,7 +49,7 @@ public:
     // Set Base for the character set to use.
     virtual void SetBase(int base) = 0;
     // Format text.
-    virtual void FormatText(string& s, vector<string>& output) = 0;
+    virtual void FormatText(std::string& s, std::vector<std::string>& output) = 0;
     WFont(int inID) : mFontID(inID){};
     virtual ~WFont(){};
 };
@@ -70,7 +73,7 @@ public:
     float GetStringWidth(const char* s) const { return it->GetStringWidth(s); };
     void SetTracking(float tracking) { it->SetTracking(tracking); };
     void SetBase(int base) { it->SetBase(base); };
-    void FormatText(string& s, vector<string>& output);
+    void FormatText(std::string& s, std::vector<std::string>& output);
 
 private:
     JLBFont* it;
@@ -91,7 +94,7 @@ public:
     virtual float GetStringWidth(const char* s) const;
     void SetTracking(float tracking){};
     void SetBase(int base){};
-    void FormatText(string& s, vector<string>& output){};
+    void FormatText(std::string& s, std::vector<std::string>& output){};
 
     virtual void DrawString(const char* s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0,
                             float width = 0);
@@ -136,7 +139,7 @@ public:
     void DrawString(const char* s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0, float width = 0);
     int GetCode(const u8* ch, int* charLength) const;
     int GetMana(const u8* ch) const;
-    void FormatText(string& s, vector<string>& output);
+    void FormatText(std::string& s, std::vector<std::string>& output);
 };
 
 class WUFont : public WFBFont {
@@ -146,7 +149,7 @@ public:
 
     int GetCode(const u8* ch, int* charLength) const;
     int GetMana(const u8* ch) const;
-    void FormatText(string& s, vector<string>& output);
+    void FormatText(std::string& s, std::vector<std::string>& output);
 };
 
 #endif

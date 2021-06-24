@@ -3,7 +3,6 @@
 
 #include <queue>
 #include <string>
-using namespace std;
 
 class JSocket {
 public:

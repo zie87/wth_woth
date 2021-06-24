@@ -5,25 +5,25 @@ using std::string;
 #include "MTGDefinitions.h"
 
 char Constants::MTGColorChars[] = {'x', 'g', 'u', 'r', 'b', 'w', 'l'};
-vector<const char*> Constants::MTGColorStrings;
+std::vector<const char*> Constants::MTGColorStrings;
 
-const string Constants::kManaColorless = "colorless";
-const string Constants::kManaGreen = "green";
-const string Constants::kManaBlue = "blue";
-const string Constants::kManaRed = "red";
-const string Constants::kManaBlack = "black";
-const string Constants::kManaWhite = "white";
+const std::string Constants::kManaColorless = "colorless";
+const std::string Constants::kManaGreen = "green";
+const std::string Constants::kManaBlue = "blue";
+const std::string Constants::kManaRed = "red";
+const std::string Constants::kManaBlack = "black";
+const std::string Constants::kManaWhite = "white";
 
 int Constants::_r[7] = {75, 20, 20, 200, 50, 255, 128};
 int Constants::_g[7] = {30, 140, 30, 15, 50, 255, 128};
 int Constants::_b[7] = {20, 0, 140, 15, 50, 255, 128};
 
-const string Constants::kAlternativeKeyword = "alternative";
-const string Constants::kBuyBackKeyword = "buyback";
-const string Constants::kFlashBackKeyword = "flashback";
-const string Constants::kRetraceKeyword = "retrace";
-const string Constants::kKickerKeyword = "kicker";
-const string Constants::kMorphKeyword = "facedown";
+const std::string Constants::kAlternativeKeyword = "alternative";
+const std::string Constants::kBuyBackKeyword = "buyback";
+const std::string Constants::kFlashBackKeyword = "flashback";
+const std::string Constants::kRetraceKeyword = "retrace";
+const std::string Constants::kKickerKeyword = "kicker";
+const std::string Constants::kMorphKeyword = "facedown";
 
 int Constants::NB_Colors = 0;  // Store the Max number of colors.
 
@@ -134,7 +134,7 @@ map<string, int> Constants::MTGBasicAbilitiesMap;
 int Constants::GetBasicAbilityIndex(string basicAbllity) {
     if (Constants::MTGBasicAbilitiesMap.size() == 0) {
         for (int idx = 0; idx < Constants::NB_BASIC_ABILITIES; ++idx) {
-            string ability = MTGBasicAbilities[idx];
+            std::string ability = MTGBasicAbilities[idx];
             MTGBasicAbilitiesMap[ability] = idx;
         }
     }

@@ -48,7 +48,7 @@ void PlayRestrictions::addRestriction(PlayRestriction* restriction) {
 }
 
 void PlayRestrictions::removeRestriction(PlayRestriction* restriction) {
-    for (vector<PlayRestriction*>::iterator iter = restrictions.begin(); iter != restrictions.end(); ++iter) {
+    for (auto iter = restrictions.begin(); iter != restrictions.end(); ++iter) {
         if (*iter == restriction) {
             restrictions.erase(iter);
             return;
@@ -59,7 +59,7 @@ void PlayRestrictions::removeRestriction(PlayRestriction* restriction) {
 int PlayRestrictions::canPutIntoZone(MTGCardInstance* card, MTGGameZone* destZone) {
     if (!card) return PlayRestriction::CANT_PLAY;
 
-    for (vector<PlayRestriction*>::iterator iter = restrictions.begin(); iter != restrictions.end(); ++iter) {
+    for (auto iter = restrictions.begin(); iter != restrictions.end(); ++iter) {
         if ((*iter)->canPutIntoZone(card, destZone) == PlayRestriction::CANT_PLAY) return PlayRestriction::CANT_PLAY;
     }
 
@@ -67,7 +67,7 @@ int PlayRestrictions::canPutIntoZone(MTGCardInstance* card, MTGGameZone* destZon
 }
 
 PlayRestrictions::~PlayRestrictions() {
-    for (vector<PlayRestriction*>::iterator iter = restrictions.begin(); iter != restrictions.end(); ++iter) {
+    for (auto iter = restrictions.begin(); iter != restrictions.end(); ++iter) {
         SAFE_DELETE(*iter);
     }
     restrictions.clear();

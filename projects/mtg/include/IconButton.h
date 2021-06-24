@@ -4,6 +4,8 @@
 #include <string>
 #include <JGui.h>
 
+#include <ostream>
+
 using std::string;
 
 class IconButtonsController : public JGuiController, public JGuiListener {
@@ -35,7 +37,7 @@ public:
     void init(IconButtonsController* parent, JQuad* quad, float x, float y, float scale, int fontId, string text,
               float textRelativeX, float textRelativeY, bool hasFocus);
     ~IconButton();
-    ostream& toString(ostream& out) const;
+    std::ostream& toString(std::ostream& out) const;
 
     bool hasFocus();
 

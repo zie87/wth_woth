@@ -17,8 +17,6 @@
 #include <list>
 #include <vector>
 
-using namespace std;
-
 class JParticleEffect;
 class JParticle;
 
@@ -207,7 +205,7 @@ private:
     int mDestBlending;
     int mMaxParticleCount;
 
-    vector<JParticle*> mParticles;
+    std::vector<JParticle*> mParticles;
 };
 
 #endif

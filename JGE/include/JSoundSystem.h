@@ -45,7 +45,6 @@
 #endif
 
 //------------------------------------------------------------------------------------------------
-using namespace std;
 
 #ifdef USE_PHONON
 class JMusic : public QObject {

@@ -66,23 +66,23 @@ public:
     virtual ~WResourceManager() {}
 
     virtual bool IsThreaded() = 0;
-    void PlaySample(const string& fileName) {
+    void PlaySample(const std::string& fileName) {
         JSample* sample = RetrieveSample(fileName);
         if (sample) {
             JSoundSystem::GetInstance()->PlaySample(sample);
         }
     };
     virtual JQuadPtr RetrieveCard(MTGCard* card, int style = RETRIEVE_NORMAL, int submode = CACHE_NORMAL) = 0;
-    virtual JSample* RetrieveSample(const string& filename, int style = RETRIEVE_NORMAL,
+    virtual JSample* RetrieveSample(const std::string& filename, int style = RETRIEVE_NORMAL,
                                     int submode = CACHE_NORMAL) = 0;
-    virtual JTexture* RetrieveTexture(const string& filename, int style = RETRIEVE_NORMAL,
+    virtual JTexture* RetrieveTexture(const std::string& filename, int style = RETRIEVE_NORMAL,
                                       int submode = CACHE_NORMAL) = 0;
-    virtual JQuadPtr RetrieveQuad(const string& filename, float offX = 0.0f, float offY = 0.0f, float width = 0.0f,
-                                  float height = 0.0f, string resname = "", int style = RETRIEVE_NORMAL,
-                                  int submode = CACHE_NORMAL, int id = 0) = 0;
-    virtual JQuadPtr RetrieveTempQuad(const string& filename, int submode = CACHE_NORMAL) = 0;
-    virtual hgeParticleSystemInfo* RetrievePSI(const string& filename, JQuad* texture, int style = RETRIEVE_NORMAL,
-                                               int submode = CACHE_NORMAL) = 0;
+    virtual JQuadPtr RetrieveQuad(const std::string& filename, float offX = 0.0f, float offY = 0.0f,
+                                  float width = 0.0f, float height = 0.0f, std::string resname = "",
+                                  int style = RETRIEVE_NORMAL, int submode = CACHE_NORMAL, int id = 0) = 0;
+    virtual JQuadPtr RetrieveTempQuad(const std::string& filename, int submode = CACHE_NORMAL) = 0;
+    virtual hgeParticleSystemInfo* RetrievePSI(const std::string& filename, JQuad* texture,
+                                               int style = RETRIEVE_NORMAL, int submode = CACHE_NORMAL) = 0;
     virtual int RetrieveError() = 0;
 
     virtual void Release(JTexture* tex) = 0;
@@ -96,25 +96,25 @@ public:
 
     virtual unsigned int nowTime() = 0;
 
-    virtual JQuadPtr GetQuad(const string& quadName) = 0;
+    virtual JQuadPtr GetQuad(const std::string& quadName) = 0;
 
     // Our file redirect system.
-    virtual string graphicsFile(const string& filename) = 0;
-    virtual string avatarFile(const string& filename) = 0;
-    virtual string cardFile(const string& filename) = 0;
-    virtual string musicFile(const string& filename) = 0;
-    virtual string sfxFile(const string& filename) = 0;
-    virtual bool fileOK(const string&) = 0;
-    virtual bool dirOK(const string& dirname) = 0;
+    virtual std::string graphicsFile(const std::string& filename) = 0;
+    virtual std::string avatarFile(const std::string& filename) = 0;
+    virtual std::string cardFile(const std::string& filename) = 0;
+    virtual std::string musicFile(const std::string& filename) = 0;
+    virtual std::string sfxFile(const std::string& filename) = 0;
+    virtual bool fileOK(const std::string&) = 0;
+    virtual bool dirOK(const std::string& dirname) = 0;
 
     // For backwards compatibility with JWResourceManager. Avoid using these, they're not optimal.
-    virtual int CreateTexture(const string& textureName) = 0;
-    virtual JTexture* GetTexture(const string& textureName) = 0;
+    virtual int CreateTexture(const std::string& textureName) = 0;
+    virtual JTexture* GetTexture(const std::string& textureName) = 0;
 
     // Font management functions
     virtual void InitFonts(const std::string& inLang) = 0;
     virtual int ReloadWFonts() = 0;
-    virtual WFont* LoadWFont(const string& inFontname, int inFontHeight, int inFontID) = 0;
+    virtual WFont* LoadWFont(const std::string& inFontname, int inFontHeight, int inFontID) = 0;
     virtual WFont* GetWFont(int id) = 0;
 
     // Wrapped from JSoundSystem. TODO: Privatize.

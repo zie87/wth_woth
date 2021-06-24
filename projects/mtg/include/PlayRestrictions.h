@@ -1,6 +1,8 @@
 #ifndef _PLAY_RESTRICTIONS_H_
 #define _PLAY_RESTRICTIONS_H_
 
+#include <vector>
+
 class TargetChooser;
 class MTGCardInstance;
 class MTGGameZone;
@@ -30,7 +32,7 @@ public:
 
 class PlayRestrictions {
 protected:
-    vector<PlayRestriction*> restrictions;
+    std::vector<PlayRestriction*> restrictions;
 
 public:
     MaxPerTurnRestriction* getMaxPerTurnRestrictionByTargetChooser(TargetChooser* tc);

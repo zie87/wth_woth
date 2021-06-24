@@ -15,8 +15,6 @@
 
 #include "JRenderer.h"
 
-using namespace std;
-
 class JResourceManager;
 class JQuad;
 class JAnimatorFrame;
@@ -212,7 +210,7 @@ public:
 
 private:
     JResourceManager* mResource;
-    vector<JAnimatorFrame*> mFrames;
+    std::vector<JAnimatorFrame*> mFrames;
 
     bool mAnimating;
     bool mActive;
@@ -291,7 +289,7 @@ private:
     float mTimer;
     float mFrameTime;
     JAnimator* mAnimator;
-    vector<JAnimatorObject*> mObjects;
+    std::vector<JAnimatorObject*> mObjects;
 };
 
 //////////////////////////////////////////////////////////////////////////

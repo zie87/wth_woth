@@ -146,7 +146,7 @@ float SimpleButton::GetEnlargedWidth() {
     return result;
 }
 
-ostream& SimpleButton::toString(ostream& out) const {
+std::ostream& SimpleButton::toString(std::ostream& out) const {
     return out << "SimpleButton ::: mHasFocus : " << hasFocus() << " ; parent : " << getParent()
                << " ; mText : " << getText() << " ; mScale : " << getScale()
                << " ; mTargetScale : " << getTargetScale() << " ; mX,mY : " << getX() << "," << getY();

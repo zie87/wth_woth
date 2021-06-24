@@ -57,21 +57,21 @@ u8 JGE::GetAnalogY() {
 
 #endif
 
-static map<JButton, float> holds;
-static map<JButton, float> oldHolds;
+static std::map<JButton, float> holds;
+static std::map<JButton, float> oldHolds;
 #define REPEAT_DELAY 0.5
 #define REPEAT_PERIOD 0.07
 
 static inline bool held(const JButton sym) { return holds.end() != holds.find(sym); }
-static inline pair<pair<LocalKeySym, JButton>, bool> triplet(LocalKeySym k, JButton b, bool h) {
-    return make_pair(make_pair(k, b), h);
+static inline std::pair<std::pair<LocalKeySym, JButton>, bool> triplet(LocalKeySym k, JButton b, bool h) {
+    return std::make_pair(std::make_pair(k, b), h);
 }
-static inline pair<pair<LocalKeySym, JButton>, bool> triplet(pair<LocalKeySym, JButton> p, bool h) {
-    return make_pair(p, h);
+static inline std::pair<std::pair<LocalKeySym, JButton>, bool> triplet(std::pair<LocalKeySym, JButton> p, bool h) {
+    return std::make_pair(p, h);
 }
 
 void JGE::PressKey(const LocalKeySym sym) {
-    const pair<keycodes_it, keycodes_it> rng = keyBinds.equal_range(sym);
+    const std::pair<keycodes_it, keycodes_it> rng = keyBinds.equal_range(sym);
     if (rng.first == rng.second)
         keyBuffer.push(triplet(sym, JGE_BTN_NONE, false));
     else
@@ -89,7 +89,7 @@ void JGE::PressKey(const JButton sym) {
     keyBuffer.push(triplet(LOCAL_KEY_NONE, sym, held(sym)));
 }
 void JGE::HoldKey(const LocalKeySym sym) {
-    const pair<keycodes_it, keycodes_it> rng = keyBinds.equal_range(sym);
+    const std::pair<keycodes_it, keycodes_it> rng = keyBinds.equal_range(sym);
     if (rng.first == rng.second)
         keyBuffer.push(triplet(sym, JGE_BTN_NONE, false));
     else
@@ -105,7 +105,7 @@ void JGE::HoldKey(const LocalKeySym sym) {
         }
 }
 void JGE::HoldKey_NoRepeat(const LocalKeySym sym) {
-    const pair<keycodes_it, keycodes_it> rng = keyBinds.equal_range(sym);
+    const std::pair<keycodes_it, keycodes_it> rng = keyBinds.equal_range(sym);
     if (rng.first == rng.second)
         keyBuffer.push(triplet(sym, JGE_BTN_NONE, false));
     else
@@ -138,16 +138,16 @@ void JGE::HoldKey_NoRepeat(const JButton sym) {
     if (!held(sym)) holds[sym] = std::numeric_limits<float>::quiet_NaN();
 }
 void JGE::ReleaseKey(const LocalKeySym sym) {
-    set<JButton> s;
-    const pair<keycodes_it, keycodes_it> rng = keyBinds.equal_range(sym);
+    std::set<JButton> s;
+    const std::pair<keycodes_it, keycodes_it> rng = keyBinds.equal_range(sym);
     for (keycodes_it it = rng.first; it != rng.second; ++it) {
         s.insert(it->second);
         holds.erase(it->second);
     }
 
-    queue<pair<pair<LocalKeySym, JButton>, bool> > r;
+    std::queue<std::pair<std::pair<LocalKeySym, JButton>, bool> > r;
     while (!keyBuffer.empty()) {
-        pair<pair<LocalKeySym, JButton>, bool> q = keyBuffer.front();
+        std::pair<std::pair<LocalKeySym, JButton>, bool> q = keyBuffer.front();
         keyBuffer.pop();
         if ((!q.second) || (s.end() == s.find(q.first.second))) r.push(q);
     }
@@ -155,16 +155,16 @@ void JGE::ReleaseKey(const LocalKeySym sym) {
 }
 void JGE::ReleaseKey(const JButton sym) {
     holds.erase(sym);
-    queue<pair<pair<LocalKeySym, JButton>, bool> > r;
+    std::queue<std::pair<std::pair<LocalKeySym, JButton>, bool> > r;
     while (!keyBuffer.empty()) {
-        pair<pair<LocalKeySym, JButton>, bool> q = keyBuffer.front();
+        std::pair<std::pair<LocalKeySym, JButton>, bool> q = keyBuffer.front();
         keyBuffer.pop();
         if ((!q.second) || (q.first.second != sym)) r.push(q);
     }
     keyBuffer = r;
 }
 void JGE::Update(float dt) {
-    for (map<JButton, float>::iterator it = holds.begin(); it != holds.end(); ++it) {
+    for (auto it = holds.begin(); it != holds.end(); ++it) {
         if (it->second < 0) {
             keyBuffer.push(triplet(LOCAL_KEY_NONE, it->first, true));
             it->second = REPEAT_PERIOD;
@@ -198,7 +198,7 @@ LocalKeySym JGE::ReadLocalKey() {
 }
 
 u32 JGE::BindKey(LocalKeySym sym, JButton button) {
-    keyBinds.insert(make_pair(sym, button));
+    keyBinds.insert(std::make_pair(sym, button));
     return keyBinds.size();
 }
 
@@ -214,7 +214,7 @@ u32 JGE::UnbindKey(LocalKeySym sym, JButton button) {
 }
 
 u32 JGE::UnbindKey(LocalKeySym sym) {
-    pair<keycodes_it, keycodes_it> rng = keyBinds.equal_range(sym);
+    std::pair<keycodes_it, keycodes_it> rng = keyBinds.equal_range(sym);
     keyBinds.erase(rng.first, rng.second);
     return keyBinds.size();
 }
@@ -260,7 +260,7 @@ JGE::JGE() {
 #if defined(WIN32) || defined(LINUX)
     strcpy(mDebuggingMsg, "");
     mCurrentMusic = NULL;
-#endif 
+#endif
     Init();
 }
 
@@ -396,7 +396,7 @@ void JGE::Destroy() {
 
 void JGE::SetARGV(int argc, char* argv[]) {
     for (int i = 0; i < argc; ++i) {
-        string s = argv[i];
+        std::string s = argv[i];
         mArgv.push_back(s);
     }
 }
@@ -451,12 +451,12 @@ void JGE::Scroll(int inXVelocity, int inYVelocity) {
     }
 }
 
-void JGE::SendCommand(string command) {}
+void JGE::SendCommand(std::string command) {}
 
 void JGE::SendCommand(std::string command, std::string parameter) {}
 
 // this controls commands meant to modify/interact with UI
 void JGE::SendCommand(std::string command, float& x, float& y, float& width, float& height) {}
 
-std::queue<pair<pair<LocalKeySym, JButton>, bool> > JGE::keyBuffer;
+std::queue<std::pair<std::pair<LocalKeySym, JButton>, bool> > JGE::keyBuffer;
 std::multimap<LocalKeySym, JButton> JGE::keyBinds;

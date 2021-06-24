@@ -7,6 +7,8 @@
 #include "SimpleButton.h"
 #include "SimpleMenu.h"
 
+#include <ostream>
+
 using std::string;
 
 #define SCALE_SELECTED 1.2f
@@ -14,7 +16,7 @@ using std::string;
 
 class SimpleMenuItem : public SimpleButton {
 private:
-    string mDescription;
+    std::string mDescription;
 
 public:
     SimpleMenuItem(int id);
@@ -23,8 +25,8 @@ public:
 
     virtual void Entering();
     virtual void setDescription(const string& desc);
-    virtual string getDescription() const;
-    virtual ostream& toString(ostream& out) const;
+    virtual std::string getDescription() const;
+    virtual std::ostream& toString(std::ostream& out) const;
 };
 
 #endif

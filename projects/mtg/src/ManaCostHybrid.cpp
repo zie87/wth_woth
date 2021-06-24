@@ -42,12 +42,11 @@ int ManaCostHybrid::hasColor(int color) {
 }
 
 string ManaCostHybrid::toString() {
-    ostringstream oss;
+    std::ostringstream oss;
     if (color1 != 0 && color2 != 0)
         oss << "{" << Constants::MTGColorChars[color1] << "/" << Constants::MTGColorChars[color2] << "}";
     return oss.str();
 }
 
-ostream& operator<<(ostream& out, ManaCostHybrid& r) { return out << r.toString(); }
-
-ostream& operator<<(ostream& out, ManaCostHybrid* r) { return out << r->toString(); }
+std::ostream& operator<<(std::ostream& out, ManaCostHybrid& r) { return out << r.toString(); }
+std::ostream& operator<<(std::ostream& out, ManaCostHybrid* r) { return out << r->toString(); }

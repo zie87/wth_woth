@@ -14,8 +14,6 @@
 #include "JRenderer.h"
 #include <vector>
 
-using namespace std;
-
 #define MID_POINT_THRESHOLD 1.0f
 
 //////////////////////////////////////////////////////////////////////////
@@ -155,8 +153,8 @@ public:
                 PIXEL_TYPE controlColor = ARGB(192, 0, 192, 0));
 
 private:
-    vector<Point> mMidPoints;
-    vector<Point> mPixels;
+    std::vector<Point> mMidPoints;
+    std::vector<Point> mPixels;
     int mCount;
 };
 

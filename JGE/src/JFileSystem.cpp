@@ -17,7 +17,6 @@ User folder is the only one that is really needed to guarantee both read and wri
 necessary but provides a nice way to distinguish The content that users should not be touching.
 */
 
-
 #ifdef WIN32
     #pragma warning(disable : 4786)
     #include <direct.h>
@@ -41,8 +40,8 @@ JZipCache::~JZipCache() { dir.clear(); }
 
 void JFileSystem::Pause() { zfs::filesystem::closeTempFiles(); }
 
-void JFileSystem::preloadZip(const string& filename) {
-    map<string, JZipCache*>::iterator it = mZipCache.find(filename);
+void JFileSystem::preloadZip(const std::string& filename) {
+    auto it = mZipCache.find(filename);
     if (it != mZipCache.end()) return;
 
     // random number of files stored in the cache.
@@ -69,7 +68,7 @@ void JFileSystem::preloadZip(const string& filename) {
     }
 }
 
-void JFileSystem::init(const string& userPath, const string& systemPath) {
+void JFileSystem::init(const std::string& userPath, const std::string& systemPath) {
     Destroy();
     mInstance = new JFileSystem(userPath, systemPath);
 }
@@ -87,11 +86,11 @@ JFileSystem* JFileSystem::GetInstance() {
 
 // Tries to set the system and user paths.
 // On some OSes, the parameters get overriden by hardcoded values
-JFileSystem::JFileSystem(const string& _userPath, const string& _systemPath)
+JFileSystem::JFileSystem(const std::string& _userPath, const std::string& _systemPath)
 
 {
-    string systemPath = _systemPath;
-    string userPath = _userPath;
+    std::string systemPath = _systemPath;
+    std::string userPath = _userPath;
 
 #if defined(QT_CONFIG)
     QDir dir(QDir::homePath());
@@ -101,17 +100,17 @@ JFileSystem::JFileSystem(const string& _userPath, const string& _systemPath)
     systemPath = "";
 #else
     // Find the Res.txt file and matching Res folders for backwards compatibility
-    ifstream mfile("Res.txt");
-    string resPath;
+    std::ifstream mfile("Res.txt");
+    std::string resPath;
     if (mfile) {
         bool found = false;
         while (!found && std::getline(mfile, resPath)) {
             if (!resPath.size()) continue;
 
             if (resPath[resPath.size() - 1] == '\r') resPath.erase(resPath.size() - 1);  // Handle DOS files
-            string testfile = resPath;
+            std::string testfile = resPath;
             testfile.append("graphics/simon.dat");
-            ifstream file(testfile.c_str());
+            std::ifstream file(testfile.c_str());
             if (file) {
                 userPath = resPath;
                 systemPath = "";
@@ -125,13 +124,13 @@ JFileSystem::JFileSystem(const string& _userPath, const string& _systemPath)
 
     // Make sure the base paths finish with a '/' or a '\'
     if (!userPath.empty()) {
-        string::iterator c = userPath.end();  // userPath.at(userPath.size()-1);
+        auto c = userPath.end();  // userPath.at(userPath.size()-1);
         c--;
         if ((*c != '/') && (*c != '\\')) userPath += '/';
     }
 
     if (!systemPath.empty()) {
-        string::iterator c = systemPath.end();  // systemPath.at(systemPath.size()-1);
+        std::string::iterator c = systemPath.end();  // systemPath.at(systemPath.size()-1);
         c--;
         if ((*c != '/') && (*c != '\\')) systemPath += '/';
     }
@@ -160,18 +159,18 @@ void JFileSystem::Destroy() {
     }
 }
 
-bool JFileSystem::DirExists(const string& strDirname) {
+bool JFileSystem::DirExists(const std::string& strDirname) {
     return (mSystemFS && mSystemFS->DirExists(strDirname)) || mUserFS->DirExists(strDirname);
 }
 
-bool JFileSystem::FileExists(const string& strFilename) {
+bool JFileSystem::FileExists(const std::string& strFilename) {
     if (strFilename.length() < 1) return false;
 
     return (mSystemFS && mSystemFS->FileExists(strFilename)) || mUserFS->FileExists(strFilename);
 }
 
-bool JFileSystem::MakeDir(const string& dir) {
-    string fullDir = mUserFSPath + dir;
+bool JFileSystem::MakeDir(const std::string& dir) {
+    std::string fullDir = mUserFSPath + dir;
     MAKEDIR(fullDir.c_str());
     return true;
 }
@@ -186,15 +185,14 @@ JFileSystem::~JFileSystem() {
 void JFileSystem::clearZipCache() {
     DetachZipFile();
 
-    map<string, JZipCache*>::iterator it;
-    for (it = mZipCache.begin(); it != mZipCache.end(); ++it) {
+    for (auto it = mZipCache.begin(); it != mZipCache.end(); ++it) {
         delete (it->second);
     }
     mZipCache.clear();
     mZipCachedElementsCount = 0;
 }
 
-bool JFileSystem::AttachZipFile(const string& zipfile, char* password /* = NULL */) {
+bool JFileSystem::AttachZipFile(const std::string& zipfile, char* password /* = NULL */) {
     if (mZipAvailable && mZipFile.is_open()) {
         if (mZipFileName != zipfile)
             DetachZipFile();  // close the previous zip file
@@ -228,7 +226,7 @@ void JFileSystem::DetachZipFile() {
     mZipAvailable = false;
 }
 
-bool JFileSystem::openForRead(zfs::izfstream& File, const string& FilePath) {
+bool JFileSystem::openForRead(zfs::izfstream& File, const std::string& FilePath) {
     File.open(FilePath.c_str(), mUserFS);
     if (File) return true;
 
@@ -240,7 +238,7 @@ bool JFileSystem::openForRead(zfs::izfstream& File, const string& FilePath) {
     return false;
 }
 
-bool JFileSystem::readIntoString(const string& FilePath, string& target) {
+bool JFileSystem::readIntoString(const std::string& FilePath, std::string& target) {
     zfs::izfstream file;
     if (!openForRead(file, FilePath)) return false;
 
@@ -248,7 +246,7 @@ bool JFileSystem::readIntoString(const string& FilePath, string& target) {
 
     try {
         target.resize((std::string::size_type)fileSize);
-    } catch (bad_alloc&) {
+    } catch (std::bad_alloc&) {
         return false;
     }
 
@@ -258,8 +256,8 @@ bool JFileSystem::readIntoString(const string& FilePath, string& target) {
     return true;
 }
 
-bool JFileSystem::openForWrite(ofstream& File, const string& FilePath, ios_base::openmode mode) {
-    string filename = mUserFSPath;
+bool JFileSystem::openForWrite(std::ofstream& File, const std::string& FilePath, std::ios_base::openmode mode) {
+    std::string filename = mUserFSPath;
     filename.append(FilePath);
     File.open(filename.c_str(), mode);
 
@@ -269,20 +267,20 @@ bool JFileSystem::openForWrite(ofstream& File, const string& FilePath, ios_base:
     return false;
 }
 
-bool JFileSystem::OpenFile(const string& filename) {
+bool JFileSystem::OpenFile(const std::string& filename) {
     mCurrentFileInZip = NULL;
 
     if (!mZipAvailable || !mZipFile) return openForRead(mFile, filename);
 
     preloadZip(mZipFileName);
-    map<string, JZipCache*>::iterator it = mZipCache.find(mZipFileName);
+    auto it = mZipCache.find(mZipFileName);
     if (it == mZipCache.end()) {
         // DetachZipFile();
         // return OpenFile(filename);
         return openForRead(mFile, filename);
     }
     JZipCache* zc = it->second;
-    map<string, zfs::filesystem::limited_file_info>::iterator it2 = zc->dir.find(filename);
+    std::map<std::string, zfs::filesystem::limited_file_info>::iterator it2 = zc->dir.find(filename);
     if (it2 == zc->dir.end()) {
         /*DetachZipFile();
         return OpenFile(filename); */
@@ -340,9 +338,9 @@ std::vector<std::string>& JFileSystem::scanRealFolder(const std::string& folderN
 std::vector<std::string>& JFileSystem::scanfolder(const std::string& _folderName, std::vector<std::string>& results) {
     if (!_folderName.size()) return results;
 
-    map<string, bool> seen;
+    std::map<std::string, bool> seen;
 
-    string folderName = _folderName;
+    std::string folderName = _folderName;
     if (folderName[folderName.length() - 1] != '/') folderName.append("/");
 
     // we scan zips first, then normal folders.
@@ -371,12 +369,12 @@ std::vector<std::string>& JFileSystem::scanfolder(const std::string& _folderName
     {
         // scan the real files
         std::vector<std::string> userReal;
-        string realFolderName = mUserFSPath;
+        std::string realFolderName = mUserFSPath;
         realFolderName.append(folderName);
         scanRealFolder(realFolderName, userReal);
 
         for (size_t i = 0; i < userReal.size(); ++i) {
-            string asFolder = userReal[i] + "/";
+            std::string asFolder = userReal[i] + "/";
             if (seen.find(asFolder) == seen.end()) seen[userReal[i]] = true;
         }
     }
@@ -385,17 +383,17 @@ std::vector<std::string>& JFileSystem::scanfolder(const std::string& _folderName
     if (mSystemFS) {
         // scan the real files
         std::vector<std::string> systemReal;
-        string realFolderName = mSystemFSPath;
+        std::string realFolderName = mSystemFSPath;
         realFolderName.append(folderName);
         scanRealFolder(realFolderName, systemReal);
 
         for (size_t i = 0; i < systemReal.size(); ++i) {
-            string asFolder = systemReal[i] + "/";
+            std::string asFolder = systemReal[i] + "/";
             if (seen.find(asFolder) == seen.end()) seen[systemReal[i]] = true;
         }
     }
 
-    for (map<string, bool>::iterator it = seen.begin(); it != seen.end(); ++it) {
+    for (auto it = seen.begin(); it != seen.end(); ++it) {
         results.push_back(it->first);
     }
 
@@ -413,9 +411,9 @@ int JFileSystem::GetFileSize() {
     return GetFileSize(mFile);
 }
 
-bool JFileSystem::Rename(string _from, string _to) {
-    string from = mUserFSPath + _from;
-    string to = mUserFSPath + _to;
+bool JFileSystem::Rename(std::string _from, std::string _to) {
+    std::string from = mUserFSPath + _from;
+    std::string to = mUserFSPath + _to;
     std::remove(to.c_str());
     return rename(from.c_str(), to.c_str()) ? true : false;
 }
@@ -429,9 +427,9 @@ int JFileSystem::GetFileSize(zfs::izfstream& file) {
         return file.getUncompSize();
     }
 
-    file.seekg(0, ios::end);
+    file.seekg(0, std::ios::end);
     int length = (int)file.tellg();
-    file.seekg(0, ios::beg);
+    file.seekg(0, std::ios::beg);
     return length;
 }
 
@@ -446,23 +444,23 @@ it to the user Filesystem, assuming that whoever called this needs to access the
 
 As a result, this function isvery inefficient and shouldn't be used in the general case.
 */
-string JFileSystem::GetResourceFile(string filename) {
+std::string JFileSystem::GetResourceFile(std::string filename) {
     zfs::izfstream temp;
     bool result = openForRead(temp, filename);
 
     if (!temp || !result) return "";
 
     if (!temp.Zipped()) {
-        string result = temp.FullFilePath();
+        std::string result = temp.FullFilePath();
         temp.close();
         return result;
     }
 
     // File is inside a zip archive,
     // we copy it to the user FS
-    string destFile = mUserFSPath + filename;
-    ofstream dest;
-    if (openForWrite(dest, filename, ios_base::binary)) {
+    std::string destFile = mUserFSPath + filename;
+    std::ofstream dest;
+    if (openForWrite(dest, filename, std::ios_base::binary)) {
         // allocate memory:
         size_t length = temp.getUncompSize();
         char* buffer = new char[length];

@@ -733,7 +733,7 @@ void GameSettings::keypadShutdown() { SAFE_DELETE(keypad); }
 
 // EnumDefinition
 int EnumDefinition::findIndex(int value) {
-    vector<assoc>::iterator it;
+    std::vector<assoc>::iterator it;
     for (it = values.begin(); it != values.end(); it++) {
         if (it->first == value) return it - values.begin();
     }
@@ -766,7 +766,7 @@ bool GameOptionEnum::read(string input) {
     number = 0;
     std::transform(input.begin(), input.end(), input.begin(), ::tolower);
 
-    vector<EnumDefinition::assoc>::iterator it;
+    std::vector<EnumDefinition::assoc>::iterator it;
     for (it = def->values.begin(); it != def->values.end(); it++) {
         string v = it->second;
         std::transform(v.begin(), v.end(), v.begin(), ::tolower);
@@ -976,11 +976,11 @@ static JButton u32_to_button(u32 b) {
 // MARK:  GameOptionKeyBindings
 
 bool GameOptionKeyBindings::read(string input) {
-    istringstream iss(input);
-    vector<pair<LocalKeySym, JButton> > assoc;
+    std::istringstream iss(input);
+    std::vector<std::pair<LocalKeySym, JButton> > assoc;
 
     while (iss.good()) {
-        stringstream s;
+        std::stringstream s;
         iss.get(*(s.rdbuf()), ',');
         iss.get();
 
@@ -989,7 +989,7 @@ bool GameOptionKeyBindings::read(string input) {
         u32 button;
         s >> local >> sep >> button;
         if (':' != sep) return false;
-        assoc.push_back(make_pair(local, u32_to_button(button)));
+        assoc.push_back(std::make_pair(local, u32_to_button(button)));
     }
 
     if (assoc.empty()) return false;
@@ -997,7 +997,7 @@ bool GameOptionKeyBindings::read(string input) {
     JGE* j = JGE::GetInstance();
 
     j->ClearBindings();
-    for (vector<pair<LocalKeySym, JButton> >::const_iterator it = assoc.begin(); it != assoc.end(); ++it)
+    for (auto it = assoc.begin(); it != assoc.end(); ++it)
         j->BindKey(it->first, it->second);
 
     return true;

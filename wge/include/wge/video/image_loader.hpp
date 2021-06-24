@@ -29,6 +29,7 @@ struct image_loader {
     static texture_data load_image(const wge::byte_t* const buffer, wge::size_t buffer_size);
     static texture_data load_image(std::istream& stream);
 
+    static texture_data load_png(const wge::byte_t* const buffer, wge::size_t buffer_size);
     static texture_data load_jpeg(const wge::byte_t* const buffer, wge::size_t buffer_size);
 private:
     static wge::byte_t* convert_pixel_buffer(const wge::byte_t* const buffer, const int width, const int height,

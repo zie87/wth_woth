@@ -774,11 +774,12 @@ static void PNGCustomWarningFn(png_structp png_ptr, png_const_charp warning_msg)
 }
 
 static void PNGCustomReadDataFn(png_structp png_ptr, png_bytep data, png_size_t length) {
-    png_size_t check;
+    png_voidp io_ptr = png_get_io_ptr(png_ptr);
+    if (io_ptr == nullptr) return;  // add custom error handling here
+    
+    auto* fileSystem = (JFileSystem*)io_ptr;
 
-    JFileSystem* fileSystem = (JFileSystem*)png_ptr->io_ptr;
-
-    check = fileSystem->ReadFile(data, length);
+    const auto check = fileSystem->ReadFile(data, length);
 
     if (check != length) {
         png_error(png_ptr, "Read Error!");
@@ -1116,7 +1117,7 @@ JTexture* JRenderer::LoadTexture(const char* filename, int mode, int textureMode
 ** Helper function for LoadPNG
 */
 void ReadPngLine(png_structp& png_ptr, u32_ptr& line, png_uint_32 width, int pixelformat, u16* p16, u32* p32) {
-    png_read_row(png_ptr, (u8*)line, png_bytep_NULL);
+    png_read_row(png_ptr, (u8*)line, nullptr);
     for (int x = 0; x < (int)width; ++x) {
         u32 color32 = line[x];
         u16 color16;
@@ -1181,7 +1182,7 @@ int JRenderer::LoadPNG(TextureInfo& textureInfo, const char* filename, int mode,
     info_ptr = png_create_info_struct(png_ptr);
     if (info_ptr == NULL) {
         fileSystem->CloseFile();
-        png_destroy_read_struct(&png_ptr, png_infopp_NULL, png_infopp_NULL);
+        png_destroy_read_struct(&png_ptr, nullptr, nullptr);
         return JGE_ERR_PNG;
     }
     png_init_io(png_ptr, NULL);
@@ -1189,17 +1190,17 @@ int JRenderer::LoadPNG(TextureInfo& textureInfo, const char* filename, int mode,
 
     png_set_sig_bytes(png_ptr, sig_read);
     png_read_info(png_ptr, info_ptr);
-    png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, &interlace_type, int_p_NULL, int_p_NULL);
+    png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, &interlace_type, nullptr, nullptr);
     png_set_strip_16(png_ptr);
     png_set_packing(png_ptr);
     if (color_type == PNG_COLOR_TYPE_PALETTE) png_set_palette_to_rgb(png_ptr);
-    if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8) png_set_gray_1_2_4_to_8(png_ptr);
+    if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8) png_set_expand_gray_1_2_4_to_8(png_ptr);
     if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)) png_set_tRNS_to_alpha(png_ptr);
     png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
     line = (u32*)malloc(width * 4);
     if (!line) {
         fileSystem->CloseFile();
-        png_destroy_read_struct(&png_ptr, png_infopp_NULL, png_infopp_NULL);
+        png_destroy_read_struct(&png_ptr, nullptr, nullptr);
         return JGE_ERR_MALLOC_FAILED;
     }
 
@@ -1234,7 +1235,7 @@ int JRenderer::LoadPNG(TextureInfo& textureInfo, const char* filename, int mode,
                        << ", total bytes: " << texWidth * kVerticalBlockSize * sizeof(PIXEL_TYPE);
                 JLOG(stream.str().c_str());
                 fileSystem->CloseFile();
-                png_destroy_read_struct(&png_ptr, png_infopp_NULL, png_infopp_NULL);
+                png_destroy_read_struct(&png_ptr, nullptr, nullptr);
                 return JGE_ERR_MALLOC_FAILED;
             }
         }
@@ -1298,7 +1299,7 @@ int JRenderer::LoadPNG(TextureInfo& textureInfo, const char* filename, int mode,
     // JLOG("Reading end");
     png_read_end(png_ptr, info_ptr);
     // JLOG("Destroying read struct");
-    png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
+    png_destroy_read_struct(&png_ptr, &info_ptr, nullptr);
 
     // JLOG("Closing PNG");
     fileSystem->CloseFile();

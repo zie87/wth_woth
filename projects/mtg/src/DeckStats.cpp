@@ -154,7 +154,7 @@ void DeckStats::save(const std::string& filename) {
             manaColorIndex = stw->getManaColorIndex();
             playerDeckMeta->setColorIndex(manaColorIndex);
         }
-        file << "MANA:" << manaColorIndex << endl;
+        file << "MANA:" << manaColorIndex << std::endl;
         for (it = stats.begin(); it != stats.end(); it++) {
             sprintf(writer, "%s\n", it->first.c_str());
             file << writer;
@@ -162,7 +162,7 @@ void DeckStats::save(const std::string& filename) {
             file << writer;
             sprintf(writer, "%i\n", it->second->victories);
             file << writer;
-            file << "MANA:" << it->second->manaColorIndex << endl;
+            file << "MANA:" << it->second->manaColorIndex << std::endl;
         }
         file.close();
         if (playerDeckMeta) playerDeckMeta->Invalidate();
@@ -268,7 +268,7 @@ void StatsWrapper::initStatistics(string deckstats) {
         int nbDecks = 0;
         char buffer[512];
         char smallDeckName[512];
-        ostringstream oss;
+        std::ostringstream oss;
         oss << "deck" << (nbDecks + 1);
         string bakaDir = "ai/baka/";
         string deckFilename = oss.str();
@@ -291,7 +291,7 @@ void StatsWrapper::initStatistics(string deckstats) {
 }
 
 string StatsWrapper::getManaColorIndex() {
-    ostringstream oss;
+    std::ostringstream oss;
     for (int i = Constants::MTG_COLOR_ARTIFACT; i < Constants::MTG_COLOR_LAND; ++i)
         if (totalCostPerColor[i] != 0)
             oss << "1";

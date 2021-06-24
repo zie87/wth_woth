@@ -40,7 +40,7 @@ public:
     virtual void Entering();
     virtual bool Leaving(JButton key);
     virtual bool ButtonPressed();
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
 
     virtual bool getTopLeft(float& top, float& left) {
         top = mY + mYOffset;

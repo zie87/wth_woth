@@ -243,8 +243,8 @@ void TestSuite::initGame(GameObserver* g) {
 }
 
 int TestSuiteGame::Log(const char* text) {
-    ofstream file;
-    if (JFileSystem::GetInstance()->openForWrite(file, "test/results.html", ios_base::app)) {
+    std::ofstream file;
+    if (JFileSystem::GetInstance()->openForWrite(file, "test/results.html", std::ios_base::app)) {
         file << text;
         file << "\n";
         file.close();
@@ -406,7 +406,7 @@ TestSuite::TestSuite(const char* filename) : TestSuiteGame(0), mRules(0), mProce
     // If more than 1 test, prefecth names to make the suite run faster
     if (nbfiles > 1) MTGCollection()->prefetchCardNameCache();
 
-    ofstream file2;
+    std::ofstream file2;
     if (JFileSystem::GetInstance()->openForWrite(file2, "/test/results.html")) {
         file2 << "<html><head>";
     #ifdef WIN32
@@ -458,7 +458,7 @@ int TestSuite::loadNext() {
     if (!load())
         return loadNext();
     else
-        cout << "Starting test : " << files[currentfile - 1] << endl;
+        std::cout << "Starting test : " << files[currentfile - 1] << std::endl;
     return currentfile;
 }
 
@@ -671,7 +671,7 @@ void TestSuiteGame::initGame() {
         p->forceBestAbilityUse = forceAbility;
         p->life = initState.players[i]->life;
         p->poisonCount = initState.players[i]->poisonCount;
-        stringstream stream;
+        std::stringstream stream;
         initState.players[i]->getRandomGenerator()->saveLoadedRandValues(stream);
         p->getRandomGenerator()->loadRandValues(stream.str());
         MTGGameZone* playerZones[] = {p->game->graveyard, p->game->library, p->game->hand, p->game->inPlay};

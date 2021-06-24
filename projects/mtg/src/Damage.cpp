@@ -191,7 +191,7 @@ void Damage::Render() {
     }
 }
 
-ostream& Damage::toString(ostream& out) const {
+std::ostream& Damage::toString(std::ostream& out) const {
     out << "Damage ::: target : " << target << " ; damage " << damage;
     return out;
 }
@@ -241,15 +241,15 @@ void DamageStack::Render() {
     }
 }
 
-ostream& DamageStack::toString(ostream& out) const {
+std::ostream& DamageStack::toString(std::ostream& out) const {
     return (out << "DamageStack ::: currentState : " << currentState);
 }
 
-ostream& operator<<(ostream& out, const Damageable& p) {
-    out << "life=" << p.life << endl;
-    out << "poisoncount=" << p.poisonCount << endl;
-    out << "damagecount=" << p.damageCount << endl;
-    out << "preventable=" << p.preventable << endl;
+std::ostream& operator<<(std::ostream& out, const Damageable& p) {
+    out << "life=" << p.life << std::endl;
+    out << "poisoncount=" << p.poisonCount << std::endl;
+    out << "damagecount=" << p.damageCount << std::endl;
+    out << "preventable=" << p.preventable << std::endl;
     return out;
 }
 

@@ -89,6 +89,7 @@ public:
     void random_shuffle(Iter first, Iter last) {
         ptrdiff_t i, n;
         n = (last - first);
+        using std::swap;
         for (i = n - 1; i > 0; --i) swap(first[i], first[random() % (i + 1)]);
     };
 };

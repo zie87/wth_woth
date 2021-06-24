@@ -219,7 +219,7 @@ void GuiMana::RenderStatic() {
     if (!totalColors) return;
 
     float x0 = x - 20 * totalColors;
-    x0 = max(40.f, x0);
+    x0 = std::max(40.f, x0);
     float xEnd = x0 + 20 * totalColors;
     r->FillRoundRect(x0, y - 5, static_cast<float>(20 * totalColors + 5), 20, 2, ARGB(128, 0, 0, 0));
 

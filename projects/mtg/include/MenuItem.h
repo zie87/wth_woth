@@ -5,7 +5,6 @@
 #include <JGui.h>
 #include <hge/hgeparticle.h>
 #include <string>
-using namespace std;
 
 #define SCALE_SELECTED 1.2f
 #define SCALE_NORMAL 1.0f
@@ -16,7 +15,7 @@ class MenuItem : public JGuiObject {
 protected:
     bool mHasFocus;
     WFont* mFont;
-    string mText;
+    std::string mText;
     float mX;
     float mY;
     int updatedSinceLastRender;
@@ -29,7 +28,7 @@ protected:
     hgeParticleSystem* mParticleSys;
 
 public:
-    MenuItem(int id, WFont* font, string text, float x, float y, JQuad* _off, JQuad* _on, const char* particle,
+    MenuItem(int id, WFont* font, std::string text, float x, float y, JQuad* _off, JQuad* _on, const char* particle,
              JQuad* particleQuad, bool hasFocus = false);
     ~MenuItem();
     virtual void Render();
@@ -44,7 +43,7 @@ public:
         return true;
     };
 
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
 };
 
 class OtherMenuItem : public MenuItem {
@@ -53,7 +52,7 @@ private:
     float mTimeIndex;
 
 public:
-    OtherMenuItem(int id, WFont* font, string text, float x, float y, JQuad* _off, JQuad* _on, JButton _key,
+    OtherMenuItem(int id, WFont* font, std::string text, float x, float y, JQuad* _off, JQuad* _on, JButton _key,
                   bool hasFocus = false);
     ~OtherMenuItem();
     virtual void Render();

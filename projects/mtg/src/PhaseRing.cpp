@@ -46,7 +46,7 @@ string PhaseRing::phaseIntToStr(int id) {
 /* Creates a New phase ring with the default rules */
 PhaseRing::PhaseRing(GameObserver* observer) : observer(observer) {
     for (int i = 0; i < observer->getPlayersNumber(); i++) {
-        list<Phase*> turnRing;  // this is temporary;
+        std::list<Phase*> turnRing;  // this is temporary;
         if (observer->players[i]->phaseRing.size()) {
             addPhase(NEW Phase(MTG_PHASE_BEFORE_BEGIN, observer->players[i]));
             vector<string> customRing = split(observer->players[i]->phaseRing, ',');
@@ -73,23 +73,21 @@ PhaseRing::PhaseRing(GameObserver* observer) : observer(observer) {
     current = turn.begin();
 }
 
-list<Phase*> PhaseRing::currentTurn() {
-    list<Phase*> temp = observer->gameTurn[observer->currentPlayer->getId()];
-    list<Phase*>::iterator tempiter;
+std::list<Phase*> PhaseRing::currentTurn() {
+    std::list<Phase*> temp = observer->gameTurn[observer->currentPlayer->getId()];
     currentTurnList.clear();
-    for (tempiter = temp.begin(); tempiter != temp.end(); tempiter++) {
+    for (auto tempiter = temp.begin(); tempiter != temp.end(); tempiter++) {
         Phase* currentIter = *tempiter;
         currentTurnList.push_back(currentIter);
     }
     return currentTurnList;
 }
 
-list<Phase*> PhaseRing::nextTurn() {
-    list<Phase*> temp = observer->gameTurn[observer->nextTurnsPlayer()->getId()];
-    list<Phase*>::iterator tempiter;
+std::list<Phase*> PhaseRing::nextTurn() {
+    std::list<Phase*> temp = observer->gameTurn[observer->nextTurnsPlayer()->getId()];
     Phase* currentIter = NULL;
     nextTurnList.clear();
-    for (tempiter = temp.begin(); tempiter != temp.end(); tempiter++) {
+    for (auto tempiter = temp.begin(); tempiter != temp.end(); tempiter++) {
         currentIter = *tempiter;
         nextTurnList.push_back(currentIter);
     }
@@ -97,12 +95,11 @@ list<Phase*> PhaseRing::nextTurn() {
 }
 
 PhaseRing::~PhaseRing() {
-    list<Phase*>::iterator it;
-    for (it = ring.begin(); it != ring.end(); it++) {
+    for (auto it = ring.begin(); it != ring.end(); it++) {
         Phase* currentPhase = *it;
         delete (currentPhase);
     }
-    for (it = extraPhases.begin(); it != extraPhases.end(); it++) {
+    for (auto it = extraPhases.begin(); it != extraPhases.end(); it++) {
         Phase* currentPhase = *it;
         SAFE_DELETE(currentPhase);
     }
@@ -194,16 +191,14 @@ int PhaseRing::addPhase(Phase* phase) {
 }
 
 int PhaseRing::addCombatAfter(Player* player, int after_id, bool withMain) {
-    list<Phase*>::iterator it;
     Phase* beforeLeaving;
-    for (it = turn.begin(); it != turn.end(); it++) {
+    for (auto it = turn.begin(); it != turn.end(); it++) {
         Phase* currentPhase = *it;
         if (currentPhase->id == after_id) {
             beforeLeaving = currentPhase;
             it++;
             Phase* addPhase = NULL;
-            list<Phase*>::iterator findP;
-            for (findP = ring.begin(); findP != ring.end(); findP++) {
+            for (auto findP = ring.begin(); findP != ring.end(); findP++) {
                 addPhase = *findP;
                 Phase* toAdd = NULL;
                 bool add = false;
@@ -266,8 +261,7 @@ int PhaseRing::addCombatAfter(Player* player, int after_id, bool withMain) {
 }
 
 Phase* PhaseRing::getPhase(int _id) {
-    list<Phase*>::iterator it;
-    for (it = turn.begin(); it != turn.end(); it++) {
+    for (auto it = turn.begin(); it != turn.end(); it++) {
         Phase* currentPhase = *it;
         if (currentPhase->id == _id) {
             return currentPhase;
@@ -277,14 +271,12 @@ Phase* PhaseRing::getPhase(int _id) {
 }
 
 int PhaseRing::addPhaseAfter(GamePhase id, Player* player, int after_id) {
-    list<Phase*>::iterator it;
-    for (it = turn.begin(); it != turn.end(); it++) {
+    for (auto it = turn.begin(); it != turn.end(); it++) {
         Phase* currentPhase = *it;
         if (currentPhase->id == after_id) {
             it++;
             Phase* addPhase = NULL;
-            list<Phase*>::iterator findP;
-            for (findP = ring.begin(); findP != ring.end(); findP++) {
+            for (auto findP = ring.begin(); findP != ring.end(); findP++) {
                 addPhase = *findP;
                 if (addPhase->id == id && addPhase->player == player) {
                     Phase* toAdd = NEW Phase(*addPhase);
@@ -300,7 +292,7 @@ int PhaseRing::addPhaseAfter(GamePhase id, Player* player, int after_id) {
 }
 
 int PhaseRing::removePhase(int id) {
-    list<Phase*>::iterator it = turn.begin();
+    auto it = turn.begin();
     while (it != turn.end()) {
         Phase* currentPhase = *it;
         if (currentPhase->id == id) {

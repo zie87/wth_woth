@@ -7,18 +7,16 @@
 #include "MTGDefinitions.h"
 #include <DeckDataWrapper.h>
 
-using namespace std;
-
 class Player;
 class GameObserver;
 
 class DeckStat {
 public:
-    DeckStat(int _nbgames = 0, int _victories = 0, string manaColorIndex = "");
+    DeckStat(int _nbgames = 0, int _victories = 0, std::string manaColorIndex = "");
 
     int nbgames;
     int victories;
-    string manaColorIndex;
+    std::string manaColorIndex;
     int percentVictories();
 };
 
@@ -27,8 +25,8 @@ protected:
     static DeckStats* mInstance;
 
 public:
-    string currentDeck;
-    map<string, map<string, DeckStat*> > masterDeckStats;
+    std::string currentDeck;
+    std::map<std::string, std::map<std::string, DeckStat*> > masterDeckStats;
 
     static DeckStats* GetInstance();
     static void EndInstance();
@@ -37,9 +35,9 @@ public:
     void load(const std::string& filename);
 
     ~DeckStats();
-    int percentVictories(string opponentsDeckFile);
+    int percentVictories(std::string opponentsDeckFile);
     int percentVictories();
-    DeckStat* getDeckStat(string opponentsFile);
+    DeckStat* getDeckStat(std::string opponentsFile);
 
     // returns the total number of games played with this deck
     int nbGames();
@@ -51,10 +49,10 @@ private:
 
 public:
     StatsWrapper(int deckId);
-    StatsWrapper(string filename);
+    StatsWrapper(std::string filename);
     ~StatsWrapper();
 
-    void initStatistics(string deckstats);
+    void initStatistics(std::string deckstats);
 
     // Stats parameters and status
     int mDeckId;
@@ -93,14 +91,14 @@ public:
     int totalCostPerColor[Constants::MTG_NB_COLORS + 1];
     int totalColoredSymbols;
 
-    string getManaColorIndex();
-    void updateStats(string filename, MTGAllCards* collection);
+    std::string getManaColorIndex();
+    void updateStats(std::string filename, MTGAllCards* collection);
     void updateStats(DeckDataWrapper* mtgDeck);
     int countCardsByType(const char* _type, DeckDataWrapper* myDeck);
     float noLuck(int n, int a, int x);
 
-    vector<string> aiDeckNames;
-    vector<DeckStat*> aiDeckStats;
+    std::vector<std::string> aiDeckNames;
+    std::vector<DeckStat*> aiDeckStats;
 };
 
 #endif

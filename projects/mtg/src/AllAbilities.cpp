@@ -3,7 +3,7 @@
 #include "Translate.h"
 
 // display a text animation, this is not a real ability.
-MTGEventText::MTGEventText(GameObserver* observer, int _id, MTGCardInstance* card, string textToShow)
+MTGEventText::MTGEventText(GameObserver* observer, int _id, MTGCardInstance* card, std::string textToShow)
     : MTGAbility(observer, _id, card) {
     textAlpha = 255;
     text = textToShow;
@@ -37,9 +37,9 @@ MTGEventText* MTGEventText::clone() const { return NEW MTGEventText(*this); }
 // Activated Abilities
 
 // Generic Activated Abilities
-GenericActivatedAbility::GenericActivatedAbility(GameObserver* observer, string newName, string castRestriction,
+GenericActivatedAbility::GenericActivatedAbility(GameObserver* observer, std::string newName, std::string castRestriction,
                                                  int _id, MTGCardInstance* card, MTGAbility* a, ManaCost* _cost,
-                                                 string limit, MTGAbility* sideEffects, string usesBeforeSideEffects,
+                                                 std::string limit, MTGAbility* sideEffects, std::string usesBeforeSideEffects,
                                                  int restrictions, MTGGameZone* dest)
     : ActivatedAbility(observer, _id, card, _cost, restrictions, limit, sideEffects, usesBeforeSideEffects,
                        castRestriction),
@@ -132,7 +132,7 @@ AADamagePrevent* AADamagePrevent::clone() const { return NEW AADamagePrevent(*th
 AADamagePrevent::~AADamagePrevent() {}
 
 // AADamager
-AADamager::AADamager(GameObserver* observer, int _id, MTGCardInstance* _source, Targetable* _target, string d,
+AADamager::AADamager(GameObserver* observer, int _id, MTGCardInstance* _source, Targetable* _target, std::string d,
                      ManaCost* _cost, int who)
     : ActivatedAbilityTP(observer, _id, _source, _target, _cost, who), d(d) {
     aType = MTGAbility::DAMAGER;
@@ -191,7 +191,7 @@ const char* AADamager::getMenuText() {
 AADamager* AADamager::clone() const { return NEW AADamager(*this); }
 
 // AADepleter
-AADepleter::AADepleter(GameObserver* observer, int _id, MTGCardInstance* card, Targetable* _target, string nbcardsStr,
+AADepleter::AADepleter(GameObserver* observer, int _id, MTGCardInstance* card, Targetable* _target, std::string nbcardsStr,
                        ManaCost* _cost, int who)
     : ActivatedAbilityTP(observer, _id, card, _target, _cost, who), nbcardsStr(nbcardsStr) {}
 int AADepleter::resolve() {
@@ -213,7 +213,7 @@ const char* AADepleter::getMenuText() { return "Deplete"; }
 AADepleter* AADepleter::clone() const { return NEW AADepleter(*this); }
 
 // take extra turns or skip turns, values in the negitive will make you skip.
-AAModTurn::AAModTurn(GameObserver* observer, int _id, MTGCardInstance* card, Targetable* _target, string nbTurnStr,
+AAModTurn::AAModTurn(GameObserver* observer, int _id, MTGCardInstance* card, Targetable* _target, std::string nbTurnStr,
                      ManaCost* _cost, int who)
     : ActivatedAbilityTP(observer, _id, card, _target, _cost, who), nbTurnStr(nbTurnStr) {}
 int AAModTurn::resolve() {
@@ -314,7 +314,7 @@ AAPhaseOut* AAPhaseOut::clone() const { return NEW AAPhaseOut(*this); }
 
 // Counters
 AACounter::AACounter(GameObserver* observer, int id, MTGCardInstance* source, MTGCardInstance* target,
-                     string counterstring, const char* _name, int power, int toughness, int nb, int maxNb,
+                     std::string counterstring, const char* _name, int power, int toughness, int nb, int maxNb,
                      ManaCost* cost)
     : ActivatedAbility(observer, id, source, cost, 0),
       counterstring(counterstring),
@@ -393,7 +393,7 @@ const char* AACounter::getMenuText() {
     char buffer[128];
 
     if (name.size()) {
-        string s = name;
+        std::string s = name;
         menu.append(s.c_str());
     }
 
@@ -448,7 +448,7 @@ ACounterShroud::~ACounterShroud() {
 
 // shield a card from a certain type of counter.
 ACounterTracker::ACounterTracker(GameObserver* observer, int id, MTGCardInstance* source, MTGCardInstance* target,
-                                 string scounter)
+                                 std::string scounter)
     : MTGAbility(observer, id, source, target), scounter(scounter) {
     removed = 0;
 }
@@ -553,7 +553,7 @@ const char* AARemoveAllCounter::getMenuText() {
     char buffer[128];
 
     if (name.size()) {
-        string s = name;
+        std::string s = name;
         menu.append(s.c_str());
     }
 
@@ -617,7 +617,7 @@ AAProliferate::~AAProliferate() {}
 //
 // choosing a type or color
 GenericChooseTypeColor::GenericChooseTypeColor(GameObserver* observer, int id, MTGCardInstance* source,
-                                               Targetable* target, string _toAdd, bool chooseColor, bool nonwall,
+                                               Targetable* target, std::string _toAdd, bool chooseColor, bool nonwall,
                                                ManaCost* cost)
     : ActivatedAbility(observer, id, source, cost, 0),
       baseAbility(_toAdd),
@@ -639,9 +639,9 @@ int GenericChooseTypeColor::resolve() {
             SAFE_DELETE(setColor);
         }
     } else {
-        vector<string> values = MTGAllCards::getCreatureValuesById();
+        std::vector<std::string> values = MTGAllCards::getCreatureValuesById();
         for (size_t i = 0; i < values.size(); ++i) {
-            string menu = values[i];
+            std::string menu = values[i];
             if (!ANonWall || (menu != "wall" && menu != "Wall")) {
                 setType = NEW AASetTypeChosen(game, game->mLayers->actionLayer()->getMaxId(), source,
                                               (MTGCardInstance*)target, i, menu, baseAbility);
@@ -677,7 +677,7 @@ GenericChooseTypeColor::~GenericChooseTypeColor() {}
 
 // set color choosen
 AASetColorChosen::AASetColorChosen(GameObserver* observer, int id, MTGCardInstance* source, MTGCardInstance* _target,
-                                   int _color, string toAlter)
+                                   int _color, std::string toAlter)
     : InstantAbility(observer, id, source), color(_color), abilityToAlter(toAlter) {
     this->target = _target;
     abilityAltered = NULL;
@@ -720,14 +720,14 @@ AASetColorChosen::~AASetColorChosen() {}
 
 // set type choosen
 AASetTypeChosen::AASetTypeChosen(GameObserver* observer, int id, MTGCardInstance* source, MTGCardInstance* _target,
-                                 int _type, string _menu, string toAlter)
+                                 int _type, std::string _menu, std::string toAlter)
     : InstantAbility(observer, id, source), type(_type), abilityToAlter(toAlter), menutext(_menu) {
     this->target = _target;
     abilityAltered = NULL;
 }
 int AASetTypeChosen::resolve() {
     MTGCardInstance* _target = (MTGCardInstance*)target;
-    string typeChoosen = menutext;
+    std::string typeChoosen = menutext;
     _target->chooseasubtype = typeChoosen;
 
     if (abilityToAlter.size()) {
@@ -764,7 +764,7 @@ AASetTypeChosen::~AASetTypeChosen() {}
 //
 // choosing a type or color
 GenericFlipACoin::GenericFlipACoin(GameObserver* observer, int id, MTGCardInstance* source, Targetable* target,
-                                   string _toAdd, ManaCost* cost)
+                                   std::string _toAdd, ManaCost* cost)
     : ActivatedAbility(observer, id, source, cost, 0), baseAbility(_toAdd), chooseColor(chooseColor) {
     this->GetId();
     setCoin = NULL;
@@ -801,7 +801,7 @@ GenericFlipACoin::~GenericFlipACoin() {}
 
 // set color choosen
 AASetCoin::AASetCoin(GameObserver* observer, int id, MTGCardInstance* source, MTGCardInstance* _target, int _side,
-                     string toAlter)
+                     std::string toAlter)
     : InstantAbility(observer, id, source), side(_side), abilityToAlter(toAlter) {
     this->target = _target;
     abilityAltered = NULL;
@@ -812,11 +812,11 @@ int AASetCoin::resolve() {
     _target->coinSide = side;
 
     int flip = game->getRandomGenerator()->random() % 2;
-    vector<string> Win = parseBetween(abilityToAlter, "winability ", " winabilityend");
+    std::vector<std::string> Win = parseBetween(abilityToAlter, "winability ", " winabilityend");
     if (Win.size()) {
         abilityWin = Win[1];
     }
-    vector<string> Lose = parseBetween(abilityToAlter, "loseability ", " loseabilityend");
+    std::vector<std::string> Lose = parseBetween(abilityToAlter, "loseability ", " loseabilityend");
     if (Lose.size()) {
         abilityLose = Lose[1];
     }
@@ -1066,7 +1066,7 @@ AADiscardCard* AADiscardCard::clone() const {
 }
 AADiscardCard::~AADiscardCard() { SAFE_DELETE(andAbility); }
 AADrawer::AADrawer(GameObserver* observer, int _id, MTGCardInstance* card, Targetable* _target, ManaCost* _cost,
-                   string nbcardsStr, int who)
+                   std::string nbcardsStr, int who)
     : ActivatedAbilityTP(observer, _id, card, _target, _cost, who), nbcardsStr(nbcardsStr) {
     aType = MTGAbility::STANDARD_DRAW;
 }
@@ -1229,7 +1229,7 @@ AAMorph* AAMorph::clone() const {
     return a;
 }
 // flip a card
-AAFlip::AAFlip(GameObserver* observer, int id, MTGCardInstance* card, MTGCardInstance* _target, string flipStats)
+AAFlip::AAFlip(GameObserver* observer, int id, MTGCardInstance* card, MTGCardInstance* _target, std::string flipStats)
     : InstantAbility(observer, id, card, _target), flipStats(flipStats) {
     target = _target;
 }
@@ -1331,7 +1331,7 @@ int AAFlip::testDestroy() {
 }
 
 const char* AAFlip::getMenuText() {
-    string s = flipStats;
+    std::string s = flipStats;
     sprintf(menuText, "Transform:%s", s.c_str());
     return menuText;
 }
@@ -1499,9 +1499,9 @@ int AADynamic::resolve() {
         std::stringstream out;
         std::stringstream out2;
         out << sourceamount;
-        string sourceamountstring = out.str();
+        std::string sourceamountstring = out.str();
         out2 << targetamount;
-        string targetamountstring = out2.str();
+        std::string targetamountstring = out2.str();
         // set values less then 0 to 0, it was reported that negitive numbers such as a creature who get -3/-3 having
         // the power become negitive, if then used as the amount, would cuase weird side effects on resolves.
         switch (effect) {
@@ -1556,7 +1556,7 @@ int AADynamic::resolve() {
         }
         case DYNAMIC_ABILITY_EFFECT_LIFELOSS:  // lose life
         {
-            string altered = "-";
+            std::string altered = "-";
             altered.append(sourceamountstring);
             mainAbility = NEW AALifer(game, this->GetId(), source, _target, altered);
             return activateMainAbility(mainAbility, source, _target);
@@ -1684,7 +1684,7 @@ AADynamic* AADynamic::clone() const {
 AADynamic::~AADynamic() { SAFE_DELETE(storedAbility); }
 
 // AALifer
-AALifer::AALifer(GameObserver* observer, int _id, MTGCardInstance* card, Targetable* _target, string life_s,
+AALifer::AALifer(GameObserver* observer, int _id, MTGCardInstance* card, Targetable* _target, std::string life_s,
                  ManaCost* _cost, int who)
     : ActivatedAbilityTP(observer, _id, card, _target, _cost, who), life_s(life_s) {
     aType = MTGAbility::LIFER;
@@ -1766,7 +1766,7 @@ AALifeSet::~AALifeSet() { SAFE_DELETE(life); }
 // AACloner
 // cloning...this makes a token thats a copy of the target.
 AACloner::AACloner(GameObserver* observer, int _id, MTGCardInstance* _source, MTGCardInstance* _target,
-                   ManaCost* _cost, int who, string abilitiesStringList, string TypesList)
+                   ManaCost* _cost, int who, std::string abilitiesStringList, std::string TypesList)
     : ActivatedAbility(observer, _id, _source, _cost, 0), who(who) {
     aType = MTGAbility::CLONING;
     target = _target;
@@ -1802,7 +1802,7 @@ int AACloner::resolve() {
         spell->source->toughness = _target->origtoughness;
         spell->source->life = _target->origtoughness;
     }
-    list<int>::iterator it;
+    std::list<int>::iterator it;
     for (it = awith.begin(); it != awith.end(); it++) {
         spell->source->basicAbilities[*it] = 1;
     }
@@ -1821,7 +1821,7 @@ const char* AACloner::getMenuText() {
     return "Clone";
 }
 
-ostream& AACloner::toString(ostream& out) const {
+std::ostream& AACloner::toString(std::ostream& out) const {
     out << "AACloner ::: with : ?"  // << abilities
         << " (";
     return ActivatedAbility::toString(out) << ")";
@@ -1924,7 +1924,7 @@ AInstantCastRestrictionUEOT* AInstantCastRestrictionUEOT::clone() const {
 AInstantCastRestrictionUEOT::~AInstantCastRestrictionUEOT() { SAFE_DELETE(ability); }
 
 // AAMover
-AAMover::AAMover(GameObserver* observer, int _id, MTGCardInstance* _source, MTGCardInstance* _target, string dest,
+AAMover::AAMover(GameObserver* observer, int _id, MTGCardInstance* _source, MTGCardInstance* _target, std::string dest,
                  ManaCost* _cost)
     : ActivatedAbility(observer, _id, _source, _cost, 0), destination(dest) {
     if (_target) target = _target;
@@ -2040,12 +2040,12 @@ AAMover::~AAMover() { SAFE_DELETE(andAbility); }
 
 // random movement of a card from zone to zone
 AARandomMover::AARandomMover(GameObserver* observer, int _id, MTGCardInstance* _source, MTGCardInstance* _target,
-                             string _tcs, string _from, string _to)
+                             std::string _tcs, std::string _from, std::string _to)
     : ActivatedAbility(observer, _id, _source, NULL, 0), abilityTC(_tcs), fromZone(_from), toZone(_to) {
     if (_target) target = _target;
 }
 
-MTGGameZone* AARandomMover::destinationZone(Targetable* target, string zone) {
+MTGGameZone* AARandomMover::destinationZone(Targetable* target, std::string zone) {
     MTGCardInstance* _target = (MTGCardInstance*)target;
     return MTGGameZone::stringToZone(game, zone, source, _target);
 }
@@ -2103,7 +2103,7 @@ AARandomMover::~AARandomMover() {}
 
 // Random Discard
 AARandomDiscarder::AARandomDiscarder(GameObserver* observer, int _id, MTGCardInstance* card, Targetable* _target,
-                                     string nbcardsStr, ManaCost* _cost, int who)
+                                     std::string nbcardsStr, ManaCost* _cost, int who)
     : ActivatedAbilityTP(observer, _id, card, _target, _cost, who), nbcardsStr(nbcardsStr) {}
 
 int AARandomDiscarder::resolve() {
@@ -2143,7 +2143,7 @@ AAShuffle* AAShuffle::clone() const { return NEW AAShuffle(*this); }
 
 // Remove Mana From ManaPool
 AARemoveMana::AARemoveMana(GameObserver* observer, int _id, MTGCardInstance* card, Targetable* _target,
-                           string manaDesc, int who)
+                           std::string manaDesc, int who)
     : ActivatedAbilityTP(observer, _id, card, _target, NULL, who) {
     if (!manaDesc.size()) {
         DebugTrace("ALL_ABILITIES: AARemoveMana ctor error");
@@ -2293,7 +2293,7 @@ AAWinGame* AAWinGame::clone() const { return NEW AAWinGame(*this); }
 // Generic Abilities
 
 // a new affinity
-ANewAffinity::ANewAffinity(GameObserver* observer, int _id, MTGCardInstance* _source, string Tc, string mana)
+ANewAffinity::ANewAffinity(GameObserver* observer, int _id, MTGCardInstance* _source, std::string Tc, std::string mana)
     : MTGAbility(observer, _id, _source), tcString(Tc), manaString(mana) {}
 
 void ANewAffinity::Update(float dt) {
@@ -2310,7 +2310,7 @@ ANewAffinity* ANewAffinity::clone() const { return NEW ANewAffinity(*this); }
 // IfThenEffect
 IfThenAbility::IfThenAbility(GameObserver* observer, int _id, MTGAbility* delayedAbility,
                              MTGAbility* delayedElseAbility, MTGCardInstance* _source, Targetable* _target, int type,
-                             string Cond)
+                             std::string Cond)
     : InstantAbility(observer, _id, _source),
       delayedAbility(delayedAbility),
       delayedElseAbility(delayedElseAbility),
@@ -2326,7 +2326,7 @@ int IfThenAbility::resolve() {
     int checkCond = af.parseCastRestrictions(card, card->controller(), Cond);
     if (Cond.find("cantargetcard(") != string::npos) {
         TargetChooser* condTc = NULL;
-        vector<string> splitTarget = parseBetween(Cond, "card(", ")");
+        std::vector<std::string> splitTarget = parseBetween(Cond, "card(", ")");
         if (splitTarget.size()) {
             TargetChooserFactory tcf(game);
             condTc = tcf.createTargetChooser(splitTarget[1], source);
@@ -2615,11 +2615,11 @@ MultiAbility::~MultiAbility() {
     abilities.clear();
 }
 // Generic Target Ability
-GenericTargetAbility::GenericTargetAbility(GameObserver* observer, string newName, string castRestriction, int _id,
+GenericTargetAbility::GenericTargetAbility(GameObserver* observer, std::string newName, std::string castRestriction, int _id,
                                            MTGCardInstance* _source, TargetChooser* _tc, MTGAbility* a,
-                                           ManaCost* _cost, string limit, MTGAbility* sideEffects,
-                                           string usesBeforeSideEffects, int restrictions, MTGGameZone* dest,
-                                           string _tcString)
+                                           ManaCost* _cost, std::string limit, MTGAbility* sideEffects,
+                                           std::string usesBeforeSideEffects, int restrictions, MTGGameZone* dest,
+                                           std::string _tcString)
     : TargetAbility(observer, _id, _source, _tc, _cost, restrictions, castRestriction),
       limit(limit),
       activeZone(dest),
@@ -2799,8 +2799,8 @@ AAlterCost::~AAlterCost() {}
 
 // ATransformer
 ATransformer::ATransformer(GameObserver* observer, int id, MTGCardInstance* source, MTGCardInstance* target,
-                           string stypes, string sabilities, string newpower, bool newpowerfound, string newtoughness,
-                           bool newtoughnessfound, vector<string> newAbilitiesList, bool newAbilityFound,
+                           std::string stypes, std::string sabilities, std::string newpower, bool newpowerfound, std::string newtoughness,
+                           bool newtoughnessfound, std::vector<std::string> newAbilitiesList, bool newAbilityFound,
                            bool aForever)
     : MTGAbility(observer, id, source, target),
       newpower(newpower),
@@ -2823,7 +2823,7 @@ ATransformer::ATransformer(GameObserver* observer, int id, MTGCardInstance* sour
     removeTypes = (stypes.find("removetypes") != string::npos);
 
     if (stypes.find("allsubtypes") != string::npos || stypes.find("removecreaturesubtypes") != string::npos) {
-        const vector<string> values = MTGAllCards::getValuesById();
+        const std::vector<std::string> values = MTGAllCards::getValuesById();
         for (size_t i = 0; i < values.size(); ++i) {
             if (!MTGAllCards::isSubtypeOfType(i, Subtypes::TYPE_CREATURE)) continue;
 
@@ -2864,7 +2864,7 @@ int ATransformer::addToGame() {
     }
     for (size_t j = 0; j < _target->types.size(); ++j) oldtypes.push_back(_target->types[j]);
 
-    list<int>::iterator it;
+    std::list<int>::iterator it;
     for (it = colors.begin(); it != colors.end(); it++) {
         if (!addNewColors) _target->setColor(0, 1);
     }
@@ -2975,7 +2975,7 @@ int ATransformer::destroy() {
     MTGCardInstance* _target = (MTGCardInstance*)target;
     if (_target) {
         while (_target->next) _target = _target->next;
-        list<int>::iterator it;
+        std::list<int>::iterator it;
 
         if (!remove) {
             for (it = types.begin(); it != types.end(); it++) {
@@ -3036,7 +3036,7 @@ int ATransformer::destroy() {
 }
 
 const char* ATransformer::getMenuText() {
-    string s = menu;
+    std::string s = menu;
     sprintf(menuText, "Becomes %s", s.c_str());
     return menuText;
 }
@@ -3047,9 +3047,9 @@ ATransformer::~ATransformer() {}
 
 // ATransformerInstant
 ATransformerInstant::ATransformerInstant(GameObserver* observer, int id, MTGCardInstance* source,
-                                         MTGCardInstance* target, string types, string abilities, string newpower,
-                                         bool newpowerfound, string newtoughness, bool newtoughnessfound,
-                                         vector<string> newAbilitiesList, bool newAbilityFound, bool aForever)
+                                         MTGCardInstance* target, std::string types, std::string abilities, std::string newpower,
+                                         bool newpowerfound, std::string newtoughness, bool newtoughnessfound,
+                                         std::vector<std::string> newAbilitiesList, bool newAbilityFound, bool aForever)
     : InstantAbility(observer, id, source, target),
       newpower(newpower),
       newpowerfound(newpowerfound),
@@ -3081,7 +3081,7 @@ ATransformerInstant::~ATransformerInstant() { SAFE_DELETE(ability); }
 
 // P/t ueot
 PTInstant::PTInstant(GameObserver* observer, int id, MTGCardInstance* source, MTGCardInstance* target, WParsedPT* wppt,
-                     string s, bool nonstatic)
+                     std::string s, bool nonstatic)
     : InstantAbility(observer, id, source, target), wppt(wppt), s(s), nonstatic(nonstatic) {
     ability = NEW APowerToughnessModifier(game, id, source, target, wppt, s, nonstatic);
     aType = MTGAbility::STANDARD_PUMP;
@@ -3292,8 +3292,8 @@ int ALoseSubtypes::destroy() {
 ALoseSubtypes* ALoseSubtypes::clone() const { return NEW ALoseSubtypes(*this); }
 
 // APreventDamageTypes
-APreventDamageTypes::APreventDamageTypes(GameObserver* observer, int id, MTGCardInstance* source, string to,
-                                         string from, int type)
+APreventDamageTypes::APreventDamageTypes(GameObserver* observer, int id, MTGCardInstance* source, std::string to,
+                                         std::string from, int type)
     : MTGAbility(observer, id, source), to(to), from(from), type(type) {
     re = NULL;
 }
@@ -3334,8 +3334,8 @@ APreventDamageTypes* APreventDamageTypes::clone() const {
 APreventDamageTypes::~APreventDamageTypes() { SAFE_DELETE(re); }
 
 // APreventDamageTypesUEOT
-APreventDamageTypesUEOT::APreventDamageTypesUEOT(GameObserver* observer, int id, MTGCardInstance* source, string to,
-                                                 string from, int type)
+APreventDamageTypesUEOT::APreventDamageTypesUEOT(GameObserver* observer, int id, MTGCardInstance* source, std::string to,
+                                                 std::string from, int type)
     : InstantAbility(observer, id, source) {
     ability = NEW APreventDamageTypes(observer, id, source, to, from, type);
 }
@@ -3367,7 +3367,7 @@ APreventDamageTypesUEOT::~APreventDamageTypesUEOT() { SAFE_DELETE(ability); }
 
 // AVanishing creature also fading
 AVanishing::AVanishing(GameObserver* observer, int _id, MTGCardInstance* card, ManaCost* _cost, int restrictions,
-                       int amount, string counterName)
+                       int amount, std::string counterName)
     : MTGAbility(observer, _id, source, target), amount(amount), counterName(counterName) {
     target = card;
     source = card;
@@ -3483,7 +3483,7 @@ int AUpkeep::resolve() {
 
 const char* AUpkeep::getMenuText() { return "Upkeep"; }
 
-ostream& AUpkeep::toString(ostream& out) const {
+std::ostream& AUpkeep::toString(std::ostream& out) const {
     out << "AUpkeep ::: paidThisTurn : " << paidThisTurn << " (";
     return ActivatedAbility::toString(out) << ")";
 }
@@ -3503,7 +3503,7 @@ AUpkeep::~AUpkeep() {
 
 // A Phase based Action
 APhaseAction::APhaseAction(GameObserver* observer, int _id, MTGCardInstance* card, MTGCardInstance* target,
-                           string sAbility, int restrictions, int _phase, bool forcedestroy, bool next, bool myturn,
+                           std::string sAbility, int restrictions, int _phase, bool forcedestroy, bool next, bool myturn,
                            bool opponentturn, bool once)
     : MTGAbility(observer, _id, card),
       sAbility(sAbility),
@@ -3583,7 +3583,7 @@ APhaseAction::~APhaseAction() {}
 
 // the main ability
 APhaseActionGeneric::APhaseActionGeneric(GameObserver* observer, int _id, MTGCardInstance* card,
-                                         MTGCardInstance* target, string sAbility, int restrictions, int _phase,
+                                         MTGCardInstance* target, std::string sAbility, int restrictions, int _phase,
                                          bool forcedestroy, bool next, bool myturn, bool opponentturn, bool once)
     : InstantAbility(observer, _id, card, target) {
     MTGCardInstance* _target = target;
@@ -3860,7 +3860,7 @@ AAConnect* AAConnect::clone() const { return NEW AAConnect(*this); }
 
 // Tutorial Messaging
 
-ATutorialMessage::ATutorialMessage(GameObserver* observer, MTGCardInstance* source, string message, int limit)
+ATutorialMessage::ATutorialMessage(GameObserver* observer, MTGCardInstance* source, std::string message, int limit)
     : MTGAbility(observer, 0, source), IconButtonsController(observer->getInput(), 0, 0), mLimit(limit) {
     mBgTex = NULL;
 
@@ -3870,7 +3870,7 @@ ATutorialMessage::ATutorialMessage(GameObserver* observer, MTGCardInstance* sour
     for (int i = 0; i < 9; i++) mBg[i] = NULL;
 
     if (game->getResourceManager()) {
-        string gfx = game->getResourceManager()->graphicsFile(message);
+        std::string gfx = game->getResourceManager()->graphicsFile(message);
         if (fileExists(gfx.c_str())) {
             mIsImage = true;
             mMessage = message;
@@ -3949,7 +3949,7 @@ void ATutorialMessage::Update(float dt) {
 void ATutorialMessage::ButtonPressed(int controllerId, int controlId) {
     // TODO : cancel ALL tips/tutorials for JGE_BTN_SEC?
     if (mLimit) {
-        string optionName = getOptionName();
+        std::string optionName = getOptionName();
         options[optionName].number = options[optionName].number + 1;
         options.save();  // TODO: if we experience I/O slowness in tutorials, move this save at the end of a turn, or
                          // at the end of the game.
@@ -4060,7 +4060,7 @@ void ATutorialMessage::Render() {
 
     if (!mBgTex || !mIsImage) {
         float posX = 40, posY = mY + 20;
-        string title = _("Help");
+        std::string title = _("Help");
 
         WFont* f = game->getResourceManager()->GetWFont(Fonts::MAGIC_FONT);
         WFont* f3 = game->getResourceManager()->GetWFont(Fonts::MENU_FONT);  // OPTION_FONT
@@ -4093,19 +4093,19 @@ ATutorialMessage::~ATutorialMessage() {
 
 // utility functions
 
-// Given a delimited string of abilities, add the ones to the list that are "Basic"  MTG abilities
-void PopulateAbilityIndexVector(list<int>& abilities, const string& abilityStringList, char delimiter) {
-    vector<string> abilitiesList = split(abilityStringList, delimiter);
-    for (vector<string>::iterator iter = abilitiesList.begin(); iter != abilitiesList.end(); ++iter) {
+// Given a delimited std::string of abilities, add the ones to the list that are "Basic"  MTG abilities
+void PopulateAbilityIndexVector(std::list<int>& abilities, const string& abilityStringList, char delimiter) {
+    std::vector<std::string> abilitiesList = split(abilityStringList, delimiter);
+    for (auto iter = abilitiesList.begin(); iter != abilitiesList.end(); ++iter) {
         int abilityIndex = Constants::GetBasicAbilityIndex(*iter);
 
         if (abilityIndex != -1) abilities.push_back(abilityIndex);
     }
 }
 
-void PopulateColorIndexVector(list<int>& colors, const string& colorStringList, char delimiter) {
-    vector<string> abilitiesList = split(colorStringList, delimiter);
-    for (vector<string>::iterator iter = abilitiesList.begin(); iter != abilitiesList.end(); ++iter) {
+void PopulateColorIndexVector(std::list<int>& colors, const string& colorStringList, char delimiter) {
+    std::vector<std::string> abilitiesList = split(colorStringList, delimiter);
+    for (auto iter = abilitiesList.begin(); iter != abilitiesList.end(); ++iter) {
         for (int colorIndex = Constants::MTG_COLOR_ARTIFACT; colorIndex < Constants::NB_Colors; ++colorIndex) {
             // if the text is not a basic ability but contains a valid color add it to the color vector
             if ((Constants::GetBasicAbilityIndex(*iter) == -1) &&
@@ -4115,10 +4115,10 @@ void PopulateColorIndexVector(list<int>& colors, const string& colorStringList, 
     }
 }
 
-void PopulateSubtypesIndexVector(list<int>& types, const string& subTypesStringList, char delimiter) {
-    vector<string> subTypesList = split(subTypesStringList, delimiter);
-    for (vector<string>::iterator it = subTypesList.begin(); it != subTypesList.end(); ++it) {
-        string subtype = *it;
+void PopulateSubtypesIndexVector(std::list<int>& types, const string& subTypesStringList, char delimiter) {
+    std::vector<std::string> subTypesList = split(subTypesStringList, delimiter);
+    for (auto it = subTypesList.begin(); it != subTypesList.end(); ++it) {
+        std::string subtype = *it;
         size_t id = MTGAllCards::findType(subtype);
         if (id != string::npos) types.push_back(id);
     }

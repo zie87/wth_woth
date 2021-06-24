@@ -23,18 +23,17 @@ class Rules;
 class TestSuiteGame;
 class Trash;
 class DeckManager;
-using namespace std;
 
 class GameObserver {
 protected:
     GameType mGameType;
     MTGCardInstance* cardWaitingForTargets;
-    queue<WEvent*> eventsQueue;
+    std::queue<WEvent*> eventsQueue;
     // used when we're running to log actions
-    list<string> actionsList;
+    std::list<std::string> actionsList;
     // used when we're loading to know what to load
-    list<string> loadingList;
-    list<string>::iterator loadingite;
+    std::list<std::string> loadingList;
+    std::list<std::string>::iterator loadingite;
     RandomGenerator randomGenerator;
     WResourceManager* mResourceManager;
     JGE* mJGE;
@@ -44,16 +43,16 @@ protected:
     int untap(MTGCardInstance* card);
     bool WaitForExtraPayment(MTGCardInstance* card);
     void cleanup();
-    string startupGameSerialized;
-    bool parseLine(const string& s);
-    void logAction(const string& s);
+    std::string startupGameSerialized;
+    bool parseLine(const std::string& s);
+    void logAction(const std::string& s);
     bool processActions(bool undo
 #ifdef TESTSUITE
                         ,
                         TestSuiteGame* testgame
 #endif
     );
-    friend ostream& operator<<(ostream&, const GameObserver&);
+    friend std::ostream& operator<<(std::ostream&, const GameObserver&);
     bool mLoading;
     void nextGamePhase();
     void shuffleLibrary(Player* p);
@@ -71,7 +70,7 @@ public:
     int forceShuffleLibraries();
     int targetListIsSet(MTGCardInstance* card);
     PhaseRing* phaseRing;
-    vector<list<Phase*> > gameTurn;
+    std::vector<std::list<Phase*> > gameTurn;
     int cancelCurrentAction();
     GamePhase currentGamePhase;
     ExtraCosts* mExtraPayment;
@@ -79,7 +78,7 @@ public:
     TargetChooser* targetChooser;
     DuelLayers* mLayers;
     ReplacementEffects* replacementEffects;
-    vector<Player*> players;  // created outside
+    std::vector<Player*> players;  // created outside
     time_t startedAt;
     Rules* mRules;
     MTGCardInstance* ExtraRules;

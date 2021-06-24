@@ -84,51 +84,51 @@ void SimplePopup::Update(DeckMetaData* selectedDeck) {
         mDeckInformation, mCollection, (mDeckInformation->getFilename().find("baka") != string::npos));
 }
 
-string SimplePopup::getDetailedInformation(string filename) {
-    ostringstream oss;
-    oss << "------- Deck Summary -----" << endl
-        << "Cards: " << mStatsWrapper->cardCount << endl
-        << "Creatures: " << setw(2) << mStatsWrapper->countCreatures
-        << "  Enchantments: " << mStatsWrapper->countEnchantments << endl
-        << "Instants: " << setw(4) << mStatsWrapper->countInstants << "   Sorceries:      " << setw(2)
-        << mStatsWrapper->countSorceries << endl
+std::string SimplePopup::getDetailedInformation(std::string filename) {
+    std::ostringstream oss;
+    oss << "------- Deck Summary -----" << std::endl
+        << "Cards: " << mStatsWrapper->cardCount << std::endl
+        << "Creatures: " << std::setw(2) << mStatsWrapper->countCreatures
+        << "  Enchantments: " << mStatsWrapper->countEnchantments << std::endl
+        << "Instants: " << std::setw(4) << mStatsWrapper->countInstants << "   Sorceries:      " << std::setw(2)
+        << mStatsWrapper->countSorceries << std::endl
         << "Lands: "
-        << "A: " << setw(2) << left
+        << "A: " << std::setw(2) << std::left
         << mStatsWrapper->countLandsPerColor[Constants::MTG_COLOR_ARTIFACT] +
                mStatsWrapper->countBasicLandsPerColor[Constants::MTG_COLOR_ARTIFACT]
         << " "
-        << "G: " << setw(2) << left
+        << "G: " << std::setw(2) << std::left
         << mStatsWrapper->countLandsPerColor[Constants::MTG_COLOR_GREEN] +
                mStatsWrapper->countLandsPerColor[Constants::MTG_COLOR_GREEN]
         << " "
-        << "R: " << setw(2) << left
+        << "R: " << std::setw(2) << std::left
         << mStatsWrapper->countLandsPerColor[Constants::MTG_COLOR_RED] +
                mStatsWrapper->countBasicLandsPerColor[Constants::MTG_COLOR_RED]
         << " "
-        << "U: " << setw(2) << left
+        << "U: " << std::setw(2) << std::left
         << mStatsWrapper->countLandsPerColor[Constants::MTG_COLOR_BLUE] +
                mStatsWrapper->countBasicLandsPerColor[Constants::MTG_COLOR_BLUE]
         << " "
-        << "B: " << setw(2) << left
+        << "B: " << std::setw(2) << std::left
         << mStatsWrapper->countLandsPerColor[Constants::MTG_COLOR_BLACK] +
                mStatsWrapper->countBasicLandsPerColor[Constants::MTG_COLOR_BLACK]
         << " "
-        << "W: " << setw(2) << left
+        << "W: " << std::setw(2) << std::left
         << mStatsWrapper->countLandsPerColor[Constants::MTG_COLOR_WHITE] +
                mStatsWrapper->countBasicLandsPerColor[Constants::MTG_COLOR_WHITE]
-        << endl
-        << "  --- Mana Curve ---  " << endl;
+        << std::endl
+        << "  --- Mana Curve ---  " << std::endl;
 
     for (int costIdx = 0; costIdx < Constants::STATS_MAX_MANA_COST + 1; ++costIdx)
         if (mStatsWrapper->countCardsPerCost[costIdx] > 0)
-            oss << costIdx << ": " << setw(2) << left << mStatsWrapper->countCardsPerCost[costIdx] << "  ";
+            oss << costIdx << ": " << std::setw(2) << std::left << mStatsWrapper->countCardsPerCost[costIdx] << "  ";
 
-    oss << endl;
+    oss << std::endl;
 
-    oss << " --- Average Cost --- " << endl
-        << "Creature: " << setprecision(2) << mStatsWrapper->avgCreatureCost << endl
-        << "Mana: " << setprecision(2) << mStatsWrapper->avgManaCost << "   "
-        << "Spell: " << setprecision(2) << mStatsWrapper->avgSpellCost << endl;
+    oss << " --- Average Cost --- " << std::endl
+        << "Creature: " << std::setprecision(2) << mStatsWrapper->avgCreatureCost << std::endl
+        << "Mana: " << std::setprecision(2) << mStatsWrapper->avgManaCost << "   "
+        << "Spell: " << std::setprecision(2) << mStatsWrapper->avgSpellCost << std::endl;
 
     return oss.str();
 }

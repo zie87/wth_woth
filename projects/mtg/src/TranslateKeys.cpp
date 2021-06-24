@@ -9,13 +9,13 @@
 using std::map;
 using std::string;
 
-static map<const LocalKeySym, KeyRep> fattable;
-static map<const JButton, KeyRep> slimtable;
+static std::map<const LocalKeySym, KeyRep> fattable;
+static std::map<const JButton, KeyRep> slimtable;
 
 #if defined(LINUX) || defined(SDL_CONFIG) || defined(QT_CONFIG)
 const KeyRep& translateKey(LocalKeySym key) {
     {
-        map<const LocalKeySym, KeyRep>::iterator res;
+        std::map<const LocalKeySym, KeyRep>::iterator res;
         if ((res = fattable.find(key)) != fattable.end()) return res->second;
     }
 
@@ -32,15 +32,15 @@ const KeyRep& translateKey(LocalKeySym key) {
                 (long unsigned int)key);  // TODO: Wagic is not supposed to know that a key actually is an unsingned
                                           // long, so this part should probably be platform specific (move to JGE ?)
     }
-    const KeyRep k = make_pair(str, static_cast<JQuad*>(NULL));
+    const KeyRep k = std::make_pair(str, static_cast<JQuad*>(NULL));
     fattable[key] = k;
     return fattable[key];
 }
 #elif defined(WIN32)
 const KeyRep& translateKey(LocalKeySym key) {
     {
-        map<const LocalKeySym, KeyRep>::iterator res;
-        if ((res = fattable.find(key)) != fattable.end()) return (res->second);
+        auto res = fattable.find(key);
+        if (res != fattable.end()) return (res->second);
     }
     unsigned int sc = MapVirtualKey(key, 0);
 
@@ -73,16 +73,16 @@ const KeyRep& translateKey(LocalKeySym key) {
     if (0 == s.length()) {
         char* str = NEW char[11];
         sprintf(str, "%d", key);
-        k = make_pair(str, static_cast<JQuad*>(NULL));
+        k = std::make_pair(str, static_cast<JQuad*>(NULL));
     } else
-        k = make_pair(s, static_cast<JQuad*>(NULL));
+        k = std::make_pair(s, static_cast<JQuad*>(NULL));
     fattable[key] = k;
     return fattable[key];
 }
 #else  // PSP
 
 const KeyRep& translateKey(LocalKeySym key) {
-    map<const LocalKeySym, KeyRep>::iterator res;
+    std::map<const LocalKeySym, KeyRep>::iterator res;
     if ((res = fattable.find(key)) == fattable.end()) {
         if (fattable.end() == fattable.find(PSP_CTRL_SELECT)) {
             fattable[PSP_CTRL_SELECT] = make_pair(_("Select"), static_cast<JQuad*>(NULL));
@@ -101,7 +101,7 @@ const KeyRep& translateKey(LocalKeySym key) {
         } else {
             char* str = NEW char[11];
             sprintf(str, "%d", (int)key);
-            fattable[key] = make_pair(str, static_cast<JQuad*>(static_cast<JQuad*>(NULL)));
+            fattable[key] = std::make_pair(str, static_cast<JQuad*>(static_cast<JQuad*>(NULL)));
         }
         res = fattable.find(key);
     }
@@ -226,7 +226,7 @@ const KeyRep& translateKey(JButton key) {
         } else {
             char* str = NEW char[11];
             sprintf(str, "%d", key);
-            slimtable[key] = make_pair(str, static_cast<JQuad*>(static_cast<JQuad*>(NULL)));
+            slimtable[key] = std::make_pair(str, static_cast<JQuad*>(static_cast<JQuad*>(NULL)));
         }
         res = slimtable.find(key);
     }

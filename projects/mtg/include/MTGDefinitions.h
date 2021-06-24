@@ -6,6 +6,8 @@ const float DEFAULT_MAIN_FONT_SCALE = 1.0f;
 const float DEFAULT_TEXT_FONT_SCALE = 1.0f;
 const float ACTIVE_MENU_FONT_SCALE = 1.2f;
 
+#include <map>
+#include <vector>
 #include <string>
 using std::string;
 

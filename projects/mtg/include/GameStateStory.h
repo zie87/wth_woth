@@ -4,6 +4,9 @@
 #include "GameState.h"
 #include <JGui.h>
 
+#include <vector>
+#include <string>
+
 class StoryFlow;
 class SimpleMenu;
 
@@ -11,7 +14,7 @@ class GameStateStory : public GameState, public JGuiListener {
 private:
     StoryFlow* flow;
     SimpleMenu* menu;
-    vector<string> stories;
+    std::vector<std::string> stories;
     void loadStoriesMenu(const char* root);
 
 public:

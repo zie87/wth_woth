@@ -4,9 +4,11 @@
 #include <string>
 #include <map>
 #include <vector>
-using namespace std;
+
 #include "../../../JGE/src/tinyxml/tinyxml.h"
+
 #include <JGui.h>
+
 class GameObserver;
 class MTGDeck;
 #define CAMPAIGNS_FOLDER "campaigns/"
@@ -30,23 +32,23 @@ public:
 
 class StoryText : public StoryDialogElement {
 public:
-    string text;
+    std::string text;
     int align;
     int font;
-    StoryText(string text, float mX, float mY, string align = "center", int font = 0, int id = 0);
+    StoryText(std::string text, float mX, float mY, std::string align = "center", int font = 0, int id = 0);
 
     void Render();
     void Update(float dt);
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     float getHeight();
 };
 class StoryImage : public StoryDialogElement {
 public:
-    string img;
-    StoryImage(string img, float mX, float mY);
+    std::string img;
+    StoryImage(std::string img, float mX, float mY);
     void Render();
     void Update(float dt);
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     float getHeight();
 };
 
@@ -59,11 +61,11 @@ public:
     };
 
     int rewardDone;
-    string value;
+    std::string value;
     int type;
 
-    StoryReward(string _type, string _value, string text, float _mX, float _mY, string align = "center", int font = 0,
-                int id = 0);
+    StoryReward(std::string _type, std::string _value, std::string text, float _mX, float _mY,
+                std::string align = "center", int font = 0, int id = 0);
     void Update(float dt);
     void Render();
 
@@ -74,12 +76,13 @@ public:
 
 class StoryChoice : public StoryText {
 public:
-    string pageId;
+    std::string pageId;
 
     bool mHasFocus;
     float mScale;
     float mTargetScale;
-    StoryChoice(string id, string text, int JGOid, float mX, float mY, string _align, int _font, bool hasFocus);
+    StoryChoice(std::string id, std::string text, int JGOid, float mX, float mY, std::string _align, int _font,
+                bool hasFocus);
     void Render();
     void Update(float dt);
 
@@ -87,18 +90,18 @@ public:
     bool Leaving(JButton key);
     bool ButtonPressed();
     bool hasFocus();
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     float getHeight();
 };
 
 class StoryFlow;
 class StoryPage {
 protected:
-    string safeAttribute(TiXmlElement* element, string attribute);
+    std::string safeAttribute(TiXmlElement* element, std::string attribute);
 
 public:
     StoryFlow* mParent;
-    string musicFile;
+    std::string musicFile;
     StoryPage(StoryFlow* mParent);
     virtual void Update(float dt) = 0;
     virtual void Render() = 0;
@@ -108,7 +111,7 @@ public:
 
 class StoryDialog : public StoryPage, public JGuiListener, public JGuiController {
 private:
-    vector<StoryDialogElement*> graphics;
+    std::vector<StoryDialogElement*> graphics;
     void RenderElement(StoryDialogElement* elmt);
 
 public:
@@ -125,9 +128,9 @@ public:
 class Rules;
 class StoryDuel : public StoryPage {
 public:
-    string pageId;
-    string onWin, onLose;
-    string bg;  // background file
+    std::string pageId;
+    std::string onWin, onLose;
+    std::string bg;  // background file
     GameObserver* game;
     Rules* rules;
     StoryDuel(TiXmlElement* el, StoryFlow* mParent);
@@ -139,19 +142,19 @@ public:
 
 class StoryFlow {
 private:
-    map<string, StoryPage*> pages;
-    bool parse(string filename);
+    std::map<std::string, StoryPage*> pages;
+    bool parse(std::string filename);
     StoryPage* loadPage(TiXmlElement* element);
-    bool _gotoPage(string id);
+    bool _gotoPage(std::string id);
 
 public:
-    string currentPageId;
-    string folder;
-    StoryFlow(string folder);
+    std::string currentPageId;
+    std::string folder;
+    StoryFlow(std::string folder);
     ~StoryFlow();
 
-    bool gotoPage(string id);
-    bool loadPageId(string id);
+    bool gotoPage(std::string id);
+    bool loadPageId(std::string id);
     void Update(float dt);
     void Render();
 };

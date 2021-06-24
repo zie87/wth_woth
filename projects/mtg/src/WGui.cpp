@@ -1614,7 +1614,7 @@ void WGuiFilters::clearArgs() { tempArgs.clear(); }
 void WGuiFilters::addArg(string display, string code) {
     if (!subMenu || !isAvailableCode(code)) return;
     subMenu->Add((int)tempArgs.size(), display.c_str());
-    tempArgs.push_back(pair<string, string>(display, code));
+    tempArgs.push_back(std::pair<std::string, std::string>(display, code));
 }
 
 // WGuiFilterItem
@@ -1946,7 +1946,7 @@ WGuiBase::CONFIRM_TYPE WGuiKeyBinder::needsConfirm() {
             char s[1024];
             snprintf(s, 1024, _("Warning : the %s key is bound to\n%i different functions:").c_str(),
                      translateKey(confirmingKey).first.c_str(), boundFunctionsList.size());
-            stringstream ss;
+            std::stringstream ss;
             ss << s << "\n";
             vector<JButton>::iterator jt = boundFunctionsList.begin();
             ss << translateKey(*jt).first.c_str();

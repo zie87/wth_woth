@@ -252,11 +252,11 @@ int MTGAllCards::processConfLine(string& s, MTGCard* card, CardPrimitive* primit
 
     default:
         if (primitive) {
-            DebugTrace(endl
+            DebugTrace(std::endl
                        << "MTGDECK Parsing Error: "
                        << " [" << primitive->getName() << "]" << s << std::endl);
         } else {
-            DebugTrace(endl << "MTGDECK Parsing Generic Error: " << s << std::endl);
+            DebugTrace(std::endl << "MTGDECK Parsing Generic Error: " << s << std::endl);
         }
         break;
     }
@@ -878,8 +878,8 @@ int MTGDeck::save(const string& destFileName, bool useExpandedDescriptions, cons
     also save each card by id, to speed up the loading of the deck next time.
 */
 void MTGDeck::printDetailedDeckText(std::ofstream& file) {
-    ostringstream currentCard, creatures, lands, spells, types;
-    map<int, int>::iterator it;
+    std::ostringstream currentCard, creatures, lands, spells, types;
+    std::map<int, int>::iterator it;
     for (it = cards.begin(); it != cards.end(); it++) {
         int cardId = it->first;
         int nbCards = it->second;
@@ -888,8 +888,8 @@ void MTGDeck::printDetailedDeckText(std::ofstream& file) {
             continue;
         }
         MTGSetInfo* setInfo = setlist.getInfo(card->setId);
-        string setName = setInfo->id;
-        string cardName = card->data->getName();
+        std::string setName = setInfo->id;
+        std::string cardName = card->data->getName();
 
         currentCard << "#" << nbCards << " x " << cardName << " (" << setName << "), ";
 
@@ -912,11 +912,11 @@ void MTGDeck::printDetailedDeckText(std::ofstream& file) {
         for (size_t x = 0; x < card->data->basicAbilities.size(); ++x) {
             if (card->data->basicAbilities[x] == 1) currentCard << Constants::MTGBasicAbilities[x] << "; ";
         }
-        currentCard << endl;
+        currentCard << std::endl;
 
-        for (int i = 0; i < nbCards; i++) currentCard << cardId << endl;
+        for (int i = 0; i < nbCards; i++) currentCard << cardId << std::endl;
 
-        currentCard << endl;
+        currentCard << std::endl;
         setInfo = NULL;
         if (card->data->isLand())
             lands << currentCard.str();
@@ -926,9 +926,9 @@ void MTGDeck::printDetailedDeckText(std::ofstream& file) {
             spells << currentCard.str();
         currentCard.str("");
     }
-    file << getCardBlockText("Creatures", creatures.str()) << endl;
-    file << getCardBlockText("Spells", spells.str()) << endl;
-    file << getCardBlockText("Lands", lands.str()) << endl;
+    file << getCardBlockText("Creatures", creatures.str()) << std::endl;
+    file << getCardBlockText("Spells", spells.str()) << std::endl;
+    file << getCardBlockText("Lands", lands.str()) << std::endl;
     creatures.str("");
     spells.str("");
     lands.str("");
@@ -938,13 +938,13 @@ void MTGDeck::printDetailedDeckText(std::ofstream& file) {
  * Convience method to print out blocks of card descriptions
  */
 string MTGDeck::getCardBlockText(const string& title, const string& text) {
-    ostringstream oss;
-    string textBlock(text);
+    std::ostringstream oss;
+    std::string textBlock(text);
 
-    oss << setfill('#') << setw(40) << "#" << endl;
-    oss << "#    " << setfill(' ') << setw(34) << left << title << "#" << endl;
-    oss << setfill('#') << setw(40) << "#" << endl;
-    oss << trim(textBlock) << endl;
+    oss << std::setfill('#') << std::setw(40) << "#" << std::endl;
+    oss << "#    " << std::setfill(' ') << std::setw(34) << std::left << title << "#" << std::endl;
+    oss << std::setfill('#') << std::setw(40) << "#" << std::endl;
+    oss << trim(textBlock) << std::endl;
 
     return oss.str();
 }

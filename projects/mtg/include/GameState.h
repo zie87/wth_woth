@@ -12,8 +12,6 @@ class JGE;
 #include "DeckMetaData.h"
 #include "DeckMenu.h"
 
-using namespace std;
-
 enum ENUM_GAME_STATE {
     GAME_STATE_NONE = -1,
     GAME_STATE_MENU = 1,
@@ -37,10 +35,10 @@ class GameState {
 protected:
     GameApp* mParent;
     JGE* mEngine;
-    string mStringID;
+    std::string mStringID;
 
 public:
-    GameState(GameApp* parent, string id);
+    GameState(GameApp* parent, std::string id);
     virtual ~GameState() {}
 
     virtual void Create() {}
@@ -54,33 +52,33 @@ public:
     virtual void Update(float dt) = 0;
     virtual void Render() = 0;
 
-    string getStringID() { return mStringID; };
+    std::string getStringID() { return mStringID; };
 
     // deck manipulation methods
     // 2010/09/15:
     // this was originally one method to do everything.  That has been split up into two distinct
     // methods since the original was building a menu and returning a value.  The first
-    // creates the vector containing the deck information.  The second will render that information
+    // creates the std::vector containing the deck information.  The second will render that information
     // it makes it easier to manipulate the deck information menus.
 
     // generate the Deck Meta Data and build the menu items of the menu given
-    static vector<DeckMetaData*> fillDeckMenu(SimpleMenu* _menu, const string& path,
-                                              const string& smallDeckPrefix = "", Player* statsPlayer = NULL);
+    static std::vector<DeckMetaData*> fillDeckMenu(SimpleMenu* _menu, const std::string& path,
+                                              const std::string& smallDeckPrefix = "", Player* statsPlayer = NULL);
 
     // generate the Deck Meta Data and build the menu items of the menu given
     // Will display up to maxDecks if maxDecks is non 0,all decks in path otherwise
-    static vector<DeckMetaData*> fillDeckMenu(DeckMenu* _menu, const string& path, const string& smallDeckPrefix = "",
+    static std::vector<DeckMetaData*> fillDeckMenu(DeckMenu* _menu, const std::string& path, const std::string& smallDeckPrefix = "",
                                               Player* statsPlayer = NULL, int maxDecks = 0);
 
-    // build a vector of decks with the information passsed in.
-    static vector<DeckMetaData*> BuildDeckList(const string& path, const string& smallDeckPrefix = "",
+    // build a std::vector of decks with the information passsed in.
+    static std::vector<DeckMetaData*> BuildDeckList(const std::string& path, const std::string& smallDeckPrefix = "",
                                                Player* statsPlayer = NULL, int maxDecks = 0);
 
-    // build menu items based on the vector<DeckMetaData *>
-    static void renderDeckMenu(SimpleMenu* _menu, const vector<DeckMetaData*>& deckMetaDataList);
+    // build menu items based on the std::vector<DeckMetaData *>
+    static void renderDeckMenu(SimpleMenu* _menu, const std::vector<DeckMetaData*>& deckMetaDataList);
 
-    // build menu items based on the vector<DeckMetaData *>
-    static void renderDeckMenu(DeckMenu* _menu, const vector<DeckMetaData*>& deckMetaDataList);
+    // build menu items based on the std::vector<DeckMetaData *>
+    static void renderDeckMenu(DeckMenu* _menu, const std::vector<DeckMetaData*>& deckMetaDataList);
 };
 bool sortByName(DeckMetaData* d1, DeckMetaData* d2);
 

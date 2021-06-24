@@ -15,8 +15,6 @@
 #include "ManaCost.h"
 #include "ObjectAnalytics.h"
 
-using namespace std;
-
 const uint8_t kColorBitMask_Artifact = 0x01;
 const uint8_t kColorBitMask_Green = 0x02;
 const uint8_t kColorBitMask_Blue = 0x04;
@@ -27,8 +25,8 @@ const uint8_t kColorBitMask_Land = 0x40;
 
 class CastRestrictions {
 public:
-    string restriction;
-    string otherrestriction;
+    std::string restriction;
+    std::string otherrestriction;
 
     CastRestrictions* clone() const { return NEW CastRestrictions(*this); };
 };
@@ -42,28 +40,28 @@ private:
     CastRestrictions* restrictions;
 
 protected:
-    string lcname;
+    std::string lcname;
     ManaCost manaCost;
 
 public:
-    vector<string> formattedText;
-    string text;
-    string name;
+    std::vector<std::string> formattedText;
+    std::string text;
+    std::string name;
     int init();
 
     uint8_t colors;
     typedef std::bitset<Constants::NB_BASIC_ABILITIES> BasicAbilitiesSet;
     BasicAbilitiesSet basicAbilities;
 
-    map<string, string> magicTexts;
-    string magicText;
+    std::map<std::string, std::string> magicTexts;
+    std::string magicText;
     int alias;
-    string spellTargetType;
+    std::string spellTargetType;
     int power;
     int toughness;
     int suspendedTime;
 
-    vector<int> types;
+    std::vector<int> types;
     CardPrimitive();
     CardPrimitive(CardPrimitive* source);
     virtual ~CardPrimitive();
@@ -79,13 +77,13 @@ public:
 
     int has(int ability);
 
-    void setText(const string& value);
-    const vector<string>& getFormattedText();
+    void setText(const std::string& value);
+    const std::vector<std::string>& getFormattedText();
 
-    void addMagicText(string value);
-    void addMagicText(string value, string zone);
+    void addMagicText(std::string value);
+    void addMagicText(std::string value, std::string zone);
 
-    void setName(const string& value);
+    void setName(const std::string& value);
     const string& getName() const;
     const string& getLCName() const;
 
@@ -112,9 +110,9 @@ public:
     void setToughness(int _toughness);
     int getToughness();
     void setRestrictions(string _restriction);
-    const string getRestrictions();
+    const std::string getRestrictions();
     void setOtherRestrictions(string _restriction);
-    const string getOtherRestrictions();
+    const std::string getOtherRestrictions();
 };
 
 #endif

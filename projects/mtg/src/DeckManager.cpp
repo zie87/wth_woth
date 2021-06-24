@@ -35,8 +35,8 @@ DeckMetaData* DeckManager::getDeckMetaDataById(int deckId, bool isAI) {
     if (pos != deckList.end()) {
         deck = *pos;
     } else {
-        ostringstream deckFilename;
-        string filepath;
+        std::ostringstream deckFilename;
+        std::string filepath;
         if (isAI)
             filepath = options.profileFile("ai/baka/");
         else
@@ -79,11 +79,11 @@ DeckMetaData* DeckManager::getDeckMetaDataByFilename(const string& filename, boo
 void DeckManager::AddMetaData(const string& filename, bool isAI) {
     if (isAI) {
         aiDeckOrderList.push_back(NEW DeckMetaData(filename, isAI));
-        aiDeckStatsMap.insert(make_pair(filename.c_str(), new StatsWrapper(aiDeckOrderList.back()->getDeckId())));
+        aiDeckStatsMap.insert(std::make_pair(filename.c_str(), new StatsWrapper(aiDeckOrderList.back()->getDeckId())));
     } else {
         playerDeckOrderList.push_back(NEW DeckMetaData(filename, isAI));
         playerDeckStatsMap.insert(
-            make_pair(filename.c_str(), new StatsWrapper(playerDeckOrderList.back()->getDeckId())));
+            std::make_pair(filename.c_str(), new StatsWrapper(playerDeckOrderList.back()->getDeckId())));
     }
 }
 
@@ -127,11 +127,11 @@ void DeckManager::DeleteMetaData(const string& filename, bool isAI) {
 StatsWrapper* DeckManager::getExtendedStatsForDeckId(int deckId, MTGAllCards* collection, bool isAI) {
     DeckMetaData* selectedDeck = getDeckMetaDataById(deckId, isAI);
     if (selectedDeck == NULL) {
-        ostringstream deckName;
+        std::ostringstream deckName;
         deckName << options.profileFile() << "/deck" << deckId << ".txt";
-        map<string, StatsWrapper*>* statsMap = isAI ? &aiDeckStatsMap : &playerDeckStatsMap;
+        std::map<std::string, StatsWrapper*>* statsMap = isAI ? &aiDeckStatsMap : &playerDeckStatsMap;
         StatsWrapper* stats = NEW StatsWrapper(deckId);
-        statsMap->insert(make_pair(deckName.str(), stats));
+        statsMap->insert(std::make_pair(deckName.str(), stats));
         return stats;
     }
     return getExtendedDeckStats(selectedDeck, collection, isAI);

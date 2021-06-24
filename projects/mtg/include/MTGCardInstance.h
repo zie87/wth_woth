@@ -21,7 +21,6 @@ class Counters;
 struct Pos;
 
 #include <list>
-using namespace std;
 
 class MTGCardInstance : public CardPrimitive,
                         public MTGCard,
@@ -37,7 +36,7 @@ private:
 protected:
     int untapping;
     int nb_damages;
-    string sample;
+    std::string sample;
     int tapped;
     int lifeOrig;
     MTGPlayerCards* belongs_to;
@@ -48,9 +47,9 @@ protected:
     int init();
 
 public:
-    vector<MTGCardInstance*> parentCards;
-    vector<MTGCardInstance*> childrenCards;
-    vector<MTGAbility*> cardsAbilities;
+    std::vector<MTGCardInstance*> parentCards;
+    std::vector<MTGCardInstance*> childrenCards;
+    std::vector<MTGAbility*> cardsAbilities;
 
     int setAttacker(int value);
     int setDefenser(MTGCardInstance* c);
@@ -93,7 +92,7 @@ public:
     bool exileEffects;
     bool suspended;
     int chooseacolor;
-    string chooseasubtype;
+    std::string chooseasubtype;
     int coinSide;  // 1 = tails
 
     int stillInUse();
@@ -125,17 +124,17 @@ public:
     MTGCardInstance* changeController(Player* newcontroller);
     Player* owner;
     Counters* counters;
-    const string getDisplayName() const;
+    const std::string getDisplayName() const;
     MTGCardInstance* target;
     Player* playerTarget;
-    vector<Targetable*> backupTargets;
+    std::vector<Targetable*> backupTargets;
 
     // types
     void addType(char* type_text);
     virtual void addType(int id);
     void setType(const char* type_text);
-    void setSubtype(string value);
-    int removeType(string value, int removeAll = 0);
+    void setSubtype(std::string value);
+    int removeType(std::string value, int removeAll = 0);
     int removeType(int value, int removeAll = 0);
 
     // dangerranking is a hint to Ai which creatures are the ones it should be targetting for effects.
@@ -143,7 +142,7 @@ public:
     // Combat
     bool isBlocked() { return blocked; };  // Blocked this turn or not?
     MTGCardInstance* defenser;
-    list<MTGCardInstance*> blockers;
+    std::list<MTGCardInstance*> blockers;
     int attacker;
     int toggleDefenser(MTGCardInstance* opponent);
     int raiseBlockerRankOrder(MTGCardInstance* blocker);
@@ -183,17 +182,17 @@ public:
     int addToToughness(int value);
     int setToughness(int value);
 
-    vector<TargetChooser*> protections;
+    std::vector<TargetChooser*> protections;
     int addProtection(TargetChooser* tc);
     int removeProtection(TargetChooser* tc, int erase = 0);
     int protectedAgainst(MTGCardInstance* card);
 
-    vector<TargetChooser*> canttarget;
+    std::vector<TargetChooser*> canttarget;
     int addCantBeTarget(TargetChooser* tc);
     int removeCantBeTarget(TargetChooser* tc, int erase = 0);
     int CantBeTargetby(MTGCardInstance* card);
 
-    vector<TargetChooser*> cantBeBlockedBys;
+    std::vector<TargetChooser*> cantBeBlockedBys;
     int addCantBeBlockedBy(TargetChooser* tc);
     int removeCantBeBlockedBy(TargetChooser* tc, int erase = 0);
     int cantBeBlockedBy(MTGCardInstance* card);
@@ -218,12 +217,12 @@ public:
 
     JQuadPtr getIcon();
 
-    ostream& toString(ostream&) const;
+    std::ostream& toString(std::ostream&) const;
 
     static MTGCardInstance AnyCard;
     static MTGCardInstance NoCard;
 
-    bool parseLine(const string& ss);
+    bool parseLine(const std::string& ss);
     virtual MTGCardInstance* clone();
 };
 

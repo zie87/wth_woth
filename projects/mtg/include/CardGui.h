@@ -20,7 +20,7 @@ const int kNumDrawModes = 3;
 
 struct CardGui : public PlayGuiObject {
 protected:
-    static map<string, string> counterGraphics;
+    static std::map<std::string, std::string> counterGraphics;
 
     /*
     ** Tries to render the Big version of a card picture, backups to text version in case of failure
@@ -30,8 +30,8 @@ protected:
     static void RenderCountersBig(MTGCard* card, const Pos& pos, int drawMode = DrawMode::kNormal);
     static void AlternateRender(MTGCard* card, const Pos& pos);
     static void TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad);
-    static string FormattedData(string data, string replace, string value);
-    static bool FilterCard(MTGCard* card, string filter);
+    static std::string FormattedData(std::string data, std::string replace, std::string value);
+    static bool FilterCard(MTGCard* card, std::string filter);
 
 public:
     static const float Width;
@@ -51,7 +51,7 @@ public:
     static void DrawCard(MTGCard* inCard, const Pos& inPosition, int inMode = DrawMode::kNormal);
 
     static JQuadPtr AlternateThumbQuad(MTGCard* card);
-    virtual ostream& toString(ostream&) const;
+    virtual std::ostream& toString(std::ostream&) const;
 };
 
 class CardView : public CardGui {
@@ -69,7 +69,7 @@ public:
 
     void Render(JQuad* q) { Pos::Render(q); }
 
-    virtual ostream& toString(ostream&) const;
+    virtual std::ostream& toString(std::ostream&) const;
 
     float GetCenterX();
     float GetCenterY();

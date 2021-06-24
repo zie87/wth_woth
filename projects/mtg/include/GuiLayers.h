@@ -9,6 +9,8 @@
 #include <JGui.h>
 #include "WEvent.h"
 
+#include <vector> 
+
 class GameObserver;
 class Player;
 
@@ -19,8 +21,8 @@ protected:
 
 public:
     int mCurr;
-    vector<JGuiObject*> mObjects;
-    vector<JGuiObject*> manaObjects;
+    std::vector<JGuiObject*> mObjects;
+    std::vector<JGuiObject*> manaObjects;
     void Add(JGuiObject* object);
     int Remove(JGuiObject* object);
     int modal;

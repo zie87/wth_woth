@@ -19,7 +19,7 @@ public:
     virtual void Update(float dt);
     bool CheckUserInput(JButton key);
     virtual MTGGamePhase* clone() const;
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     bool NextGamePhase();
 };
 

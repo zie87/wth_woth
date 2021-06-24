@@ -49,7 +49,7 @@ public:
         return true;
     };
     virtual ~PlayGuiObject(){};
-    vector<Effect*> effects;
+    std::vector<Effect*> effects;
 };
 
 #endif

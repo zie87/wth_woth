@@ -62,9 +62,9 @@ protected:
     DuelLayers* duel;
     LimitorFunctor<PlayGuiObject>* limitor;
     Pos bigpos;
-    map<const CardView::SelectorZone, SelectorMemory> lasts;
-    stack<pair<LimitorFunctor<PlayGuiObject>*, CardView::SelectorZone> > limitorStack;
-    stack<SelectorMemory> memoryStack;
+    std::map<const CardView::SelectorZone, SelectorMemory> lasts;
+    std::stack<std::pair<LimitorFunctor<PlayGuiObject>*, CardView::SelectorZone> > limitorStack;
+    std::stack<SelectorMemory> memoryStack;
 
     PlayGuiObject* fetchMemory(SelectorMemory&);
 

@@ -5,8 +5,6 @@
 #include <map>
 #include <vector>
 
-using namespace std;
-
 class Subtypes {
 public:
     // A list of commonly used types
@@ -32,24 +30,24 @@ public:
     };
 
 protected:
-    map<string, int> values;
-    vector<string> valuesById;
-    vector<unsigned int> subtypesToType;
+    std::map<std::string, int> values;
+    std::vector<std::string> valuesById;
+    std::vector<unsigned int> subtypesToType;
 
 public:
-    vector<string> subtypesCreature;
+    std::vector<std::string> subtypesCreature;
     Subtypes();
-    int find(string subtype, bool forceAdd = true);
-    string find(unsigned int id);
+    int find(std::string subtype, bool forceAdd = true);
+    std::string find(unsigned int id);
     bool isSubtypeOfType(unsigned int subtype, unsigned int type);
     bool isSuperType(unsigned int type);
     bool isType(unsigned int type);
     bool isSubType(unsigned int type);
     void sortSubTypes();
-    int add(string value, unsigned int parentType);
-    const vector<string>& getValuesById();
-    const vector<string>& getCreatureValuesById();
-    const map<string, int>& getValuesByMap();
+    int add(std::string value, unsigned int parentType);
+    const std::vector<std::string>& getValuesById();
+    const std::vector<std::string>& getCreatureValuesById();
+    const std::map<std::string, int>& getValuesByMap();
 };
 
 #endif

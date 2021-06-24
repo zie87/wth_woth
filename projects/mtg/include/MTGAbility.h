@@ -152,7 +152,7 @@ public:
     virtual int resolve() { return 0; }
 
     virtual MTGAbility* clone() const = 0;
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     virtual int addToGame();
     virtual int removeFromGame();
 
@@ -216,7 +216,7 @@ public:
     int receiveEvent(WEvent* e);
     virtual int resolve() = 0;
     virtual TriggeredAbility* clone() const = 0;
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     string castRestriction;
 };
 
@@ -268,7 +268,7 @@ public:
     virtual int resolve() = 0;
     void activateSideEffect();
     virtual ActivatedAbility* clone() const = 0;
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
 };
 
 class TargetAbility : public ActivatedAbility, public NestedAbility {
@@ -285,7 +285,7 @@ public:
     virtual void Render();
     virtual int resolve();
     virtual const char* getMenuText();
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
 };
 
 class InstantAbility : public MTGAbility {
@@ -299,7 +299,7 @@ public:
     virtual int resolve() { return 0; }
 
     virtual InstantAbility* clone() const = 0;
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
 };
 
 /* State based effects. This class works ONLY for InPlay and needs to be extended for other areas of the game !!! */
@@ -332,7 +332,7 @@ public:
 
     virtual int destroy();
     virtual ListMaintainerAbility* clone() const = 0;
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
 };
 
 class TriggerAtPhase : public TriggeredAbility {
@@ -367,7 +367,7 @@ public:
 class GenericTriggeredAbility : public TriggeredAbility, public NestedAbility {
 public:
     TriggeredAbility* t;
-    queue<Targetable*> targets;
+    std::queue<Targetable*> targets;
     MTGAbility* destroyCondition;
     GenericTriggeredAbility(GameObserver* observer, int id, MTGCardInstance* _source, TriggeredAbility* _t,
                             MTGAbility* a, MTGAbility* dc = NULL, Targetable* _target = NULL);
@@ -392,23 +392,24 @@ private:
     string storedAbilityString;
     string storedAndAbility;
     int countCards(TargetChooser* tc, Player* player = NULL, int option = 0);
-    TriggeredAbility* parseTrigger(string s, string magicText, int id, Spell* spell, MTGCardInstance* card,
+    TriggeredAbility* parseTrigger(std::string s, string magicText, int id, Spell* spell, MTGCardInstance* card,
                                    Targetable* target);
-    MTGAbility* getAlternateCost(string s, int id, Spell* spell, MTGCardInstance* card);
-    MTGAbility* getManaReduxAbility(string s, int id, Spell* spell, MTGCardInstance* card, MTGCardInstance* target);
+    MTGAbility* getAlternateCost(std::string s, int id, Spell* spell, MTGCardInstance* card);
+    MTGAbility* getManaReduxAbility(std::string s, int id, Spell* spell, MTGCardInstance* card,
+                                    MTGCardInstance* target);
     TargetChooser* parseSimpleTC(const std::string& s, const std::string& starter, MTGCardInstance* card,
                                  bool forceNoTarget = true);
     GameObserver* observer;
 
 public:
     AbilityFactory(GameObserver* observer) : observer(observer){};
-    int parseRestriction(string s);
+    int parseRestriction(std::string s);
     int parseCastRestrictions(MTGCardInstance* card, Player* player, string restrictions);
-    Counter* parseCounter(string s, MTGCardInstance* target, Spell* spell = NULL);
-    int parsePowerToughness(string s, int* power, int* toughness);
+    Counter* parseCounter(std::string s, MTGCardInstance* target, Spell* spell = NULL);
+    int parsePowerToughness(std::string s, int* power, int* toughness);
     int getAbilities(vector<MTGAbility*>* v, Spell* spell, MTGCardInstance* card = NULL, int id = 0,
                      MTGGameZone* dest = NULL);
-    MTGAbility* parseMagicLine(string s, int id, Spell* spell, MTGCardInstance* card, bool activated = false,
+    MTGAbility* parseMagicLine(std::string s, int id, Spell* spell, MTGCardInstance* card, bool activated = false,
                                bool forceUEOT = false, MTGGameZone* dest = NULL);
     int abilityEfficiency(MTGAbility* a, Player* p, int mode = MODE_ABILITY, TargetChooser* tc = NULL,
                           Targetable* target = NULL);
@@ -422,11 +423,11 @@ public:
     int TapAll(TargetChooser* tc);
     int UntapAll(TargetChooser* tc);
     void addAbilities(int _id, Spell* spell);
-    MTGAbility* parseUpkeepAbility(string s = "", MTGCardInstance* card = NULL, Spell* spell = NULL,
+    MTGAbility* parseUpkeepAbility(std::string s = "", MTGCardInstance* card = NULL, Spell* spell = NULL,
                                    int restrictions = 0, int id = -1);
-    MTGAbility* parsePhaseActionAbility(string s = "", MTGCardInstance* card = NULL, Spell* spell = NULL,
+    MTGAbility* parsePhaseActionAbility(std::string s = "", MTGCardInstance* card = NULL, Spell* spell = NULL,
                                         MTGCardInstance* target = NULL, int restrictions = 0, int id = -1);
-    MTGAbility* parseChooseActionAbility(string s = "", MTGCardInstance* card = NULL, Spell* spell = NULL,
+    MTGAbility* parseChooseActionAbility(std::string s = "", MTGCardInstance* card = NULL, Spell* spell = NULL,
                                          MTGCardInstance* target = NULL, int restrictions = 0, int id = -1);
 };
 

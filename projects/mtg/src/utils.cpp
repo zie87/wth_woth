@@ -17,7 +17,6 @@ std::map<std::string, int> ifstream::sFileMap;
 #endif
 }  // namespace wagic
 
-using std::queue;
 using std::vector;
 
 int RandomGenerator::random() {
@@ -32,18 +31,16 @@ int RandomGenerator::random() {
     return result;
 }
 
-ostream& RandomGenerator::saveUsedRandValues(ostream& out) const {
-    list<int>::const_iterator ite;
-    for (ite = usedRandomValues.begin(); ite != usedRandomValues.end(); ite++) {
+std::ostream& RandomGenerator::saveUsedRandValues(std::ostream& out) const {
+    for (auto ite = usedRandomValues.begin(); ite != usedRandomValues.end(); ite++) {
         out << *ite << ",";
     }
 
     return out;
 }
 
-ostream& RandomGenerator::saveLoadedRandValues(ostream& out) {
-    list<int>::iterator ite;
-    for (ite = loadedRandomValues.begin(); ite != loadedRandomValues.end(); ite++) {
+std::ostream& RandomGenerator::saveLoadedRandValues(std::ostream& out) {
+    for (auto ite = loadedRandomValues.begin(); ite != loadedRandomValues.end(); ite++) {
         out << *ite << ",";
     }
 

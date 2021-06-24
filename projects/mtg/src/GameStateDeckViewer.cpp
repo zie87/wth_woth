@@ -176,8 +176,8 @@ void GameStateDeckViewer::updateDecks() {
 }
 
 void GameStateDeckViewer::buildEditorMenu() {
-    ostringstream deckSummaryInformation;
-    deckSummaryInformation << "All changes are final." << endl;
+    std::ostringstream deckSummaryInformation;
+    deckSummaryInformation << "All changes are final." << std::endl;
 
     if (menu) SAFE_DELETE(menu);
     // Build menu.
@@ -302,7 +302,7 @@ void GameStateDeckViewer::saveAsAIDeck(string deckName) {
     string aiDeckName = oss.str();
     oss.str("");
     if (myDeck->parent->meta_desc == "")
-        oss << endl << "Can you beat your own creations?" << endl << "User created AI Deck # " << deckId;
+        oss << std::endl << "Can you beat your own creations?" << std::endl << "User created AI Deck # " << deckId;
     else
         oss << myDeck->parent->meta_desc;
     string deckDesc = oss.str();
@@ -1278,7 +1278,7 @@ void GameStateDeckViewer::renderCard(int id, float rotation) {
 
     float y = (SCREEN_HEIGHT_F) / 2.0f + SCREEN_HEIGHT_F * mSlide * (scale + 0.2f);
 
-    cardsCoordinates[id] = pair<float, float>(x, y);
+    cardsCoordinates[id] = std::pair<float, float>(x, y);
 
     int alpha = (int)(255 * (scale + 1.0 - max_scale));
 

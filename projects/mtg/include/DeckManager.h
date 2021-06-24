@@ -3,14 +3,12 @@
 
 #include "DeckMetaData.h"
 
-using namespace std;
-
 class DeckManager {
 private:
-    vector<DeckMetaData*> playerDeckOrderList;
-    vector<DeckMetaData*> aiDeckOrderList;
-    map<string, StatsWrapper*> playerDeckStatsMap;
-    map<string, StatsWrapper*> aiDeckStatsMap;
+    std::vector<DeckMetaData*> playerDeckOrderList;
+    std::vector<DeckMetaData*> aiDeckOrderList;
+    std::map<std::string, StatsWrapper*> playerDeckStatsMap;
+    std::map<std::string, StatsWrapper*> aiDeckStatsMap;
 
     static DeckManager* mInstance;
 
@@ -19,9 +17,9 @@ public:
         // private constructor
     }
 
-    void updateMetaDataList(vector<DeckMetaData*>* refList, bool isAI);
-    vector<DeckMetaData*>* getPlayerDeckOrderList();
-    vector<DeckMetaData*>* getAIDeckOrderList();
+    void updateMetaDataList(std::vector<DeckMetaData*>* refList, bool isAI);
+    std::vector<DeckMetaData*>* getPlayerDeckOrderList();
+    std::vector<DeckMetaData*>* getAIDeckOrderList();
 
     void AddMetaData(const std::string& filename, bool isAI);
     void DeleteMetaData(const std::string& filename, bool isAI);

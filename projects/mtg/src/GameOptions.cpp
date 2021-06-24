@@ -756,7 +756,7 @@ string GameOptionEnum::menuStr() {
 bool GameOptionEnum::write(std::ofstream* file, string name) {
     if (!file || !def || number <= 0 || number >= (int)def->values.size()) return false;
 
-    (*file) << name << "=" << menuStr() << endl;
+    (*file) << name << "=" << menuStr() << std::endl;
     return true;
 }
 
@@ -1012,7 +1012,7 @@ bool GameOptionKeyBindings::write(std::ofstream* file, string name) {
         ++start;
     }
     for (JGE::keybindings_it it = start; it != end; ++it) *file << "," << it->first << ":" << it->second;
-    *file << endl;
+    *file << std::endl;
     return true;
 }
 // MARK:  -

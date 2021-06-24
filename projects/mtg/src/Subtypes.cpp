@@ -81,7 +81,7 @@ bool Subtypes::isType(unsigned int type) {
 
 bool Subtypes::isSubType(unsigned int type) { return (!isSuperType(type) && !isType(type)); }
 
-const vector<string>& Subtypes::getValuesById() { return valuesById; }
+const std::vector<std::string>& Subtypes::getValuesById() { return valuesById; }
 
 void Subtypes::sortSubTypes() {
     sort(subtypesCreature.begin(), subtypesCreature.end());
@@ -89,7 +89,7 @@ void Subtypes::sortSubTypes() {
     return;
 }
 
-const vector<string>& Subtypes::getCreatureValuesById() {
+const std::vector<std::string>& Subtypes::getCreatureValuesById() {
     sort(subtypesCreature.begin(), subtypesCreature.end());
     subtypesCreature.erase(unique(subtypesCreature.begin(), subtypesCreature.end()), subtypesCreature.end());
     return subtypesCreature;

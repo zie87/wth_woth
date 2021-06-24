@@ -250,17 +250,17 @@ void HumanPlayer::End() {
         DeckStats::GetInstance()->saveStats(this, opponent(), observer);
 }
 
-ostream& operator<<(ostream& out, const Player& p) {
-    out << "mode=" << p.playMode << endl;
+std::ostream& operator<<(std::ostream& out, const Player& p) {
+    out << "mode=" << p.playMode << std::endl;
     out << *(Damageable*)&p;
     string manapoolstring = p.manaPool->toString();
-    if (manapoolstring != "") out << "manapool=" << manapoolstring << endl;
-    if (p.mAvatarName != "") out << "avatar=" << p.mAvatarName << endl;
-    if (p.phaseRing != "") out << "customphasering=" << p.phaseRing << endl;
-    out << "offerinterruptonphase=" << Constants::MTGPhaseCodeNames[p.offerInterruptOnPhase] << endl;
-    out << "premade=" << p.premade << endl;
-    if (p.deckFile != "") out << "deckfile=" << p.deckFile << endl;
-    if (p.deckFileSmall != "") out << "deckfilesmall=" << p.deckFileSmall << endl;
+    if (manapoolstring != "") out << "manapool=" << manapoolstring << std::endl;
+    if (p.mAvatarName != "") out << "avatar=" << p.mAvatarName << std::endl;
+    if (p.phaseRing != "") out << "customphasering=" << p.phaseRing << std::endl;
+    out << "offerinterruptonphase=" << Constants::MTGPhaseCodeNames[p.offerInterruptOnPhase] << std::endl;
+    out << "premade=" << p.premade << std::endl;
+    if (p.deckFile != "") out << "deckfile=" << p.deckFile << std::endl;
+    if (p.deckFileSmall != "") out << "deckfilesmall=" << p.deckFileSmall << std::endl;
 
     if (p.game) {
         out << *(p.game);

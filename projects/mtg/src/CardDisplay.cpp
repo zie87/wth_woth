@@ -222,7 +222,7 @@ void CardDisplay::Render() {
     }
 }
 
-ostream& CardDisplay::toString(ostream& out) const {
+std::ostream& CardDisplay::toString(std::ostream& out) const {
     return (out << "CardDisplay ::: x,y : " << x << "," << y << " ; start_item : " << start_item
                 << " ; nb_displayed_items " << nb_displayed_items << " ; tc : " << tc << " ; listener : " << listener);
 }

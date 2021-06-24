@@ -23,25 +23,25 @@ public:
     enum Mode { MODE_TEST_SUITE, MODE_HUMAN, MODE_AI };
 
     int deckId;
-    string mAvatarName;
+    std::string mAvatarName;
     Mode playMode;
     bool nomaxhandsize;
     MTGPlayerCards* game;
     MTGDeck* mDeck;
-    string deckFile;
-    string deckFileSmall;
-    string deckName;
-    string phaseRing;
+    std::string deckFile;
+    std::string deckFileSmall;
+    std::string deckName;
+    std::string phaseRing;
     int offerInterruptOnPhase;
     int skippingTurn;
     int extraTurn;
-    vector<MTGCardInstance*> curses;
+    std::vector<MTGCardInstance*> curses;
     Player(GameObserver* observer, string deckFile, string deckFileSmall, MTGDeck* deck = NULL);
     virtual ~Player();
     virtual void setObserver(GameObserver* g);
     virtual void End();
     virtual int displayStack() { return 1; }
-    const string getDisplayName() const;
+    const std::string getDisplayName() const;
 
     int afterDamage();
 
@@ -78,7 +78,7 @@ public:
     */
     std::string GetCurrentDeckStatsFile();
     virtual bool parseLine(const string& s);
-    friend ostream& operator<<(ostream&, const Player&);
+    friend std::ostream& operator<<(std::ostream&, const Player&);
     bool operator<(Player& aPlayer);
     bool isDead();
 };
@@ -88,7 +88,7 @@ public:
     HumanPlayer(GameObserver* observer, string deckFile, string deckFileSmall, bool premade = false,
                 MTGDeck* deck = NULL);
     void End();
-    friend ostream& operator<<(ostream&, const HumanPlayer&);
+    friend std::ostream& operator<<(std::ostream&, const HumanPlayer&);
 };
 
 #endif

@@ -15,8 +15,6 @@
 
 class CardPrimitive;
 
-using namespace std;
-
 class MTGCard
 #ifdef TRACK_OBJECT_USAGE
     : public InstanceCounter<MTGCard>
@@ -45,7 +43,7 @@ public:
     int getMTGId() const;
     int getId() const;
     char getRarity() const;
-    const string getImageName();
+    const std::string getImageName();
 };
 
 #endif

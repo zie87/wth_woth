@@ -795,7 +795,7 @@ void GameStateMenu::ButtonPressed(int controllerId, int controlId) {
     }
 }
 
-ostream& GameStateMenu::toString(ostream& out) const {
+std::ostream& GameStateMenu::toString(std::ostream& out) const {
     return out << "GameStateMenu ::: scroller : " << scroller << " ; scrollerSet : " << scrollerSet
                << " ; mGuiController : " << mGuiController << " ; subMenuController : " << subMenuController
                << " ; gameTypeMenu : " << gameTypeMenu << " ; hasChosenGameType : " << hasChosenGameType

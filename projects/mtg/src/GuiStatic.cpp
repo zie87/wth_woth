@@ -114,7 +114,7 @@ void GuiAvatar::Render() {
     PlayGuiObject::Render();
 }
 
-ostream& GuiAvatar::toString(ostream& out) const {
+std::ostream& GuiAvatar::toString(std::ostream& out) const {
     return out << "GuiAvatar ::: avatarRed : " << avatarRed << " ; currentLife : " << currentLife
                << " ; currentpoisonCount : " << currentpoisonCount << " ; player : " << player;
 }
@@ -198,7 +198,7 @@ GuiGameZone::~GuiGameZone() {
     for (vector<CardView*>::iterator it = cards.begin(); it != cards.end(); ++it) delete (*it);
 }
 
-ostream& GuiGameZone::toString(ostream& out) const {
+std::ostream& GuiGameZone::toString(std::ostream& out) const {
     return out << "GuiGameZone ::: zone : " << zone << " ; cd : " << cd << " ; showCards : " << showCards;
 }
 
@@ -238,7 +238,7 @@ int GuiGraveyard::receiveEventMinus(WEvent* e) {
     return 0;
 }
 
-ostream& GuiGraveyard::toString(ostream& out) const { return out << "GuiGraveyard :::"; }
+std::ostream& GuiGraveyard::toString(std::ostream& out) const { return out << "GuiGraveyard :::"; }
 
 // opponenthand begins
 GuiOpponentHand::GuiOpponentHand(float x, float y, bool hasFocus, Player* player, GuiAvatars* parent)
@@ -277,11 +277,11 @@ int GuiOpponentHand::receiveEventMinus(WEvent* e) {
     return 0;
 }
 
-ostream& GuiOpponentHand::toString(ostream& out) const { return out << "GuiOpponentHand :::"; }
+std::ostream& GuiOpponentHand::toString(std::ostream& out) const { return out << "GuiOpponentHand :::"; }
 
 GuiLibrary::GuiLibrary(float x, float y, bool hasFocus, Player* player, GuiAvatars* parent)
     : GuiGameZone(x, y, hasFocus, player->game->library, parent), player(player) {
     type = GUI_LIBRARY;
 }
 
-ostream& GuiLibrary::toString(ostream& out) const { return out << "GuiLibrary :::"; }
+std::ostream& GuiLibrary::toString(std::ostream& out) const { return out << "GuiLibrary :::"; }

@@ -34,14 +34,6 @@ std::string ToHex(T* pointer) {
                     stream << inString << std::endl; \
                     qDebug(stream.str().c_str());    \
                 }
-        #elif defined(ANDROID)
-            #include <android/log.h>
-            #define DebugTrace(inString)                                                   \
-                {                                                                          \
-                    std::ostringstream stream;                                             \
-                    stream << inString;                                                    \
-                    __android_log_write(ANDROID_LOG_DEBUG, "Wagic", stream.str().c_str()); \
-                }
         #else
             #define DebugTrace(inString)                     \
                 {                                            \

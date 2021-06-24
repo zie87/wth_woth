@@ -18,11 +18,7 @@
 
 #include "JTypes.h"
 
-#ifdef ANDROID
-    #include <SLES/OpenSLES.h>
-    #include "SLES/OpenSLES_Android.h"
-
-#elif defined USE_PHONON
+#if defined USE_PHONON
     #include <phonon/AudioOutput>
     #include <phonon/MediaObject>
 #else
@@ -70,17 +66,8 @@ public slots:
     void seekAtTheBegining();
 #elif defined(PSP)
     JMP3* mTrack;
-#elif defined(IOS)
-std::string filename;
-std::string key;
-std::string ext;
 #elif defined WITH_FMOD
 FSOUND_SAMPLE* mTrack;  // MP3 needed to be of "sample" type for FMOD, FMUSIC_MODULE is for MODs
-#elif defined ANDROID
-SLObjectItf playerObject;
-SLPlayItf playInterface;
-SLSeekItf seekInterface;
-SLVolumeItf musicVolumeInterface;
 #else
 void* mTrack;
 #endif  // WITH_FMOD
@@ -96,22 +83,11 @@ public:
 
 #if defined(PSP)
     WAVDATA* mSample;
-#elif defined(IOS)
-    std::string filename;
-    std::string key;
-    std::string ext;
-
-    void* mSample;
 #elif defined(WITH_FMOD)
     FSOUND_SAMPLE* mSample;
 #elif defined(USE_PHONON)
     Phonon::AudioOutput* mOutput;
     Phonon::MediaObject* mMediaObject;
-    void* mSample;
-#elif defined ANDROID
-    SLObjectItf playerObject;
-    SLPlayItf playInterface;
-    SLVolumeItf sampleVolumeInterface;
     void* mSample;
 #else
     void* mSample;

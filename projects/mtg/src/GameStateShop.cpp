@@ -542,24 +542,15 @@ void GameStateShop::Update(float dt) {
             clearInput = true;
             return;
         } else if (shopMenu) {
-#if defined(IOS) || defined(ANDROID)
-            if ((cycleCardsButton->ButtonPressed() || showCardListButton->ButtonPressed()))
-#else
+
             if ((btn == JGE_BTN_OK) && (cycleCardsButton->ButtonPressed() || showCardListButton->ButtonPressed()))
-#endif
             {
                 disablePurchase = true;
                 return;
-            } else
-#if defined(IOS) || defined(ANDROID)
-                if (clearInput && (btn == JGE_BTN_OK)) {
-                clearInput = false;
-                disablePurchase = false;
-                return;
-            } else
-#endif
+            } else {
                 if (shopMenu->CheckUserInput(btn))
                 srcCards->Touch();
+            }
         }
         if (shopMenu) shopMenu->Update(dt);
 

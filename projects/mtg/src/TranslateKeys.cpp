@@ -12,7 +12,7 @@ using std::string;
 static map<const LocalKeySym, KeyRep> fattable;
 static map<const JButton, KeyRep> slimtable;
 
-#if defined(LINUX) || defined(IOS) || defined(ANDROID) || defined(SDL_CONFIG) || defined(QT_CONFIG)
+#if defined(LINUX) || defined(SDL_CONFIG) || defined(QT_CONFIG)
 const KeyRep& translateKey(LocalKeySym key) {
     {
         map<const LocalKeySym, KeyRep>::iterator res;

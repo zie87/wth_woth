@@ -17,9 +17,6 @@ User folder is the only one that is really needed to guarantee both read and wri
 necessary but provides a nice way to distinguish The content that users should not be touching.
 */
 
-#if defined(ANDROID)
-    #include "../../include/PrecompiledHeader.h"
-#endif
 
 #ifdef WIN32
     #pragma warning(disable : 4786)
@@ -96,19 +93,7 @@ JFileSystem::JFileSystem(const string& _userPath, const string& _systemPath)
     string systemPath = _systemPath;
     string userPath = _userPath;
 
-#ifdef IOS
-    NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString* documentsDirectory = [paths objectAtIndex:0];
-
-    userPath = [[documentsDirectory stringByAppendingString:@"/User/"] cStringUsingEncoding:1];
-    systemPath = [[documentsDirectory stringByAppendingString:@"/Res/"] cStringUsingEncoding:1];
-
-#elif defined(ANDROID)
-    userPath = JGE::GetInstance()->getFileSystemLocation();
-    systemPath = "";
-
-    DebugTrace("User path " << userPath);
-#elif defined(QT_CONFIG)
+#if defined(QT_CONFIG)
     QDir dir(QDir::homePath());
     dir.cd(USERDIR);
 

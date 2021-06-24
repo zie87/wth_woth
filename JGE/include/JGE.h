@@ -44,20 +44,12 @@ typedef WPARAM LocalKeySym;
     #include <X11/keysym.h>
 typedef KeySym LocalKeySym;
     #define LOCAL_KEY_NONE XK_VoidSymbol
-
-#elif defined(ANDROID)  // This is temporary until we understand how to send real key events from Java
-typedef long unsigned int LocalKeySym;
-    #define LOCAL_KEY_NONE 0
-
 #else
 typedef u32 LocalKeySym;
     #define LOCAL_KEY_NONE ((u32)-1)
 
 #endif
 
-#if defined(ANDROID)
-    #include <jni.h>
-#endif
 
 bool JGEGetButtonState(const JButton button);
 bool JGEGetButtonClick(const JButton button);
@@ -124,13 +116,6 @@ public:
 private:
 #endif
 
-#if defined(ANDROID)
-    JavaVM* mJavaVM;
-    JNIEnv* mJNIEnv;
-    jclass mJNIClass;
-    jmethodID midSendCommand;
-#endif
-
     bool mDone;
     float mDeltaTime;
     bool mDebug;
@@ -162,10 +147,6 @@ public:
     static JGE* GetInstance();
     static void Destroy();
 
-#ifdef ANDROID
-    JNIEnv* getJNIEnv();
-    void setJVM(JavaVM* vm);
-#endif
     void Init();
     void End();
 
@@ -370,12 +351,6 @@ public:
     void SendCommand(std::string command, std::string parameter);
     void SendCommand(std::string command, float& x, float& y, float& width, float& height);
 
-#if defined(ANDROID)
-    /// Access to JNI Environment
-    void SetJNIEnv(JNIEnv* env, jclass cls);
-    void sendJNICommand(std::string command);
-    std::string getFileSystemLocation();
-#endif
 
 protected:
     JGE();

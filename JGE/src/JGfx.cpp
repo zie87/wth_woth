@@ -38,6 +38,8 @@ extern "C" {
 #include "JRenderer.h"
 #include "JFileSystem.h"
 
+#include <wge/math.hpp>
+
 #include <utility>
 
 static unsigned int __attribute__((aligned(16))) list[262144];
@@ -782,15 +784,6 @@ static void PNGCustomReadDataFn(png_structp png_ptr, png_bytep data, png_size_t 
     }
 }
 
-static int getNextPower2(int width) {
-    int b = width;
-    int n;
-    for (n = 0; b != 0; n++) b >>= 1;
-    b = 1 << n;
-    if (b == 2 * width) b >>= 1;
-    return b;
-}
-
 /*
 ** Alternate swizzle function that can handle any number of lines (as opposed to swizzle_fast, which is
 ** hardcoded to do 8 at a time)
@@ -865,42 +858,148 @@ static void jpeg_mem_src(j_decompress_ptr cinfo, u8* mem, int len) {
     cinfo->src->next_input_byte = mem;
 }
 
+enum class pixel_format {
+    format_5650,
+    format_5551,
+    format_4444,
+    format_8888,
+};
+
+template <pixel_format Format>
+struct pixel_converter;
+
+template <>
+struct pixel_converter<pixel_format::format_5650> final {
+    using pixel_t = wge::u16;
+    static constexpr auto pixel_size = sizeof(pixel_t);
+    static constexpr auto psp_display_pixel_format = PSP_DISPLAY_PIXEL_FORMAT_5551;
+
+    static constexpr pixel_t convert(uint32_t r, uint32_t g, uint32_t b, [[maybe_unused]] uint32_t a = 255) noexcept {
+        return static_cast<pixel_t>((r >> 3) | ((g >> 2) << 5) | ((b >> 3) << 11));
+    }
+};
+
+template <>
+struct pixel_converter<pixel_format::format_5551> final {
+    using pixel_t = wge::u16;
+    static constexpr auto pixel_size = sizeof(pixel_t);
+    static constexpr auto psp_display_pixel_format = PSP_DISPLAY_PIXEL_FORMAT_5551;
+
+    static constexpr pixel_t convert(uint32_t r, uint32_t g, uint32_t b, uint32_t a = 255) noexcept {
+        return static_cast<pixel_t>((r >> 3) | ((g >> 3) << 5) | ((b >> 3) << 10) | ((a >> 7) << 15));
+    }
+};
+
+template <>
+struct pixel_converter<pixel_format::format_4444> final {
+    using pixel_t = wge::u16;
+    static constexpr auto pixel_size = sizeof(pixel_t);
+    static constexpr auto psp_display_pixel_format = PSP_DISPLAY_PIXEL_FORMAT_4444;
+
+    static constexpr pixel_t convert(uint32_t r, uint32_t g, uint32_t b, uint32_t a = 255) noexcept {
+        return static_cast<pixel_t>((r >> 4) | ((g >> 4) << 4) | ((b >> 4) << 8) | ((a >> 4) << 12));
+    }
+};
+
+template <>
+struct pixel_converter<pixel_format::format_8888> final {
+    using pixel_t = wge::u32;
+    static constexpr auto pixel_size = sizeof(pixel_t);
+    static constexpr auto psp_display_pixel_format = PSP_DISPLAY_PIXEL_FORMAT_8888;
+
+    static constexpr pixel_t convert(uint32_t r, uint32_t g, uint32_t b, uint32_t a = 255) noexcept {
+        return static_cast<pixel_t>(r | (g << 8) | (b << 16) | (a << 24));
+    }
+};
+
 int JRenderer::PixelSize(int textureMode) {
     switch (textureMode) {
     case GU_PSM_5650:
+        return pixel_converter<pixel_format::format_5650>::pixel_size;
     case GU_PSM_5551:
+        return pixel_converter<pixel_format::format_5551>::pixel_size;
     case GU_PSM_4444:
-        return 2;
+        return pixel_converter<pixel_format::format_4444>::pixel_size;
     case GU_PSM_8888:
-        return 4;
+        return pixel_converter<pixel_format::format_8888>::pixel_size;
     }
     return PIXEL_SIZE;
+}
+
+struct psp_ram_ptr {
+    using pointer_type = void*;
+
+    psp_ram_ptr(void* ptr, bool vram) noexcept : m_buffer(ptr), m_is_vram(vram) {}
+    ~psp_ram_ptr() noexcept { reset(); }
+
+    inline bool is_vram() const noexcept { return m_is_vram; }
+    inline pointer_type get() const noexcept { return m_buffer; }
+    inline pointer_type release() noexcept {
+        auto* tmp = m_buffer;
+        m_buffer = nullptr;
+        return tmp;
+    }
+
+    inline bool is_valid() const noexcept { return m_buffer != nullptr; }
+    explicit inline operator bool() const noexcept { return is_valid(); }
+
+    psp_ram_ptr(const psp_ram_ptr&) = delete;
+    psp_ram_ptr(psp_ram_ptr&&) = delete;
+    psp_ram_ptr& operator=(const psp_ram_ptr&) = delete;
+    psp_ram_ptr& operator=(psp_ram_ptr&&) = delete;
+
+    inline void reset() noexcept {
+        if (m_buffer != nullptr) {
+            if (m_is_vram) {
+                vfree(m_buffer);
+            } else {
+                free(m_buffer);
+            }
+            m_buffer = nullptr;
+        }
+    }
+
+private:
+    pointer_type m_buffer;
+    bool m_is_vram;
+};
+
+psp_ram_ptr make_ram_ptr(wge::size_t size, bool is_vram) noexcept {
+    psp_ram_ptr::pointer_type ptr = nullptr;
+
+    if (is_vram) {
+        ptr = valloc(size);
+    }
+
+    if (ptr == nullptr) {
+        ptr = memalign(16, size);
+        is_vram = false;
+    }
+
+    return {ptr, is_vram};
 }
 
 void JRenderer::LoadJPG(TextureInfo& textureInfo, const char* filename, int mode, int textureMode) {
     JLOG("JRenderer::LoadJPG");
     textureInfo.mBits = NULL;
 
-    bool useVideoRAM = (mode == TEX_TYPE_USE_VRAM);
+    const bool useVideoRAM = (mode == TEX_TYPE_USE_VRAM);
+    const auto pixel_size = PixelSize(textureMode);
 
     struct jpeg_decompress_struct cinfo;
     struct jpeg_error_mgr jerr;
-    u8 *rawdata, *scanline, *p;
-    u16 *rgbadata16, *q16, *bits16;
-    u32 *rgbadata32, *q32, *bits32;
-    int rawsize, i;
-    int pixelSize = PixelSize(textureMode);
-    bits16 = NULL;
-    bits32 = NULL;
+    u8 *scanline, *p;
+    u16* q16;
+    u32* q32;
 
     JFileSystem* fileSystem = JFileSystem::GetInstance();
     if (!fileSystem->OpenFile(filename)) {
         return;
     }
 
-    rawsize = fileSystem->GetFileSize();
+    const auto rawsize = fileSystem->GetFileSize();
 
-    rawdata = new u8[rawsize];
+    auto* rawdata = new u8[rawsize];
 
     if (!rawdata) {
         fileSystem->CloseFile();
@@ -924,46 +1023,28 @@ void JRenderer::LoadJPG(TextureInfo& textureInfo, const char* filename, int mode
         return;
     }
 
-    int tw = getNextPower2(cinfo.output_width);
-    int th = getNextPower2(cinfo.output_height);
+    const wge::size_t tw = wge::math::nearest_superior_power_of_2(cinfo.output_width);
+    const wge::size_t th = wge::math::nearest_superior_power_of_2(cinfo.output_height);
+    const auto size = tw * th * pixel_size;
 
-    bool videoRAMUsed = false;
+    auto ram_ptr = make_ram_ptr(size, useVideoRAM);
 
-    int size = tw * th * pixelSize;
+    wge::u16* bits16 = nullptr;
+    wge::u32* bits32 = nullptr;
 
-    if (useVideoRAM) {
-        if (pixelSize == 2) {
-            bits16 = (u16*)valloc(size);
-        } else {
-            bits32 = (u32*)valloc(size);
-        }
-        videoRAMUsed = true;
+    if (pixel_size == 2) {
+        bits16 = reinterpret_cast<wge::u16*>(ram_ptr.get());
+    } else {
+        bits32 = reinterpret_cast<wge::u32*>(ram_ptr.get());
     }
 
-    // else
-    if (bits16 == NULL && bits32 == NULL) {
-        videoRAMUsed = false;
-        if (pixelSize == 2) {
-            bits16 = (u16*)memalign(16, size);
-        } else {
-            bits32 = (u32*)memalign(16, size);
-        }
-    }
-
-    rgbadata16 = bits16;
-    rgbadata32 = bits32;
+    wge::u16* rgbadata16 = bits16;
+    wge::u32* rgbadata32 = bits32;
     if (mSwizzle) {
         if (rgbadata16) rgbadata16 = (u16*)memalign(16, size);
         if (rgbadata32) rgbadata32 = (u32*)memalign(16, size);
         if (!rgbadata16 && !rgbadata32) {
             jpeg_destroy_decompress(&cinfo);
-            if (videoRAMUsed) {
-                if (bits16) vfree(bits16);
-                if (bits32) vfree(bits32);
-            } else {
-                if (bits16) free(bits16);
-                if (bits32) free(bits32);
-            }
             return;
         }
     }
@@ -972,13 +1053,6 @@ void JRenderer::LoadJPG(TextureInfo& textureInfo, const char* filename, int mode
     if (!scanline) {
         jpeg_destroy_decompress(&cinfo);
 
-        if (videoRAMUsed) {
-            if (bits16) vfree(bits16);
-            if (bits32) vfree(bits32);
-        } else {
-            if (bits16) free(bits16);
-            if (bits32) free(bits32);
-        }
         if (mSwizzle) {
             if (rgbadata16) free(rgbadata16);
             if (rgbadata32) free(rgbadata32);
@@ -988,35 +1062,29 @@ void JRenderer::LoadJPG(TextureInfo& textureInfo, const char* filename, int mode
 
     u16* currRow16 = rgbadata16;
     u32* currRow32 = rgbadata32;
-    u16 color16;
-    u32 color32;
     while (cinfo.output_scanline < cinfo.output_height) {
         p = scanline;
         jpeg_read_scanlines(&cinfo, &scanline, 1);
 
         q16 = currRow16;
         q32 = currRow32;
-        for (i = 0; i < (int)cinfo.output_width; ++i) {
+        for (wge::u32 i = 0; i < cinfo.output_width; ++i) {
             int a = 255;
             int r = p[0];
             int g = p[1];
             int b = p[2];
             switch (textureMode) {
             case GU_PSM_5650:
-                color16 = (r >> 3) | ((g >> 2) << 5) | ((b >> 3) << 11);
-                *(q16) = color16;
+                *(q16) = pixel_converter<pixel_format::format_5650>::convert(r, g, b);
                 break;
             case GU_PSM_5551:
-                color16 = (r >> 3) | ((g >> 3) << 5) | ((b >> 3) << 10) | ((a >> 7) << 15);
-                *(q16) = color16;
+                *(q16) = pixel_converter<pixel_format::format_5551>::convert(r, g, b, a);
                 break;
             case GU_PSM_4444:
-                color16 = (r >> 4) | ((g >> 4) << 4) | ((b >> 4) << 8) | ((a >> 4) << 12);
-                *(q16) = color16;
+                *(q16) = pixel_converter<pixel_format::format_4444>::convert(r, g, b, a);
                 break;
             case GU_PSM_8888:
-                color32 = r | (g << 8) | (b << 16) | (a << 24);
-                *(q32) = color32;
+                *(q32) = pixel_converter<pixel_format::format_8888>::convert(r, g, b, a);
                 break;
             }
 
@@ -1036,25 +1104,24 @@ void JRenderer::LoadJPG(TextureInfo& textureInfo, const char* filename, int mode
     }
 
     if (mSwizzle) {
+        auto* buf = reinterpret_cast<wge::u8*>(ram_ptr.get());
         if (rgbadata16) {
-            swizzle_fast((u8*)bits16, (const u8*)rgbadata16, tw * pixelSize, th /*cinfo.output_height*/);
+            swizzle_fast(buf, (const u8*)rgbadata16, tw * pixel_size, th /*cinfo.output_height*/);
             free(rgbadata16);
         }
         if (rgbadata32) {
-            swizzle_fast((u8*)bits32, (const u8*)rgbadata32, tw * pixelSize, th /*cinfo.output_height*/);
+            swizzle_fast(buf, (const u8*)rgbadata32, tw * pixel_size, th /*cinfo.output_height*/);
             free(rgbadata32);
         }
     }
 
-    if (bits16)
-        textureInfo.mBits = (u8*)bits16;
-    else
-        textureInfo.mBits = (u8*)bits32;
+    textureInfo.mVRAM = ram_ptr.is_vram();
+    textureInfo.mBits = reinterpret_cast<wge::byte_t*>(ram_ptr.release());
+
     textureInfo.mWidth = cinfo.output_width;
     textureInfo.mHeight = cinfo.output_height;
     textureInfo.mTexWidth = tw;
     textureInfo.mTexHeight = th;
-    textureInfo.mVRAM = videoRAMUsed;
 
     jpeg_destroy_decompress(&cinfo);
     delete[] rawdata;
@@ -1114,29 +1181,26 @@ JTexture* JRenderer::LoadTexture(const char* filename, int mode, int textureMode
 */
 void ReadPngLine(png_structp& png_ptr, u32_ptr& line, png_uint_32 width, int pixelformat, u16* p16, u32* p32) {
     png_read_row(png_ptr, (u8*)line, nullptr);
-    for (int x = 0; x < (int)width; ++x) {
-        u32 color32 = line[x];
-        u16 color16;
-        int a = (color32 >> 24) & 0xff;
+    for (wge::u32 x = 0; x < width; ++x) {
+        const u32 color32 = line[x];
+
         int r = color32 & 0xff;
         int g = (color32 >> 8) & 0xff;
         int b = (color32 >> 16) & 0xff;
+        int a = (color32 >> 24) & 0xff;
+
         switch (pixelformat) {
         case PSP_DISPLAY_PIXEL_FORMAT_565:
-            color16 = (r >> 3) | ((g >> 2) << 5) | ((b >> 3) << 11);
-            *(p16 + x) = color16;
+            *(p16 + x) = pixel_converter<pixel_format::format_5650>::convert(r, g, b);
             break;
         case PSP_DISPLAY_PIXEL_FORMAT_5551:
-            color16 = (r >> 3) | ((g >> 3) << 5) | ((b >> 3) << 10) | ((a >> 7) << 15);
-            *(p16 + x) = color16;
+            *(p16 + x) = pixel_converter<pixel_format::format_5551>::convert(r, g, b, a);
             break;
         case PSP_DISPLAY_PIXEL_FORMAT_4444:
-            color16 = (r >> 4) | ((g >> 4) << 4) | ((b >> 4) << 8) | ((a >> 4) << 12);
-            *(p16 + x) = color16;
+            *(p16 + x) = pixel_converter<pixel_format::format_4444>::convert(r, g, b, a);
             break;
         case PSP_DISPLAY_PIXEL_FORMAT_8888:
-            color32 = r | (g << 8) | (b << 16) | (a << 24);
-            *(p32 + x) = color32;
+            *(p32 + x) = pixel_converter<pixel_format::format_8888>::convert(r, g, b, a);
             break;
         }
     }
@@ -1152,30 +1216,27 @@ int JRenderer::LoadPNG(TextureInfo& textureInfo, const char* filename, int mode,
     // JLOG(filename);
     textureInfo.mBits = NULL;
 
-    bool useVideoRAM = (mode == TEX_TYPE_USE_VRAM);
-    int pixelformat = PIXEL_FORMAT;
+    const bool useVideoRAM = (mode == TEX_TYPE_USE_VRAM);
+    constexpr int pixelformat = PIXEL_FORMAT;
 
     u32* p32;
     u16* p16;
-    png_structp png_ptr;
-    png_infop info_ptr;
     unsigned int sig_read = 0;
     png_uint_32 width, height;
     int bit_depth, color_type, interlace_type;
-    u32* line;
 
     JFileSystem* fileSystem = JFileSystem::GetInstance();
     if (!fileSystem->OpenFile(filename)) return JGE_ERR_CANT_OPEN_FILE;
 
     // JLOG("PNG opened - creating read struct");
-    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    auto png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
     if (png_ptr == NULL) {
         fileSystem->CloseFile();
         return JGE_ERR_PNG;
     }
     // JLOG("Setting error callback func");
     png_set_error_fn(png_ptr, (png_voidp)NULL, (png_error_ptr)NULL, PNGCustomWarningFn);
-    info_ptr = png_create_info_struct(png_ptr);
+    auto info_ptr = png_create_info_struct(png_ptr);
     if (info_ptr == NULL) {
         fileSystem->CloseFile();
         png_destroy_read_struct(&png_ptr, nullptr, nullptr);
@@ -1193,42 +1254,33 @@ int JRenderer::LoadPNG(TextureInfo& textureInfo, const char* filename, int mode,
     if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8) png_set_expand_gray_1_2_4_to_8(png_ptr);
     if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)) png_set_tRNS_to_alpha(png_ptr);
     png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
-    line = (u32*)malloc(width * 4);
+
+    auto* line = (u32*)malloc(width * 4);
     if (!line) {
         fileSystem->CloseFile();
         png_destroy_read_struct(&png_ptr, nullptr, nullptr);
         return JGE_ERR_MALLOC_FAILED;
     }
 
-    int texWidth = getNextPower2(width);
-    int texHeight = getNextPower2(height);
+    const wge::size_t tw = wge::math::nearest_superior_power_of_2(width);
+    const wge::size_t th = wge::math::nearest_superior_power_of_2(height);
 
     bool done = false;
-    PIXEL_TYPE* bits = NULL;
-    bool videoRAMUsed = false;
-    int size = texWidth * texHeight * sizeof(PIXEL_TYPE);
+    const auto size = tw * th * sizeof(PIXEL_TYPE);
+
+    auto ram_ptr = make_ram_ptr(size, useVideoRAM);
 
     {
-        if (useVideoRAM) {
-            bits = (PIXEL_TYPE*)valloc(size);
-            videoRAMUsed = true;
-        }
-
-        if (bits == NULL) {
-            videoRAMUsed = false;
-            bits = (PIXEL_TYPE*)memalign(16, size);
-        }
-
-        PIXEL_TYPE* buffer = bits;
+        PIXEL_TYPE* buffer = reinterpret_cast<PIXEL_TYPE*>(ram_ptr.get());
         const unsigned int kVerticalBlockSize = 8;
         if (mSwizzle) {
             // JLOG("allocating swizzle buffer");
-            buffer = (PIXEL_TYPE*)memalign(16, texWidth * kVerticalBlockSize * sizeof(PIXEL_TYPE));
+            buffer = (PIXEL_TYPE*)memalign(16, tw * kVerticalBlockSize * sizeof(PIXEL_TYPE));
             if (!buffer) {
                 JLOG("failed to allocate destination swizzle buffer!");
                 std::ostringstream stream;
-                stream << "Alloc failed for: Tex Width: " << texWidth << " Tex Height: " << kVerticalBlockSize
-                       << ", total bytes: " << texWidth * kVerticalBlockSize * sizeof(PIXEL_TYPE);
+                stream << "Alloc failed for: Tex Width: " << tw << " Tex Height: " << kVerticalBlockSize
+                       << ", total bytes: " << tw * kVerticalBlockSize * sizeof(PIXEL_TYPE);
                 JLOG(stream.str().c_str());
                 fileSystem->CloseFile();
                 png_destroy_read_struct(&png_ptr, nullptr, nullptr);
@@ -1237,9 +1289,9 @@ int JRenderer::LoadPNG(TextureInfo& textureInfo, const char* filename, int mode,
         }
 
         if (buffer) {
-            unsigned int src_row = texWidth * 8;
-            u32* dst = (u32*)bits;
-            u32* ysrc = (u32*)buffer;
+            unsigned int src_row = tw * 8;
+            auto* dst = reinterpret_cast<wge::u32*>(ram_ptr.get());
+            auto* ysrc = reinterpret_cast<wge::u32*>(buffer);
             unsigned int totalVerticalBlocksToProcess = height / kVerticalBlockSize;
 
             p32 = (u32*)buffer;
@@ -1248,12 +1300,12 @@ int JRenderer::LoadPNG(TextureInfo& textureInfo, const char* filename, int mode,
                 for (unsigned int y = 0; y < kVerticalBlockSize; ++y) {
                     ReadPngLine(png_ptr, line, width, pixelformat, p16, p32);
 
-                    p32 += texWidth;
-                    p16 += texWidth;
+                    p32 += tw;
+                    p16 += tw;
                 }
 
                 if (mSwizzle) {
-                    swizzle_fast((u8*)dst, (const u8*)buffer, texWidth * sizeof(PIXEL_TYPE), kVerticalBlockSize);
+                    swizzle_fast((u8*)dst, (const u8*)buffer, tw * sizeof(PIXEL_TYPE), kVerticalBlockSize);
                     dst += src_row;
 
                     // if we're swizzling, reset the read pointers to the top of the buffer, as we re-read into an 8
@@ -1268,20 +1320,20 @@ int JRenderer::LoadPNG(TextureInfo& textureInfo, const char* filename, int mode,
             {
                 if (mSwizzle) {
                     // clear the conversion buffer so that leftover scan lines are transparent
-                    memset(buffer, 255, texWidth * kVerticalBlockSize * sizeof(PIXEL_TYPE));
+                    memset(buffer, 255, tw * kVerticalBlockSize * sizeof(PIXEL_TYPE));
                 }
                 unsigned int remainingLines = height % kVerticalBlockSize;
                 for (unsigned int y = 0; y < remainingLines; ++y) {
                     ReadPngLine(png_ptr, line, width, pixelformat, p16, p32);
 
-                    p32 += texWidth;
-                    p16 += texWidth;
+                    p32 += tw;
+                    p16 += tw;
                 }
 
                 if (mSwizzle) {
                     // swizzle_fast only can handle eight lines at a time, and will overrun memory in our destination,
                     // which only has remainingLines to fill - use the swizzle_lines function instead
-                    swizzle_lines((const u8*)buffer, (u8*)dst, texWidth, remainingLines);
+                    swizzle_lines((const u8*)buffer, (u8*)dst, tw, remainingLines);
                 }
             }
 
@@ -1301,25 +1353,20 @@ int JRenderer::LoadPNG(TextureInfo& textureInfo, const char* filename, int mode,
     fileSystem->CloseFile();
 
     if (done) {
-        textureInfo.mBits = (u8*)bits;
+        textureInfo.mVRAM = ram_ptr.is_vram();
+        textureInfo.mBits = reinterpret_cast<wge::u8*>(ram_ptr.release());
         textureInfo.mWidth = width;
         textureInfo.mHeight = height;
-        textureInfo.mTexWidth = texWidth;
-        textureInfo.mTexHeight = texHeight;
-        textureInfo.mVRAM = videoRAMUsed;
+        textureInfo.mTexWidth = tw;
+        textureInfo.mTexHeight = th;
         JLOG("-- OK -- JRenderer::LoadPNG");
         return 1;
-
-    } else {
-        JLOG("LoadPNG failure - deallocating bits");
-        textureInfo.mBits = NULL;
-
-        if (videoRAMUsed)
-            vfree(bits);
-        else
-            free(bits);
-        return JGE_ERR_GENERIC;
     }
+
+    JLOG("LoadPNG failure - deallocating bits");
+    textureInfo.mBits = NULL;
+
+    return JGE_ERR_GENERIC;
 }
 
 JTexture* JRenderer::CreateTexture(int width, int height, int mode) {
@@ -1330,8 +1377,8 @@ JTexture* JRenderer::CreateTexture(int width, int height, int mode) {
         tex->mWidth = width;
         tex->mHeight = height;
 
-        tex->mTexWidth = getNextPower2(width);
-        tex->mTexHeight = getNextPower2(height);
+        tex->mTexWidth = wge::math::nearest_superior_power_of_2(width);
+        tex->mTexHeight = wge::math::nearest_superior_power_of_2(height);
 
         int size = tex->mTexWidth * tex->mTexHeight * sizeof(PIXEL_TYPE);
         if (useVideoRAM) {

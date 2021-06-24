@@ -1,7 +1,7 @@
-
-
-
 add_library(wge STATIC)
+
+find_package(PNG REQUIRED)
+find_package(JPEG REQUIRED)
 
 target_sources(wge 
     PRIVATE
@@ -24,7 +24,8 @@ endif()
 
 target_compile_features(wge PUBLIC cxx_std_14)
 target_include_directories(wge PUBLIC ${WOTH_WGE_ROOT_DIR}/include)
-target_link_libraries(wge PUBLIC WotH::options)
+target_link_libraries(wge PUBLIC JPEG::JPEG PNG::PNG WotH::options)
+
 
 if(NOT DEFINED WOTH_PSP_BUILD)
     find_package(Threads REQUIRED)

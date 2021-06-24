@@ -189,9 +189,9 @@ wge::byte_t* image_loader::convert_pixel_buffer(const wge::byte_t* const buffer,
 namespace wge {
 namespace video {
 
-static void jpg_null(j_decompress_ptr cinfo __attribute__((unused))) {}
+static void jpg_null([[maybe_unused]] j_decompress_ptr cinfo) {}
 
-static int jpg_fill_input_buffer(j_decompress_ptr cinfo __attribute__((unused))) {
+static int jpg_fill_input_buffer([[maybe_unused]] j_decompress_ptr cinfo) {
     ////    ri.Con_Printf(PRINT_ALL, "Premature end of JPEG data\n");
     return 1;
 }
@@ -215,7 +215,7 @@ texture_data image_loader::load_jpeg(const wge::byte_t* const buffer, wge::size_
     jpeg_create_decompress(&cinfo);
 
     cinfo.src = (struct jpeg_source_mgr*)(*cinfo.mem->alloc_small)((j_common_ptr)&cinfo, JPOOL_PERMANENT,
-                                                                    sizeof(struct jpeg_source_mgr));
+                                                                   sizeof(struct jpeg_source_mgr));
     cinfo.src->init_source = jpg_null;
     cinfo.src->fill_input_buffer = jpg_fill_input_buffer;
     cinfo.src->skip_input_data = jpg_skip_input_data;
@@ -300,8 +300,7 @@ texture_data image_loader::load_jpeg(const wge::byte_t* const buffer, wge::size_
 
 namespace wge {
 namespace video {
-static void PNGCustomWarningFn(png_structp png_ptr __attribute__((unused)),
-                               png_const_charp warning_msg __attribute__((unused))) {
+static void PNGCustomWarningFn([[maybe_unused]] png_structp png_ptr, [[maybe_unused]] png_const_charp warning_msg) {
     // ignore PNG warnings
 }
 

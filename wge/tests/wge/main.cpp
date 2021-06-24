@@ -7,11 +7,8 @@
 /* Define the module info section */
 PSP_MODULE_INFO("WGE_UNITTEST", 0, 1, 1);
 
-int done = 0;
-
 /* Exit callback */
 int exit_callback(int arg1, int arg2, void* common) {
-    done = 1;
     return 0;
 }
 
@@ -53,69 +50,6 @@ void close_sys() {
     sceKernelExitGame();
 }
 
-#elif defined(WOTH_PLATFORM_WII)
-
-#include <stdlib.h>
-#include <ogcsys.h>
-#include <gccore.h>
-#include <wiiuse/wpad.h>
-
-void start_sys() {
-    VIDEO_Init();
-    PAD_Init();
-
-    auto* rmode = VIDEO_GetPreferredMode(NULL);
-
-    auto* xfb = MEM_K0_TO_K1(SYS_AllocateFramebuffer(rmode));
-    console_init(xfb, 20, 20, rmode->fbWidth, rmode->xfbHeight, rmode->fbWidth * VI_DISPLAY_PIX_SZ);
-
-    VIDEO_Configure(rmode);
-    VIDEO_SetNextFramebuffer(xfb);
-    VIDEO_SetBlack(FALSE);
-    VIDEO_Flush();
-    VIDEO_WaitVSync();
-    if (rmode->viTVMode & VI_NON_INTERLACE)
-        VIDEO_WaitVSync();
-}
-
-void close_sys() {
-    while (1) {
-
-        VIDEO_WaitVSync();
-        PAD_ScanPads();
-
-        int buttonsDown = WPAD_ButtonsDown(0);
-
-        if (buttonsDown & WPAD_BUTTON_HOME) {
-            exit(0);
-        }
-    }
-}
-
-#elif defined(WOTH_PLATFORM_N3DS)
-
-#include <3ds.h>
-
-void start_sys() {
-    gfxInitDefault();
-    consoleInit(GFX_TOP, NULL);
-}
-void close_sys() {
-    while (aptMainLoop()) {
-        gspWaitForVBlank();
-        hidScanInput();
-
-        u32 kDown = hidKeysDown();
-        if (kDown & KEY_START)
-            break; // break in order to return to hbmenu
-
-        // Flush and swap framebuffers
-        gfxFlushBuffers();
-        gfxSwapBuffers();
-    }
-    gfxExit();
-}
-
 #else
 
 void start_sys() {}
@@ -123,9 +57,7 @@ void close_sys() {}
 
 #endif
 
-extern "C" {
-#include <unity_fixture.h>
-}
+#include <wtest/wtest.hpp>
 
 static void RunAllTests() {
     RUN_TEST_GROUP(WgeMath);

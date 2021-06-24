@@ -27,7 +27,7 @@ struct texture_data {
 struct image_loader {
     static const int number_of_channels;
     static texture_data load_image(const wge::byte_t* const buffer, wge::size_t buffer_size);
-    static texture_data load_image(std::istream& stream);
+    //static texture_data load_image(std::istream& stream);
 
     static texture_data load_png(const wge::byte_t* const buffer, wge::size_t buffer_size);
     static texture_data load_jpeg(const wge::byte_t* const buffer, wge::size_t buffer_size);

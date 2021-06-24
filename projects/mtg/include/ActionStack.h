@@ -76,7 +76,7 @@ public:
 
     virtual int receiveEvent(WEvent* event) { return 0; }
 
-#if defined(WIN32) || defined(LINUX) || defined(IOS)
+#if defined(WIN32) || defined(LINUX)
     virtual void Dump();
 #endif
 
@@ -211,7 +211,7 @@ public:
     int has(Interruptible* action);
     int has(MTGAbility* ability);
     int receiveEventPlus(WEvent* event);
-#if defined(WIN32) || defined(LINUX) || defined(IOS)
+#if defined(WIN32) || defined(LINUX)
     void Dump();
 #endif
     void setCurrentTutorial(ATutorialMessage* message) { currentTutorial = message; };

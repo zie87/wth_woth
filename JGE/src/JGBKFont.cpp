@@ -11,8 +11,8 @@
 
 #include <stdio.h>
 
-#include "../include/JGBKFont.h"
-#include "../include/JFileSystem.h"
+#include "JGBKFont.h"
+#include "JFileSystem.h"
 
 JRenderer* JGBKFont::mRenderer = NULL;
 
@@ -159,7 +159,7 @@ int JGBKFont::PreCacheChar(const BYTE* ch) {
     int index = mCurr++;
     if (mCurr >= mCacheSize) mCurr = 0;
 
-#if defined(WIN32) || defined(LINUX) || defined(IOS)
+#if defined(WIN32) || defined(LINUX)
     int x = 0;
     int y = 0;
 
@@ -189,7 +189,7 @@ int JGBKFont::PreCacheChar(const BYTE* ch) {
                 bits = src[i++];
                 BYTE bitMask = 0x80;
                 for (int z = 0; z < 8 && bitCount; z++) {
-#if defined(WIN32) || defined(LINUX) || defined(IOS)
+#if defined(WIN32) || defined(LINUX)
                     if ((bits & bitMask) != 0)
                         mCharBuffer[y * mFontSize + x] = ARGB(255, 255, 255, 255);
                     else
@@ -216,7 +216,7 @@ int JGBKFont::PreCacheChar(const BYTE* ch) {
         int n;
 
         for (int i = 0; i < size;) {
-#if defined(WIN32) || defined(LINUX) || defined(IOS)
+#if defined(WIN32) || defined(LINUX)
             x = 0;
 #else
             x = (int)mSprites[index]->mX;
@@ -225,7 +225,7 @@ int JGBKFont::PreCacheChar(const BYTE* ch) {
             // put char in the middle
             if (mFontSize <= 16) {
                 for (n = 0; n < (mFontSize - 8) / 2; n++) {
-#if defined(WIN32) || defined(LINUX) || defined(IOS)
+#if defined(WIN32) || defined(LINUX)
                     mCharBuffer[y * mFontSize + x] = ARGB(0, 0, 0, 0);
 #else
                     SwizzlePlot(pTexture, ARGB(0, 0, 0, 0), x * PIXEL_SIZE, y, mTexture->mTexWidth * PIXEL_SIZE);
@@ -240,7 +240,7 @@ int JGBKFont::PreCacheChar(const BYTE* ch) {
                 bits = src[i++];
                 BYTE bitMask = 0x80;
                 for (int z = 0; z < 8 && bitCount; z++) {
-#if defined(WIN32) || defined(LINUX) || defined(IOS)
+#if defined(WIN32) || defined(LINUX)
                     if ((bits & bitMask) != 0)
                         mCharBuffer[y * mFontSize + x] = ARGB(255, 255, 255, 255);
                     else
@@ -260,7 +260,7 @@ int JGBKFont::PreCacheChar(const BYTE* ch) {
 
             if (mFontSize <= 16) {
                 for (n = 0; n < (mFontSize - 8) / 2; n++) {
-#if defined(WIN32) || defined(LINUX) || defined(IOS)
+#if defined(WIN32) || defined(LINUX)
                     mCharBuffer[y * mFontSize + x] = ARGB(0, 0, 0, 0);
 #else
                     SwizzlePlot(pTexture, ARGB(0, 0, 0, 0), x * PIXEL_SIZE, y, mTexture->mTexWidth * PIXEL_SIZE);
@@ -275,7 +275,7 @@ int JGBKFont::PreCacheChar(const BYTE* ch) {
 
     mGBCode[index] = code;
 
-#if defined(WIN32) || defined(LINUX) || defined(IOS)
+#if defined(WIN32) || defined(LINUX)
     x = (int)mSprites[index]->mX;
     y = (int)mSprites[index]->mY;
 

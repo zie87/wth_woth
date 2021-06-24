@@ -102,9 +102,7 @@ enum {
 typedef uint8_t byte;
 typedef uint32_t DWORD;
 typedef uint8_t BYTE;
-    #ifndef IOS
 typedef bool BOOL;
-    #endif
 #endif
 
 #ifndef QT_CONFIG

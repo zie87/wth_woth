@@ -1962,7 +1962,6 @@ WGuiBase::CONFIRM_TYPE WGuiKeyBinder::needsConfirm() {
     }
 
     // Check whether any button has no key associated to it.
-#if (!defined IOS)
     confirmingButton = JGE_BTN_NONE;
     for (signed int i = (sizeof(btnToCheck) / sizeof(btnToCheck[0])) - 1; i >= 0; --i) {
         if (confirmedButtons.end() != find(confirmedButtons.begin(), confirmedButtons.end(), btnToCheck[i])) continue;
@@ -1986,7 +1985,6 @@ WGuiBase::CONFIRM_TYPE WGuiKeyBinder::needsConfirm() {
         confirmMenu->Add(2, _("This is okay, validate and save").c_str());
         return CONFIRM_NEED;
     }
-#endif  // IOS
 
     return CONFIRM_OK;
 }

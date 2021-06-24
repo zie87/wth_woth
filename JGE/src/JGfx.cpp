@@ -18,8 +18,9 @@
 #include <pspdebug.h>
 #include <pspdisplay.h>
 #include <png.h>
-#include "../include/vram.h"
-#include "../include/JLogger.h"
+
+#include "vram.h"
+#include "JLogger.h"
 
 #include <sstream>
 
@@ -33,9 +34,9 @@ extern "C" {
 }
 #endif
 
-#include "../include/JGE.h"
-#include "../include/JRenderer.h"
-#include "../include/JFileSystem.h"
+#include "JGE.h"
+#include "JRenderer.h"
+#include "JFileSystem.h"
 
 static unsigned int __attribute__((aligned(16))) list[262144];
 

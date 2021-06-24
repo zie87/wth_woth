@@ -450,12 +450,7 @@ int TestSuite::loadNext() {
             mWorkerThread.pop_back();
         }
 
-        size_t thread_count = 1;
-    #ifdef QT_CONFIG
-        thread_count = QThread::idealThreadCount();
-    #elif defined(IOS)
-        thread_count = 6;
-    #endif
+        const auto thread_count = wge::thread::hardware_concurrency();
         for (size_t i = 0; i < (thread_count - 1); i++) mWorkerThread.push_back(new wge::thread(ThreadProc, this));
     }
 

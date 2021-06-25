@@ -19,7 +19,6 @@
 #include <pspdisplay.h>
 #include <png.h>
 
-#include "vram.h"
 #include "JLogger.h"
 
 #include <sstream>
@@ -39,6 +38,8 @@ extern "C" {
 #include "JFileSystem.h"
 
 #include <wge/math.hpp>
+#include <wge/video/pixel_format.hpp>
+#include <wge/video/image_loader.hpp>
 #include <wge/video/vram_ptr.hpp>
 
 #include <utility>
@@ -859,70 +860,16 @@ static void jpeg_mem_src(j_decompress_ptr cinfo, u8* mem, int len) {
     cinfo->src->next_input_byte = mem;
 }
 
-enum class pixel_format {
-    format_5650,
-    format_5551,
-    format_4444,
-    format_8888,
-};
-
-template <pixel_format Format>
-struct pixel_converter;
-
-template <>
-struct pixel_converter<pixel_format::format_5650> final {
-    using pixel_t = wge::u16;
-    static constexpr auto pixel_size = sizeof(pixel_t);
-    static constexpr auto psp_display_pixel_format = PSP_DISPLAY_PIXEL_FORMAT_5551;
-
-    static constexpr pixel_t convert(uint32_t r, uint32_t g, uint32_t b, [[maybe_unused]] uint32_t a = 255) noexcept {
-        return static_cast<pixel_t>((r >> 3) | ((g >> 2) << 5) | ((b >> 3) << 11));
-    }
-};
-
-template <>
-struct pixel_converter<pixel_format::format_5551> final {
-    using pixel_t = wge::u16;
-    static constexpr auto pixel_size = sizeof(pixel_t);
-    static constexpr auto psp_display_pixel_format = PSP_DISPLAY_PIXEL_FORMAT_5551;
-
-    static constexpr pixel_t convert(uint32_t r, uint32_t g, uint32_t b, uint32_t a = 255) noexcept {
-        return static_cast<pixel_t>((r >> 3) | ((g >> 3) << 5) | ((b >> 3) << 10) | ((a >> 7) << 15));
-    }
-};
-
-template <>
-struct pixel_converter<pixel_format::format_4444> final {
-    using pixel_t = wge::u16;
-    static constexpr auto pixel_size = sizeof(pixel_t);
-    static constexpr auto psp_display_pixel_format = PSP_DISPLAY_PIXEL_FORMAT_4444;
-
-    static constexpr pixel_t convert(uint32_t r, uint32_t g, uint32_t b, uint32_t a = 255) noexcept {
-        return static_cast<pixel_t>((r >> 4) | ((g >> 4) << 4) | ((b >> 4) << 8) | ((a >> 4) << 12));
-    }
-};
-
-template <>
-struct pixel_converter<pixel_format::format_8888> final {
-    using pixel_t = wge::u32;
-    static constexpr auto pixel_size = sizeof(pixel_t);
-    static constexpr auto psp_display_pixel_format = PSP_DISPLAY_PIXEL_FORMAT_8888;
-
-    static constexpr pixel_t convert(uint32_t r, uint32_t g, uint32_t b, uint32_t a = 255) noexcept {
-        return static_cast<pixel_t>(r | (g << 8) | (b << 16) | (a << 24));
-    }
-};
-
 int JRenderer::PixelSize(int textureMode) {
     switch (textureMode) {
     case GU_PSM_5650:
-        return pixel_converter<pixel_format::format_5650>::pixel_size;
+        return wge::video::pixel_converter<wge::video::pixel_format::format_5650>::pixel_size;
     case GU_PSM_5551:
-        return pixel_converter<pixel_format::format_5551>::pixel_size;
+        return wge::video::pixel_converter<wge::video::pixel_format::format_5551>::pixel_size;
     case GU_PSM_4444:
-        return pixel_converter<pixel_format::format_4444>::pixel_size;
+        return wge::video::pixel_converter<wge::video::pixel_format::format_4444>::pixel_size;
     case GU_PSM_8888:
-        return pixel_converter<pixel_format::format_8888>::pixel_size;
+        return wge::video::pixel_converter<wge::video::pixel_format::format_8888>::pixel_size;
     }
     return PIXEL_SIZE;
 }
@@ -1023,16 +970,16 @@ void JRenderer::LoadJPG(TextureInfo& textureInfo, const char* filename, int mode
             int b = p[2];
             switch (textureMode) {
             case GU_PSM_5650:
-                *(q16) = pixel_converter<pixel_format::format_5650>::convert(r, g, b);
+                *(q16) = wge::video::pixel_converter<wge::video::pixel_format::format_5650>::convert(r, g, b);
                 break;
             case GU_PSM_5551:
-                *(q16) = pixel_converter<pixel_format::format_5551>::convert(r, g, b, a);
+                *(q16) = wge::video::pixel_converter<wge::video::pixel_format::format_5551>::convert(r, g, b, a);
                 break;
             case GU_PSM_4444:
-                *(q16) = pixel_converter<pixel_format::format_4444>::convert(r, g, b, a);
+                *(q16) = wge::video::pixel_converter<wge::video::pixel_format::format_4444>::convert(r, g, b, a);
                 break;
             case GU_PSM_8888:
-                *(q32) = pixel_converter<pixel_format::format_8888>::convert(r, g, b, a);
+                *(q32) = wge::video::pixel_converter<wge::video::pixel_format::format_8888>::convert(r, g, b, a);
                 break;
             }
 
@@ -1139,16 +1086,16 @@ void ReadPngLine(png_structp& png_ptr, u32_ptr& line, png_uint_32 width, int pix
 
         switch (pixelformat) {
         case PSP_DISPLAY_PIXEL_FORMAT_565:
-            *(p16 + x) = pixel_converter<pixel_format::format_5650>::convert(r, g, b);
+            *(p16 + x) = wge::video::pixel_converter<wge::video::pixel_format::format_5650>::convert(r, g, b);
             break;
         case PSP_DISPLAY_PIXEL_FORMAT_5551:
-            *(p16 + x) = pixel_converter<pixel_format::format_5551>::convert(r, g, b, a);
+            *(p16 + x) = wge::video::pixel_converter<wge::video::pixel_format::format_5551>::convert(r, g, b, a);
             break;
         case PSP_DISPLAY_PIXEL_FORMAT_4444:
-            *(p16 + x) = pixel_converter<pixel_format::format_4444>::convert(r, g, b, a);
+            *(p16 + x) = wge::video::pixel_converter<wge::video::pixel_format::format_4444>::convert(r, g, b, a);
             break;
         case PSP_DISPLAY_PIXEL_FORMAT_8888:
-            *(p32 + x) = pixel_converter<pixel_format::format_8888>::convert(r, g, b, a);
+            *(p32 + x) = wge::video::pixel_converter<wge::video::pixel_format::format_8888>::convert(r, g, b, a);
             break;
         }
     }

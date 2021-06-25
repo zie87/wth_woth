@@ -25,7 +25,7 @@ struct texture_data {
     wge::size_t texture_width = 0;
     wge::size_t texture_height = 0;
 
-    vram_ptr<wge::byte_t> pixels{nullptr};
+    vram_ptr<wge::byte_t> pixels = {};
     wge::size_t channels = 0;
 };
 

@@ -82,4 +82,4 @@ jobs:
       shell: bash
       run: |
         cd build
-        ctest ${{ matrix.build_type }}
+        ctest ${{ matrix.build_type }} --rerun-failed --output-on-failure

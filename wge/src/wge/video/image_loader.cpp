@@ -176,6 +176,18 @@ static void jpg_skip_input_data(j_decompress_ptr cinfo, long num_bytes) {
     ////		ri.Con_Printf(PRINT_ALL, "Premature end of JPEG data\n");
 }
 
+void make_jpeg_info(jpeg_decompress_struct& cinfo, const wge::byte_t* const buffer, wge::size_t buffer_size) noexcept {
+    cinfo.src = (struct jpeg_source_mgr*)(*cinfo.mem->alloc_small)((j_common_ptr)&cinfo, JPOOL_PERMANENT,
+                                                                   sizeof(struct jpeg_source_mgr));
+    cinfo.src->init_source = jpg_null;
+    cinfo.src->fill_input_buffer = jpg_fill_input_buffer;
+    cinfo.src->skip_input_data = jpg_skip_input_data;
+    cinfo.src->resync_to_restart = jpeg_resync_to_restart;
+    cinfo.src->term_source = jpg_null;
+    cinfo.src->bytes_in_buffer = buffer_size;
+    cinfo.src->next_input_byte = buffer;
+}
+
 template <wge::video::pixel_format Format>
 inline void convert_image_line(wge::byte_t* line, wge::size_t width, wge::size_t num_channels,
                                typename wge::video::pixel_converter<Format>::pixel_t* out) noexcept {
@@ -194,48 +206,64 @@ inline void convert_image_line(wge::byte_t* line, wge::size_t width, wge::size_t
 struct jpeg_stream final {
     jpeg_source_mgr pub;
     std::istream* stream;
-    std::array<wge::byte_t, 4096> buffer;
+    std::array<wge::byte_t, 64> buffer;
+    bool start_of_file;
 };
 
 void init_source(j_decompress_ptr cinfo) noexcept {
     auto* src = reinterpret_cast<jpeg_stream*>(cinfo->src);
-    src->stream->seekg(0, std::ios::beg);
+    src->start_of_file = true;
 }
 
 boolean fill_buffer(j_decompress_ptr cinfo) noexcept {
-    // Read to buffer
     auto* src = reinterpret_cast<jpeg_stream*>(cinfo->src);
     std::istream& stream = *(src->stream);
     stream.read(reinterpret_cast<char*>(src->buffer.data()), src->buffer.size());
+    auto nbytes = stream.gcount();
+
+    if (nbytes <= 0) {
+        if (src->start_of_file) {
+            /* Treat empty input file as fatal error */
+            // ERREXIT(cinfo, JERR_INPUT_EMPTY);
+        }
+        // WARNMS(cinfo, JWRN_JPEG_EOF);
+
+        /* Insert a fake EOI marker */
+        src->buffer[0] = (JOCTET)0xFF;
+        src->buffer[1] = (JOCTET)JPEG_EOI;
+        nbytes = 2;
+    }
 
     src->pub.next_input_byte = src->buffer.data();
-    src->pub.bytes_in_buffer = stream.gcount();
+    src->pub.bytes_in_buffer = nbytes;
+    src->start_of_file = false;
 
-    return stream.eof() ? TRUE : FALSE;
+    return TRUE;
 }
 
-void skip(j_decompress_ptr cinfo, long count) noexcept {
+void skip(j_decompress_ptr cinfo, long num_bytes) noexcept {
     auto* src = reinterpret_cast<jpeg_stream*>(cinfo->src);
     std::istream& stream = *(src->stream);
-    stream.seekg(count, std::ios::cur);
 
-    fill_buffer(cinfo);
+    /* Just a dumb implementation for now.  Could use fseek() except
+     * it doesn't work on pipes.  Not clear that being smart is worth
+     * any trouble anyway --- large skips are infrequent.
+     */
+    if (num_bytes > 0) {
+        while (num_bytes > src->pub.bytes_in_buffer) {
+            num_bytes -= src->pub.bytes_in_buffer;
+            (void)fill_buffer(cinfo);
+            /* note we assume that fill_input_buffer will never return FALSE,
+             * so suspension need not be handled.
+             */
+        }
+        src->pub.next_input_byte += (size_t)num_bytes;
+        src->pub.bytes_in_buffer -= (size_t)num_bytes;
+    }
 }
 
 void term(j_decompress_ptr cinfo) noexcept {
     // Close the stream, can be nop
-}
-
-void make_jpeg_info(jpeg_decompress_struct& cinfo, const wge::byte_t* const buffer, wge::size_t buffer_size) noexcept {
-    cinfo.src = (struct jpeg_source_mgr*)(*cinfo.mem->alloc_small)((j_common_ptr)&cinfo, JPOOL_PERMANENT,
-                                                                   sizeof(struct jpeg_source_mgr));
-    cinfo.src->init_source = jpg_null;
-    cinfo.src->fill_input_buffer = jpg_fill_input_buffer;
-    cinfo.src->skip_input_data = jpg_skip_input_data;
-    cinfo.src->resync_to_restart = jpeg_resync_to_restart;
-    cinfo.src->term_source = jpg_null;
-    cinfo.src->bytes_in_buffer = buffer_size;
-    cinfo.src->next_input_byte = buffer;
 }
 
 void make_jpeg_info(jpeg_decompress_struct& cinfo, std::istream& is) noexcept {

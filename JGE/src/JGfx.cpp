@@ -808,23 +808,11 @@ JTexture* JRenderer::LoadTexture(const char* filename, int mode, int textureMode
         return nullptr;
     }
 
-    // auto& filestream = fileSystem->current_file();
-    // auto data = wge::video::image_loader::load_image(filestream);
-    // fileSystem->CloseFile();
-
-    const auto raw_size = fileSystem->GetFileSize();
-    auto raw_data = std::make_unique<wge::byte_t[]>(raw_size);
-
-    if (!raw_data) {
-        fileSystem->CloseFile();
-        return nullptr;
-    }
-
-    fileSystem->ReadFile(raw_data.get(), raw_size);
-    fileSystem->CloseFile();
-
     const bool use_vram = (mode == TEX_TYPE_USE_VRAM);
-    auto data = wge::video::image_loader::load_image(raw_data.get(), raw_size, pixel_format, use_vram, mSwizzle);
+    auto& filestream = fileSystem->current_file();
+
+    auto data = wge::video::image_loader::load_image(filestream, pixel_format, use_vram, mSwizzle);
+    fileSystem->CloseFile();
 
     if (!data.pixels) {
         printf("Texture %s failed to load\n", filename);

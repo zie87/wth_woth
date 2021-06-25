@@ -1491,28 +1491,18 @@ JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureForm
         return nullptr;
     }
 
-    // auto& filestream = fileSystem->current_file();
-    // auto data = wge::video::image_loader::load_image(filestream);
-    // fileSystem->CloseFile();
-
-    const auto raw_size = fileSystem->GetFileSize();
-    auto raw_data = std::make_unique<wge::byte_t[]>(raw_size);
-
-    if (!raw_data) {
-        fileSystem->CloseFile();
-        return nullptr;
-    }
-
-    fileSystem->ReadFile(raw_data.get(), raw_size);
+    printf("load texture %s\n", filename);
+    auto& filestream = fileSystem->current_file();
+    auto data = wge::video::image_loader::load_image(filestream);
     fileSystem->CloseFile();
 
-    auto data = wge::video::image_loader::load_image(raw_data.get(), raw_size);
 
     if (!data.pixels) {
         printf("Texture %s failed to load\n", filename);
         return nullptr;
     }
 
+    printf("load texture %s successful\n", filename);
     if (mImageFilter != nullptr) {
         mImageFilter->ProcessImage(reinterpret_cast<wge::pixel_t*>(data.pixels.get()), data.width, data.height);
     }

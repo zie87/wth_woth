@@ -100,7 +100,7 @@ texture_data image_loader::load_image(std::istream& stream, pixel_format format,
     constexpr std::size_t min_check_size = 16U;
     wge::byte_t check_buf[min_check_size];
 
-    stream.get(reinterpret_cast<char*>(check_buf), min_check_size);
+    stream.read(reinterpret_cast<char*>(check_buf), min_check_size);
     const auto img_type = ::get_image_type(check_buf, stream.gcount());
     stream.seekg(pos);
 
@@ -157,7 +157,6 @@ private:
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-
 namespace wge {
 namespace video {
 
@@ -207,7 +206,7 @@ boolean fill_buffer(j_decompress_ptr cinfo) noexcept {
     // Read to buffer
     auto* src = reinterpret_cast<jpeg_stream*>(cinfo->src);
     std::istream& stream = *(src->stream);
-    stream.get(reinterpret_cast<char*>(src->buffer.data()), src->buffer.size());
+    stream.read(reinterpret_cast<char*>(src->buffer.data()), src->buffer.size());
 
     src->pub.next_input_byte = src->buffer.data();
     src->pub.bytes_in_buffer = stream.gcount();
@@ -347,7 +346,7 @@ texture_data read_jpg_data(jpeg_decompress_struct& cinfo, pixel_format format, b
         }
     }
 
-    return texture_data{cinfo.output_width, cinfo.output_height, tw, th, std::move(ram_ptr), 4};
+    return texture_data{cinfo.output_width, cinfo.output_height, tw, th, std::move(ram_ptr), pixel_size};
 }
 
 }  // namespace
@@ -388,7 +387,6 @@ texture_data image_loader::load_jpeg(std::istream& stream, pixel_format format, 
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
-
 
 namespace wge {
 namespace video {
@@ -529,7 +527,8 @@ static void read_png_from_stream(png_structp png_ptr, png_bytep outBytes, png_si
     if (io_ptr == nullptr) return;  // add custom error handling here
 
     auto& input_stream = *(std::istream*)io_ptr;
-    input_stream.get(reinterpret_cast<char*>(outBytes), byteCountToRead);
+
+    input_stream.read(reinterpret_cast<char*>(outBytes), byteCountToRead);
 
     const auto bytesRead = input_stream.gcount();
     if ((png_size_t)bytesRead != byteCountToRead) {
@@ -577,6 +576,7 @@ texture_data image_loader::load_png(std::istream& stream, pixel_format format, b
     }
     png_init_io(png_ptr, nullptr);
 
+    stream >> std::noskipws;
     png_set_read_fn(png_ptr, &stream, read_png_from_stream);
 
     auto texture_data = read_png_data(png_ptr, info_ptr, use_vram, format, swizzle);

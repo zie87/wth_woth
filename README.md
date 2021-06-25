@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/github/zie87/wth_woth/badge.svg)](https://coveralls.io/github/zie87/wth_woth)
+
 # Wagic: War of the Homebrew
 
 *War of the Homebrew* is an open source collectible trading card game. You play as a wizard against the CPU with your army of minions. You start the game with a small collection of cards (symbolizing creatures and spells), and as you win battles against the AI, you earn credits that allow you to buy more cards and build more powerful decks. As you play, you unlock cards and new game modes, so it is much more than a simple card simulation. 

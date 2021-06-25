@@ -7,6 +7,7 @@
 #include <wge/memory.hpp>
 #include <wge/types.hpp>
 
+#include <wge/video/pixel_format.hpp>
 #include <wge/video/vram_ptr.hpp>
 
 namespace wge {
@@ -32,13 +33,20 @@ struct texture_data {
 struct image_loader {
     static const int number_of_channels;
 
-    static texture_data load_image(std::istream& stream) noexcept;
+    //static texture_data load_image(std::istream& stream) noexcept;
     static texture_data load_png(std::istream& stream) noexcept;
-    static texture_data load_jpeg(std::istream& stream) noexcept;
+    //static texture_data load_jpeg(std::istream& stream) noexcept;
+
+    static texture_data load_jpeg(const wge::byte_t* const buffer, wge::size_t buffer_size, pixel_format format,
+                                  bool use_vram, bool swizzle) noexcept;
+    
 
     static texture_data load_image(const wge::byte_t* const buffer, wge::size_t buffer_size) noexcept;
     static texture_data load_png(const wge::byte_t* const buffer, wge::size_t buffer_size) noexcept;
-    static texture_data load_jpeg(const wge::byte_t* const buffer, wge::size_t buffer_size) noexcept;
+
+    static inline texture_data load_jpeg(const wge::byte_t* const buffer, wge::size_t buffer_size) noexcept {
+        return load_jpeg(buffer, buffer_size, pixel_format::none, false, false);
+    }
 };
 }  // namespace video
 }  // namespace wge

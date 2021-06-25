@@ -1,4 +1,6 @@
 #include <wge/video/image_loader.hpp>
+#include <wge/video/utils.hpp>
+
 #include <wge/math/utils.hpp>
 #include <wge/types.hpp>
 
@@ -85,26 +87,26 @@ texture_data::texture_data(wge::size_t w, wge::size_t h, wge::size_t tw, wge::si
                            wge::size_t channels) noexcept
     : width(w), height(h), texture_width(tw), texture_height(th), pixels(std::move(buf)), channels(channels) {}
 
-texture_data image_loader::load_image(std::istream& stream) noexcept {
-    const auto pos = stream.tellg();
-
-    constexpr std::size_t min_check_size = 16U;
-    wge::byte_t check_buf[min_check_size];
-
-    stream.get(reinterpret_cast<char*>(check_buf), min_check_size);
-    const auto img_type = ::get_image_type(check_buf, min_check_size);
-    stream.seekg(pos);
-
-    if (img_type == image_types::jpg) {
-        return load_jpeg(stream);
-    }
-
-    if (img_type == image_types::png) {
-        return load_png(stream);
-    }
-
-    return {};
-}
+// texture_data image_loader::load_image(std::istream& stream) noexcept {
+//    const auto pos = stream.tellg();
+//
+//    constexpr std::size_t min_check_size = 16U;
+//    wge::byte_t check_buf[min_check_size];
+//
+//    stream.get(reinterpret_cast<char*>(check_buf), min_check_size);
+//    const auto img_type = ::get_image_type(check_buf, min_check_size);
+//    stream.seekg(pos);
+//
+//    if (img_type == image_types::jpg) {
+//        return load_jpeg(stream);
+//    }
+//
+//    if (img_type == image_types::png) {
+//        return load_png(stream);
+//    }
+//
+//    return {};
+//}
 
 texture_data image_loader::load_image(const wge::byte_t* const buffer, wge::size_t buffer_size) noexcept {
     const auto img_type = ::get_image_type(buffer, buffer_size);
@@ -156,6 +158,7 @@ private:
 namespace wge {
 namespace video {
 
+namespace {
 static void jpg_null([[maybe_unused]] j_decompress_ptr cinfo) {}
 
 static boolean jpg_fill_input_buffer([[maybe_unused]] j_decompress_ptr cinfo) {
@@ -171,7 +174,20 @@ static void jpg_skip_input_data(j_decompress_ptr cinfo, long num_bytes) {
     ////		ri.Con_Printf(PRINT_ALL, "Premature end of JPEG data\n");
 }
 
-namespace {
+template <wge::video::pixel_format Format>
+inline void convert_image_line(wge::byte_t* line, wge::size_t width, wge::size_t num_channels,
+                               typename wge::video::pixel_converter<Format>::pixel_t* out) noexcept {
+    using Converter = wge::video::pixel_converter<Format>;
+    for (wge::size_t x = 0; x < width; ++x) {
+        int r = line[0];
+        int g = line[1];
+        int b = line[2];
+        int a = (num_channels == 4) ? line[3] : 255;
+
+        *(out + x) = Converter::convert(r, g, b, a);
+        line += num_channels;
+    }
+}
 
 void fill_jpeg_info(jpeg_decompress_struct& cinfo, const wge::byte_t* const buffer, wge::size_t buffer_size) noexcept {
     cinfo.src = (struct jpeg_source_mgr*)(*cinfo.mem->alloc_small)((j_common_ptr)&cinfo, JPOOL_PERMANENT,
@@ -184,82 +200,100 @@ void fill_jpeg_info(jpeg_decompress_struct& cinfo, const wge::byte_t* const buff
     cinfo.src->bytes_in_buffer = buffer_size;
     cinfo.src->next_input_byte = buffer;
 }
+
+void read_jpg_line(jpeg_decompress_struct& cinfo, wge::byte_t* scanline, pixel_format format,
+                   wge::byte_t* buf) noexcept {
+    jpeg_read_scanlines(&cinfo, &scanline, 1);
+    const auto width = cinfo.output_width;
+
+    switch (format) {
+    case pixel_format::format_5650:
+        convert_image_line<pixel_format::format_5650>(scanline, width, 3, reinterpret_cast<wge::u16*>(buf));
+        break;
+    case pixel_format::format_5551:
+        convert_image_line<pixel_format::format_5551>(scanline, width, 3, reinterpret_cast<wge::u16*>(buf));
+        break;
+    case pixel_format::format_4444:
+        convert_image_line<pixel_format::format_4444>(scanline, width, 3, reinterpret_cast<wge::u16*>(buf));
+        break;
+    case pixel_format::format_8888:
+        convert_image_line<pixel_format::format_8888>(scanline, width, 3, reinterpret_cast<wge::u32*>(buf));
+        break;
+    case pixel_format::none:
+        convert_image_line<pixel_format::none>(scanline, width, 3, reinterpret_cast<wge::u32*>(buf));
+        break;
+    }
+}
 }  // namespace
 
-texture_data image_loader::load_jpeg(const wge::byte_t* const buffer, wge::size_t buffer_size) noexcept {
+texture_data image_loader::load_jpeg(const wge::byte_t* const buffer, wge::size_t buffer_size, pixel_format format,
+                                     bool use_vram, bool swizzle) noexcept {
     struct jpeg_decompress_struct cinfo;
     struct jpeg_error_mgr jerr;
-    wge::byte_t *p, *q;
-    int i;
-
-    // Initialize libJpeg Object
     cinfo.err = jpeg_std_error(&jerr);
     jpeg_create_decompress(&cinfo);
 
     fill_jpeg_info(cinfo, buffer, buffer_size);
 
-    // Process JPEG header
     jpeg_read_header(&cinfo, true);
-
-    // Start Decompression
     jpeg_start_decompress(&cinfo);
 
-    // Check Colour Components
     if (cinfo.output_components != 3 && cinfo.output_components != 4) {
-        ////		ri.Con_Printf(PRINT_ALL, "Invalid JPEG colour components\n");
         jpeg_destroy_decompress(&cinfo);
-        ////		ri.FS_FreeFile(rawdata);
         return {};
     }
 
+    const auto pixel_size = get_pixel_size(format);
     const wge::size_t tw = wge::math::nearest_superior_power_of_2(cinfo.output_width);
     const wge::size_t th = wge::math::nearest_superior_power_of_2(cinfo.output_height);
+    const auto size = tw * th * pixel_size;
 
-    constexpr wge::size_t pixel_size = 4U;
-    const wge::size_t rgba_data_size = tw * th * pixel_size;
-    auto rgba_data = make_vram_ptr<wge::byte_t>(rgba_data_size, false);
+    auto ram_ptr = wge::video::make_vram_ptr<wge::byte_t>(size, use_vram);
 
+    wge::byte_t* work_buf = nullptr;
+    if (swizzle) {
+        work_buf = new wge::byte_t[size];
+    } else {
+        work_buf = ram_ptr.get();
+    }
+
+    const auto row_size = tw * pixel_size;
     {
-        // Allocate Scanline buffer
         auto scanline = std::make_unique<wge::byte_t[]>(cinfo.output_width * 3);
+        if (!scanline) {
+            jpeg_destroy_decompress(&cinfo);
 
-        // Read Scanlines, and expand from RGB to RGBA
-        wge::byte_t* currRow = rgba_data.get();
-        while (cinfo.output_scanline < cinfo.output_height) {
-            p = scanline.get();
-            jpeg_read_scanlines(&cinfo, &p, 1);
-
-            q = currRow;
-            for (i = 0; i < (int)cinfo.output_width; i++) {
-                q[0] = p[0];
-                q[1] = p[1];
-                q[2] = p[2];
-                q[3] = 255;
-
-                p += 3;
-                q += 4;
+            if (swizzle && (work_buf != nullptr)) {
+                delete[] work_buf;
             }
-            currRow += tw * 4;
+            return {};
+        }
+
+        wge::byte_t* row_ptr = work_buf;
+        while (cinfo.output_scanline < cinfo.output_height) {
+            read_jpg_line(cinfo, scanline.get(), format, row_ptr);
+            row_ptr += row_size;
         }
     }
 
-    texture_data data{cinfo.output_width, cinfo.output_height, tw, th, std::move(rgba_data), 4};
-
     jpeg_finish_decompress(&cinfo);
-    // Destroy JPEG object
+
+    if (swizzle) {
+        auto* buf = reinterpret_cast<wge::u8*>(ram_ptr.get());
+        if (work_buf) {
+            utils::swizzle_fast(buf, work_buf, row_size, th);
+            delete[] work_buf;
+        }
+    }
+
+    texture_data data{cinfo.output_width, cinfo.output_height, tw, th, std::move(ram_ptr), 4};
     jpeg_destroy_decompress(&cinfo);
 
     return data;
 }
-texture_data image_loader::load_jpeg(std::istream& stream) noexcept { return {}; }
 
 }  // namespace video
 }  // namespace wge
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////

@@ -41,6 +41,7 @@ extern "C" {
 #include <wge/video/pixel_format.hpp>
 #include <wge/video/image_loader.hpp>
 #include <wge/video/vram_ptr.hpp>
+#include <wge/video/utils.hpp>
 
 #include <utility>
 
@@ -786,56 +787,32 @@ static void PNGCustomReadDataFn(png_structp png_ptr, png_bytep data, png_size_t 
     }
 }
 
-/*
-** Alternate swizzle function that can handle any number of lines (as opposed to swizzle_fast, which is
-** hardcoded to do 8 at a time)
-*/
-static void swizzle_lines(const u8* inSrc, u8* inDst, unsigned int inWidth, unsigned int inLines) {
-    unsigned int rowblocks = (inWidth * sizeof(u32) / 16);
-    for (unsigned int j = 0; j < inLines; ++j) {
-        for (unsigned int i = 0; i < inWidth * sizeof(u32); ++i) {
-            unsigned int blockx = i / 16;
-            unsigned int blocky = j / 8;
-
-            unsigned int x = (i - blockx * 16);
-            unsigned int y = (j - blocky * 8);
-            unsigned int block_index = blockx + ((blocky)*rowblocks);
-            unsigned int block_address = block_index * 16 * 8;
-
-            inDst[block_address + x + y * 16] = inSrc[i + j * inWidth * sizeof(u32)];
-        }
+inline constexpr wge::video::pixel_format to_pixel_format(PspDisplayPixelFormats psp_format) noexcept {
+    switch (psp_format) {
+    case PSP_DISPLAY_PIXEL_FORMAT_565:
+        return wge::video::pixel_format::format_5650;
+    case PSP_DISPLAY_PIXEL_FORMAT_5551:
+        return wge::video::pixel_format::format_5551;
+    case PSP_DISPLAY_PIXEL_FORMAT_4444:
+        return wge::video::pixel_format::format_4444;
+    case PSP_DISPLAY_PIXEL_FORMAT_8888:
+        return wge::video::pixel_format::format_8888;
     }
+    return wge::video::pixel_format::none;
 }
 
-typedef u32* u32_ptr;
-static void swizzle_row(const u8* inSrc, u32_ptr& inDst, unsigned int inBlockWidth, unsigned int inPitch) {
-    for (unsigned int blockx = 0; blockx < inBlockWidth; ++blockx) {
-        const u32* src = (u32*)inSrc;
-        for (unsigned int j = 0; j < 8; ++j) {
-            *(inDst++) = *(src++);
-            *(inDst++) = *(src++);
-            *(inDst++) = *(src++);
-            *(inDst++) = *(src++);
-            src += inPitch;
-        }
-        inSrc += 16;
-    }
-}
+template <wge::video::pixel_format Format>
+inline void convert_image_line(wge::byte_t* line, wge::size_t width, wge::size_t num_channels,
+                               typename wge::video::pixel_converter<Format>::pixel_t* out) noexcept {
+    using Converter = wge::video::pixel_converter<Format>;
+    for (wge::size_t x = 0; x < width; ++x) {
+        int r = line[0];
+        int g = line[1];
+        int b = line[2];
+        int a = (num_channels == 4) ? line[3] : 255;
 
-static void swizzle_fast(u8* out, const u8* in, unsigned int width, unsigned int height) {
-    unsigned int width_blocks = (width / 16);
-    unsigned int height_blocks = (height / 8);
-
-    unsigned int src_pitch = (width - 16) / 4;
-    unsigned int src_row = width * 8;
-
-    const u8* ysrc = in;
-    u32* dst = (u32*)out;
-
-    for (unsigned int blocky = 0; blocky < height_blocks; ++blocky) {
-        const u8* xsrc = ysrc;
-        swizzle_row(xsrc, dst, width_blocks, src_pitch);
-        ysrc += src_row;
+        *(out + x) = Converter::convert(r, g, b, a);
+        line += num_channels;
     }
 }
 
@@ -874,18 +851,32 @@ int JRenderer::PixelSize(int textureMode) {
     return PIXEL_SIZE;
 }
 
+typedef u32* u32_ptr;
+void read_line_jpg(jpeg_decompress_struct& cinfo, wge::byte_t* scanline, int tex_mode, u16* q16, u32* q32) noexcept {
+    jpeg_read_scanlines(&cinfo, &scanline, 1);
+    const auto width = cinfo.output_width;
+
+    switch (tex_mode) {
+    case GU_PSM_5650:
+        convert_image_line<wge::video::pixel_format::format_5650>(scanline, width, 3, q16);
+        break;
+    case GU_PSM_5551:
+        convert_image_line<wge::video::pixel_format::format_5551>(scanline, width, 3, q16);
+        break;
+    case GU_PSM_4444:
+        convert_image_line<wge::video::pixel_format::format_4444>(scanline, width, 3, q16);
+        break;
+    case GU_PSM_8888:
+        convert_image_line<wge::video::pixel_format::format_8888>(scanline, width, 3, q32);
+        break;
+    }
+}
+
 void JRenderer::LoadJPG(TextureInfo& textureInfo, const char* filename, int mode, int textureMode) {
     JLOG("JRenderer::LoadJPG");
     textureInfo.mBits = NULL;
 
-    const bool useVideoRAM = (mode == TEX_TYPE_USE_VRAM);
-    const auto pixel_size = PixelSize(textureMode);
-
-    struct jpeg_decompress_struct cinfo;
-    struct jpeg_error_mgr jerr;
-    u8 *scanline, *p;
-    u16* q16;
-    u32* q32;
+    const bool use_vram = (mode == TEX_TYPE_USE_VRAM);
 
     JFileSystem* fileSystem = JFileSystem::GetInstance();
     if (!fileSystem->OpenFile(filename)) {
@@ -903,6 +894,14 @@ void JRenderer::LoadJPG(TextureInfo& textureInfo, const char* filename, int mode
 
     fileSystem->ReadFile(rawdata, rawsize);
     fileSystem->CloseFile();
+
+    const auto pixel_size = PixelSize(textureMode);
+
+    struct jpeg_decompress_struct cinfo;
+    struct jpeg_error_mgr jerr;
+    u8 *scanline, *p;
+    u16* q16;
+    u32* q32;
 
     cinfo.err = jpeg_std_error(&jerr);
     jpeg_create_decompress(&cinfo);
@@ -922,7 +921,7 @@ void JRenderer::LoadJPG(TextureInfo& textureInfo, const char* filename, int mode
     const wge::size_t th = wge::math::nearest_superior_power_of_2(cinfo.output_height);
     const auto size = tw * th * pixel_size;
 
-    auto ram_ptr = wge::video::make_vram_ptr<wge::byte_t>(size, useVideoRAM);
+    auto ram_ptr = wge::video::make_vram_ptr<wge::byte_t>(size, use_vram);
 
     wge::u16* bits16 = nullptr;
     wge::u32* bits32 = nullptr;
@@ -958,54 +957,24 @@ void JRenderer::LoadJPG(TextureInfo& textureInfo, const char* filename, int mode
     u16* currRow16 = rgbadata16;
     u32* currRow32 = rgbadata32;
     while (cinfo.output_scanline < cinfo.output_height) {
-        p = scanline;
-        jpeg_read_scanlines(&cinfo, &scanline, 1);
+        read_line_jpg(cinfo, scanline, textureMode, currRow16, currRow32);
 
-        q16 = currRow16;
-        q32 = currRow32;
-        for (wge::u32 i = 0; i < cinfo.output_width; ++i) {
-            int a = 255;
-            int r = p[0];
-            int g = p[1];
-            int b = p[2];
-            switch (textureMode) {
-            case GU_PSM_5650:
-                *(q16) = wge::video::pixel_converter<wge::video::pixel_format::format_5650>::convert(r, g, b);
-                break;
-            case GU_PSM_5551:
-                *(q16) = wge::video::pixel_converter<wge::video::pixel_format::format_5551>::convert(r, g, b, a);
-                break;
-            case GU_PSM_4444:
-                *(q16) = wge::video::pixel_converter<wge::video::pixel_format::format_4444>::convert(r, g, b, a);
-                break;
-            case GU_PSM_8888:
-                *(q32) = wge::video::pixel_converter<wge::video::pixel_format::format_8888>::convert(r, g, b, a);
-                break;
-            }
-
-            p += 3;
-            if (q16) q16 += 1;
-            if (q32) q32 += 1;
-        }
         if (currRow32) currRow32 += tw;
         if (currRow16) currRow16 += tw;
     }
 
     free(scanline);
 
-    try {
-        jpeg_finish_decompress(&cinfo);
-    } catch (...) {
-    }
+    jpeg_finish_decompress(&cinfo);
 
     if (mSwizzle) {
         auto* buf = reinterpret_cast<wge::u8*>(ram_ptr.get());
         if (rgbadata16) {
-            swizzle_fast(buf, (const u8*)rgbadata16, tw * pixel_size, th /*cinfo.output_height*/);
+            wge::video::utils::swizzle_fast(buf, (const u8*)rgbadata16, tw * pixel_size, th /*cinfo.output_height*/);
             free(rgbadata16);
         }
         if (rgbadata32) {
-            swizzle_fast(buf, (const u8*)rgbadata32, tw * pixel_size, th /*cinfo.output_height*/);
+            wge::video::utils::swizzle_fast(buf, (const u8*)rgbadata32, tw * pixel_size, th /*cinfo.output_height*/);
             free(rgbadata32);
         }
     }
@@ -1074,30 +1043,24 @@ JTexture* JRenderer::LoadTexture(const char* filename, int mode, int textureMode
 /*
 ** Helper function for LoadPNG
 */
+
+typedef u32* u32_ptr;
 void ReadPngLine(png_structp& png_ptr, u32_ptr& line, png_uint_32 width, int pixelformat, u16* p16, u32* p32) {
     png_read_row(png_ptr, (u8*)line, nullptr);
-    for (wge::u32 x = 0; x < width; ++x) {
-        const u32 color32 = line[x];
-
-        int r = color32 & 0xff;
-        int g = (color32 >> 8) & 0xff;
-        int b = (color32 >> 16) & 0xff;
-        int a = (color32 >> 24) & 0xff;
-
-        switch (pixelformat) {
-        case PSP_DISPLAY_PIXEL_FORMAT_565:
-            *(p16 + x) = wge::video::pixel_converter<wge::video::pixel_format::format_5650>::convert(r, g, b);
-            break;
-        case PSP_DISPLAY_PIXEL_FORMAT_5551:
-            *(p16 + x) = wge::video::pixel_converter<wge::video::pixel_format::format_5551>::convert(r, g, b, a);
-            break;
-        case PSP_DISPLAY_PIXEL_FORMAT_4444:
-            *(p16 + x) = wge::video::pixel_converter<wge::video::pixel_format::format_4444>::convert(r, g, b, a);
-            break;
-        case PSP_DISPLAY_PIXEL_FORMAT_8888:
-            *(p32 + x) = wge::video::pixel_converter<wge::video::pixel_format::format_8888>::convert(r, g, b, a);
-            break;
-        }
+    auto* in = reinterpret_cast<wge::byte_t*>(line);
+    switch (pixelformat) {
+    case PSP_DISPLAY_PIXEL_FORMAT_565:
+        convert_image_line<wge::video::pixel_format::format_5650>(in, width, 4, p16);
+        break;
+    case PSP_DISPLAY_PIXEL_FORMAT_5551:
+        convert_image_line<wge::video::pixel_format::format_5551>(in, width, 4, p16);
+        break;
+    case PSP_DISPLAY_PIXEL_FORMAT_4444:
+        convert_image_line<wge::video::pixel_format::format_4444>(in, width, 4, p16);
+        break;
+    case PSP_DISPLAY_PIXEL_FORMAT_8888:
+        convert_image_line<wge::video::pixel_format::format_8888>(in, width, 4, p32);
+        break;
     }
 }
 
@@ -1200,7 +1163,8 @@ int JRenderer::LoadPNG(TextureInfo& textureInfo, const char* filename, int mode,
                 }
 
                 if (mSwizzle) {
-                    swizzle_fast((u8*)dst, (const u8*)buffer, tw * sizeof(PIXEL_TYPE), kVerticalBlockSize);
+                    wge::video::utils::swizzle_fast((u8*)dst, (const u8*)buffer, tw * sizeof(PIXEL_TYPE),
+                                                    kVerticalBlockSize);
                     dst += src_row;
 
                     // if we're swizzling, reset the read pointers to the top of the buffer, as we re-read into an 8
@@ -1228,7 +1192,7 @@ int JRenderer::LoadPNG(TextureInfo& textureInfo, const char* filename, int mode,
                 if (mSwizzle) {
                     // swizzle_fast only can handle eight lines at a time, and will overrun memory in our destination,
                     // which only has remainingLines to fill - use the swizzle_lines function instead
-                    swizzle_lines((const u8*)buffer, (u8*)dst, tw, remainingLines);
+                    wge::video::utils::swizzle_lines((const u8*)buffer, (u8*)dst, tw, remainingLines);
                 }
             }
 

@@ -57,5 +57,5 @@ jobs:
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: ./cov_filter.info
+        path-to-lcov: ${{runner.workspace}}/cov_filter.info
 

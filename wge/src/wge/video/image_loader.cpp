@@ -108,14 +108,15 @@ texture_data::texture_data(wge::size_t w, wge::size_t h, wge::size_t tw, wge::si
 //    return {};
 //}
 
-texture_data image_loader::load_image(const wge::byte_t* const buffer, wge::size_t buffer_size) noexcept {
+texture_data image_loader::load_image(const wge::byte_t* const buffer, wge::size_t buffer_size, pixel_format format,
+                                      bool use_vram, bool swizzle) noexcept {
     const auto img_type = ::get_image_type(buffer, buffer_size);
     if (img_type == image_types::jpg) {
-        return load_jpeg(buffer, buffer_size);
+        return load_jpeg(buffer, buffer_size, format, use_vram, swizzle);
     }
 
     if (img_type == image_types::png) {
-        return load_png(buffer, buffer_size);
+        return load_png(buffer, buffer_size, format, use_vram, swizzle);
     }
 
     return {};
@@ -249,12 +250,19 @@ texture_data image_loader::load_jpeg(const wge::byte_t* const buffer, wge::size_
     const auto size = tw * th * pixel_size;
 
     auto ram_ptr = wge::video::make_vram_ptr<wge::byte_t>(size, use_vram);
+    if (!ram_ptr) {
+        return {};
+    }
 
     wge::byte_t* work_buf = nullptr;
     if (swizzle) {
         work_buf = new wge::byte_t[size];
     } else {
         work_buf = ram_ptr.get();
+    }
+
+    if (!work_buf) {
+        return {};
     }
 
     const auto row_size = tw * pixel_size;
@@ -308,13 +316,37 @@ texture_data image_loader::load_jpeg(const wge::byte_t* const buffer, wge::size_
 namespace wge {
 namespace video {
 static void PNGCustomWarningFn([[maybe_unused]] png_structp png_ptr, [[maybe_unused]] png_const_charp warning_msg) {
-    // ignore PNG warnings
+    // TODO: log warnings!
 }
 
 namespace {
 
-texture_data read_png_data(png_structp& png_ptr, png_infop& info_ptr) noexcept {
-    unsigned int sig_read = 0;
+void read_png_line(png_structp& png_ptr, wge::byte_t* scanline, wge::size_t width, pixel_format format,
+                   wge::byte_t* buf) noexcept {
+    png_read_row(png_ptr, scanline, nullptr);
+
+    switch (format) {
+    case pixel_format::format_5650:
+        convert_image_line<pixel_format::format_5650>(scanline, width, 4, reinterpret_cast<wge::u16*>(buf));
+        break;
+    case pixel_format::format_5551:
+        convert_image_line<pixel_format::format_5551>(scanline, width, 4, reinterpret_cast<wge::u16*>(buf));
+        break;
+    case pixel_format::format_4444:
+        convert_image_line<pixel_format::format_4444>(scanline, width, 4, reinterpret_cast<wge::u16*>(buf));
+        break;
+    case pixel_format::format_8888:
+        convert_image_line<pixel_format::format_8888>(scanline, width, 4, reinterpret_cast<wge::u32*>(buf));
+        break;
+    case pixel_format::none:
+        convert_image_line<pixel_format::none>(scanline, width, 4, reinterpret_cast<wge::u32*>(buf));
+        break;
+    }
+}
+
+texture_data read_png_data(png_structp& png_ptr, png_infop& info_ptr, bool use_vram, pixel_format format,
+                           bool swizzle) noexcept {
+    const unsigned int sig_read = 0;
     png_uint_32 width, height;
     int bit_depth, color_type, interlace_type, x, y;
 
@@ -328,42 +360,77 @@ texture_data read_png_data(png_structp& png_ptr, png_infop& info_ptr) noexcept {
     if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)) png_set_tRNS_to_alpha(png_ptr);
     png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
 
-    auto* line = reinterpret_cast<wge::u32*>(malloc(width * 4));
-    if (!line) {
-        png_destroy_read_struct(&png_ptr, nullptr, nullptr);
-        return {};
-    }
-
     const wge::size_t tw = wge::math::nearest_superior_power_of_2(width);
     const wge::size_t th = wge::math::nearest_superior_power_of_2(height);
 
-    constexpr wge::size_t pixel_size = 4U;
-    const wge::size_t rgba_data_size = tw * th * pixel_size;
-    auto rgba_data = make_vram_ptr<wge::byte_t>(rgba_data_size, false);
+    const auto pixel_size = get_pixel_size(format);
+    const wge::size_t size = tw * th * pixel_size;
+    auto ram_ptr = make_vram_ptr<wge::byte_t>(size, use_vram);
+    if (!ram_ptr) {
+        return {};
+    }
 
-    wge::u32* p32 = nullptr;
-    if (rgba_data) {
-        p32 = reinterpret_cast<wge::u32*>(rgba_data.get());
+    wge::byte_t* work_buf = nullptr;
 
-        for (y = 0; y < (int)height; y++) {
-            png_read_row(png_ptr, reinterpret_cast<wge::byte_t*>(line), nullptr);
-            for (x = 0; x < (int)width; x++) {
-                wge::u32 color32 = line[x];
-                int a = (color32 >> 24) & 0xff;
-                int r = color32 & 0xff;
-                int g = (color32 >> 8) & 0xff;
-                int b = (color32 >> 16) & 0xff;
+    constexpr wge::size_t vertical_block_size = 8U;
+    const auto swizzle_size = tw * vertical_block_size * pixel_size;
+    if (swizzle) {
+        work_buf = new wge::byte_t[swizzle_size];
+    } else {
+        work_buf = ram_ptr.get();
+    }
 
-                color32 = r | (g << 8) | (b << 16) | (a << 24);
-                *(p32 + x) = color32;
+    if (work_buf == nullptr) {
+        return {};
+    }
+
+    const auto row_size = tw * pixel_size;
+    {
+        auto scanline = std::make_unique<wge::byte_t[]>(width * 4);
+        if (!scanline) {
+            png_destroy_read_struct(&png_ptr, nullptr, nullptr);
+
+            if (swizzle && (work_buf != nullptr)) {
+                delete[] work_buf;
             }
-            p32 += tw;
+            return {};
+        }
+
+        const auto num_vertical_blocks = height / vertical_block_size;
+
+        wge::byte_t* dst = ram_ptr.get();
+        wge::byte_t* tmp_ptr = work_buf;
+
+        for (wge::size_t block = 0; block < num_vertical_blocks; ++block) {
+            for (y = 0; y < vertical_block_size; y++) {
+                read_png_line(png_ptr, scanline.get(), width, format, tmp_ptr);
+                tmp_ptr += row_size;
+            }
+
+            if (swizzle) {
+                utils::swizzle_fast(dst, work_buf, row_size, vertical_block_size);
+                dst += row_size * vertical_block_size;
+                tmp_ptr = work_buf;
+            }
+        }
+
+        // remaining lines (if height was not evenly devisibble by vertical block size)
+        if (swizzle) {
+            // clear the conversion buffer so that leftover scan lines are transparent
+            std::fill_n(work_buf, swizzle_size, 255);
+        }
+        const auto remaining_lines = height % vertical_block_size;
+        for (wge::size_t line = 0; line < remaining_lines; ++line) {
+            read_png_line(png_ptr, scanline.get(), width, format, tmp_ptr);
+            tmp_ptr += row_size;
+        }
+
+        if (swizzle) {
+            utils::swizzle_lines(work_buf, dst, tw, remaining_lines);
         }
     }
 
-    free(line);
-
-    return texture_data(width, height, tw, th, std::move(rgba_data), 4);
+    return texture_data(width, height, tw, th, std::move(ram_ptr), pixel_size);
 }
 
 }  // namespace
@@ -393,23 +460,25 @@ static void read_png_from_stream(png_structp png_ptr, png_bytep outBytes, png_si
     }
 }
 
-texture_data image_loader::load_png(const wge::byte_t* const buffer, wge::size_t buffer_size) noexcept {
-    png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-    if (png_ptr == NULL) {
+texture_data image_loader::load_png(const wge::byte_t* const buffer, wge::size_t buffer_size, pixel_format format,
+                                    bool use_vram, bool swizzle) noexcept {
+    png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
+    if (png_ptr == nullptr) {
         return {};
     }
 
     png_set_error_fn(png_ptr, nullptr, nullptr, PNGCustomWarningFn);
     png_infop info_ptr = png_create_info_struct(png_ptr);
-    if (info_ptr == NULL) {
+    if (info_ptr == nullptr) {
+        png_destroy_read_struct(&png_ptr, nullptr, nullptr);
         return {};
     }
-    png_init_io(png_ptr, NULL);
+    png_init_io(png_ptr, nullptr);
 
     stream_wrapper input_stream(buffer, buffer_size);
     png_set_read_fn(png_ptr, &input_stream, read_png_from_buffer);
 
-    auto texture_data = read_png_data(png_ptr, info_ptr);
+    auto texture_data = read_png_data(png_ptr, info_ptr, use_vram, format, swizzle);
 
     png_read_end(png_ptr, info_ptr);
     png_destroy_read_struct(&png_ptr, &info_ptr, nullptr);
@@ -418,21 +487,22 @@ texture_data image_loader::load_png(const wge::byte_t* const buffer, wge::size_t
 }
 
 texture_data image_loader::load_png(std::istream& stream) noexcept {
-    png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-    if (png_ptr == NULL) {
+    png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
+    if (png_ptr == nullptr) {
         return {};
     }
 
     png_set_error_fn(png_ptr, nullptr, nullptr, PNGCustomWarningFn);
     png_infop info_ptr = png_create_info_struct(png_ptr);
-    if (info_ptr == NULL) {
+    if (info_ptr == nullptr) {
+        png_destroy_read_struct(&png_ptr, nullptr, nullptr);
         return {};
     }
-    png_init_io(png_ptr, NULL);
+    png_init_io(png_ptr, nullptr);
 
     png_set_read_fn(png_ptr, &stream, read_png_from_stream);
 
-    auto texture_data = read_png_data(png_ptr, info_ptr);
+    auto texture_data = read_png_data(png_ptr, info_ptr, false, pixel_format::none, false);
 
     png_read_end(png_ptr, info_ptr);
     png_destroy_read_struct(&png_ptr, &info_ptr, nullptr);

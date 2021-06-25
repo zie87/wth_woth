@@ -538,11 +538,6 @@ public:
     };
 
 private:
-#if (defined PSP)
-    void LoadJPG(TextureInfo& textureInfo, const char* filename, int mode = 0, int TextureFormat = TEXTURE_FORMAT);
-    int LoadPNG(TextureInfo& textureInfo, const char* filename, int mode = 0, int TextureFormat = TEXTURE_FORMAT);
-#endif
-
     static JRenderer* mInstance;
 
 #if (!defined PSP)

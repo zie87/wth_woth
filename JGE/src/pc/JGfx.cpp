@@ -14,9 +14,9 @@
 #define GL_GLEXT_PROTOTYPES
 
 #if (!defined QT_CONFIG)
-    #ifdef WIN32
-        #pragma warning(disable : 4786)
-    #endif
+#ifdef WIN32
+#pragma warning(disable : 4786)
+#endif
 #endif
 
 #include "JGE.h"
@@ -26,19 +26,19 @@
 #include "JAssert.h"
 
 #if (defined WIN32) && (!defined QT_CONFIG)
-    #ifndef __attribute__
-        #define __attribute__((a))
-    #endif
+#ifndef __attribute__
+#define __attribute__((a))
+#endif
 #endif
 
 #ifdef _DEBUG
-    #define checkGlError()                                                                          \
-        {                                                                                           \
-            GLenum glError = glGetError();                                                          \
-            if (glError != 0) printf("%s : %u : GLerror is %u\n", __FUNCTION__, __LINE__, glError); \
-        }
+#define checkGlError()                                                                          \
+    {                                                                                           \
+        GLenum glError = glGetError();                                                          \
+        if (glError != 0) printf("%s : %u : GLerror is %u\n", __FUNCTION__, __LINE__, glError); \
+    }
 #else
-    #define checkGlError() (void(0))
+#define checkGlError() (void(0))
 #endif
 
 //#define FORCE_GL2
@@ -103,7 +103,7 @@ typedef void(APIENTRY* _glStencilOpSeparate)(GLenum face, GLenum sfail, GLenum d
 typedef void(APIENTRY* _glActiveTexture)(GLenum);
 typedef void(APIENTRY* _glBlendColor)(GLclampf, GLclampf, GLclampf, GLclampf);
 
-    #define GLSLGETPROC(func) a##func = (_##func)wglGetProcAddress(#func);
+#define GLSLGETPROC(func) a##func = (_##func)wglGetProcAddress(#func);
 
 struct glslFunctions {
     void load() {
@@ -216,59 +216,59 @@ struct glslFunctions {
 
 static glslFunctions g_glslfuncts;
 
-    #define glCreateShader g_glslfuncts.aglCreateShader
-    #define glCompileShader g_glslfuncts.aglCompileShader
-    #define glGetShaderiv g_glslfuncts.aglGetShaderiv
-    #define glGetShaderInfoLog g_glslfuncts.aglGetShaderInfoLog
-    #define glDeleteShader g_glslfuncts.aglDeleteShader
-    #define glCreateProgram g_glslfuncts.aglCreateProgram
-    #define glDeleteProgram g_glslfuncts.aglDeleteProgram
-    #define glShaderSource g_glslfuncts.aglShaderSource
-    #define glAttachShader g_glslfuncts.aglAttachShader
-    #define glLinkProgram g_glslfuncts.aglLinkProgram
-    #define glGetProgramiv g_glslfuncts.aglGetProgramiv
-    #define glGetProgramInfoLog g_glslfuncts.aglGetProgramInfoLog
-    #define glGetAttribLocation g_glslfuncts.aglGetAttribLocation
-    #define glGetUniformLocation g_glslfuncts.aglGetUniformLocation
-    #define glGetProgramiv g_glslfuncts.aglGetProgramiv
-    #define glVertexAttribPointer g_glslfuncts.aglVertexAttribPointer
-    #define glEnableVertexAttribArray g_glslfuncts.aglEnableVertexAttribArray
-    #define glUniform4fv g_glslfuncts.aglUniform4fv
-    #define glActiveTexture g_glslfuncts.aglActiveTexture
-    #define glUniform1i g_glslfuncts.aglUniform1i
-    #define glUseProgram g_glslfuncts.aglUseProgram
-    #define glUniformMatrix4fv g_glslfuncts.aglUniformMatrix4fv
+#define glCreateShader g_glslfuncts.aglCreateShader
+#define glCompileShader g_glslfuncts.aglCompileShader
+#define glGetShaderiv g_glslfuncts.aglGetShaderiv
+#define glGetShaderInfoLog g_glslfuncts.aglGetShaderInfoLog
+#define glDeleteShader g_glslfuncts.aglDeleteShader
+#define glCreateProgram g_glslfuncts.aglCreateProgram
+#define glDeleteProgram g_glslfuncts.aglDeleteProgram
+#define glShaderSource g_glslfuncts.aglShaderSource
+#define glAttachShader g_glslfuncts.aglAttachShader
+#define glLinkProgram g_glslfuncts.aglLinkProgram
+#define glGetProgramiv g_glslfuncts.aglGetProgramiv
+#define glGetProgramInfoLog g_glslfuncts.aglGetProgramInfoLog
+#define glGetAttribLocation g_glslfuncts.aglGetAttribLocation
+#define glGetUniformLocation g_glslfuncts.aglGetUniformLocation
+#define glGetProgramiv g_glslfuncts.aglGetProgramiv
+#define glVertexAttribPointer g_glslfuncts.aglVertexAttribPointer
+#define glEnableVertexAttribArray g_glslfuncts.aglEnableVertexAttribArray
+#define glUniform4fv g_glslfuncts.aglUniform4fv
+#define glActiveTexture g_glslfuncts.aglActiveTexture
+#define glUniform1i g_glslfuncts.aglUniform1i
+#define glUseProgram g_glslfuncts.aglUseProgram
+#define glUniformMatrix4fv g_glslfuncts.aglUniformMatrix4fv
 
-    #define GL_FRAGMENT_SHADER 0x8B30
-    #define GL_VERTEX_SHADER 0x8B31
-    #define GL_FLOAT_VEC2 0x8B50
-    #define GL_FLOAT_VEC3 0x8B51
-    #define GL_FLOAT_VEC4 0x8B52
-    #define GL_INT_VEC2 0x8B53
-    #define GL_INT_VEC3 0x8B54
-    #define GL_INT_VEC4 0x8B55
-    #define GL_BOOL 0x8B56
-    #define GL_BOOL_VEC2 0x8B57
-    #define GL_BOOL_VEC3 0x8B58
-    #define GL_BOOL_VEC4 0x8B59
-    #define GL_FLOAT_MAT2 0x8B5A
-    #define GL_FLOAT_MAT3 0x8B5B
-    #define GL_FLOAT_MAT4 0x8B5C
-    #define GL_SAMPLER_1D 0x8B5D
-    #define GL_SAMPLER_2D 0x8B5E
-    #define GL_SAMPLER_3D 0x8B5F
-    #define GL_SAMPLER_CUBE 0x8B60
-    #define GL_COMPILE_STATUS 0x8B81
-    #define GL_LINK_STATUS 0x8B82
-    #define GL_INFO_LOG_LENGTH 0x8B84
-    #define GL_ACTIVE_UNIFORMS 0x8B86
-    #define GL_ACTIVE_UNIFORM_MAX_LENGTH 0x8B87
-    #define GL_ACTIVE_ATTRIBUTES 0x8B89
-    #define GL_ACTIVE_ATTRIBUTE_MAX_LENGTH 0x8B8A
-    #define GL_TEXTURE0 0x84C0
-    #define GL_TEXTURE1 0x84C1
+#define GL_FRAGMENT_SHADER 0x8B30
+#define GL_VERTEX_SHADER 0x8B31
+#define GL_FLOAT_VEC2 0x8B50
+#define GL_FLOAT_VEC3 0x8B51
+#define GL_FLOAT_VEC4 0x8B52
+#define GL_INT_VEC2 0x8B53
+#define GL_INT_VEC3 0x8B54
+#define GL_INT_VEC4 0x8B55
+#define GL_BOOL 0x8B56
+#define GL_BOOL_VEC2 0x8B57
+#define GL_BOOL_VEC3 0x8B58
+#define GL_BOOL_VEC4 0x8B59
+#define GL_FLOAT_MAT2 0x8B5A
+#define GL_FLOAT_MAT3 0x8B5B
+#define GL_FLOAT_MAT4 0x8B5C
+#define GL_SAMPLER_1D 0x8B5D
+#define GL_SAMPLER_2D 0x8B5E
+#define GL_SAMPLER_3D 0x8B5F
+#define GL_SAMPLER_CUBE 0x8B60
+#define GL_COMPILE_STATUS 0x8B81
+#define GL_LINK_STATUS 0x8B82
+#define GL_INFO_LOG_LENGTH 0x8B84
+#define GL_ACTIVE_UNIFORMS 0x8B86
+#define GL_ACTIVE_UNIFORM_MAX_LENGTH 0x8B87
+#define GL_ACTIVE_ATTRIBUTES 0x8B89
+#define GL_ACTIVE_ATTRIBUTE_MAX_LENGTH 0x8B8A
+#define GL_TEXTURE0 0x84C0
+#define GL_TEXTURE1 0x84C1
 
-    #define GL_VERSION_2_0
+#define GL_VERSION_2_0
 #endif
 
 JQuad::JQuad(JTexture* tex, float x, float y, float width, float height)
@@ -655,9 +655,9 @@ void JRenderer::InitRenderer() {
     mCurrentRenderMode = MODE_UNKNOWN;
 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
-    #ifdef FORCE_GL2
+#ifdef FORCE_GL2
     g_glslfuncts.load();
-    #endif  // FORCE_GL2
+#endif  // FORCE_GL2
 
     char vShader[] =
         "uniform mat4 u_mvp_matrix;                         \n"
@@ -670,10 +670,10 @@ void JRenderer::InitRenderer() {
         "   v_color = a_color;                              \n"
         "}                                                  \n";
     char fShader[] =
-    #ifdef GL_ES_VERSION_2_0  // This line works fine on Windows, but not on Linux and it's required for GL_ES_2... hoh
-                              // well
+#ifdef GL_ES_VERSION_2_0  // This line works fine on Windows, but not on Linux and it's required for GL_ES_2... hoh
+                          // well
         "precision mediump float;                           \n"
-    #endif  // GL_ES_VERSION_2_0
+#endif  // GL_ES_VERSION_2_0
         "varying vec4 v_color;                              \n"
         "void main()                                        \n"
         "{                                                  \n"
@@ -693,10 +693,10 @@ void JRenderer::InitRenderer() {
         "   v_color = a_color;                              \n"
         "}                                                  \n";
     char fShaderWithTexture[] =
-    #ifdef GL_ES_VERSION_2_0  // This line works fine on Windows, but not on Linux and it's required for GL_ES_2... hoh
-                              // well
+#ifdef GL_ES_VERSION_2_0  // This line works fine on Windows, but not on Linux and it's required for GL_ES_2... hoh
+                          // well
         "precision mediump float;                           \n"
-    #endif  // GL_ES_VERSION_2_0
+#endif  // GL_ES_VERSION_2_0
         "varying vec2 v_texCoord;                           \n"
         "varying vec4 v_color;                              \n"
         "uniform sampler2D s_texture;                       \n"
@@ -898,7 +898,7 @@ void JRenderer::RenderQuad(JQuad* quad, float xo, float yo, float angle, float x
         glScalef(xScale, yScale, 1.0f);
     }
 
-    #if (defined GL_VERSION_ES_CM_1_1) || (defined GL_OES_VERSION_1_1)
+#if (defined GL_VERSION_ES_CM_1_1) || (defined GL_OES_VERSION_1_1)
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
@@ -926,7 +926,7 @@ void JRenderer::RenderQuad(JQuad* quad, float xo, float yo, float angle, float x
     glDisableClientState(GL_COLOR_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     glDisableClientState(GL_VERTEX_ARRAY);
-    #else
+#else
     glBegin(GL_QUADS);
 
     glColor4ub(quad->mColor[0].r, quad->mColor[0].g, quad->mColor[0].b, quad->mColor[0].a);
@@ -949,7 +949,7 @@ void JRenderer::RenderQuad(JQuad* quad, float xo, float yo, float angle, float x
     glVertex2f(pt[3].x, pt[3].y);
 
     glEnd();
-    #endif  //(defined GL_ES_VERSION_1_1) || (defined GL_VERSION_1_1)
+#endif  //(defined GL_ES_VERSION_1_1) || (defined GL_VERSION_1_1)
 
     glPopMatrix();
 
@@ -1508,7 +1508,7 @@ JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureForm
 
     auto data = wge::video::image_loader::load_image(raw_data.get(), raw_size);
 
-    if (data.pixels == nullptr) {
+    if (!data.pixels) {
         printf("Texture %s failed to load\n", filename);
         return nullptr;
     }
@@ -1519,14 +1519,15 @@ JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureForm
 
     auto* tex = new JTexture();
 
-    tex->mFilter = TEX_FILTER_LINEAR;
-    tex->mWidth = data.width;
-    tex->mHeight = data.height;
-    tex->mTexWidth = data.texture_width;
-    tex->mTexHeight = data.texture_height;
+    if (tex) {
+        tex->mFilter = TEX_FILTER_LINEAR;
+        tex->mWidth = data.width;
+        tex->mHeight = data.height;
+        tex->mTexWidth = data.texture_width;
+        tex->mTexHeight = data.texture_height;
 
-    tex->mBuffer = data.pixels.release();
-
+        tex->mBuffer = data.pixels.release();
+    }
     return tex;
 }
 #endif
@@ -1689,11 +1690,11 @@ void JRenderer::Enable2D() {
     glMatrixMode(GL_PROJECTION);  // Select The Projection Matrix
     glLoadIdentity();             // Reset The Projection Matrix
 
-    #if (defined GL_VERSION_ES_CM_1_1) || (defined GL_OES_VERSION_1_1)
+#if (defined GL_VERSION_ES_CM_1_1) || (defined GL_OES_VERSION_1_1)
     glOrthof(0.0f, SCREEN_WIDTH_F, 0.0f, SCREEN_HEIGHT_F - 1.0f, -1.0f, 1.0f);
-    #else
+#else
     gluOrtho2D(0.0f, SCREEN_WIDTH_F, 0.0f, SCREEN_HEIGHT_F - 1.0f);
-    #endif
+#endif
 
     glMatrixMode(GL_MODELVIEW);  // Select The Modelview Matrix
     glLoadIdentity();            // Reset The Modelview Matrix

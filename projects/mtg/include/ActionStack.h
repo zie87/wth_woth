@@ -76,9 +76,7 @@ public:
 
     virtual int receiveEvent(WEvent* event) { return 0; }
 
-#if defined(WIN32) || defined(LINUX)
     virtual void Dump();
-#endif
 
 protected:
     float GetVerticalTextOffset() const;
@@ -211,9 +209,7 @@ public:
     int has(Interruptible* action);
     int has(MTGAbility* ability);
     int receiveEventPlus(WEvent* event);
-#if defined(WIN32) || defined(LINUX)
     void Dump();
-#endif
     void setCurrentTutorial(ATutorialMessage* message) { currentTutorial = message; };
     ATutorialMessage* getCurrentTutorial() { return currentTutorial; };
     bool isCalm() { return interruptDecision[0] == NOT_DECIDED && interruptDecision[1] == NOT_DECIDED; };

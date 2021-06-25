@@ -1027,8 +1027,6 @@ void ActionStack::Render() {
     }
 }
 
-#if defined(WIN32) || defined(LINUX)
-
 void Interruptible::Dump() {
     string stype, sstate, sdisplay = "";
     switch (type) {
@@ -1083,5 +1081,3 @@ void ActionStack::Dump() {
         current->Dump();
     }
 }
-
-#endif

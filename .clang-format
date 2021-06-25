@@ -4,7 +4,7 @@
 Language: Cpp
 BasedOnStyle: Google
 ColumnLimit: 119
-IndentPPDirectives: BeforeHash
+IndentPPDirectives: None
 IndentCaseLabels: false
 DerivePointerAlignment: false
 IndentWidth: 4

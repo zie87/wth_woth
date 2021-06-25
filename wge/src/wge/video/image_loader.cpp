@@ -81,6 +81,10 @@ texture_data::texture_data(wge::size_t w, wge::size_t h, wge::size_t tw, wge::si
                            wge::size_t channels) noexcept
     : width(w), height(h), texture_width(tw), texture_height(th), pixels(buf), channels(channels) {}
 
+texture_data::texture_data(wge::size_t w, wge::size_t h, wge::size_t tw, wge::size_t th, vram_ptr<wge::byte_t>&& buf,
+                           wge::size_t channels) noexcept
+    : width(w), height(h), texture_width(tw), texture_height(th), pixels(std::move(buf)), channels(channels) {}
+
 texture_data image_loader::load_image(std::istream& stream) noexcept {
     const auto pos = stream.tellg();
 
@@ -213,7 +217,7 @@ texture_data image_loader::load_jpeg(const wge::byte_t* const buffer, wge::size_
 
     constexpr wge::size_t pixel_size = 4U;
     const wge::size_t rgba_data_size = tw * th * pixel_size;
-    auto rgba_data = std::make_unique<wge::byte_t[]>(rgba_data_size);
+    auto rgba_data = make_vram_ptr<wge::byte_t>(rgba_data_size, false);
 
     {
         // Allocate Scanline buffer
@@ -239,7 +243,7 @@ texture_data image_loader::load_jpeg(const wge::byte_t* const buffer, wge::size_
         }
     }
 
-    texture_data data{cinfo.output_width, cinfo.output_height, tw, th, rgba_data.release(), 4};
+    texture_data data{cinfo.output_width, cinfo.output_height, tw, th, std::move(rgba_data), 4};
 
     jpeg_finish_decompress(&cinfo);
     // Destroy JPEG object
@@ -266,7 +270,6 @@ texture_data image_loader::load_jpeg(std::istream& stream) noexcept { return {};
 
 #include <wge/memory.hpp>
 #include <wge/math/utils.hpp>
-
 
 namespace wge {
 namespace video {
@@ -302,7 +305,7 @@ texture_data read_png_data(png_structp& png_ptr, png_infop& info_ptr) noexcept {
 
     constexpr wge::size_t pixel_size = 4U;
     const wge::size_t rgba_data_size = tw * th * pixel_size;
-    auto rgba_data = std::make_unique<wge::byte_t[]>(rgba_data_size);
+    auto rgba_data = make_vram_ptr<wge::byte_t>(rgba_data_size, false);
 
     wge::u32* p32 = nullptr;
     if (rgba_data) {
@@ -326,7 +329,7 @@ texture_data read_png_data(png_structp& png_ptr, png_infop& info_ptr) noexcept {
 
     free(line);
 
-    return texture_data{width, height, tw, th, rgba_data.release(), 4};
+    return texture_data(width, height, tw, th, std::move(rgba_data), 4);
 }
 
 }  // namespace

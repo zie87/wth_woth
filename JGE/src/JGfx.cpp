@@ -39,6 +39,7 @@ extern "C" {
 #include "JFileSystem.h"
 
 #include <wge/math.hpp>
+#include <wge/video/vram_ptr.hpp>
 
 #include <utility>
 
@@ -926,59 +927,6 @@ int JRenderer::PixelSize(int textureMode) {
     return PIXEL_SIZE;
 }
 
-struct psp_ram_ptr {
-    using pointer_type = void*;
-
-    psp_ram_ptr(void* ptr, bool vram) noexcept : m_buffer(ptr), m_is_vram(vram) {}
-    ~psp_ram_ptr() noexcept { reset(); }
-
-    inline bool is_vram() const noexcept { return m_is_vram; }
-    inline pointer_type get() const noexcept { return m_buffer; }
-    inline pointer_type release() noexcept {
-        auto* tmp = m_buffer;
-        m_buffer = nullptr;
-        return tmp;
-    }
-
-    inline bool is_valid() const noexcept { return m_buffer != nullptr; }
-    explicit inline operator bool() const noexcept { return is_valid(); }
-
-    psp_ram_ptr(const psp_ram_ptr&) = delete;
-    psp_ram_ptr(psp_ram_ptr&&) = delete;
-    psp_ram_ptr& operator=(const psp_ram_ptr&) = delete;
-    psp_ram_ptr& operator=(psp_ram_ptr&&) = delete;
-
-    inline void reset() noexcept {
-        if (m_buffer != nullptr) {
-            if (m_is_vram) {
-                vfree(m_buffer);
-            } else {
-                free(m_buffer);
-            }
-            m_buffer = nullptr;
-        }
-    }
-
-private:
-    pointer_type m_buffer;
-    bool m_is_vram;
-};
-
-psp_ram_ptr make_ram_ptr(wge::size_t size, bool is_vram) noexcept {
-    psp_ram_ptr::pointer_type ptr = nullptr;
-
-    if (is_vram) {
-        ptr = valloc(size);
-    }
-
-    if (ptr == nullptr) {
-        ptr = memalign(16, size);
-        is_vram = false;
-    }
-
-    return {ptr, is_vram};
-}
-
 void JRenderer::LoadJPG(TextureInfo& textureInfo, const char* filename, int mode, int textureMode) {
     JLOG("JRenderer::LoadJPG");
     textureInfo.mBits = NULL;
@@ -1027,7 +975,7 @@ void JRenderer::LoadJPG(TextureInfo& textureInfo, const char* filename, int mode
     const wge::size_t th = wge::math::nearest_superior_power_of_2(cinfo.output_height);
     const auto size = tw * th * pixel_size;
 
-    auto ram_ptr = make_ram_ptr(size, useVideoRAM);
+    auto ram_ptr = wge::video::make_vram_ptr<wge::byte_t>(size, useVideoRAM);
 
     wge::u16* bits16 = nullptr;
     wge::u32* bits32 = nullptr;
@@ -1116,7 +1064,7 @@ void JRenderer::LoadJPG(TextureInfo& textureInfo, const char* filename, int mode
     }
 
     textureInfo.mVRAM = ram_ptr.is_vram();
-    textureInfo.mBits = reinterpret_cast<wge::byte_t*>(ram_ptr.release());
+    textureInfo.mBits = ram_ptr.release();
 
     textureInfo.mWidth = cinfo.output_width;
     textureInfo.mHeight = cinfo.output_height;
@@ -1268,7 +1216,7 @@ int JRenderer::LoadPNG(TextureInfo& textureInfo, const char* filename, int mode,
     bool done = false;
     const auto size = tw * th * sizeof(PIXEL_TYPE);
 
-    auto ram_ptr = make_ram_ptr(size, useVideoRAM);
+    auto ram_ptr = wge::video::make_vram_ptr<wge::byte_t>(size, useVideoRAM);
 
     {
         PIXEL_TYPE* buffer = reinterpret_cast<PIXEL_TYPE*>(ram_ptr.get());

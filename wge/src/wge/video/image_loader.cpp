@@ -87,26 +87,28 @@ texture_data::texture_data(wge::size_t w, wge::size_t h, wge::size_t tw, wge::si
                            wge::size_t channels) noexcept
     : width(w), height(h), texture_width(tw), texture_height(th), pixels(std::move(buf)), channels(channels) {}
 
-// texture_data image_loader::load_image(std::istream& stream) noexcept {
-//    const auto pos = stream.tellg();
-//
-//    constexpr std::size_t min_check_size = 16U;
-//    wge::byte_t check_buf[min_check_size];
-//
-//    stream.get(reinterpret_cast<char*>(check_buf), min_check_size);
-//    const auto img_type = ::get_image_type(check_buf, min_check_size);
-//    stream.seekg(pos);
-//
-//    if (img_type == image_types::jpg) {
-//        return load_jpeg(stream);
-//    }
-//
-//    if (img_type == image_types::png) {
-//        return load_png(stream);
-//    }
-//
-//    return {};
-//}
+texture_data image_loader::load_image(std::istream& stream, pixel_format format, bool use_vram,
+                                      bool swizzle) noexcept {
+    const auto pos = stream.tellg();
+
+    constexpr std::size_t min_check_size = 16U;
+    wge::byte_t check_buf[min_check_size];
+
+    stream.get(reinterpret_cast<char*>(check_buf), min_check_size);
+    const auto img_type = ::get_image_type(check_buf, stream.gcount());
+    stream.seekg(pos);
+
+    if (img_type == image_types::jpg) {
+        return load_jpeg(stream, format, use_vram, swizzle);
+    }
+
+    if (img_type == image_types::png) {
+        return load_png(stream, format, use_vram, swizzle);
+    }
+
+    printf("*** unkown format\n");
+    return {};
+}
 
 texture_data image_loader::load_image(const wge::byte_t* const buffer, wge::size_t buffer_size, pixel_format format,
                                       bool use_vram, bool swizzle) noexcept {
@@ -190,7 +192,42 @@ inline void convert_image_line(wge::byte_t* line, wge::size_t width, wge::size_t
     }
 }
 
-void fill_jpeg_info(jpeg_decompress_struct& cinfo, const wge::byte_t* const buffer, wge::size_t buffer_size) noexcept {
+struct jpeg_stream final {
+    jpeg_source_mgr pub;
+    std::istream* stream;
+    std::array<wge::byte_t, 4096> buffer;
+};
+
+void init_source(j_decompress_ptr cinfo) noexcept {
+    auto* src = reinterpret_cast<jpeg_stream*>(cinfo->src);
+    src->stream->seekg(0, std::ios::beg);
+}
+
+boolean fill_buffer(j_decompress_ptr cinfo) noexcept {
+    // Read to buffer
+    auto* src = reinterpret_cast<jpeg_stream*>(cinfo->src);
+    std::istream& stream = *(src->stream);
+    stream.get(reinterpret_cast<char*>(src->buffer.data()), src->buffer.size());
+
+    src->pub.next_input_byte = src->buffer.data();
+    src->pub.bytes_in_buffer = stream.gcount();
+
+    return stream.eof() ? TRUE : FALSE;
+}
+
+void skip(j_decompress_ptr cinfo, long count) noexcept {
+    auto* src = reinterpret_cast<jpeg_stream*>(cinfo->src);
+    std::istream& stream = *(src->stream);
+    stream.seekg(count, std::ios::cur);
+
+    fill_buffer(cinfo);
+}
+
+void term(j_decompress_ptr cinfo) noexcept {
+    // Close the stream, can be nop
+}
+
+void make_jpeg_info(jpeg_decompress_struct& cinfo, const wge::byte_t* const buffer, wge::size_t buffer_size) noexcept {
     cinfo.src = (struct jpeg_source_mgr*)(*cinfo.mem->alloc_small)((j_common_ptr)&cinfo, JPOOL_PERMANENT,
                                                                    sizeof(struct jpeg_source_mgr));
     cinfo.src->init_source = jpg_null;
@@ -200,6 +237,31 @@ void fill_jpeg_info(jpeg_decompress_struct& cinfo, const wge::byte_t* const buff
     cinfo.src->term_source = jpg_null;
     cinfo.src->bytes_in_buffer = buffer_size;
     cinfo.src->next_input_byte = buffer;
+}
+
+void make_jpeg_info(jpeg_decompress_struct& cinfo, std::istream& is) noexcept {
+    /* The source object and input buffer are made permanent so that a series
+     * of JPEG images can be read from the same file by calling jpeg_stdio_src
+     * only before the first one.  (If we discarded the buffer at the end of
+     * one image, we'd likely lose the start of the next one.)
+     * This makes it unsafe to use this manager and a different source
+     * manager serially with the same JPEG object.  Caveat programmer.
+     */
+    if (cinfo.src == nullptr) {
+        /* first time for this JPEG object? */
+        cinfo.src = (struct jpeg_source_mgr*)(*cinfo.mem->alloc_small)((j_common_ptr)&cinfo, JPOOL_PERMANENT,
+                                                                       sizeof(jpeg_stream));
+    }
+
+    auto* src = reinterpret_cast<jpeg_stream*>(cinfo.src);
+    src->stream = &is;
+    src->pub.init_source = init_source;
+    src->pub.fill_input_buffer = fill_buffer;
+    src->pub.skip_input_data = skip;
+    src->pub.resync_to_restart = jpeg_resync_to_restart; /* use default method */
+    src->pub.term_source = term;
+    src->pub.bytes_in_buffer = 0;       /* forces fill_input_buffer on first read */
+    src->pub.next_input_byte = nullptr; /* until buffer loaded */
 }
 
 void read_jpg_line(jpeg_decompress_struct& cinfo, wge::byte_t* scanline, pixel_format format,
@@ -225,17 +287,8 @@ void read_jpg_line(jpeg_decompress_struct& cinfo, wge::byte_t* scanline, pixel_f
         break;
     }
 }
-}  // namespace
 
-texture_data image_loader::load_jpeg(const wge::byte_t* const buffer, wge::size_t buffer_size, pixel_format format,
-                                     bool use_vram, bool swizzle) noexcept {
-    struct jpeg_decompress_struct cinfo;
-    struct jpeg_error_mgr jerr;
-    cinfo.err = jpeg_std_error(&jerr);
-    jpeg_create_decompress(&cinfo);
-
-    fill_jpeg_info(cinfo, buffer, buffer_size);
-
+texture_data read_jpg_data(jpeg_decompress_struct& cinfo, pixel_format format, bool use_vram, bool swizzle) noexcept {
     jpeg_read_header(&cinfo, true);
     jpeg_start_decompress(&cinfo);
 
@@ -294,7 +347,37 @@ texture_data image_loader::load_jpeg(const wge::byte_t* const buffer, wge::size_
         }
     }
 
-    texture_data data{cinfo.output_width, cinfo.output_height, tw, th, std::move(ram_ptr), 4};
+    return texture_data{cinfo.output_width, cinfo.output_height, tw, th, std::move(ram_ptr), 4};
+}
+
+}  // namespace
+
+texture_data image_loader::load_jpeg(const wge::byte_t* const buffer, wge::size_t buffer_size, pixel_format format,
+                                     bool use_vram, bool swizzle) noexcept {
+    struct jpeg_decompress_struct cinfo;
+    struct jpeg_error_mgr jerr;
+    cinfo.err = jpeg_std_error(&jerr);
+    jpeg_create_decompress(&cinfo);
+
+    make_jpeg_info(cinfo, buffer, buffer_size);
+
+    auto data = read_jpg_data(cinfo, format, use_vram, swizzle);
+
+    jpeg_destroy_decompress(&cinfo);
+
+    return data;
+}
+
+texture_data image_loader::load_jpeg(std::istream& stream, pixel_format format, bool use_vram, bool swizzle) noexcept {
+    struct jpeg_decompress_struct cinfo;
+    struct jpeg_error_mgr jerr;
+    cinfo.err = jpeg_std_error(&jerr);
+    jpeg_create_decompress(&cinfo);
+
+    make_jpeg_info(cinfo, stream);
+
+    auto data = read_jpg_data(cinfo, format, use_vram, swizzle);
+
     jpeg_destroy_decompress(&cinfo);
 
     return data;
@@ -303,8 +386,6 @@ texture_data image_loader::load_jpeg(const wge::byte_t* const buffer, wge::size_
 }  // namespace video
 }  // namespace wge
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -486,7 +567,7 @@ texture_data image_loader::load_png(const wge::byte_t* const buffer, wge::size_t
     return texture_data;
 }
 
-texture_data image_loader::load_png(std::istream& stream) noexcept {
+texture_data image_loader::load_png(std::istream& stream, pixel_format format, bool use_vram, bool swizzle) noexcept {
     png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
     if (png_ptr == nullptr) {
         return {};
@@ -502,7 +583,7 @@ texture_data image_loader::load_png(std::istream& stream) noexcept {
 
     png_set_read_fn(png_ptr, &stream, read_png_from_stream);
 
-    auto texture_data = read_png_data(png_ptr, info_ptr, false, pixel_format::none, false);
+    auto texture_data = read_png_data(png_ptr, info_ptr, use_vram, format, swizzle);
 
     png_read_end(png_ptr, info_ptr);
     png_destroy_read_struct(&png_ptr, &info_ptr, nullptr);

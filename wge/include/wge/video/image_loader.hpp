@@ -33,9 +33,9 @@ struct texture_data {
 struct image_loader {
     static const int number_of_channels;
 
-    // static texture_data load_image(std::istream& stream) noexcept;
-    static texture_data load_png(std::istream& stream) noexcept;
-    // static texture_data load_jpeg(std::istream& stream) noexcept;
+    static texture_data load_image(std::istream& stream, pixel_format format, bool use_vram, bool swizzle) noexcept;
+    static texture_data load_jpeg(std::istream& stream, pixel_format format, bool use_vram, bool swizzle) noexcept;
+    static texture_data load_png(std::istream& stream, pixel_format format, bool use_vram, bool swizzle) noexcept;
 
     static texture_data load_image(const wge::byte_t* const buffer, wge::size_t buffer_size, pixel_format format,
                                    bool use_vram, bool swizzle) noexcept;
@@ -43,6 +43,16 @@ struct image_loader {
                                   bool use_vram, bool swizzle) noexcept;
     static texture_data load_png(const wge::byte_t* const buffer, wge::size_t buffer_size, pixel_format format,
                                  bool use_vram, bool swizzle) noexcept;
+
+    static inline texture_data load_image(std::istream& stream) noexcept {
+        return load_image(stream, pixel_format::none, false, false);
+    }
+    static inline texture_data load_jpeg(std::istream& stream) noexcept {
+        return load_jpeg(stream, pixel_format::none, false, false);
+    }
+    static inline texture_data load_png(std::istream& stream) noexcept {
+        return load_png(stream, pixel_format::none, false, false);
+    }
 
     static inline texture_data load_image(const wge::byte_t* const buffer, wge::size_t buffer_size) noexcept {
         return load_image(buffer, buffer_size, pixel_format::none, false, false);

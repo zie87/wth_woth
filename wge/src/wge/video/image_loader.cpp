@@ -1,10 +1,16 @@
 #include <wge/video/image_loader.hpp>
 #include <wge/video/utils.hpp>
 
+#include <wge/memory.hpp>
 #include <wge/math/utils.hpp>
 #include <wge/types.hpp>
 
-#include <vector>
+#include <jpeglib.h>
+#include <png.h>
+
+#include <array>
+#include <algorithm>
+
 #include <cstring>
 
 namespace {
@@ -130,8 +136,6 @@ texture_data image_loader::load_image(const wge::byte_t* const buffer, wge::size
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <algorithm>
-
 namespace {
 struct stream_wrapper {
     stream_wrapper(const wge::byte_t* buf, wge::size_t size) noexcept : length(size), buffer(buf) {}
@@ -153,10 +157,6 @@ private:
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <jpeglib.h>
-
-#include <wge/memory.hpp>
-#include <wge/math/utils.hpp>
 
 namespace wge {
 namespace video {
@@ -389,10 +389,6 @@ texture_data image_loader::load_jpeg(std::istream& stream, pixel_format format, 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <png.h>
-
-#include <wge/memory.hpp>
-#include <wge/math/utils.hpp>
 
 namespace wge {
 namespace video {

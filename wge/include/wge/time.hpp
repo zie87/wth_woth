@@ -24,6 +24,6 @@ struct clock {
 using time_point = clock::time_point;
 using duration = clock::duration;
 
-};  // namespace wge
+}  // namespace wge
 
 #endif  // WOTH_WGE_TIME_HPP

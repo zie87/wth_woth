@@ -12,9 +12,13 @@ template <typename T, class = typename std::enable_if<std::is_integral<T>::value
 constexpr inline T nearest_superior_power_of_2(T n) noexcept {
     T b = n;
     T cnt = 0;
-    for (; b != 0; cnt++) b >>= 1;
-    b = 1 << cnt;
-    if (b == 2 * n) b >>= 1;
+    for (; b != 0; cnt++) {
+        b >>= 1;
+    }
+    b = static_cast<T>(1 << cnt);
+    if (b == 2 * n) {
+        b >>= 1;
+    }
     return b;
 }
 

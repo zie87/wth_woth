@@ -3,11 +3,13 @@ cmake_minimum_required(VERSION 3.10)
 set(WOTH_CMAKE_MODULES_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/modules)
 list(APPEND CMAKE_MODULE_PATH ${WOTH_CMAKE_MODULES_PATH})
 
+find_package(Git REQUIRED)
 include( MunkeiVersionFromGit )
 
 version_from_git(
-  LOG       ON
-  TIMESTAMP "%Y%m%d%H%M%S"
+    GIT_EXECUTABLE ${GIT_EXECUTABLE}
+    LOG       ON
+    TIMESTAMP "%Y%m%d%H%M%S"
 )
 
 project(wth_woth LANGUAGES C CXX VERSION ${VERSION})

@@ -8,7 +8,7 @@ class JGE;
 #include <JSoundSystem.h>
 #include <string>
 #include <vector>
-#include <iostream>
+
 #include "DeckMetaData.h"
 #include "DeckMenu.h"
 

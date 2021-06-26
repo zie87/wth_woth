@@ -1,7 +1,6 @@
 #ifndef _WEVENT_H_
 #define _WEVENT_H_
 
-#include <iostream>
 #include "PhaseRing.h"
 
 class MTGCardInstance;

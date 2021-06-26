@@ -458,7 +458,7 @@ int TestSuite::loadNext() {
     if (!load())
         return loadNext();
     else
-        std::cout << "Starting test : " << files[currentfile - 1] << std::endl;
+        WGE_LOG_INFO("Starting test : {}", files[currentfile - 1]);
     return currentfile;
 }
 

@@ -8,6 +8,8 @@
 #include "CardSelector.h"
 #include "Closest.cpp"
 
+#include <wge/log.hpp>
+
 static const float MARGIN = 70;
 static const float TOP_LINE = 80;
 
@@ -101,7 +103,7 @@ void GuiCombat::validateDamage() {
         observer->userRequestNextGamePhase(false, false);
         break;
     default:
-        std::cout << "COMBAT : Cannot validate damage in this phase" << std::endl;
+        WGE_LOG_WARN("Cannot validate damage in this phase");
         break;
     }
 }

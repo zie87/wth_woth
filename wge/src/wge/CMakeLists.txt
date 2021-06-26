@@ -29,7 +29,7 @@ endif()
 
 target_compile_features(wge PUBLIC cxx_std_17)
 target_include_directories(wge PUBLIC ${WOTH_WGE_ROOT_DIR}/include)
-target_link_libraries(wge PUBLIC fmt::fmt WotH::options PRIVATE JPEG::JPEG PNG::PNG) 
+target_link_libraries(wge PUBLIC fmt::fmt WotH::options PRIVATE JPEG::JPEG PNG::PNG WotH::warnings) 
 
 
 if(NOT DEFINED WOTH_PSP_BUILD)

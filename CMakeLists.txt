@@ -1,6 +1,16 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(wth_woth LANGUAGES C CXX)
+set(WOTH_CMAKE_MODULES_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/modules)
+list(APPEND CMAKE_MODULE_PATH ${WOTH_CMAKE_MODULES_PATH})
+
+include( MunkeiVersionFromGit )
+
+version_from_git(
+  LOG       ON
+  TIMESTAMP "%Y%m%d%H%M%S"
+)
+
+project(wth_woth LANGUAGES C CXX VERSION ${VERSION})
 
 # Set a default build type if none was specified
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -12,10 +22,6 @@ endif()
 
 # Generate compile_commands.json to make it easier to work with clang based tools
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-set(WOTH_CMAKE_MODULES_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/modules)
-list(APPEND CMAKE_MODULE_PATH ${WOTH_CMAKE_MODULES_PATH})
-
 
 include(CompilerWarnings)
 

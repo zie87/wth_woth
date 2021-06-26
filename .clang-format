@@ -15,4 +15,4 @@ AlwaysBreakTemplateDeclarations: true
 FixNamespaceComments: true
 #ShortNamespaceLines: 0
 SortIncludes: false
-
+AlignConsecutiveAssignments: true

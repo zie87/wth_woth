@@ -770,13 +770,13 @@ void JRenderer::ScreenShot(const char* filename) {
 inline constexpr wge::video::pixel_format to_pixel_format(PspDisplayPixelFormats psp_format) noexcept {
     switch (psp_format) {
     case PSP_DISPLAY_PIXEL_FORMAT_565:
-        return wge::video::pixel_format::format_5650;
+        return wge::video::pixel_format::bgr_5650;
     case PSP_DISPLAY_PIXEL_FORMAT_5551:
-        return wge::video::pixel_format::format_5551;
+        return wge::video::pixel_format::abgr_5551;
     case PSP_DISPLAY_PIXEL_FORMAT_4444:
-        return wge::video::pixel_format::format_4444;
+        return wge::video::pixel_format::abgr_4444;
     case PSP_DISPLAY_PIXEL_FORMAT_8888:
-        return wge::video::pixel_format::format_8888;
+        return wge::video::pixel_format::abgr_8888;
     }
     return wge::video::pixel_format::none;
 }
@@ -784,13 +784,13 @@ inline constexpr wge::video::pixel_format to_pixel_format(PspDisplayPixelFormats
 int JRenderer::PixelSize(int textureMode) {
     switch (textureMode) {
     case GU_PSM_5650:
-        return wge::video::pixel_converter<wge::video::pixel_format::format_5650>::pixel_size;
+        return wge::video::pixel_converter<wge::video::pixel_format::bgr_5650>::pixel_size;
     case GU_PSM_5551:
-        return wge::video::pixel_converter<wge::video::pixel_format::format_5551>::pixel_size;
+        return wge::video::pixel_converter<wge::video::pixel_format::abgr_5551>::pixel_size;
     case GU_PSM_4444:
-        return wge::video::pixel_converter<wge::video::pixel_format::format_4444>::pixel_size;
+        return wge::video::pixel_converter<wge::video::pixel_format::abgr_4444>::pixel_size;
     case GU_PSM_8888:
-        return wge::video::pixel_converter<wge::video::pixel_format::format_8888>::pixel_size;
+        return wge::video::pixel_converter<wge::video::pixel_format::abgr_8888>::pixel_size;
     }
     return PIXEL_SIZE;
 }

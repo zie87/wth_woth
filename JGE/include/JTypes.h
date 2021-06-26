@@ -15,53 +15,53 @@
 
 #if defined(PSP)
 
-    #include <pspgu.h>
-    #include <pspgum.h>
-    #include <pspkernel.h>
-    #include <pspdisplay.h>
-    #include <pspdebug.h>
-    #include <pspctrl.h>
-    #include <time.h>
-    #include <string.h>
-    #include <pspaudiolib.h>
-    #include <psprtc.h>
+#include <pspgu.h>
+#include <pspgum.h>
+#include <pspkernel.h>
+#include <pspdisplay.h>
+#include <pspdebug.h>
+#include <pspctrl.h>
+#include <time.h>
+#include <string.h>
+#include <pspaudiolib.h>
+#include <psprtc.h>
 
-    #include "JAudio.h"
+#include "JAudio.h"
 
 #else
 
-    #include <stdint.h>
+#include <stdint.h>
 
 #endif
 
 #ifndef __GNUC__
-    #define __attribute__(arg)
+#define __attribute__(arg)
 #endif
 
 #define MAX_CHANNEL 128
 
 enum {
     JGE_ERR_CANT_OPEN_FILE = -1,
-    JGE_ERR_PNG = -2,
-    JGE_ERR_MALLOC_FAILED = -4,
-    JGE_ERR_GENERIC = -5,
+    JGE_ERR_PNG            = -2,
+    JGE_ERR_MALLOC_FAILED  = -4,
+    JGE_ERR_GENERIC        = -5,
 };
 
 #ifdef PSP
-    #include <fastmath.h>
+#include <fastmath.h>
 #else
-    #include <math.h>
+#include <math.h>
 #endif
 
 #ifndef M_PI
-    #define M_PI 3.14159265358979323846f
-    #define M_PI_2 1.57079632679489661923f
-    #define M_PI_4 0.785398163397448309616f
-    #define M_1_PI 0.318309886183790671538f
-    #define M_2_PI 0.636619772367581343076f
+#define M_PI 3.14159265358979323846f
+#define M_PI_2 1.57079632679489661923f
+#define M_PI_4 0.785398163397448309616f
+#define M_1_PI 0.318309886183790671538f
+#define M_2_PI 0.636619772367581343076f
 
-    // prevent macro redefinition within SDL
-    #define HAVE_M_PI
+// prevent macro redefinition within SDL
+#define HAVE_M_PI
 #endif
 
 #define RAD2DEG 57.29577951f
@@ -90,117 +90,118 @@ enum {
 //	#define BLEND_OPTION_ADD	BLEND_COLORADD
 //	#define BLEND_OPTION_BLEND	(BLEND_COLORADD | BLEND_ALPHABLEND | BLEND_NOZWRITE)
 #else
-    #define DEFAULT_BLEND GU_TFX_MODULATE
-    #define BLEND_OPTION_ADD GU_TFX_ADD
-    #define BLEND_OPTION_BLEND GU_TFX_BLEND
+#define DEFAULT_BLEND GU_TFX_MODULATE
+#define BLEND_OPTION_ADD GU_TFX_ADD
+#define BLEND_OPTION_BLEND GU_TFX_BLEND
 #endif
 
 #if (defined WIN32) && (!defined LINUX)
-    #include <windows.h>
+#include <windows.h>
 #endif
+
 #if defined(LINUX)
 typedef uint32_t DWORD;
 typedef bool BOOL;
 #endif
 
 #ifndef QT_CONFIG
-    #if defined(WIN32) || defined(LINUX)
-        #include <GL/gl.h>
-        #include <GL/glu.h>
-    #endif
+#if defined(WIN32) || defined(LINUX)
+#include <GL/gl.h>
+#include <GL/glu.h>
+#endif
 #else
-    #include <QtOpenGL>
+#include <QtOpenGL>
 #endif
 
 #if (defined FORCE_GLES)
-    #undef GL_ES_VERSION_2_0
-    #undef GL_VERSION_2_0
-    #define GL_VERSION_ES_CM_1_1 1
-    #ifndef GL_OES_VERSION_1_1
-        #define glOrthof glOrtho
-        #define glClearDepthf glClearDepth
-    #endif
+#undef GL_ES_VERSION_2_0
+#undef GL_VERSION_2_0
+#define GL_VERSION_ES_CM_1_1 1
+#ifndef GL_OES_VERSION_1_1
+#define glOrthof glOrtho
+#define glClearDepthf glClearDepth
+#endif
 #endif
 
 #if defined(PSP)
 
-    #ifndef ABGR8888
-        #define ABGR8888
-    #endif
+#ifndef ABGR8888
+#define ABGR8888
+#endif
 
-    #if defined(ABGR8888)
-        #define PIXEL_TYPE u32
-        #ifndef ARGB
-            #define ARGB(a, r, g, b) \
-                (PIXEL_TYPE)((a << 24) | (b << 16) | (g << 8) | r)  // macro to assemble pixels in correct format
-        #endif
-        #define MAKE_COLOR(a, c) (a << 24 | c)
-        #define MASK_ALPHA 0xFF000000  // masks for accessing individual pixels
-        #define MASK_BLUE 0x00FF0000
-        #define MASK_GREEN 0x0000FF00
-        #define MASK_RED 0x000000FF
+#if defined(ABGR8888)
+#define PIXEL_TYPE u32
+#ifndef ARGB
+#define ARGB(a, r, g, b) \
+    (PIXEL_TYPE)((a << 24) | (b << 16) | (g << 8) | r)  // macro to assemble pixels in correct format
+#endif
+#define MAKE_COLOR(a, c) (a << 24 | c)
+#define MASK_ALPHA 0xFF000000  // masks for accessing individual pixels
+#define MASK_BLUE 0x00FF0000
+#define MASK_GREEN 0x0000FF00
+#define MASK_RED 0x000000FF
 
-        #define PIXEL_SIZE 4
-        #define PIXEL_FORMAT PSP_DISPLAY_PIXEL_FORMAT_8888
+#define PIXEL_SIZE 4
+#define PIXEL_FORMAT PSP_DISPLAY_PIXEL_FORMAT_8888
 
-        #define BUFFER_FORMAT GU_PSM_8888
-        #define TEXTURE_FORMAT GU_PSM_8888
-        #define TEXTURE_COLOR_FORMAT GU_COLOR_8888
+#define BUFFER_FORMAT GU_PSM_8888
+#define TEXTURE_FORMAT GU_PSM_8888
+#define TEXTURE_COLOR_FORMAT GU_COLOR_8888
 
-    #elif defined(ABGR5551)
+#elif defined(ABGR5551)
 
-        #ifndef ARGB
-            #define ARGB(a, r, g, b) ((r >> 3) | ((g >> 3) << 5) | ((b >> 3) << 10) | ((a >> 7) << 15))
-        #endif
-        #define MAKE_COLOR(a, c) (((a >> 7) << 15) | c)
-        #define MASK_ALPHA 0x8000
-        #define MASK_BLUE 0x7C00
-        #define MASK_GREEN 0x03E0
-        #define MASK_RED 0x001F
-        #define PIXEL_TYPE u16
-        #define PIXEL_SIZE 2
-        #define PIXEL_FORMAT PSP_DISPLAY_PIXEL_FORMAT_5551
+#ifndef ARGB
+#define ARGB(a, r, g, b) ((r >> 3) | ((g >> 3) << 5) | ((b >> 3) << 10) | ((a >> 7) << 15))
+#endif
+#define MAKE_COLOR(a, c) (((a >> 7) << 15) | c)
+#define MASK_ALPHA 0x8000
+#define MASK_BLUE 0x7C00
+#define MASK_GREEN 0x03E0
+#define MASK_RED 0x001F
+#define PIXEL_TYPE u16
+#define PIXEL_SIZE 2
+#define PIXEL_FORMAT PSP_DISPLAY_PIXEL_FORMAT_5551
 
-        #define BUFFER_FORMAT GU_PSM_8888
-        #define TEXTURE_FORMAT GU_PSM_5551
-        #define TEXTURE_COLOR_FORMAT GU_COLOR_5551
+#define BUFFER_FORMAT GU_PSM_8888
+#define TEXTURE_FORMAT GU_PSM_5551
+#define TEXTURE_COLOR_FORMAT GU_COLOR_5551
 
-    #elif defined(ABGR4444)
-        #ifndef ARGB
-            #define ARGB(a, r, g, b) ((r >> 4) | ((g >> 4) << 4) | ((b >> 4) << 8) | ((a >> 4) << 12))
-        #endif
-        #define MAKE_COLOR(a, c) (((a >> 4) << 12) | c)
-        #define MASK_ALPHA 0xF000
-        #define MASK_BLUE 0x0F00
-        #define MASK_GREEN 0x00F0
-        #define MASK_RED 0x000F
-        #define PIXEL_TYPE u16
-        #define PIXEL_SIZE 2
-        #define PIXEL_FORMAT PSP_DISPLAY_PIXEL_FORMAT_4444
+#elif defined(ABGR4444)
+#ifndef ARGB
+#define ARGB(a, r, g, b) ((r >> 4) | ((g >> 4) << 4) | ((b >> 4) << 8) | ((a >> 4) << 12))
+#endif
+#define MAKE_COLOR(a, c) (((a >> 4) << 12) | c)
+#define MASK_ALPHA 0xF000
+#define MASK_BLUE 0x0F00
+#define MASK_GREEN 0x00F0
+#define MASK_RED 0x000F
+#define PIXEL_TYPE u16
+#define PIXEL_SIZE 2
+#define PIXEL_FORMAT PSP_DISPLAY_PIXEL_FORMAT_4444
 
-        #define BUFFER_FORMAT GU_PSM_4444
-        #define TEXTURE_FORMAT GU_PSM_4444
-        #define TEXTURE_COLOR_FORMAT GU_COLOR_4444
+#define BUFFER_FORMAT GU_PSM_4444
+#define TEXTURE_FORMAT GU_PSM_4444
+#define TEXTURE_COLOR_FORMAT GU_COLOR_4444
 
-    #endif
+#endif
 
-    #define FRAME_BUFFER_WIDTH 512
-    #define FRAME_BUFFER_SIZE FRAME_BUFFER_WIDTH* SCREEN_HEIGHT* PIXEL_SIZE
+#define FRAME_BUFFER_WIDTH 512
+#define FRAME_BUFFER_SIZE FRAME_BUFFER_WIDTH* SCREEN_HEIGHT* PIXEL_SIZE
 
-    #define SLICE_SIZE_F 64.0f
+#define SLICE_SIZE_F 64.0f
 typedef unsigned int DWORD;
 
-    #define BLEND_ZERO 0x1000
-    #define BLEND_ONE 0x1002
-    #define BLEND_SRC_COLOR GU_SRC_COLOR
-    #define BLEND_ONE_MINUS_SRC_COLOR GU_ONE_MINUS_SRC_COLOR
-    #define BLEND_SRC_ALPHA GU_SRC_ALPHA
-    #define BLEND_ONE_MINUS_SRC_ALPHA GU_ONE_MINUS_SRC_ALPHA
-    #define BLEND_DST_ALPHA GU_DST_ALPHA
-    #define BLEND_ONE_MINUS_DST_ALPHA GU_ONE_MINUS_DST_ALPHA
-    #define BLEND_DST_COLOR GU_DST_COLOR
-    #define BLEND_ONE_MINUS_DST_COLOR GU_ONE_MINUS_DST_COLOR
-    #define BLEND_SRC_ALPHA_SATURATE BLEND_ONE
+#define BLEND_ZERO 0x1000
+#define BLEND_ONE 0x1002
+#define BLEND_SRC_COLOR GU_SRC_COLOR
+#define BLEND_ONE_MINUS_SRC_COLOR GU_ONE_MINUS_SRC_COLOR
+#define BLEND_SRC_ALPHA GU_SRC_ALPHA
+#define BLEND_ONE_MINUS_SRC_ALPHA GU_ONE_MINUS_SRC_ALPHA
+#define BLEND_DST_ALPHA GU_DST_ALPHA
+#define BLEND_ONE_MINUS_DST_ALPHA GU_ONE_MINUS_DST_ALPHA
+#define BLEND_DST_COLOR GU_DST_COLOR
+#define BLEND_ONE_MINUS_DST_COLOR GU_ONE_MINUS_DST_COLOR
+#define BLEND_SRC_ALPHA_SATURATE BLEND_ONE
 
 typedef struct {
     ScePspFVector2 texture;
@@ -216,31 +217,31 @@ typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
 
-    #define BLEND_ZERO GL_ZERO
-    #define BLEND_ONE GL_ONE
-    #define BLEND_SRC_COLOR GL_SRC_COLOR
-    #define BLEND_ONE_MINUS_SRC_COLOR GL_ONE_MINUS_SRC_COLOR
-    #define BLEND_SRC_ALPHA GL_SRC_ALPHA
-    #define BLEND_ONE_MINUS_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-    #define BLEND_DST_ALPHA GL_DST_ALPHA
-    #define BLEND_ONE_MINUS_DST_ALPHA GL_ONE_MINUS_DST_ALPHA
-    #define BLEND_DST_COLOR GL_DST_COLOR
-    #define BLEND_ONE_MINUS_DST_COLOR GL_ONE_MINUS_DST_COLOR
-    #define BLEND_SRC_ALPHA_SATURATE GL_SRC_ALPHA_SATURATE
+#define BLEND_ZERO GL_ZERO
+#define BLEND_ONE GL_ONE
+#define BLEND_SRC_COLOR GL_SRC_COLOR
+#define BLEND_ONE_MINUS_SRC_COLOR GL_ONE_MINUS_SRC_COLOR
+#define BLEND_SRC_ALPHA GL_SRC_ALPHA
+#define BLEND_ONE_MINUS_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+#define BLEND_DST_ALPHA GL_DST_ALPHA
+#define BLEND_ONE_MINUS_DST_ALPHA GL_ONE_MINUS_DST_ALPHA
+#define BLEND_DST_COLOR GL_DST_COLOR
+#define BLEND_ONE_MINUS_DST_COLOR GL_ONE_MINUS_DST_COLOR
+#define BLEND_SRC_ALPHA_SATURATE GL_SRC_ALPHA_SATURATE
 
-    #define ARGB(a, r, g, b) (((a) << 24) | ((r) << 16) | ((g) << 8) | (b))
-    #define RGBA(r, g, b, a) (((a) << 24) | ((b) << 16) | ((g) << 8) | (r))
+#define ARGB(a, r, g, b) (((a) << 24) | ((r) << 16) | ((g) << 8) | (b))
+#define RGBA(r, g, b, a) (((a) << 24) | ((b) << 16) | ((g) << 8) | (r))
 
-    #define TEXTURE_FORMAT 0
-    #define GU_PSM_8888 0
-    #define GU_PSM_5551 0
-    #define GU_PSM_4444 0
-    #define GU_PSM_5650 0
-    #define PIXEL_TYPE wge::pixel_t
+#define TEXTURE_FORMAT 0
+#define GU_PSM_8888 0
+#define GU_PSM_5551 0
+#define GU_PSM_4444 0
+#define GU_PSM_5650 0
+#define PIXEL_TYPE wge::pixel_t
 
 #endif
 
-typedef enum Buttons {
+enum JButton {
     JGE_BTN_NONE = 0,  // No button pressed
     JGE_BTN_QUIT,      // Home on PSP
     JGE_BTN_MENU,      // Start on PSP
@@ -260,7 +261,7 @@ typedef enum Buttons {
     JGE_BTN_FULLSCREEN,  // Switch to fullscreen (obviously, PC only)
 
     JGE_BTN_MAX = JGE_BTN_FULLSCREEN + 1
-} JButton;
+};
 
 //------------------------------------------------------------------------------------------------
 struct Vertex {

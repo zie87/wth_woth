@@ -3,9 +3,14 @@ add_library(wge STATIC)
 find_package(PNG REQUIRED)
 find_package(JPEG REQUIRED)
 
+if (NOT TARGET fmt::fmt AND NOT TARGET fmt)
+    find_package(fmt REQUIRED)
+endif ()
+
 target_sources(wge 
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/video/image_loader.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/debug/log_core.cpp
 )
 
 if(DEFINED WOTH_PSP_BUILD)
@@ -24,7 +29,7 @@ endif()
 
 target_compile_features(wge PUBLIC cxx_std_17)
 target_include_directories(wge PUBLIC ${WOTH_WGE_ROOT_DIR}/include)
-target_link_libraries(wge PUBLIC JPEG::JPEG PNG::PNG WotH::options)
+target_link_libraries(wge PUBLIC fmt::fmt WotH::options PRIVATE JPEG::JPEG PNG::PNG) 
 
 
 if(NOT DEFINED WOTH_PSP_BUILD)

@@ -48,6 +48,8 @@ WTEST_CASE(WgeVideoImageLoader, load_png_image_from_buffer) {
     constexpr wge::size_t img_height = 128;
     constexpr wge::size_t pixel_size = 4;
 
+    WTEST_ASSERT(data.pixels);
+
     WTEST_ASSERT_EQUAL(img_width, data.width);
     WTEST_ASSERT_EQUAL(img_height, data.height);
 
@@ -55,8 +57,6 @@ WTEST_CASE(WgeVideoImageLoader, load_png_image_from_buffer) {
     WTEST_ASSERT_EQUAL(img_height, data.texture_height);
 
     WTEST_ASSERT_EQUAL(pixel_size, data.channels);
-
-    WTEST_ASSERT(data.pixels);
 
     const auto expected = read_file_to_buffer(TEST_DATA_DIR "/bg_solid_colors_png.dat");
 
@@ -72,6 +72,8 @@ WTEST_CASE(WgeVideoImageLoader, load_png_image_from_stream) {
     std::ifstream stream(solid_bg_path, std::ios::in);
     const auto data = wge::video::image_loader::load_image(stream);
 
+    WTEST_ASSERT(data.pixels);
+
     constexpr wge::size_t img_width = 256;
     constexpr wge::size_t img_height = 128;
     constexpr wge::size_t pixel_size = 4;
@@ -83,8 +85,6 @@ WTEST_CASE(WgeVideoImageLoader, load_png_image_from_stream) {
     WTEST_ASSERT_EQUAL(img_height, data.texture_height);
 
     WTEST_ASSERT_EQUAL(pixel_size, data.channels);
-
-    WTEST_ASSERT(data.pixels);
 
     const auto expected = read_file_to_buffer(TEST_DATA_DIR "/bg_solid_colors_png.dat");
 
@@ -104,6 +104,8 @@ WTEST_CASE(WgeVideoImageLoader, load_jpg_image_from_buffer) {
         constexpr wge::size_t img_height = 128;
         constexpr wge::size_t pixel_size = 4;
 
+        WTEST_ASSERT(data.pixels);
+
         WTEST_ASSERT_EQUAL(img_width, data.width);
         WTEST_ASSERT_EQUAL(img_height, data.height);
 
@@ -111,8 +113,6 @@ WTEST_CASE(WgeVideoImageLoader, load_jpg_image_from_buffer) {
         WTEST_ASSERT_EQUAL(img_height, data.texture_height);
 
         WTEST_ASSERT_EQUAL(pixel_size, data.channels);
-
-        WTEST_ASSERT(data.pixels);
 
         const auto expected = read_file_to_buffer(TEST_DATA_DIR "/bg_solid_colors_jpg.dat");
 
@@ -267,8 +267,10 @@ WTEST_CASE(WgeVideoImageLoader, load_jpg_image_from_stream) {
 
 WTEST_SUITE_RUNNER(WgeVideoImageLoader) {
     RUN_TEST_CASE(WgeVideoImageLoader, load_png_image_from_buffer);
-    RUN_TEST_CASE(WgeVideoImageLoader, load_png_image_from_stream);
-
     RUN_TEST_CASE(WgeVideoImageLoader, load_jpg_image_from_buffer);
+
+#ifndef WOTH_PLATFORM_WIN32
     RUN_TEST_CASE(WgeVideoImageLoader, load_jpg_image_from_stream);
+    RUN_TEST_CASE(WgeVideoImageLoader, load_png_image_from_stream);
+#endif
 }

@@ -1471,7 +1471,7 @@ JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureForm
             tex->mHeight = tmpImage.height();
             tex->mTexWidth = wge::math::nearest_superior_power_of_2(tmpImage.width());
             tex->mTexHeight = wge::math::nearest_superior_power_of_2(tmpImage.height());
-            tex->mBuffer = new BYTE[tex->mTexWidth * tex->mTexHeight * 4];
+            tex->mBuffer = new wge::byte_t[tex->mTexWidth * tex->mTexHeight * 4];
 
             for (int i = 0; i < tex->mHeight; i++) {
                 memcpy(tex->mBuffer + (i * 4 * tex->mTexWidth), tmpImage.constScanLine(i), tmpImage.bytesPerLine());
@@ -1495,7 +1495,6 @@ JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureForm
     auto& filestream = fileSystem->current_file();
     auto data = wge::video::image_loader::load_image(filestream);
     fileSystem->CloseFile();
-
 
     if (!data.pixels) {
         printf("Texture %s failed to load\n", filename);

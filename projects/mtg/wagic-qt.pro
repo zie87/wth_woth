@@ -12,10 +12,10 @@ maemo5:QT += dbus
 TARGET = wagic
 TEMPLATE = app
 
-QMAKE_CXXFLAGS += -std=c++14
+QMAKE_CXXFLAGS += -std=c++17
 
 #!macx:CONFIG += precompile_header
-unix|macx:QMAKE_CXXFLAGS += -Wno-unused-parameter
+unix|macx:QMAKE_CXXFLAGS += -Wno-unused-parameter -Wno-deprecated-copy
 windows:DEFINES += WIN32
 windows:DEFINES += _CRT_SECURE_NO_WARNINGS
 unix|macx:DEFINES += LINUX
@@ -30,6 +30,7 @@ windows:INCLUDEPATH += ../../JGE/Dependencies/include
 windows:INCLUDEPATH += extra
 unix:!symbian:INCLUDEPATH += /usr/include/GL
 macx:INCLUDEPATH += /opt/include
+INCLUDEPATH += ../../wge/extern/fmt/include
 INCLUDEPATH += ../../wge/include
 INCLUDEPATH += ../../JGE/include/qt
 INCLUDEPATH += ../../JGE/include
@@ -288,7 +289,6 @@ SOURCES += \
         ../../JGE/src/JGameObject.cpp\
         ../../JGE/src/JGE.cpp\
         ../../JGE/src/JGui.cpp\
-        ../../JGE/src/JLogger.cpp\
         ../../JGE/src/JLBFont.cpp\
         ../../JGE/src/JMD2Model.cpp\
         ../../JGE/src/JOBJModel.cpp\
@@ -316,6 +316,14 @@ SOURCES += \
         ../../JGE/src/pc/JSfx.cpp\
         ../../JGE/src/pc/JGfx.cpp
 
+SOURCES += \
+        ../../wge/extern/fmt/src/format.cc\
+        ../../wge/extern/fmt/src/os.cc\
+        ../../wge/src/wge/debug/log_core.cpp
+
+HEADERS += \
+        ../../wge/extern/fmt/include/fmt/format.h
+
 HEADERS += \
         ../../JGE/include/qt/filedownloader.h\
         ../../JGE/include/qt/corewrapper.h\
@@ -333,7 +341,6 @@ HEADERS += \
         ../../JGE/include/JGE.h\
         ../../JGE/include/JGui.h\
         ../../JGE/include/JLBFont.h\
-        ../../JGE/include/JLogger.h\
         ../../JGE/include/JMD2Model.h\
         ../../JGE/include/JMP3.h\
         ../../JGE/include/JNetwork.h\

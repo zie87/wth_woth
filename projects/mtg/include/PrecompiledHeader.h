@@ -17,7 +17,6 @@
 
 #include "JGE.h"
 #include "JFileSystem.h"
-#include "JLogger.h"
 
 #include "GameOptions.h"
 

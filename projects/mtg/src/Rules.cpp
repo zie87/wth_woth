@@ -11,9 +11,10 @@
 #include "AllAbilities.h"
 #include "DeckManager.h"
 #include "AIPlayer.h"
-#include <JLogger.h>
 
-vector<Rules*> Rules::RulesList = vector<Rules*>();
+#include <wge/log.hpp>
+
+std::vector<Rules*> Rules::RulesList = std::vector<Rules*>();
 
 // Sorting by displayName
 struct RulesMenuCmp {
@@ -342,13 +343,13 @@ void Rules::initGame(GameObserver* g) {
                         delete spell;
                     } else {
                         if (!p->game->library->hasCard(card)) {
-                            LOG("RULES ERROR, CARD NOT FOUND IN LIBRARY\n");
+                            WGE_LOG_ERROR("card not found in library");
                         }
                         p->game->putInZone(card, p->game->library, zone);
                     }
                 } else {
                     if (!card) {
-                        LOG("RULES ERROR, card is NULL\n");
+                        WGE_LOG_ERROR("card is NULL");
                     }
                 }
             }

@@ -18,14 +18,15 @@
 #include <stdio.h>
 #include <queue>
 
-#include "../../JGE/include/JGE.h"
-#include "../../JGE/include/JApp.h"
-#include "../../JGE/include/JGameLauncher.h"
-#include "../../JGE/include/JRenderer.h"
-#include "../../JGE/include/JLogger.h"
+#include "JGE.h"
+#include "JApp.h"
+#include "JGameLauncher.h"
+#include "JRenderer.h"
+
+#include <wge/log.hpp>
 
 #ifndef JGEApp_Title
-    #define JGEApp_Title "JGE++"
+#define JGEApp_Title "JGE++"
 #endif
 
 #ifdef DEVHOOK
@@ -151,7 +152,6 @@ void ExceptionHandler(PspDebugRegBlock* regs) {
     pspDebugScreenPrintf("Your PSP has just crashed!\n");
     pspDebugScreenPrintf("Exception details:\n\n");
 
-    pspDebugScreenPrintf("Last Log Message: \n%s\n\n", JLogger::lastLog.c_str());
     pspDebugScreenPrintf("Exception - %s\n", codeTxt[(regs->cause >> 2) & 31]);
     pspDebugScreenPrintf("EPC       - %08X / %s.text + %08X\n", (int)regs->epc, module_info.modname,
                          (unsigned int)(regs->epc - (int)&_ftext));
@@ -173,7 +173,6 @@ void ExceptionHandler(PspDebugRegBlock* regs) {
             FILE* log = fopen("exception.log", "w");
             if (log != NULL) {
                 char testo[1024];
-                pspDebugScreenPrintf("Last Log Message: \n%s\n\n", JLogger::lastLog.c_str());
                 fwrite(testo, 1, strlen(testo), log);
                 sprintf(testo, "Exception details:\n\n");
                 fwrite(testo, 1, strlen(testo), log);
@@ -290,10 +289,11 @@ int main(int argc, char* argv[]) {
 
     pspDebugScreenPrintf("JGE:Loading application...");
 
-    JLOG("SetupCallbacks()");
+    WGE_LOG_TRACE("SetupCallbacks()");
     SetupCallbacks();
+
 #ifdef DEVHOOK
-    JLOG("initExceptionHandler()");
+    WGE_LOG_TRACE("initExceptionHandler()");
     initExceptionHandler();
 #endif
     g_engine = NULL;
@@ -303,18 +303,18 @@ int main(int argc, char* argv[]) {
     u32 flags = launcher->GetInitFlags();
     if ((flags & JINIT_FLAG_ENABLE3D) != 0) JRenderer::Set3DFlag(true);
 
-    JLOG("sceRtcGetTickResolution()");
+    WGE_LOG_TRACE("sceRtcGetTickResolution()");
     gTickFrequency = sceRtcGetTickResolution();
-    JLOG("JGE::GetInstance()");
+    WGE_LOG_TRACE("JGE::GetInstance()");
     g_engine = JGE::GetInstance();
     g_engine->SetARGV(argc, argv);
     JGECreateDefaultBindings();
 
-    JLOG("Create Game");
+    WGE_LOG_TRACE("Create Game");
     game = launcher->GetGameApp();
     game->Create();
 
-    JLOG("Run Game");
+    WGE_LOG_TRACE("Run Game");
     g_engine->SetApp(game);
     g_engine->Run();
 

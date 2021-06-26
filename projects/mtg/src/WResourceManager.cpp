@@ -6,10 +6,12 @@
 #include "CacheEngine.h"
 
 #if defined(WIN32)
-    #include <sys/types.h>
-    #include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #endif
 #include "WFont.h"
+
+#include <wge/log.hpp>
 
 //#define FORCE_LOW_CACHE_MEMORY
 const unsigned int kConstrainedCacheLimit = 8 * 1024 * 1024;
@@ -169,7 +171,6 @@ void ResourceManagerImpl::FlattenTimes() {
 }
 
 ResourceManagerImpl::ResourceManagerImpl() {
-    DebugTrace("Init ResourceManagerImpl : " << this);
 #ifdef DEBUG_CACHE
     menuCached = 0;
 #endif
@@ -182,7 +183,7 @@ ResourceManagerImpl::ResourceManagerImpl() {
 
     bThemedCards = false;
 
-    LOG("Calling CacheEngine::Create");
+    WGE_LOG_TRACE("Calling CacheEngine::Create");
 
 #ifdef PSP
     CacheEngine::Create<UnthreadedCardRetriever>(textureWCache);
@@ -192,11 +193,11 @@ ResourceManagerImpl::ResourceManagerImpl() {
 }
 
 ResourceManagerImpl::~ResourceManagerImpl() {
-    LOG("==Destroying ResourceManagerImpl==");
+    WGE_LOG_TRACE("== Destroying ResourceManagerImpl ==");
     RemoveWFonts();
 
     CacheEngine::Terminate();
-    LOG("==Successfully Destroyed ResourceManagerImpl==");
+    WGE_LOG_TRACE("== Successfully Destroyed ResourceManagerImpl ==");
 }
 
 bool ResourceManagerImpl::IsThreaded() { return CacheEngine::IsThreaded(); }
@@ -807,13 +808,13 @@ void ResourceManagerImpl::ResetCacheLimits() {
     }
     textureWCache.Resize(MIN(myNewSize, HUGE_CACHE_LIMIT), MAX_CACHE_OBJECTS);
 #else
-    #ifdef FORCE_LOW_CACHE_MEMORY
+#ifdef FORCE_LOW_CACHE_MEMORY
     textureWCache.Resize(kConstrainedCacheLimit, MAX_CACHE_OBJECTS);
-    #else
+#else
     unsigned long cacheSize =
         options["cachesize"].number ? (unsigned long)(options["cachesize"].number) * 1024 * 1024 : HUGE_CACHE_LIMIT;
     textureWCache.Resize(cacheSize, MAX_CACHE_OBJECTS);
-    #endif
+#endif
 
 #endif
     return;
@@ -854,11 +855,7 @@ bool WCache<cacheItem, cacheActual>::RemoveOldest() {
     }
 
     if (oldest != cache.end() && oldest->second && !oldest->second->isLocked()) {
-#ifdef DEBUG_CACHE
-        std::ostringstream stream;
-        stream << "erasing from cache: " << oldest->second->mFilename << " " << oldest->first;
-        LOG(stream.str().c_str());
-#endif
+        WGE_LOG_DEBUG("erasing from cache: {} {}", oldest->second->mFilename, oldest->first);
         Delete(oldest->second);
         cache.erase(oldest);
         return true;
@@ -885,13 +882,9 @@ void WCache<cacheItem, cacheActual>::ClearUnlocked() {
 template <class cacheItem, class cacheActual>
 void WCache<cacheItem, cacheActual>::Resize(unsigned long size, int items) {
     maxCacheSize = size;
-    DebugTrace(typeid(cacheActual).name() << " cache resized to " << size << " bytes");
 
-#ifdef DEBUG_CACHE
-    std::ostringstream stream;
-    stream << "Max cache limit resized to " << size << ", items limit reset to " << items;
-    LOG(stream.str().c_str());
-#endif
+    WGE_LOG_DEBUG("{} cache resized to {} bytes", typeid(cacheActual).name(), size);
+    WGE_LOG_DEBUG("Max cache limit resized to {}, items limit reset to {}", size, items);
 
     if (items > MAX_CACHE_OBJECTS || items < 1)
         maxCached = MAX_CACHE_OBJECTS;
@@ -1101,12 +1094,8 @@ cacheItem* WCache<cacheItem, cacheActual>::LoadIntoCache(int id, const string& f
         cacheSize += isize;
     }
 
-#ifdef DEBUG_CACHE
-    std::ostringstream stream;
-    stream << "Cache insert: " << filename << " " << id << ", cacheItem count: " << cacheItems
-           << ", cacheSize is now: " << cacheSize;
-    LOG(stream.str().c_str());
-#endif
+    WGE_LOG_DEBUG("Cache insert: {} {}, cacheItem count: {}, cacheSize is now: {}", filename, id, cacheItems,
+                  cacheSize);
 
     return item;
 }

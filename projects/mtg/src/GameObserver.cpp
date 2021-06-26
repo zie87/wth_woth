@@ -6,7 +6,6 @@
 #include "Rules.h"
 #include "ExtraCost.h"
 #include "Subtypes.h"
-#include <JLogger.h>
 #include <JRenderer.h>
 #include "MTGGamePhase.h"
 #include "GuiPhaseBar.h"
@@ -16,8 +15,10 @@
 #include "DeckManager.h"
 #include "GuiCombat.h"
 #ifdef TESTSUITE
-    #include "TestSuiteAI.h"
+#include "TestSuiteAI.h"
 #endif
+
+#include <wge/log.hpp>
 
 void GameObserver::cleanup() {
     SAFE_DELETE(targetChooser);
@@ -47,7 +48,8 @@ void GameObserver::cleanup() {
 }
 
 GameObserver::~GameObserver() {
-    LOG("==Destroying GameObserver==");
+    WGE_LOG_TRACE("== Destroying GameObserver ==");
+
     for (size_t i = 0; i < players.size(); ++i) {
         players[i]->End();
     }
@@ -61,7 +63,9 @@ GameObserver::~GameObserver() {
     players.clear();
     delete[] ExtraRules;
     ExtraRules = 0;
-    LOG("==GameObserver Destroyed==");
+
+    WGE_LOG_TRACE("== GameObserver Destroyed ==");
+
     SAFE_DELETE(mTrash);
     SAFE_DELETE(mDeckManager);
 }

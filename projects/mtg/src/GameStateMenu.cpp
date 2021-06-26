@@ -17,7 +17,6 @@
 #include "PlayerData.h"
 #include "utils.h"
 #include "WFont.h"
-#include <JLogger.h>
 #include "Rules.h"
 #include "ModRules.h"
 #include "Credits.h"
@@ -26,6 +25,8 @@
 #ifdef NETWORK_SUPPORT
     #include <JNetwork.h>
 #endif  // NETWORK_SUPPORT
+
+#include <wge/log.hpp>
 
 static const char* GAME_VERSION = "WTH?! " WAGIC_VERSION_STRING " - wololo.net";
 
@@ -112,7 +113,6 @@ void GameStateMenu::Destroy() {
 }
 
 void GameStateMenu::Start() {
-    LOG("GameStateMenu::Start");
     JRenderer::GetInstance()->EnableVSync(true);
     subMenuController = NULL;
     SAFE_DELETE(mGuiController);
@@ -297,7 +297,6 @@ void GameStateMenu::setLang(int id) {
 }
 
 void GameStateMenu::loadLangMenu() {
-    LOG("GameStateMenu::loadLangMenu");
     subMenuController = NEW SimpleMenu(JGE::GetInstance(), MENU_LANGUAGE_SELECTION, this, Fonts::MENU_FONT, 150, 60);
     if (!subMenuController) return;
 
@@ -324,15 +323,13 @@ void GameStateMenu::loadLangMenu() {
             subMenuController->Add(langs.size(), lang.c_str());
         }
     }
-    LOG("GameStateMenu::loadLangMenu - Done");
 }
 
 void GameStateMenu::listPrimitives() {
-    LOG("GameStateMenu::listPrimitives");
     vector<string> primitiveFiles = JFileSystem::GetInstance()->scanfolder("sets/primitives/");
 
     if (!primitiveFiles.size()) {
-        DebugTrace("GameStateMenu.cpp:WARNING:Primitives folder is missing");
+        WGE_LOG_WARN("Primitives folder is missing!");
         primitivesLoadCounter = 0;
         return;
     }
@@ -345,7 +342,6 @@ void GameStateMenu::listPrimitives() {
         primitives.push_back(filename);
     }
     primitivesLoadCounter = 0;
-    LOG("GameStateMenu::listPrimitives - Done");
 }
 
 void GameStateMenu::ensureMGuiController() {

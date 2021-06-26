@@ -1,12 +1,13 @@
 #include "PrecompiledHeader.h"
 
 #include <JGE.h>
-#include <JLogger.h>
 #include <JRenderer.h>
+#include <JFileSystem.h>
+
 #if defined(PSP)
-    #include <pspfpu.h>
+#include <pspfpu.h>
 #else
-    #include <time.h>
+#include <time.h>
 #endif
 
 #include "WResourceManager.h"
@@ -28,9 +29,10 @@
 #include "WFilter.h"
 #include "Rules.h"
 #include "ModRules.h"
-#include "JFileSystem.h"
 #include "Credits.h"
 #include "AbilityParser.h"
+
+#include <wge/log.hpp>
 
 #define DEFAULT_DURATION .25
 
@@ -80,15 +82,15 @@ GameApp::~GameApp() { WResourceManager::Terminate(); }
 void GameApp::Create() {
     srand((unsigned int)time(0));  // initialize random
 #if !defined(QT_CONFIG)
-    #if defined(WIN32)
+#if defined(WIN32)
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-    #elif defined(PSP)
+#elif defined(PSP)
     pspFpuSetEnable(0);  // disable FPU Exceptions until we find where the FPU errors come from
     pspDebugScreenPrintf("Wagic:Loading resources...");
-    #endif
+#endif
 #endif  // QT_CONFIG
     //_CrtSetBreakAlloc(368);
-    LOG("starting Game");
+    WGE_LOG_TRACE("starting Game");
 
     string systemFolder = "Res/";
     string foldersRoot = "";
@@ -111,7 +113,7 @@ void GameApp::Create() {
         }
         mfile.close();
     }
-    LOG("init Res Folder at " + foldersRoot);
+    WGE_LOG_DEBUG("init Res Folder at {}", foldersRoot);
     JFileSystem::init(foldersRoot + "User/", foldersRoot + systemFolder);
 
     // Create User Folders (for write access) if they don't exist
@@ -125,11 +127,11 @@ void GameApp::Create() {
         }
     }
 
-    LOG("Loading Modrules");
+    WGE_LOG_TRACE("Loading Modrules");
     // Load Mod Rules before everything else
     gModRules.load("rules/modrules.xml");
 
-    LOG("Loading Unlockables");
+    WGE_LOG_TRACE("Loading Unlockables");
     // Load awards (needs to be loaded before any option are accessed)
     Unlockable::load();
 
@@ -137,28 +139,27 @@ void GameApp::Create() {
     options.theGame = this;
 
     // Ensure that options are partially loaded before loading files.
-    LOG("options.reloadProfile()");
+    WGE_LOG_TRACE("options.reloadProfile()");
     options.reloadProfile();
 
     // Setup Cache before calling any gfx/sfx functions
     WResourceManager::Instance()->ResetCacheLimits();
 
-    LOG("Checking for music files");
+    WGE_LOG_TRACE("Checking for music files");
     // Test for Music files presence
     JFileSystem* jfs = JFileSystem::GetInstance();
     HasMusic = jfs->FileExists(WResourceManager::Instance()->musicFile("Track0.mp3")) &&
                jfs->FileExists(WResourceManager::Instance()->musicFile("Track1.mp3"));
 
-    LOG("Init Collection");
+    WGE_LOG_TRACE("Init Collection");
     MTGAllCards::loadInstance();
 
-    LOG("Loading rules");
+    WGE_LOG_TRACE("Loading rules");
     Rules::loadAllRules();
 
-    LOG("Loading Textures");
-    LOG("--Loading menuicons.png");
+    WGE_LOG_TRACE("Loading Textures");
+    WGE_LOG_TRACE("-- Loading menuicons.png");
     WResourceManager::Instance()->RetrieveTexture("menuicons.png", RETRIEVE_MANAGE);
-    LOG("---Gettings menuicons.png quads");
 
     // Load all icons from gModRules and save in manaIcons -> todo. Change the icons positions on menuicons.png to
     // avoid use item->mColorId
@@ -179,7 +180,7 @@ void GameApp::Create() {
     for (int i = manaIcons.size() - 1; i >= 0; --i)
         if (manaIcons[i].get()) manaIcons[i]->SetHotSpot(16, 16);
 
-    LOG("--Loading back.jpg");
+    WGE_LOG_TRACE("-- Loading back.jpg");
     WResourceManager::Instance()->RetrieveTexture("back.jpg", RETRIEVE_MANAGE);
     JQuadPtr jq = WResourceManager::Instance()->RetrieveQuad("back.jpg", 0, 0, 0, 0, kGenericCardID, RETRIEVE_MANAGE);
     if (jq.get()) jq->SetHotSpot(jq->mWidth / 2, jq->mHeight / 2);
@@ -188,21 +189,21 @@ void GameApp::Create() {
     WResourceManager::Instance()->RetrieveQuad("back_thumb.jpg", 0, 0, MTG_MINIIMAGE_WIDTH, MTG_MINIIMAGE_HEIGHT,
                                                kGenericCardThumbnailID, RETRIEVE_MANAGE);
 
-    LOG("--Loading particles.png");
+    WGE_LOG_TRACE("-- Loading particles.png");
     WResourceManager::Instance()->RetrieveTexture("particles.png", RETRIEVE_MANAGE);
     jq = WResourceManager::Instance()->RetrieveQuad("particles.png", 0, 0, 32, 32, "particles", RETRIEVE_MANAGE);
     if (jq) jq->SetHotSpot(16, 16);
     jq = WResourceManager::Instance()->RetrieveQuad("particles.png", 64, 0, 32, 32, "stars", RETRIEVE_MANAGE);
     if (jq) jq->SetHotSpot(16, 16);
 
-    LOG("--Loading fonts");
+    WGE_LOG_TRACE("-- Loading fonts");
     string lang = options[Options::LANG].str;
     std::transform(lang.begin(), lang.end(), lang.begin(), ::tolower);
     WResourceManager::Instance()->InitFonts(lang);
     Translator::GetInstance()->init();
     // The translator is ready now.
 
-    LOG("--Loading various textures");
+    WGE_LOG_TRACE("-- Loading various textures");
     // Load in this function only textures that are used frequently throughout the game. These textures will constantly
     // stay in Ram, so be frugal
     WResourceManager::Instance()->RetrieveTexture("phasebar.png", RETRIEVE_MANAGE);
@@ -222,7 +223,7 @@ void GameApp::Create() {
 
     jq = WResourceManager::Instance()->RetrieveQuad("phasebar.png", 0, 0, 0, 0, "phasebar", RETRIEVE_MANAGE);
 
-    LOG("Creating Game States");
+    WGE_LOG_TRACE("Creating Game States");
     mGameStates[GAME_STATE_DECK_VIEWER] = NEW GameStateDeckViewer(this);
     mGameStates[GAME_STATE_DECK_VIEWER]->Create();
 
@@ -253,19 +254,19 @@ void GameApp::Create() {
     JSoundSystem::GetInstance()->SetSfxVolume(options[Options::SFXVOLUME].number);
     JSoundSystem::GetInstance()->SetMusicVolume(options[Options::MUSICVOLUME].number);
 
-    DebugTrace("size of MTGCardInstance: " << sizeof(MTGCardInstance));
-    DebugTrace("size of MTGCard: " << sizeof(MTGCard));
-    DebugTrace("size of CardPrimitive: " << sizeof(CardPrimitive));
-    DebugTrace("size of ExtraCost: " << sizeof(ExtraCost));
-    DebugTrace("size of ManaCost: " << sizeof(ManaCost));
+    WGE_LOG_DEBUG("size of MTGCardInstance: {}", sizeof(MTGCardInstance));
+    WGE_LOG_DEBUG("size of MTGCard: {}", sizeof(MTGCard));
+    WGE_LOG_DEBUG("size of CardPrimitive: {}", sizeof(CardPrimitive));
+    WGE_LOG_DEBUG("size of ExtraCost: {}", sizeof(ExtraCost));
+    WGE_LOG_DEBUG("size of ManaCost: {}", sizeof(ManaCost));
 
-    LOG("Game Creation Done.");
+    WGE_LOG_TRACE("Game Creation Done.");
 }
 
 void GameApp::LoadGameStates() {}
 
 void GameApp::Destroy() {
-    LOG("==Destroying GameApp==");
+    WGE_LOG_TRACE("== Destroying GameApp ==");
 
 #ifdef TRACK_OBJECT_USAGE
     ObjectAnalytics::DumpStatistics();
@@ -297,7 +298,7 @@ void GameApp::Destroy() {
     AutoLineMacro::Destroy();
 
     Rules::unloadAllRules();
-    LOG("==Destroying GameApp Successful==");
+    WGE_LOG_TRACE("== Destroying GameApp Successful ==");
 
 #ifdef TRACK_FILE_USAGE_STATS
     wagic::ifstream::Dump();

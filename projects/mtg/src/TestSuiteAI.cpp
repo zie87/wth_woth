@@ -9,7 +9,7 @@
 #include "GameObserver.h"
 #include "GameStateShop.h"
 
-using std::string;
+#include <wge/log.hpp>
 
 #ifdef TESTSUITE
 
@@ -409,9 +409,9 @@ TestSuite::TestSuite(const char* filename) : TestSuiteGame(0), mRules(0), mProce
     std::ofstream file2;
     if (JFileSystem::GetInstance()->openForWrite(file2, "/test/results.html")) {
         file2 << "<html><head>";
-    #ifdef WIN32
+#ifdef WIN32
         file2 << "<meta http-equiv=\"refresh\" content=\"10\" >";
-    #endif
+#endif
         file2 << "<STYLE type='text/css'>";
         file2 << ".success {color:green}\n";
         file2 << ".error {color:red}\n";
@@ -595,7 +595,7 @@ void TestSuite::pregameTests() {
 }
 
 void TestSuite::ThreadProc(void* inParam) {
-    LOG("Entering TestSuite::ThreadProc");
+    WGE_LOG_TRACE("Entering");
     TestSuite* instance = reinterpret_cast<TestSuite*>(inParam);
     if (instance) {
         string filename;
@@ -622,7 +622,7 @@ void TestSuite::ThreadProc(void* inParam) {
             }
         }
     }
-    LOG("Leaving TestSuite::ThreadProc");
+    WGE_LOG_TRACE("Leaving");
 }
 
 wge::mutex TestSuiteGame::mMutex;
@@ -660,7 +660,7 @@ void TestSuiteGame::ResetManapools() {
 }
 
 void TestSuiteGame::initGame() {
-    DebugTrace("TESTSUITE Init Game");
+    WGE_LOG_TRACE("Init Game");
     observer->phaseRing->goToPhase(initState.phase, observer->players[0], false);
     observer->currentGamePhase = initState.phase;
 
@@ -691,13 +691,13 @@ void TestSuiteGame::initGame() {
                         delete spell;
                     } else {
                         if (!p->game->library->hasCard(card)) {
-                            LOG("TESTUITE ERROR, CARD NOT FOUND IN LIBRARY\n");
+                            WGE_LOG_ERROR("card not found in library!");
                         }
                         p->game->putInZone(card, p->game->library, zone);
                     }
                 } else {
                     if (!card) {
-                        LOG("TESTUITE ERROR, card is NULL\n");
+                        WGE_LOG_ERROR("card is NULL!");
                     }
                 }
             }
@@ -707,7 +707,7 @@ void TestSuiteGame::initGame() {
         p->game->stack->cardsSeenThisTurn
             .clear();  // don't consider those cards as having moved in this area during this turn
     }
-    DebugTrace("TESTUITE Init Game Done !");
+    WGE_LOG_TRACE("Init Game Done !");
 }
 
 MTGPlayerCards* TestSuiteGame::buildDeck(Player* player, int playerId) {

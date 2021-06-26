@@ -125,6 +125,7 @@ target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-D_DEBUG>")
 target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-DDEBUG>")
 target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-DDEBUG_CACHE>")
 
+target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-DTESTSUITE>")
 target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-DAI_CHANGE_TESTING>")
 
 target_include_directories(wth_woth 

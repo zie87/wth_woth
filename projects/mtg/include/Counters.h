@@ -1,6 +1,8 @@
 #ifndef _COUNTERS_H_
 #define _COUNTERS_H_
+
 #include <string>
+#include <vector>
 
 using std::string;
 class MTGCardInstance;
@@ -8,7 +10,7 @@ class MTGCardInstance;
 /* One family of counters. Ex : +1/+1 */
 class Counter {
 public:
-    string name;
+    std::string name;
     int nb;
     int maxNb;
     int power, toughness;
@@ -27,7 +29,7 @@ public:
 class Counters {
 public:
     int mCount;
-    vector<Counter*> counters;
+    std::vector<Counter*> counters;
     MTGCardInstance* target;
     Counters(MTGCardInstance* _target);
     ~Counters();

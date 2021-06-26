@@ -3,25 +3,15 @@
 # 3rd
 #########################################################################
 find_package(ZLIB REQUIRED)
+find_package(PNG REQUIRED)
+find_package(JPEG REQUIRED)
 
 if(DEFINED PSP)
     set(DEPENDENCIES_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/psp")
     set(DEPENDENCIES_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/psp")
 
-    add_library(png_old INTERFACE)
-    target_include_directories(png_old INTERFACE "${DEPENDENCIES_INCLUDE_DIR}")
-    set(PNG_LIBRARY "${DEPENDENCIES_LIBRARY_DIR}/libpng.a")
-    target_link_libraries(png_old INTERFACE ${PNG_LIBRARY})
-    add_library(WotH::png ALIAS png_old)
-
-    add_library(jpeg_old INTERFACE)
-    target_include_directories(jpeg_old INTERFACE "${DEPENDENCIES_INCLUDE_DIR}")
-    set(JPEG_LIBRARY "${DEPENDENCIES_LIBRARY_DIR}/libjpeg.a")
-    target_link_libraries(jpeg_old INTERFACE ${JPEG_LIBRARY})
-    add_library(WotH::jpeg ALIAS jpeg_old)
-
     add_library(old_ft INTERFACE)
-    target_include_directories(old_ft INTERFACE "${DEPENDENCIES_INCLUDE_DIR}/freetype2")
+    target_include_directories(old_ft INTERFACE "${DEPENDENCIES_INCLUDE_DIR}" "${DEPENDENCIES_INCLUDE_DIR}/freetype2")
     set(FREETYPE2_LIBRARY "${DEPENDENCIES_LIBRARY_DIR}/libfreetype.a")
     target_link_libraries(old_ft INTERFACE ${FREETYPE2_LIBRARY})
     add_library(WotH::freetype ALIAS old_ft)
@@ -29,12 +19,6 @@ if(DEFINED PSP)
 endif()
 
 if(DEFINED UNIX OR DEFINED WIN32)
-    add_library(jpg_alias INTERFACE)
-    add_library(WotH::jpeg ALIAS jpg_alias)
-
-    add_library(png_old INTERFACE)
-    add_library(WotH::png ALIAS png_old)
-
     find_package(SDL2 REQUIRED)
     find_package(OpenGL COMPONENTS OpenGL REQUIRED)
 
@@ -184,12 +168,12 @@ target_link_libraries(jge300
     PUBLIC
         WotH::hge
         WotH::wge
-        WotH::png
-        WotH::jpeg
         WotH::freetype
+        JPEG::JPEG
+        PNG::PNG
         ZLIB::ZLIB
     PRIVATE
-        woth_options
+        WotH::options
 )
 
 

@@ -101,7 +101,7 @@ void GuiCombat::validateDamage() {
         observer->userRequestNextGamePhase(false, false);
         break;
     default:
-        cout << "COMBAT : Cannot validate damage in this phase" << endl;
+        std::cout << "COMBAT : Cannot validate damage in this phase" << std::endl;
         break;
     }
 }
@@ -152,7 +152,7 @@ bool GuiCombat::clickOK() {
     case TRIGGERS:
         assert(false);  // this is an assert for "do i show the screen that lets you select multiple blocker damage
                         // assignment.
-        return false;  // that should not happen
+        return false;   // that should not happen
 
     case ORDER:
         observer->userRequestNextGamePhase(true, false);

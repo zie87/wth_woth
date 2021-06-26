@@ -16,7 +16,6 @@ They are accessed through the global variable gModRules, and loaded from rules/m
 
 #include <string>
 #include <vector>
-using namespace std;
 
 #include "CardGui.h"
 
@@ -44,12 +43,12 @@ enum {
 
 class ModRulesMenuItem {
 protected:
-    static int strToAction(string str);
+    static int strToAction(std::string str);
 
 public:
     int mActionId;
-    string mDisplayName;
-    ModRulesMenuItem(string actionIdStr, string displayName);
+    std::string mDisplayName;
+    ModRulesMenuItem(std::string actionIdStr, std::string displayName);
     // most actionIds are associated to a game state. e.g. MENUITEM_DECKEDITOR <--> GAME_STATE_DECK_VIEWER
     // This function returns the game state that matches the actionId, if any
     int getMatchingGameState();
@@ -59,21 +58,21 @@ public:
 class ModRulesMainMenuItem : public ModRulesMenuItem {
 public:
     int mIconId;
-    string mParticleFile;
-    ModRulesMainMenuItem(string actionIdStr, string displayName, int iconId, string particleFile);
+    std::string mParticleFile;
+    ModRulesMainMenuItem(std::string actionIdStr, std::string displayName, int iconId, std::string particleFile);
 };
 
 class ModRulesOtherMenuItem : public ModRulesMenuItem {
 public:
     JButton mKey;
-    ModRulesOtherMenuItem(string actionIdStr, string displayName, string keyStr);
-    static JButton strToJButton(string keyStr);
+    ModRulesOtherMenuItem(std::string actionIdStr, std::string displayName, std::string keyStr);
+    static JButton strToJButton(std::string keyStr);
 };
 
 class ModRulesMenu {
 public:
-    vector<ModRulesMainMenuItem*> main;
-    vector<ModRulesOtherMenuItem*> other;
+    std::vector<ModRulesMainMenuItem*> main;
+    std::vector<ModRulesOtherMenuItem*> other;
 
     void parse(TiXmlElement* element);
     ~ModRulesMenu();
@@ -81,25 +80,25 @@ public:
 
 class ModRulesBackGroundCardGuiItem {
 protected:
-    static int strToint(string str);
+    static int strToint(std::string str);
 
 public:
     int mColorId;
-    string MColorName;
-    string mDisplayImg;
-    string mDisplayThumb;
+    std::string MColorName;
+    std::string mDisplayImg;
+    std::string mDisplayThumb;
     int mMenuIcon;
-    ModRulesBackGroundCardGuiItem(string ColorId, string ColorName, string DisplayImg, string DisplayThumb,
-                                  string MenuIcon);
+    ModRulesBackGroundCardGuiItem(std::string ColorId, std::string ColorName, std::string DisplayImg,
+                                  std::string DisplayThumb, std::string MenuIcon);
 };
 
 class ModRulesRenderCardGuiItem {
 public:
-    string mName;
+    std::string mName;
     int mPosX;
     int mPosY;
-    string mFilter;
-    string mFormattedData;
+    std::string mFilter;
+    std::string mFormattedData;
     int mFontSize;
     bool mFont;
     PIXEL_TYPE mFontColor;
@@ -107,17 +106,17 @@ public:
     int mSizeIcon;
     int mIconPosX;
     int mIconPosY;
-    string mFileName;
-    ModRulesRenderCardGuiItem(string name, int posX, int posY, string formattedData, string filter, bool font,
-                              int fontSize, PIXEL_TYPE fontColor, int SizeIcon, int IconPosX, int IconPosY,
-                              string FileName);
+    std::string mFileName;
+    ModRulesRenderCardGuiItem(std::string name, int posX, int posY, std::string formattedData, std::string filter,
+                              bool font, int fontSize, PIXEL_TYPE fontColor, int SizeIcon, int IconPosX, int IconPosY,
+                              std::string FileName);
 };
 
 class ModRulesCardGui {
 public:
-    vector<ModRulesBackGroundCardGuiItem*> background;
-    vector<ModRulesRenderCardGuiItem*> renderbig;
-    vector<ModRulesRenderCardGuiItem*> rendertinycrop;
+    std::vector<ModRulesBackGroundCardGuiItem*> background;
+    std::vector<ModRulesRenderCardGuiItem*> renderbig;
+    std::vector<ModRulesRenderCardGuiItem*> rendertinycrop;
     void parse(TiXmlElement* element);
     ~ModRulesCardGui();
 };
@@ -147,7 +146,7 @@ public:
 class ModRulesCards {
 public:
     SimpleCardEffect* activateEffect;
-    static SimpleCardEffect* parseEffect(string str);
+    static SimpleCardEffect* parseEffect(std::string str);
     ModRulesCards();
     ~ModRulesCards();
     void parse(TiXmlElement* element);
@@ -160,8 +159,8 @@ public:
     ModRulesMenu menu;
     ModRulesGame game;
     ModRulesCardGui cardgui;
-    bool load(string filename);
-    static int getValueAsInt(TiXmlElement* element, string childName);
+    bool load(std::string filename);
+    static int getValueAsInt(TiXmlElement* element, std::string childName);
 };
 
 extern ModRules gModRules;

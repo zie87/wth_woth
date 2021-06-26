@@ -99,7 +99,7 @@ void DeckMenuItem::RenderWithOffset(float yOffset) {
                 "new.png", 2.0f, 2.0f, tex->mWidth - 4.0f,
                 tex->mHeight - 4.0f);  // avoids weird rectangle aroudn the texture because of bilinear filtering
             quad->SetHotSpot(quad->mWidth / 2.0f, quad->mHeight / 2.0f);
-            float x = mX + min(ITEM_PX_WIDTH - quad->mWidth, getWidth()) / 2 + quad->mWidth / 2;
+            float x = mX + std::min(ITEM_PX_WIDTH - quad->mWidth, getWidth()) / 2 + quad->mWidth / 2;
             if (quad) JRenderer::GetInstance()->RenderQuad(quad.get(), x, mY + yOffset + quad->mHeight / 2, 0.5);
         }
     }
@@ -154,7 +154,7 @@ string DeckMenuItem::getDeckName() const {
     return "[deck" + s + "]";
 }
 
-ostream& DeckMenuItem::toString(ostream& out) const {
+std::ostream& DeckMenuItem::toString(std::ostream& out) const {
     return out << "DeckMenuItem ::: mHasFocus : " << mHasFocus << " ; parent : " << parent << " ; mText : " << mText
                << " ; mX,mY : " << mX << "," << mY;
 }

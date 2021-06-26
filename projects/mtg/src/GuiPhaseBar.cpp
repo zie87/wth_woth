@@ -143,4 +143,4 @@ int GuiPhaseBar::receiveEventMinus(WEvent* e) {
     return 1;
 }
 
-ostream& GuiPhaseBar::toString(ostream& out) const { return out << "GuiPhaseBar"; }
+std::ostream& GuiPhaseBar::toString(std::ostream& out) const { return out << "GuiPhaseBar"; }

@@ -140,7 +140,7 @@ void DeckMenu::RenderDeckManaColors() {
 }
 
 void DeckMenu::RenderBackground() {
-    ostringstream bgFilename;
+    std::ostringstream bgFilename;
     bgFilename << backgroundName << ".png";
 
     static bool loadBackground = true;
@@ -268,8 +268,8 @@ void DeckMenu::Render() {
 
                 // fill in the statistical portion
                 if (currentMenuItem->hasMetaData()) {
-                    ostringstream oss;
-                    oss << _("Deck: ") << currentMenuItem->getDeckName() << endl;
+                    std::ostringstream oss;
+                    oss << _("Deck: ") << currentMenuItem->getDeckName() << std::endl;
                     oss << currentMenuItem->getDeckStatsSummary();
                     descriptionFont->DrawString(oss.str(), statsX, statsY);
                 }
@@ -358,11 +358,11 @@ void DeckMenu::updateScroller() {
     mScroller->Reset();
 
     for (vector<Task*>::iterator it = taskList.tasks.begin(); it != taskList.tasks.end(); it++) {
-        ostringstream taskDescription;
-        taskDescription << "Credits: " << setw(4) << (*it)->getReward() << " / "
-                        << "Days Left: " << (*it)->getExpiration() << endl
-                        << (*it)->getDesc() << endl
-                        << endl;
+        std::ostringstream taskDescription;
+        taskDescription << "Credits: " << std::setw(4) << (*it)->getReward() << " / "
+                        << "Days Left: " << (*it)->getExpiration() << std::endl
+                        << (*it)->getDesc() << std::endl
+                        << std::endl;
         mScroller->Add(taskDescription.str());
     }
 }

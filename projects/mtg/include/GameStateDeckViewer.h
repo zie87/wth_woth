@@ -122,7 +122,7 @@ private:
     bool userPressedButton();
     void RenderButtons();
 
-    pair<float, float> cardsCoordinates[CARDS_DISPLAYED];
+    std::pair<float, float> cardsCoordinates[CARDS_DISPLAYED];
 
 public:
     GameStateDeckViewer(GameApp* parent);

@@ -20,8 +20,6 @@
 #include <map>
 #include <string>
 
-using namespace std;
-
 #define INVALID_ID -1
 #define ALREADY_EXISTS -2
 
@@ -37,34 +35,34 @@ public:
     JResourceManager();
     virtual ~JResourceManager();
 
-    // void SetResourceRoot(const string& resourceRoot);
-    bool LoadResource(const string& resourceName);
+    // void SetResourceRoot(const std::string& resourceRoot);
+    bool LoadResource(const std::string& resourceName);
 
     virtual void RemoveAll();
     virtual void RemoveJLBFonts();
 
-    virtual int CreateTexture(const string& textureName);
-    virtual JTexture* GetTexture(const string& textureName);
+    virtual int CreateTexture(const std::string& textureName);
+    virtual JTexture* GetTexture(const std::string& textureName);
     virtual JTexture* GetTexture(int id);
 
-    virtual int CreateQuad(const string& quadName, const string& textureName, float x, float y, float width,
+    virtual int CreateQuad(const std::string& quadName, const std::string& textureName, float x, float y, float width,
                            float height);
-    virtual JQuad* GetQuad(const string& quadName);
+    virtual JQuad* GetQuad(const std::string& quadName);
     virtual JQuad* GetQuad(int id);
 
-    virtual JLBFont* LoadJLBFont(const string& fontName, int height);
-    virtual JLBFont* GetJLBFont(const string& fontName);
+    virtual JLBFont* LoadJLBFont(const std::string& fontName, int height);
+    virtual JLBFont* GetJLBFont(const std::string& fontName);
     virtual JLBFont* GetJLBFont(int id);
 
 protected:
-    vector<JTexture*> mTextureList;
-    map<string, int> mTextureMap;
+    std::vector<JTexture*> mTextureList;
+    std::map<std::string, int> mTextureMap;
 
-    vector<JQuad*> mQuadList;
-    map<string, int> mQuadMap;
+    std::vector<JQuad*> mQuadList;
+    std::map<std::string, int> mQuadMap;
 
-    vector<JLBFont*> mFontList;
-    map<string, int> mFontMap;
+    std::vector<JLBFont*> mFontList;
+    std::map<std::string, int> mFontMap;
 };
 
 #endif

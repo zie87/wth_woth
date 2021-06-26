@@ -21,8 +21,6 @@
 
 #include "JRenderer.h"
 
-using namespace std;
-
 //////////////////////////////////////////////////////////////////////////
 /// Sprite is a container of single static image or animation frames.
 ///
@@ -416,7 +414,7 @@ protected:
     static JRenderer* mRenderer;
 
     JTexture* mTex;
-    vector<JQuad*> mFrames;
+    std::vector<JQuad*> mFrames;
     float mDuration;
     float mTimer;
     int mFrameCount;

@@ -25,7 +25,7 @@ const float CardGui::BigHeight = 285.0;
 
 const float kWidthScaleFactor = 0.8f;
 
-map<string, string> CardGui::counterGraphics;
+std::map<std::string, std::string> CardGui::counterGraphics;
 
 namespace {
 inline float SineHelperFunction(const float& value) { return sinf(2 * M_PI * (value) / 256.0f); }
@@ -473,20 +473,20 @@ void CardGui::AlternateRender(MTGCard* card, const Pos& pos) {
                 string formattedfield = Carditem->mFormattedData;
                 size_t found = Carditem->mName.find("title");  // Write the title
                 if (found != string::npos) {
-                    stringstream st;
+                    std::stringstream st;
                     st << card->data->name;
                     formattedfield = FormattedData(formattedfield, "title", st.str());
                 }
 
                 found = Carditem->mName.find("power");  // Write the strength
                 if (found != string::npos) {
-                    stringstream st;
+                    std::stringstream st;
                     st << card->data->power;
                     formattedfield = FormattedData(formattedfield, "power", st.str());
                 }
                 found = Carditem->mName.find("life");  // Write the toughness
                 if (found != string::npos) {
-                    stringstream st;
+                    std::stringstream st;
                     st << card->data->toughness;
                     formattedfield = FormattedData(formattedfield, "life", st.str());
                 }
@@ -737,20 +737,20 @@ void CardGui::TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad) {
                 string formattedfield = Carditem->mFormattedData;
                 size_t found = Carditem->mName.find("title");  // Write the title
                 if (found != string::npos) {
-                    stringstream st;
+                    std::stringstream st;
                     st << card->data->name;
                     formattedfield = FormattedData(formattedfield, "title", st.str());
                 }
 
                 found = Carditem->mName.find("power");  // Write the strength
                 if (found != string::npos) {
-                    stringstream st;
+                    std::stringstream st;
                     st << card->data->power;
                     formattedfield = FormattedData(formattedfield, "power", st.str());
                 }
                 found = Carditem->mName.find("life");  // Write the toughness
                 if (found != string::npos) {
-                    stringstream st;
+                    std::stringstream st;
                     st << card->data->toughness;
                     formattedfield = FormattedData(formattedfield, "life", st.str());
                 }
@@ -1194,11 +1194,11 @@ TransientCardView::TransientCardView(MTGCardInstance* card, float x, float y) : 
 
 TransientCardView::TransientCardView(MTGCardInstance* card, const Pos& ref) : CardGui(card, ref){};
 
-ostream& CardView::toString(ostream& out) const {
+std::ostream& CardView::toString(std::ostream& out) const {
     return (CardGui::toString(out) << " : CardView ::: card : " << card << ";  actX,actY : " << actX << "," << actY
                                    << "; t : " << t << " ; actT : " << actT);
 }
-ostream& CardGui::toString(ostream& out) const { return (out << "CardGui ::: x,y " << x << "," << y); }
+std::ostream& CardGui::toString(std::ostream& out) const { return (out << "CardGui ::: x,y " << x << "," << y); }
 
 SimpleCardEffectRotate::SimpleCardEffectRotate(float rotation) : mRotation(rotation) {}
 

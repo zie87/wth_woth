@@ -126,38 +126,38 @@ public:
     static MTGGameZone* intToZone(int zoneId, Player* source, Player* target = NULL);
     bool needShuffle;
     virtual const char* getName() { return "zone"; };
-    virtual ostream& toString(ostream&) const;
+    virtual std::ostream& toString(std::ostream&) const;
     bool parseLine(const string& s);
 };
 
 class MTGLibrary : public MTGGameZone {
 public:
     vector<MTGCardInstance*> placeOnTop;
-    virtual ostream& toString(ostream&) const;
+    virtual std::ostream& toString(std::ostream&) const;
     const char* getName() { return "library"; }
 };
 
 class MTGGraveyard : public MTGGameZone {
 public:
-    virtual ostream& toString(ostream&) const;
+    virtual std::ostream& toString(std::ostream&) const;
     const char* getName() { return "graveyard"; }
 };
 
 class MTGHand : public MTGGameZone {
 public:
-    virtual ostream& toString(ostream&) const;
+    virtual std::ostream& toString(std::ostream&) const;
     const char* getName() { return "hand"; }
 };
 
 class MTGRemovedFromGame : public MTGGameZone {
 public:
-    virtual ostream& toString(ostream&) const;
+    virtual std::ostream& toString(std::ostream&) const;
     const char* getName() { return "exile"; }
 };
 
 class MTGStack : public MTGGameZone {
 public:
-    virtual ostream& toString(ostream&) const;
+    virtual std::ostream& toString(std::ostream&) const;
     const char* getName() { return "stack"; }
 };
 
@@ -165,7 +165,7 @@ class MTGInPlay : public MTGGameZone {
 public:
     void untapAll();
     MTGCardInstance* getNextAttacker(MTGCardInstance* previous);
-    virtual ostream& toString(ostream&) const;
+    virtual std::ostream& toString(std::ostream&) const;
     const char* getName() { return "battlefield"; }
 };
 
@@ -213,7 +213,7 @@ public:
     bool parseLine(const string& s);
 };
 
-ostream& operator<<(ostream&, const MTGGameZone&);
-ostream& operator<<(ostream&, const MTGPlayerCards&);
+std::ostream& operator<<(std::ostream&, const MTGGameZone&);
+std::ostream& operator<<(std::ostream&, const MTGPlayerCards&);
 
 #endif

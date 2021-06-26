@@ -2,7 +2,7 @@
 #define _REPLACEMENT_EFFECTS_H_
 
 #include <list>
-using namespace std;
+
 #include "Damage.h"
 #include "WEvent.h"
 #include "Counters.h"
@@ -49,7 +49,7 @@ public:
 
 class ReplacementEffects {
 protected:
-    list<ReplacementEffect*> modifiers;
+    std::list<ReplacementEffect*> modifiers;
 
 public:
     ReplacementEffects();

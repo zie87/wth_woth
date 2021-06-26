@@ -3,6 +3,10 @@
 
 #include "WResource_Fwd.h"
 
+#include <vector>
+#include <string>
+#include <map>
+
 class WCardFilter;
 struct WCardSort;
 struct WDistort;
@@ -73,16 +77,16 @@ protected:
 class WSrcImage : public WDataSource {
 public:
     virtual JQuadPtr getImage(int offset = 0);
-    WSrcImage(string s);
+    WSrcImage(std::string s);
 
 protected:
-    string filename;
+    std::string filename;
 };
 
 class WSrcCards : public WDataSource {
 protected:
-    vector<MTGCard*> cards;
-    vector<size_t> validated;
+    std::vector<MTGCard*> cards;
+    std::vector<size_t> validated;
     WCardFilter* filtersRoot;
     float mDelay;
 
@@ -231,7 +235,7 @@ public:
     int getCount(int count = UNFILTERED_COPIES);
 
 protected:
-    map<int, int> copies;  // Maps MTGID to card counts.
+    std::map<int, int> copies;  // Maps MTGID to card counts.
     int counts[MAX_COUNTS];
 };
 

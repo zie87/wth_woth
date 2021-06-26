@@ -8,12 +8,12 @@
 //
 //-------------------------------------------------------------------------------------
 
-#include "../include/JGE.h"
-#include "../include/JResourceManager.h"
-#include "../include/JFileSystem.h"
-#include "../include/JRenderer.h"
-#include "../include/JSprite.h"
-#include "../include/JAnimator.h"
+#include "JGE.h"
+#include "JResourceManager.h"
+#include "JFileSystem.h"
+#include "JRenderer.h"
+#include "JSprite.h"
+#include "JAnimator.h"
 
 #include "tinyxml/tinyxml.h"
 

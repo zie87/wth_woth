@@ -44,7 +44,7 @@ void DeckMetaData::LoadDeck() {
         if (!mIsAI)
             mAvatarFilename = "avatar.jpg";
         else {
-            ostringstream avatarFilename;
+            std::ostringstream avatarFilename;
             avatarFilename << "avatar" << getAvatarId() << ".jpg";
             mAvatarFilename = avatarFilename.str();
         }
@@ -134,10 +134,10 @@ string DeckMetaData::getDescription() { return mDescription; }
 string DeckMetaData::getStatsSummary() {
     LoadStats();
 
-    ostringstream statsSummary;
-    statsSummary << _("Difficulty: ") << _(getDifficultyString()) << endl
-                 << _("Victory %: ") << getVictoryPercentage() << endl
-                 << _("Games Played: ") << getGamesPlayed() << endl;
+    std::ostringstream statsSummary;
+    statsSummary << _("Difficulty: ") << _(getDifficultyString()) << std::endl
+                 << _("Victory %: ") << getVictoryPercentage() << std::endl
+                 << _("Games Played: ") << getGamesPlayed() << std::endl;
 
     return statsSummary.str();
 }

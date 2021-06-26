@@ -3475,7 +3475,7 @@ int MTGAbility::fireAbility() {
     return 1;
 }
 
-ostream& MTGAbility::toString(ostream& out) const {
+std::ostream& MTGAbility::toString(std::ostream& out) const {
     return out << "MTGAbility ::: menuText : " << menuText << " ; game : " << game
                << " ; forceDestroy : " << forceDestroy << " ; mCost : " << mCost << " ; target : " << target
                << " ; aType : " << aType << " ; source : " << source;
@@ -3714,7 +3714,7 @@ ActivatedAbility::~ActivatedAbility() {
     SAFE_DELETE(sa);
 }
 
-ostream& ActivatedAbility::toString(ostream& out) const {
+std::ostream& ActivatedAbility::toString(std::ostream& out) const {
     out << "ActivatedAbility ::: restrictions : " << restrictions << " ; needsTapping : " << needsTapping << " (";
     return MTGAbility::toString(out) << ")";
 }
@@ -3838,7 +3838,7 @@ const char* TargetAbility::getMenuText() {
 
 TargetAbility::~TargetAbility() { SAFE_DELETE(ability); }
 
-ostream& TargetAbility::toString(ostream& out) const {
+std::ostream& TargetAbility::toString(std::ostream& out) const {
     out << "TargetAbility ::: (";
     return ActivatedAbility::toString(out) << ")";
 }
@@ -3869,7 +3869,7 @@ void TriggeredAbility::Update(float dt) {
     if (trigger()) fireAbility();
 }
 
-ostream& TriggeredAbility::toString(ostream& out) const {
+std::ostream& TriggeredAbility::toString(std::ostream& out) const {
     out << "TriggeredAbility ::: (";
     return MTGAbility::toString(out) << ")";
 }
@@ -3925,7 +3925,7 @@ int InstantAbility::testDestroy() {
     return 0;
 }
 
-ostream& InstantAbility::toString(ostream& out) const {
+std::ostream& InstantAbility::toString(std::ostream& out) const {
     out << "InstantAbility ::: init : " << init << " (";
     return MTGAbility::toString(out) << ")";
 }
@@ -4050,7 +4050,7 @@ int ListMaintainerAbility::destroy() {
     return 1;
 }
 
-ostream& ListMaintainerAbility::toString(ostream& out) const {
+std::ostream& ListMaintainerAbility::toString(std::ostream& out) const {
     out << "ListMaintainerAbility ::: (";
     return MTGAbility::toString(out) << ")";
 }

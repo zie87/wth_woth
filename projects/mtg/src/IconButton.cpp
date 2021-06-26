@@ -106,4 +106,4 @@ IconButton::~IconButton() {
     }
 }
 
-ostream& IconButton::toString(ostream& out) const { return out << "IconButton ::: mHasFocus : " << mHasFocus; }
+std::ostream& IconButton::toString(std::ostream& out) const { return out << "IconButton ::: mHasFocus : " << mHasFocus; }

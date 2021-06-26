@@ -32,7 +32,7 @@ public:
     Player* player;
     virtual void Render();
     GuiAvatar(float x, float y, bool hasFocus, Player* player, Corner corner, GuiAvatars* parent);
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
 };
 
 struct GuiGameZone : public GuiStatic {
@@ -51,7 +51,7 @@ public:
     ~GuiGameZone();
     virtual void ButtonPressed(int controllerId, int controlId);
     void toggleDisplay();
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
 };
 // opponenthand
 class GuiOpponentHand : public GuiGameZone {
@@ -60,7 +60,7 @@ public:
     GuiOpponentHand(float _x, float _y, bool hasFocus, Player* player, GuiAvatars* Parent);
     int receiveEventPlus(WEvent*);
     int receiveEventMinus(WEvent*);
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
 };
 // end of my addition
 class GuiGraveyard : public GuiGameZone {
@@ -69,14 +69,14 @@ public:
     GuiGraveyard(float _x, float _y, bool hasFocus, Player* player, GuiAvatars* parent);
     int receiveEventPlus(WEvent*);
     int receiveEventMinus(WEvent*);
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
 };
 
 class GuiLibrary : public GuiGameZone {
 public:
     Player* player;
     GuiLibrary(float _x, float _y, bool hasFocus, Player* player, GuiAvatars* parent);
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
 };
 
 #endif  // _GUISTATIC_H_

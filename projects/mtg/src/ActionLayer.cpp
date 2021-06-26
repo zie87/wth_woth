@@ -371,7 +371,7 @@ void ActionLayer::doReactTo(int menuIndex) {
 }
 
 void ActionLayer::ButtonPressed(int controllerid, int controlid) {
-    stringstream stream;
+    std::stringstream stream;
     for (size_t i = 0; i < abilitiesMenu->mObjects.size();
          i++) {  // this computes the reverse from the doReactTo method
         if (abilitiesMenu->mObjects[i]->GetId() == controlid) {

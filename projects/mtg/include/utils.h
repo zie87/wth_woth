@@ -29,35 +29,40 @@
 
 #include "DebugRoutines.h"
 
+#include <list>
+#include <vector>
+#include <string>
+
 using std::string;
 
-// string manipulation methods
-string& trim(string& str);
-string& ltrim(string& str);
-string& rtrim(string& str);
+// std::string manipulation methods
+std::string& trim(std::string& str);
+std::string& ltrim(std::string& str);
+std::string& rtrim(std::string& str);
 
-inline string trim(const string& str) {
-    string value(str);
+inline std::string trim(const std::string& str) {
+    std::string value(str);
     return trim(value);
 }
 
-std::string join(vector<string>& v, string delim = " ");
+std::string join(std::vector<std::string>& v, std::string delim = " ");
 
 std::vector<std::string>& split(const std::string& s, char delim, std::vector<std::string>& elems);
-std::vector<std::string> split(const std::string& s,
-                               char delim);  // splits a string with "delim" and returns a vector of strings.
+std::vector<std::string> split(
+    const std::string& s,
+    char delim);  // splits a std::string with "delim" and returns a std::vector of std::strings.
 
 // A simple parsing function
-// splits string s by finding the first occurence of start, and the first occurence of stop, and returning
-// a vector of 3 strings. The first string is everything before the first occurence of start, the second string is
-// everything between start and stop the third string is everything after stop. for example, parseBetween ("this is a
-// function(foo) call", "function(", ")") will return: ["this is a ", "foo", " call"];
-// If an error occurs, returns an empty vector.
-// if "stopRequired" is set to false, the function will return a vector of 3 strings even if "stop" is not found in the
-// string.
-std::vector<std::string>& parseBetween(const std::string& s, string start, string stop, bool stopRequired,
+// splits std::string s by finding the first occurence of start, and the first occurence of stop, and returning
+// a std::vector of 3 std::strings. The first std::string is everything before the first occurence of start, the second
+// std::string is everything between start and stop the third std::string is everything after stop. for example,
+// parseBetween ("this is a function(foo) call", "function(", ")") will return: ["this is a ", "foo", " call"]; If an
+// error occurs, returns an empty std::vector. if "stopRequired" is set to false, the function will return a
+// std::vector of 3 std::strings even if "stop" is not found in the std::string.
+std::vector<std::string>& parseBetween(const std::string& s, std::string start, std::string stop, bool stopRequired,
                                        std::vector<std::string>& elems);
-std::vector<std::string> parseBetween(const std::string& s, string start, string stop, bool stopRequired = true);
+std::vector<std::string> parseBetween(const std::string& s, std::string start, std::string stop,
+                                      bool stopRequired = true);
 
 std::string wordWrap(const std::string& s, float width, int fontId);
 
@@ -70,20 +75,21 @@ unsigned long hash_djb2(const char* str);
 // test AI
 class RandomGenerator {
 protected:
-    list<int> loadedRandomValues;
-    list<int> usedRandomValues;
+    std::list<int> loadedRandomValues;
+    std::list<int> usedRandomValues;
     bool log;
 
 public:
     RandomGenerator(bool doLog = false) : log(doLog){};
-    void loadRandValues(string s);
-    ostream& saveUsedRandValues(ostream& out) const;
-    ostream& saveLoadedRandValues(ostream& out);
+    void loadRandValues(std::string s);
+    std::ostream& saveUsedRandValues(std::ostream& out) const;
+    std::ostream& saveLoadedRandValues(std::ostream& out);
     int random();
     template <typename Iter>
     void random_shuffle(Iter first, Iter last) {
         ptrdiff_t i, n;
         n = (last - first);
+        using std::swap;
         for (i = n - 1; i > 0; --i) swap(first[i], first[random() % (i + 1)]);
     };
 };
@@ -126,13 +132,13 @@ inline void ReplaceString(std::string& subject, const std::string& search, const
 }
 
 bool fileExists(const char* filename);
-bool FileExists(const string& filename);
-std::string buildFilePath(const vector<string>& folders, const string& filename);
-std::string ensureFolder(const string& folderName);
+bool FileExists(const std::string& filename);
+std::string buildFilePath(const std::vector<string>& folders, const std::string& filename);
+std::string ensureFolder(const std::string& folderName);
 /*
 template <class T> istream& operator>>(istream& in, T& p)
 {
-    string s;
+    std::string s;
 
     while(std::getline(in, s))
     {

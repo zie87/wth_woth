@@ -124,7 +124,7 @@ int AIPlayer::clickMultiTarget(TargetChooser* tc, vector<Targetable*>& potential
                                          // "confirming click".
         {
             clickstream.push(NEW AIAction(this, card));
-            DebugTrace("Ai clicked source as a target: " << (card ? card->name : "None") << endl);
+            DebugTrace("Ai clicked source as a target: " << (card ? card->name : "None") << std::endl);
             ite = potentialTargets.erase(ite);
             continue;
         } else if (Player* pTarget = dynamic_cast<Player*>(*ite)) {

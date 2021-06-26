@@ -3,10 +3,15 @@ set(TEST_NAME "wge_unittests")
 add_executable(${TEST_NAME} 
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/math_tests.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/video/image_loader_tests.cpp
 )
 
 target_link_libraries(${TEST_NAME} PUBLIC WotH::wge WotH::wtest)
 set_target_properties(${TEST_NAME} PROPERTIES LINKER_LANGUAGE CXX)
+
+set(TEST_DATA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/data)
+
+target_compile_options(${TEST_NAME} PRIVATE "-DTEST_DATA_DIR=\"${TEST_DATA_DIR}\"")
 
 if(DEFINED PSP)
     create_pbp_file(TARGET ${TEST_NAME} 

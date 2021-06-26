@@ -12,7 +12,7 @@ jobs:
     runs-on: windows-latest
 
     env:
-      VCPKG_DEPS: sdl2 zlib
+      VCPKG_DEPS: sdl2 zlib libpng libjpeg-turbo
 
     strategy:
       matrix:
@@ -70,16 +70,13 @@ jobs:
       shell: bash
       run: |
         source env.sh
-        mkdir build
-        cd build
-        cmake .. -G"Visual Studio 16 2019" -A Win32 -DCMAKE_BUILD_TYPE=${{ matrix.config }} -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake
+        cmake -S . -B build -G "Visual Studio 16 2019" -A Win32 -DCMAKE_BUILD_TYPE=${{ matrix.config }} -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake
     - name: Build
       shell: bash
       run: |
-        cd build
-        cmake --build . --config ${{ matrix.build_type }}
+        cmake --build build --config ${{ matrix.build_type }}
     - name: Tests
       shell: bash
       run: |
         cd build
-        ctest ${{ matrix.build_type }}
+        ctest ${{ matrix.build_type }} --rerun-failed --output-on-failure

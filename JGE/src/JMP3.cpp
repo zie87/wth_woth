@@ -11,14 +11,16 @@
     #include <pspmp3.h>
     #include <psputility.h>
 
+    #include <unistd.h>
+
 #else
     #define PSP_AUDIO_VOLUME_MAX 100
 #endif
 
-#include "../include/JAudio.h"
-#include "../include/JFileSystem.h"
-#include "../include/JMP3.h"
-#include "../include/JLogger.h"
+#include "JAudio.h"
+#include "JFileSystem.h"
+#include "JMP3.h"
+#include "JLogger.h"
 
 JMP3* JMP3::mInstance = NULL;
 bool JMP3::init_done = false;

@@ -25,7 +25,7 @@ public:
     virtual void Update(float dt);
     void Render();
     void init(MTGGameZone* zone);
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
 };
 
 std::ostream& operator<<(std::ostream& out, const CardDisplay& m);

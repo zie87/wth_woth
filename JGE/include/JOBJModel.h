@@ -13,8 +13,6 @@
 
 #include <vector>
 
-using namespace std;
-
 #if defined(PSP)
     #include <pspgu.h>
     #include <pspgum.h>

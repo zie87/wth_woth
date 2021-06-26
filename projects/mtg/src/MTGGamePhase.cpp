@@ -47,6 +47,6 @@ bool MTGGamePhase::CheckUserInput(JButton key) {
 
 MTGGamePhase* MTGGamePhase::clone() const { return NEW MTGGamePhase(*this); }
 
-ostream& MTGGamePhase::toString(ostream& out) const {
+std::ostream& MTGGamePhase::toString(std::ostream& out) const {
     return out << "MTGGamePhase ::: animation " << animation << " ; currentState : " << currentState;
 }

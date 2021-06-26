@@ -11,12 +11,10 @@
 #include <string>
 #include <sstream>
 
-using namespace std;
-
 template <class T>
 std::string ToHex(T* pointer) {
     std::ostringstream stream;
-    stream << hex << showbase << setfill('0') << setw(8) << (uint64_t)pointer;
+    stream << std::hex << std::showbase << std::setfill('0') << std::setw(8) << (uint64_t)pointer;
     return stream.str();
 }
 

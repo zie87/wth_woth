@@ -5,12 +5,11 @@ class JLBFont;
 #include <JGui.h>
 #include <string>
 #include <vector>
-using namespace std;
 
 class TextScroller : public JGuiObject {
 protected:
-    string mText;
-    string tempText;
+    std::string mText;
+    std::string tempText;
     int fontId;
     float mWidth;  // width of the text scroller object
     float mScrollSpeed;
@@ -19,19 +18,19 @@ protected:
     float start;
     int timer;
 
-    vector<string> strings;
+    std::vector<std::string> strings;
     unsigned int currentId;
     int mRandom;
     int scrollDirection;
 
 public:
     TextScroller(int fontId, float x, float y, float width, float speed = 30);
-    void Add(string text);
+    void Add(std::string text);
     void Reset();
     void setRandom(int mode = 1);
     void Render();
     void Update(float dt);
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
 };
 
 class VerticalTextScroller : public TextScroller {
@@ -49,6 +48,6 @@ public:
                          size_t _minimumItems = 1);
     void Render();
     void Update(float dt);
-    void Add(string text);
+    void Add(std::string text);
 };
 #endif

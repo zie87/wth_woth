@@ -1,10 +1,10 @@
-#include "../include/JLogger.h"
-#include "../include/JGE.h"
-#include "../include/DebugRoutines.h"
+#include "JLogger.h"
+#include "JGE.h"
+#include "DebugRoutines.h"
 
 #include <fstream>
 
-string JLogger::lastLog = "";
+std::string JLogger::lastLog = "";
 int JLogger::lastTime = 0;
 
 void JLogger::Log(const char* text) {

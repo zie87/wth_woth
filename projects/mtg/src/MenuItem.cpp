@@ -90,7 +90,7 @@ bool MenuItem::ButtonPressed() { return true; }
 
 MenuItem::~MenuItem() { SAFE_DELETE(mParticleSys); }
 
-ostream& MenuItem::toString(ostream& out) const {
+std::ostream& MenuItem::toString(std::ostream& out) const {
     return out << "MenuItem ::: mHasFocus : " << mHasFocus << " ; mFont : " << mFont << " ; mText : " << mText
                << " ; mX,mY : " << mX << "," << mY << " ; updatedSinceLastRender : " << updatedSinceLastRender
                << " ; lastDt : " << lastDt << " ; mScale : " << mScale << " ; mTargetScale : " << mTargetScale

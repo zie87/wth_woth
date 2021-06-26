@@ -8,28 +8,26 @@
     #define DEBUG_TRANSLATE
 #endif
 
-using namespace std;
-
 class Translator {
 protected:
     static Translator* mInstance;
     bool initDone;
 
-    void load(string filename, map<string, string>* dictionary);
+    void load(std::string filename, std::map<std::string, std::string>* dictionary);
 
 public:
-    map<string, string> values;
-    map<string, string> tempValues;
-    map<string, string> deckValues;
+    std::map<std::string, std::string> values;
+    std::map<std::string, std::string> tempValues;
+    std::map<std::string, std::string> deckValues;
 #if defined DEBUG_TRANSLATE
-    map<string, int> missingValues;
-    map<string, int> dontCareValues;
+    std::map<std::string, int> missingValues;
+    std::map<std::string, int> dontCareValues;
     int checkMisses;
 #endif
-    string translate(string toTranslate);
+    std::string translate(std::string toTranslate);
     Translator();
     ~Translator();
-    int Add(string from, string to);
+    int Add(std::string from, std::string to);
     void initCards();
     void initDecks();
     void init();
@@ -37,7 +35,7 @@ public:
     static void EndInstance();
 };
 
-string _(string toTranslate);
+std::string _(std::string toTranslate);
 
 extern bool neofont;
 #endif

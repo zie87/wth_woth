@@ -503,7 +503,7 @@ int ManaCost::getConvertedCost() {
 
 int ManaCost::remove(int color, int value) {
     assert(value >= 0);
-    int8_t toRemove = min(cost[color], (int8_t)value);
+    int8_t toRemove = std::min(cost[color], (int8_t)value);
     cost[color] -= toRemove;
     return 1;
 }
@@ -528,7 +528,7 @@ int ManaCost::add(ManaCost* _cost) {
 int ManaCost::remove(ManaCost* _cost) {
     if (!_cost) return 0;
     for (int i = 0; i < Constants::NB_Colors; i++) {
-        int8_t toRemove = min(cost[i], (int8_t)_cost->getCost(i));  // we don't want to be negative
+        int8_t toRemove = std::min(cost[i], (int8_t)_cost->getCost(i));  // we don't want to be negative
         cost[i] -= toRemove;
         assert(cost[i] >= 0);
     }
@@ -698,8 +698,8 @@ ManaCost* ManaCost::Diff(ManaCost* _cost) {
     return result;
 }
 
-string ManaCost::toString() {
-    ostringstream oss;
+std::string ManaCost::toString() {
+    std::ostringstream oss;
     for (int i = 0; i <= Constants::NB_Colors; i++) {
         if (cost[i]) {
             if (i == Constants::MTG_COLOR_ARTIFACT)
@@ -729,11 +729,9 @@ void ManaCost::Dump() {
 
 #endif
 
-ostream& operator<<(ostream& out, ManaCost& m) { return out << m.toString(); }
-
-ostream& operator<<(ostream& out, ManaCost* m) { return out << m->toString(); }
-
-ostream& operator<<(ostream& out, ManaCost m) { return out << m.toString(); }
+std::ostream& operator<<(std::ostream& out, ManaCost& m) { return out << m.toString(); }
+std::ostream& operator<<(std::ostream& out, ManaCost* m) { return out << m->toString(); }
+std::ostream& operator<<(std::ostream& out, ManaCost m) { return out << m.toString(); }
 
 void ManaPool::Empty() {
     init();

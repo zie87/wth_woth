@@ -45,7 +45,7 @@ public:
 
     bool parseLine(const string& s);
 
-    friend ostream& operator<<(ostream& out, const Damageable& p);
+    friend std::ostream& operator<<(std::ostream& out, const Damageable& p);
 };
 
 class Damage : public Interruptible {
@@ -61,7 +61,7 @@ public:
     Damage(GameObserver* observer, MTGCardInstance* source, Damageable* target, int damage,
            int typeOfDamage = DAMAGE_OTHER);
     int resolve();
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
 };
 
 class DamageStack : public GuiLayer, public Interruptible {
@@ -72,7 +72,7 @@ public:
     int receiveEvent(WEvent* event);
     int resolve();
     void Render();
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     DamageStack(GameObserver* observer);
 };
 

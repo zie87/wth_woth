@@ -20,7 +20,9 @@ namespace wge {
 namespace test {
 
 template <typename T>
-inline void assert_equal(const T& expected, const T& actual, unsigned int line, const char* msg) noexcept;
+inline void assert_equal(const T& expected, const T& actual, unsigned int line, const char* msg) noexcept {
+    UNITY_TEST_ASSERT((expected == actual), line, msg);
+}
 
 template <>
 inline void assert_equal<wge::i8>(const wge::i8& expected, const wge::i8& actual, unsigned int line,
@@ -56,6 +58,10 @@ template <>
 inline void assert_equal<wge::u32>(const wge::u32& expected, const wge::u32& actual, unsigned int line,
                                    const char* msg) noexcept {
     UNITY_TEST_ASSERT_EQUAL_UINT32(expected, actual, line, msg);
+}
+
+inline void assert_equal(const char* expected, const char* actual, unsigned int line, const char* msg) noexcept {
+    UNITY_TEST_ASSERT_EQUAL_STRING(expected, actual, line, msg);
 }
 
 template <typename T, wge::size_t>

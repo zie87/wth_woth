@@ -141,7 +141,7 @@ void MTGPlayerCards::OptimizedHand(Player* who, int amount, int lands, int creat
             }
         }
         //--------------incase none of them cost 2 or less(which makes for a really poorly crafted Ai deck), try for 3
-        //or less at this point we're accepting anything but lands under 3 mana---
+        // or less at this point we're accepting anything but lands under 3 mana---
         for (int k = 0; k < z->nb_cards; k++) {
             MTGCardInstance* _card = z->cards[k];
 
@@ -163,7 +163,7 @@ void MTGPlayerCards::OptimizedHand(Player* who, int amount, int lands, int creat
             }
         }
         //--------------add up remaining. only 7 cards are optimized, the remaining cards (if rules change amount) are
-        //just drawn.
+        // just drawn.
         int leftover = 0;
         leftover = amount;
         leftover -= optimizedland;
@@ -591,7 +591,7 @@ void MTGGameZone::addCard(MTGCardInstance* card) {
 }
 
 void MTGGameZone::debugPrint() {
-    for (int i = 0; i < nb_cards; i++) std::cerr << cards[i]->getName() << endl;
+    for (int i = 0; i < nb_cards; i++) std::cerr << cards[i]->getName() << std::endl;
 }
 
 //------------------------------
@@ -933,16 +933,16 @@ MTGGameZone* MTGGameZone::stringToZone(GameObserver* g, string zoneName, MTGCard
     return intToZone(g, zoneStringToId(zoneName), source, target);
 }
 
-ostream& MTGGameZone::toString(ostream& out) const { return out << "Unknown zone"; }
-ostream& MTGLibrary::toString(ostream& out) const { return out << "Library " << owner->getDisplayName(); }
-ostream& MTGGraveyard::toString(ostream& out) const { return out << "Graveyard " << owner->getDisplayName(); }
-ostream& MTGHand::toString(ostream& out) const { return out << "Hand " << owner->getDisplayName(); }
-ostream& MTGRemovedFromGame::toString(ostream& out) const {
+std::ostream& MTGGameZone::toString(std::ostream& out) const { return out << "Unknown zone"; }
+std::ostream& MTGLibrary::toString(std::ostream& out) const { return out << "Library " << owner->getDisplayName(); }
+std::ostream& MTGGraveyard::toString(std::ostream& out) const { return out << "Graveyard " << owner->getDisplayName(); }
+std::ostream& MTGHand::toString(std::ostream& out) const { return out << "Hand " << owner->getDisplayName(); }
+std::ostream& MTGRemovedFromGame::toString(std::ostream& out) const {
     return out << "RemovedFromGame " << owner->getDisplayName();
 }
-ostream& MTGStack::toString(ostream& out) const { return out << "Stack " << owner->getDisplayName(); }
-ostream& MTGInPlay::toString(ostream& out) const { return out << "InPlay " << owner->getDisplayName(); }
-ostream& operator<<(ostream& out, const MTGGameZone& z) {
+std::ostream& MTGStack::toString(std::ostream& out) const { return out << "Stack " << owner->getDisplayName(); }
+std::ostream& MTGInPlay::toString(std::ostream& out) const { return out << "InPlay " << owner->getDisplayName(); }
+std::ostream& operator<<(std::ostream& out, const MTGGameZone& z) {
     for (int i = 0; i < z.nb_cards; i++) {
         out << z.cards[i]->getMTGId();
         if (i < z.nb_cards - 1) out << ",";
@@ -1002,22 +1002,22 @@ bool MTGGameZone::parseLine(const string& ss) {
     return result;
 }
 
-ostream& operator<<(ostream& out, const MTGPlayerCards& z) {
+std::ostream& operator<<(std::ostream& out, const MTGPlayerCards& z) {
     if (z.library->cards.size()) {
         out << "library=";
-        out << *(z.library) << endl;
+        out << *(z.library) << std::endl;
     }
     if (z.battlefield->cards.size()) {
         out << "inplay=";
-        out << *(z.battlefield) << endl;
+        out << *(z.battlefield) << std::endl;
     }
     if (z.graveyard->cards.size()) {
         out << "graveyard=";
-        out << *(z.graveyard) << endl;
+        out << *(z.graveyard) << std::endl;
     }
     if (z.hand->cards.size()) {
         out << "hand=";
-        out << *(z.hand) << endl;
+        out << *(z.hand) << std::endl;
     }
 
     return out;

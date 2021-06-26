@@ -88,11 +88,11 @@ public:
     static int optionSet(int setID);
     static int optionInterrupt(int gamePhase);
 
-    static int getID(string name);
-    static string getName(int option);
+    static int getID(std::string name);
+    static std::string getName(int option);
 
 private:
-    static const string optionNames[];
+    static const std::string optionNames[];
 };
 
 class GameOption {
@@ -100,41 +100,41 @@ public:
     virtual ~GameOption() {}
 
     int number;
-    string str;
+    std::string str;
     // All calls to asColor should include a fallback color for people without a theme.
     PIXEL_TYPE asColor(PIXEL_TYPE fallback = ARGB(255, 255, 255, 255));
 
-    virtual bool isDefault();  // Returns true when number is 0 and string is "" or "Default"
-    virtual string menuStr();  // The string we'll use for GameStateOptions.
-    virtual bool write(std::ofstream* file, string name);
-    virtual bool read(string input);
+    virtual bool isDefault();       // Returns true when number is 0 and std::string is "" or "Default"
+    virtual std::string menuStr();  // The std::string we'll use for GameStateOptions.
+    virtual bool write(std::ofstream* file, std::string name);
+    virtual bool read(std::string input);
 
     GameOption(int value = 0);
-    GameOption(string);
-    GameOption(int, string);
+    GameOption(std::string);
+    GameOption(int, std::string);
 };
 
 struct EnumDefinition {
     int findIndex(int value);
 
-    typedef pair<int, string> assoc;
-    vector<assoc> values;
+    typedef std::pair<int, std::string> assoc;
+    std::vector<assoc> values;
 };
 
 class GameOptionEnum : public GameOption {
 public:
-    virtual string menuStr();
-    virtual bool write(std::ofstream* file, string name);
-    virtual bool read(string input);
+    virtual std::string menuStr();
+    virtual bool write(std::ofstream* file, std::string name);
+    virtual bool read(std::string input);
     EnumDefinition* def;
 };
 
 class GameOptionAward : public GameOption {
 public:
     GameOptionAward();
-    virtual string menuStr();
-    virtual bool write(std::ofstream* file, string name);
-    virtual bool read(string input);
+    virtual std::string menuStr();
+    virtual bool write(std::ofstream* file, std::string name);
+    virtual bool read(std::string input);
     virtual bool giveAward();  // Returns false if already awarded
     virtual bool isViewed();
 
@@ -146,8 +146,8 @@ private:
 };
 
 class GameOptionKeyBindings : public GameOption {
-    virtual bool read(string input);
-    virtual bool write(std::ofstream*, string);
+    virtual bool read(std::string input);
+    virtual bool write(std::ofstream*, std::string);
 };
 
 class OptionVolume : public EnumDefinition {
@@ -259,21 +259,21 @@ private:
 
 class GameOptions {
 public:
-    string mFilename;
+    std::string mFilename;
     int save();
     int load();
 
     GameOption* get(int);
-    GameOption* get(string optionName);
+    GameOption* get(std::string optionName);
     GameOption& operator[](int);
-    GameOption& operator[](string);
-    GameOptions(string filename);
+    GameOption& operator[](std::string);
+    GameOptions(std::string filename);
     ~GameOptions();
 
 private:
-    vector<GameOption*> values;
-    map<string, GameOption*> unknownMap;
-    GameOption* factorNewGameOption(string optionName, string value = "");
+    std::vector<GameOption*> values;
+    std::map<std::string, GameOption*> unknownMap;
+    GameOption* factorNewGameOption(std::string optionName, std::string value = "");
 };
 
 class GameSettings {
@@ -284,11 +284,11 @@ public:
     ~GameSettings();
     int save();
 
-    SimplePad* keypadStart(string input, string* _dest = NULL, bool _cancel = true, bool _numpad = false,
+    SimplePad* keypadStart(std::string input, std::string* _dest = NULL, bool _cancel = true, bool _numpad = false,
                            float _x = SCREEN_WIDTH_F / 2, float _y = SCREEN_HEIGHT_F / 2);
-    string keypadFinish();
+    std::string keypadFinish();
     void keypadShutdown();
-    void keypadTitle(string set);
+    void keypadTitle(std::string set);
 
     bool keypadActive() {
         if (keypad) return keypad->isActive();
@@ -331,7 +331,7 @@ public:
     // These return a filepath accurate to the current mode/profile/theme, and can
     // optionally fallback to a file within a certain directory.
     // The sanity=false option returns the adjusted path even if the file doesn't exist.
-    string profileFile(string filename = "", string fallback = "", bool sanity = false);
+    std::string profileFile(std::string filename = "", std::string fallback = "", bool sanity = false);
 
     void reloadProfile();  // Reloads profile using current options[ACTIVE_PROFILE]
     void checkProfile();   // Confirms that a profile is loaded and contains a collection.
@@ -339,7 +339,7 @@ public:
 
     GameOption* get(int);
     GameOption& operator[](int);
-    GameOption& operator[](string);
+    GameOption& operator[](std::string);
 
     GameOptions* profileOptions;
     GameOptions* globalOptions;

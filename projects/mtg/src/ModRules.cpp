@@ -47,7 +47,7 @@ int ModRulesMenuItem::strToAction(string str) {
     return MENUITEM_PLAY;
 }
 
-ModRulesMenuItem::ModRulesMenuItem(string actionIdStr, string displayName) {
+ModRulesMenuItem::ModRulesMenuItem(string actionIdStr, std::string displayName) {
     mActionId = strToAction(actionIdStr);
     mDisplayName = displayName;
 }
@@ -69,7 +69,8 @@ int ModRulesMenuItem::getMatchingGameState(int actionId) {
     }
 }
 
-ModRulesMainMenuItem::ModRulesMainMenuItem(string actionIdStr, string displayName, int iconId, string particleFile)
+ModRulesMainMenuItem::ModRulesMainMenuItem(string actionIdStr, std::string displayName, int iconId,
+                                           std::string particleFile)
     : ModRulesMenuItem(actionIdStr, displayName), mIconId(iconId), mParticleFile(particleFile) {}
 
 JButton ModRulesOtherMenuItem::strToJButton(string str) {
@@ -84,7 +85,7 @@ JButton ModRulesOtherMenuItem::strToJButton(string str) {
     return JGE_BTN_NEXT;
 }
 
-ModRulesOtherMenuItem::ModRulesOtherMenuItem(string actionIdStr, string displayName, string keyStr)
+ModRulesOtherMenuItem::ModRulesOtherMenuItem(string actionIdStr, std::string displayName, std::string keyStr)
     : ModRulesMenuItem(actionIdStr, displayName) {
     mKey = strToJButton(keyStr);
 }
@@ -145,7 +146,7 @@ void ModRulesGeneral::parse(TiXmlElement* element) {
     if (value != -1) mHasShop = value > 0;
 }
 
-int ModRules::getValueAsInt(TiXmlElement* element, string childName) {
+int ModRules::getValueAsInt(TiXmlElement* element, std::string childName) {
     TiXmlNode* node = element->FirstChild(childName.c_str());
     if (node) {
         const char* value = node->ToElement()->GetText();
@@ -160,7 +161,7 @@ ModRulesCards::ModRulesCards() {
 
 SimpleCardEffect* ModRulesCards::parseEffect(string s) {
     size_t limiter = s.find("(");
-    string function, params;
+    std::string function, params;
     if (limiter != string::npos) {
         function = s.substr(0, limiter);
         params = s.substr(limiter + 1, s.size() - 2 - limiter);
@@ -173,7 +174,7 @@ SimpleCardEffect* ModRulesCards::parseEffect(string s) {
     }
 
     if (function.compare("mask") == 0) {
-        vector<string> argb = split(params, ',');
+        auto argb = split(params, ',');
         if (argb.size() < 4) {
             DebugTrace("not enough params in mask");
             return NULL;
@@ -204,8 +205,9 @@ void ModRulesCards::parse(TiXmlElement* element) {
 
 ModRulesCards::~ModRulesCards() { SAFE_DELETE(activateEffect); }
 
-ModRulesBackGroundCardGuiItem::ModRulesBackGroundCardGuiItem(string ColorId, string ColorName, string DisplayImg,
-                                                             string DisplayThumb, string MenuIcon) {
+ModRulesBackGroundCardGuiItem::ModRulesBackGroundCardGuiItem(string ColorId, std::string ColorName,
+                                                             std::string DisplayImg, std::string DisplayThumb,
+                                                             std::string MenuIcon) {
     mColorId = atoi(ColorId.c_str());
     MColorName = ColorName;
     mDisplayImg = DisplayImg;
@@ -213,9 +215,9 @@ ModRulesBackGroundCardGuiItem::ModRulesBackGroundCardGuiItem(string ColorId, str
     mMenuIcon = atoi(MenuIcon.c_str());
 }
 
-ModRulesRenderCardGuiItem::ModRulesRenderCardGuiItem(string name, int posX, int posY, string formattedData,
-                                                     string filter, bool font, int fontSize, PIXEL_TYPE fontColor,
-                                                     int SizeIcon, int IconPosX, int IconPosY, string FileName) {
+ModRulesRenderCardGuiItem::ModRulesRenderCardGuiItem(string name, int posX, int posY, std::string formattedData,
+                                                     std::string filter, bool font, int fontSize, PIXEL_TYPE fontColor,
+                                                     int SizeIcon, int IconPosX, int IconPosY, std::string FileName) {
     mName = name;
     mPosX = posX;
     mPosY = posY;
@@ -231,18 +233,18 @@ ModRulesRenderCardGuiItem::ModRulesRenderCardGuiItem(string name, int posX, int 
 }
 
 void ModRulesCardGui::parse(TiXmlElement* element) {
-    string _Name;
+    std::string _Name;
     int _Posx;
     int _Posy;
-    string _FormattedText;
-    string _Filter;
+    std::string _FormattedText;
+    std::string _Filter;
     int _FontSize;
     bool _Font;
     PIXEL_TYPE _FontColor;
     int _SizeIcon;
     int _IconPosX;
     int _IconPosY;
-    string _FileName;
+    std::string _FileName;
 
     TiXmlNode* mainNode = element->FirstChild("background");
     if (mainNode) {
@@ -291,7 +293,7 @@ void ModRulesCardGui::parse(TiXmlElement* element) {
             if (ChildNode) {
                 _Font = true;
                 _FontSize = atoi(ChildNode->ToElement()->Attribute("size"));
-                vector<string> argb = split(ChildNode->ToElement()->Attribute("color"), ',');
+                auto argb = split(ChildNode->ToElement()->Attribute("color"), ',');
                 _FontColor =
                     ARGB(atoi(argb[0].c_str()), atoi(argb[1].c_str()), atoi(argb[2].c_str()), atoi(argb[3].c_str()));
             }
@@ -351,7 +353,7 @@ void ModRulesCardGui::parse(TiXmlElement* element) {
             if (ChildNode) {
                 _Font = true;
                 _FontSize = atoi(ChildNode->ToElement()->Attribute("size"));
-                vector<string> argb = split(ChildNode->ToElement()->Attribute("color"), ',');
+                auto argb = split(ChildNode->ToElement()->Attribute("color"), ',');
                 _FontColor =
                     ARGB(atoi(argb[0].c_str()), atoi(argb[1].c_str()), atoi(argb[2].c_str()), atoi(argb[3].c_str()));
             }

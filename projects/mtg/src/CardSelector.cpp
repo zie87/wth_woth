@@ -299,7 +299,7 @@ void CardSelector::PushLimitor() {
         owner = q->owner;
     else
         owner = CardView::nullZone;
-    limitorStack.push(make_pair(limitor, owner));
+    limitorStack.push(std::make_pair(limitor, owner));
 }
 
 void CardSelector::PopLimitor() {

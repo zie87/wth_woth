@@ -71,16 +71,16 @@ public:
     void DoAnimation(int trans, float dur = -1);
     static hgeParticleSystem* Particles[6];
     static bool HasMusic;
-    static string systemError;
+    static std::string systemError;
     static JMusic* music;
-    static string currentMusicFile;
-    static void playMusic(string filename = "", bool loop = true);
+    static std::string currentMusicFile;
+    static void playMusic(std::string filename = "", bool loop = true);
     static void stopMusic();
     static void pauseMusic();
     static void resumeMusic();
     static PlayerType players[2];
 };
 
-extern vector<JQuadPtr> manaIcons;
+extern std::vector<JQuadPtr> manaIcons;
 
 #endif

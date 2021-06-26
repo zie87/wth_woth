@@ -47,10 +47,10 @@ bool JOBJModel::Load(const char* modelName, const char* textureName) {
 
     Vector3D vert;
 
-    vector<Face> faceList;
-    vector<Vector3D> normalList;
-    vector<Vector3D> texList;
-    vector<Vector3D> vertList;
+    std::vector<Face> faceList;
+    std::vector<Vector3D> normalList;
+    std::vector<Vector3D> texList;
+    std::vector<Vector3D> vertList;
 
     normalList.reserve(32);
     texList.reserve(32);

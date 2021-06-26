@@ -6,6 +6,8 @@ const float DEFAULT_MAIN_FONT_SCALE = 1.0f;
 const float DEFAULT_TEXT_FONT_SCALE = 1.0f;
 const float ACTIVE_MENU_FONT_SCALE = 1.2f;
 
+#include <map>
+#include <vector>
 #include <string>
 using std::string;
 
@@ -63,21 +65,21 @@ public:
     const static int PARSER_INVALID_KEYWORD = 3000;
 
     // color constants
-    static const string kManaColorless;
-    static const string kManaGreen;
-    static const string kManaBlue;
-    static const string kManaRed;
-    static const string kManaBlack;
-    static const string kManaWhite;
+    static const std::string kManaColorless;
+    static const std::string kManaGreen;
+    static const std::string kManaBlue;
+    static const std::string kManaRed;
+    static const std::string kManaBlack;
+    static const std::string kManaWhite;
 
     // alternative costs constants
 
-    static const string kAlternativeKeyword;
-    static const string kBuyBackKeyword;
-    static const string kFlashBackKeyword;
-    static const string kRetraceKeyword;
-    static const string kKickerKeyword;
-    static const string kMorphKeyword;
+    static const std::string kAlternativeKeyword;
+    static const std::string kBuyBackKeyword;
+    static const std::string kFlashBackKeyword;
+    static const std::string kRetraceKeyword;
+    static const std::string kKickerKeyword;
+    static const std::string kMorphKeyword;
 
     // used for deck statistics
     static const int STATS_FOR_TURNS = 8;
@@ -278,16 +280,16 @@ public:
     };
 
     static char MTGColorChars[];
-    static vector<const char*> MTGColorStrings;
+    static std::vector<const char*> MTGColorStrings;
     static int _r[], _g[], _b[];
 
-    static map<string, int> MTGBasicAbilitiesMap;
+    static std::map<std::string, int> MTGBasicAbilitiesMap;
     static const char* MTGBasicAbilities[];
     static const char* MTGPhaseNames[];
     static const char* MTGPhaseCodeNames[];
 
-    static int GetBasicAbilityIndex(string mtgAbility);
-    static int GetColorStringIndex(string mtgColor);
+    static int GetBasicAbilityIndex(std::string mtgAbility);
+    static int GetColorStringIndex(std::string mtgColor);
     static int NB_Colors;
 };
 

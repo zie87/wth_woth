@@ -10,8 +10,8 @@
 
 #include <math.h>
 
-#include "../include/JFileSystem.h"
-#include "../include/JSpline.h"
+#include "JFileSystem.h"
+#include "JSpline.h"
 
 #include "tinyxml/tinyxml.h"
 

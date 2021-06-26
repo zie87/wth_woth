@@ -12,6 +12,7 @@
 #define _JGUI_H
 
 #include <ostream>
+
 #include "JGE.h"
 #include "JSprite.h"
 
@@ -88,9 +89,8 @@ protected:
     // int mKeyHoldTime;
 
 public:
-    vector<JGuiObject*> mObjects;
-
-    vector<JGuiObject*> mButtons;
+    std::vector<JGuiObject*> mObjects;
+    std::vector<JGuiObject*> mButtons;
     int mCount;
 
     JGuiController(JGE* jge, int id, JGuiListener* listener);
@@ -113,6 +113,6 @@ public:
     void SetActive(bool flag);
 };
 
-ostream& operator<<(ostream& out, const JGuiObject& j);
+std::ostream& operator<<(std::ostream& out, const JGuiObject& j);
 
 #endif

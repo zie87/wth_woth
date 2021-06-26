@@ -22,8 +22,6 @@
 class JParticleEffect;
 class JParticleEmitter;
 
-using namespace std;
-
 //////////////////////////////////////////////////////////////////////////
 /// The particle system of JGE++ is built on a key frame concept with
 /// multiple emitters for each effect. It's inspired by the particle system
@@ -96,7 +94,7 @@ public:
 private:
     bool mActive;
 
-    list<JParticleEffect*> mEffects;
+    std::list<JParticleEffect*> mEffects;
 };
 
 #endif

@@ -356,8 +356,8 @@ void SdlApp::OnUpdate() {
     try {
         g_engine->SetDelta((float)dt / 1000.0f);
         g_engine->Update((float)dt / 1000.0f);
-    } catch (out_of_range& oor) {
-        cerr << oor.what();
+    } catch (std::out_of_range& oor) {
+        std::cerr << oor.what();
     }
 
     if (g_engine) g_engine->Render();
@@ -563,7 +563,7 @@ bool SdlApp::OnInit() {
     JGECreateDefaultBindings();
 
     if (!InitGame()) {
-        cerr << "Could not init the game\n";
+        std::cerr << "Could not init the game\n";
         return false;
     }
 
@@ -572,8 +572,7 @@ bool SdlApp::OnInit() {
     return true;
 };
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
     DebugTrace("I R in da native");
 
     g_launcher = new JGameLauncher();

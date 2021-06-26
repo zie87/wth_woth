@@ -57,43 +57,43 @@ void DeckEditorMenu::Render() {
 }
 
 void DeckEditorMenu::drawDeckStatistics() {
-    ostringstream deckStatsString;
+    std::ostringstream deckStatsString;
 
     deckStatsString
-        << _("------- Deck Summary -----") << endl
-        << _("Cards: ") << stw->cardCount << endl
-        << _("Creatures: ") << setw(2) << stw->countCreatures << _("  Enchantments: ") << stw->countEnchantments
-        << endl
-        << _("Instants: ") << setw(4) << stw->countInstants << _("   Sorceries:      ") << setw(2)
-        << stw->countSorceries << endl
-        << _("Lands: ") << _("A: ") << setw(2) << left
+        << _("------- Deck Summary -----") << std::endl
+        << _("Cards: ") << stw->cardCount << std::endl
+        << _("Creatures: ") << std::setw(2) << stw->countCreatures << _("  Enchantments: ") << stw->countEnchantments
+        << std::endl
+        << _("Instants: ") << std::setw(4) << stw->countInstants << _("   Sorceries:      ") << std::setw(2)
+        << stw->countSorceries << std::endl
+        << _("Lands: ") << _("A: ") << std::setw(2) << std::left
         << stw->countLandsPerColor[Constants::MTG_COLOR_ARTIFACT] +
                stw->countBasicLandsPerColor[Constants::MTG_COLOR_ARTIFACT]
-        << " " << _("G: ") << setw(2) << left
+        << " " << _("G: ") << std::setw(2) << std::left
         << stw->countLandsPerColor[Constants::MTG_COLOR_GREEN] + stw->countLandsPerColor[Constants::MTG_COLOR_GREEN]
-        << " " << _("R: ") << setw(2) << left
+        << " " << _("R: ") << std::setw(2) << std::left
         << stw->countLandsPerColor[Constants::MTG_COLOR_RED] + stw->countBasicLandsPerColor[Constants::MTG_COLOR_RED]
-        << " " << _("U: ") << setw(2) << left
+        << " " << _("U: ") << std::setw(2) << std::left
         << stw->countLandsPerColor[Constants::MTG_COLOR_BLUE] + stw->countBasicLandsPerColor[Constants::MTG_COLOR_BLUE]
-        << " " << _("B: ") << setw(2) << left
+        << " " << _("B: ") << std::setw(2) << std::left
         << stw->countLandsPerColor[Constants::MTG_COLOR_BLACK] +
                stw->countBasicLandsPerColor[Constants::MTG_COLOR_BLACK]
-        << " " << _("W: ") << setw(2) << left
+        << " " << _("W: ") << std::setw(2) << std::left
         << stw->countLandsPerColor[Constants::MTG_COLOR_WHITE] +
                stw->countBasicLandsPerColor[Constants::MTG_COLOR_WHITE]
-        << endl
-        << _("  --- Card color count ---  ") << endl
-        << _("A: ") << setw(2) << left << selectedDeck->getCount(Constants::MTG_COLOR_ARTIFACT) << " " << _("G: ")
-        << setw(2) << left << selectedDeck->getCount(Constants::MTG_COLOR_GREEN) << " " << _("U: ") << setw(2) << left
-        << selectedDeck->getCount(Constants::MTG_COLOR_BLUE) << " " << _("R: ") << setw(2) << left
-        << selectedDeck->getCount(Constants::MTG_COLOR_RED) << " " << _("B: ") << setw(2) << left
-        << selectedDeck->getCount(Constants::MTG_COLOR_BLACK) << " " << _("W: ") << setw(2) << left
-        << selectedDeck->getCount(Constants::MTG_COLOR_WHITE) << endl
+        << std::endl
+        << _("  --- Card color count ---  ") << std::endl
+        << _("A: ") << std::setw(2) << std::left << selectedDeck->getCount(Constants::MTG_COLOR_ARTIFACT) << " "
+        << _("G: ") << std::setw(2) << std::left << selectedDeck->getCount(Constants::MTG_COLOR_GREEN) << " "
+        << _("U: ") << std::setw(2) << std::left << selectedDeck->getCount(Constants::MTG_COLOR_BLUE) << " "
+        << _("R: ") << std::setw(2) << std::left << selectedDeck->getCount(Constants::MTG_COLOR_RED) << " " << _("B: ")
+        << std::setw(2) << std::left << selectedDeck->getCount(Constants::MTG_COLOR_BLACK) << " " << _("W: ")
+        << std::setw(2) << std::left << selectedDeck->getCount(Constants::MTG_COLOR_WHITE) << std::endl
 
-        << _(" --- Average Cost --- ") << endl
-        << _("Creature: ") << setprecision(2) << stw->avgCreatureCost << endl
-        << _("Mana: ") << setprecision(2) << stw->avgManaCost << "   " << _("Spell: ") << setprecision(2)
-        << stw->avgSpellCost << endl;
+        << _(" --- Average Cost --- ") << std::endl
+        << _("Creature: ") << std::setprecision(2) << stw->avgCreatureCost << std::endl
+        << _("Mana: ") << std::setprecision(2) << stw->avgManaCost << "   " << _("Spell: ") << std::setprecision(2)
+        << stw->avgSpellCost << std::endl;
 
     WFont* mainFont = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
     mainFont->DrawString(deckStatsString.str().c_str(), descX, descY + 25);

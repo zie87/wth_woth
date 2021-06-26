@@ -94,7 +94,7 @@ void GameApp::Create() {
     string foldersRoot = "";
 
     // Find the Res folder
-    ifstream mfile("Res.txt");
+    std::ifstream mfile("Res.txt");
     string resPath;
     if (mfile) {
         bool found = false;
@@ -102,7 +102,7 @@ void GameApp::Create() {
             if (resPath[resPath.size() - 1] == '\r') resPath.erase(resPath.size() - 1);  // Handle DOS files
             string testfile = resPath + systemFolder;
             testfile.append("graphics/simon.dat");
-            ifstream tempfile(testfile.c_str());
+            std::ifstream tempfile(testfile.c_str());
             if (tempfile) {
                 found = true;
                 tempfile.close();

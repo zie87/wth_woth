@@ -62,7 +62,7 @@ NextGamePhase::NextGamePhase(GameObserver* observer, int id) : Interruptible(obs
     type = ACTION_NEXTGAMEPHASE;
 }
 
-ostream& NextGamePhase::toString(ostream& out) const {
+std::ostream& NextGamePhase::toString(std::ostream& out) const {
     out << "NextGamePhase ::: ";
     return out;
 }
@@ -146,7 +146,7 @@ StackAbility::StackAbility(GameObserver* observer, int id, MTGAbility* _ability)
     type = ACTION_ABILITY;
 }
 
-ostream& StackAbility::toString(ostream& out) const {
+std::ostream& StackAbility::toString(std::ostream& out) const {
     out << "StackAbility ::: ability : " << ability;
     return out;
 }
@@ -323,7 +323,7 @@ void Spell::Render() {
     Interruptible::Render(source, quad.get(), alt1, alt2, action, true);
 }
 
-ostream& Spell::toString(ostream& out) const {
+std::ostream& Spell::toString(std::ostream& out) const {
     out << "Spell ::: cost : " << cost;
     return out;
 }
@@ -365,7 +365,7 @@ void PutInGraveyard::Render() {
     }
 }
 
-ostream& PutInGraveyard::toString(ostream& out) const {
+std::ostream& PutInGraveyard::toString(std::ostream& out) const {
     out << "PutInGraveyard ::: removeFromGame : " << removeFromGame;
     return out;
 }
@@ -392,7 +392,7 @@ void DrawAction::Render() {
     mFont->DrawString(buffer, x + 35, y + GetVerticalTextOffset(), JGETEXT_LEFT);
 }
 
-ostream& DrawAction::toString(ostream& out) const {
+std::ostream& DrawAction::toString(std::ostream& out) const {
     out << "DrawAction ::: nbcards : " << nbcards << " ; player : " << player;
     return out;
 }
@@ -419,7 +419,7 @@ void LifeAction::Render() {
     mFont->DrawString(buffer, x + 20, y, JGETEXT_LEFT);
 }
 
-ostream& LifeAction::toString(ostream& out) const {
+std::ostream& LifeAction::toString(std::ostream& out) const {
     out << "LifeAction ::: amount : " << amount << " ; target : " << target;
     return out;
 }
@@ -489,11 +489,11 @@ int ActionStack::setIsInterrupting(Player* player, bool log) {
     // Is it a valid interruption request, or is uninterruptible stuff going on in the game?
     if (observer->getCurrentTargetChooser()) {
         DebugTrace("ActionStack: WARNING - We were asked to interrupt, During Targetchoosing"
-                   << endl
+                   << std::endl
                    << "source: "
                    << (observer->getCurrentTargetChooser()->source ? observer->getCurrentTargetChooser()->source->name
                                                                    : "None")
-                   << endl);
+                   << std::endl);
         return 0;
     }
 
@@ -779,7 +779,7 @@ void ActionStack::cancelInterruptOffer(InterruptDecision cancelMode, bool log) {
     observer->isInterrupting = NULL;
     timer = -1;
     if (log) {
-        stringstream stream;
+        std::stringstream stream;
         stream << "no " << cancelMode;
         observer->logAction(playerId, stream.str());
     }
@@ -1027,8 +1027,6 @@ void ActionStack::Render() {
     }
 }
 
-#if defined(WIN32) || defined(LINUX)
-
 void Interruptible::Dump() {
     string stype, sstate, sdisplay = "";
     switch (type) {
@@ -1083,5 +1081,3 @@ void ActionStack::Dump() {
         current->Dump();
     }
 }
-
-#endif

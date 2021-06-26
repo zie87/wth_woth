@@ -154,7 +154,7 @@ public:
     virtual float getWidth() = 0;
     virtual float getHeight() = 0;
     virtual int getId() { return INVALID_ID; };
-    virtual string getDisplay() const { return ""; };
+    virtual std::string getDisplay() const { return ""; };
     virtual float minWidth() { return getWidth(); };
     virtual float minHeight() { return getHeight(); };
 
@@ -191,14 +191,14 @@ public:
     WGuiItem(string _display, u8 _mF = 0);
     virtual ~WGuiItem(){};
 
-    string _(string input);  // Override global with our flag checker.
+    std::string _(string input);  // Override global with our flag checker.
 
     virtual void setData(){};
 
     virtual bool hasFocus() { return mFocus; };
     virtual void setFocus(bool bFocus) { mFocus = bFocus; };
 
-    virtual string getDisplay() const { return displayValue; };
+    virtual std::string getDisplay() const { return displayValue; };
     virtual void setDisplay(string s) { displayValue = s; };
 
     virtual int getId() { return INVALID_ID; };
@@ -223,7 +223,7 @@ protected:
     bool mFocus;
     float x, y;
     float width, height;
-    string displayValue;
+    std::string displayValue;
 };
 
 /**
@@ -303,7 +303,7 @@ public:
     virtual void ButtonPressed(int controllerId, int controlId) { it->ButtonPressed(controllerId, controlId); };
 
     virtual bool hasFocus() { return it->hasFocus(); };
-    virtual string getDisplay() const { return it->getDisplay(); };
+    virtual std::string getDisplay() const { return it->getDisplay(); };
     virtual int getId() { return it->getId(); };
     virtual float getX() { return it->getX(); };
     virtual float getY() { return it->getY(); };
@@ -333,8 +333,8 @@ protected:
 */
 class WGuiAward : public WGuiItem {
 public:
-    WGuiAward(int _id, string name, string _text, string _details = "");
-    WGuiAward(string _id, string name, string _text, string _details = "");
+    WGuiAward(int _id, std::string name, std::string _text, std::string _details = "");
+    WGuiAward(string _id, std::string name, std::string _text, std::string _details = "");
     virtual ~WGuiAward();
     virtual void Render();
     virtual bool Selectable() { return Visible(); };
@@ -344,10 +344,10 @@ public:
     virtual void Overlay();
 
 protected:
-    string details;
+    std::string details;
     int id;
-    string textId;
-    string text;
+    std::string textId;
+    std::string text;
 };
 
 /**
@@ -403,8 +403,8 @@ public:
     virtual void ButtonPressed(int controllerId, int controlId);
     virtual bool CheckUserInput(JButton key);
 
-    string confirm;
-    string cancel;
+    std::string confirm;
+    std::string cancel;
 
 protected:
     enum {
@@ -419,7 +419,7 @@ protected:
 };
 
 /**
-  Decorator for numeric values, transforms them into meaningful strings. Used by options
+  Decorator for numeric values, transforms them into meaningful std::strings. Used by options
   that have an enum or similar as their underlying representation. Requires an EnumDefinition
   so it knows what value maps to what string.
 */
@@ -427,7 +427,7 @@ class WDecoEnum : public WGuiDeco {
 public:
     WDecoEnum(WGuiBase* _it, EnumDefinition* _edef = NULL);
     virtual void Render();
-    string lookupVal(int value);
+    std::string lookupVal(int value);
 
 protected:
     EnumDefinition* edef;
@@ -552,7 +552,7 @@ class WGuiList : public WGuiMenu {
 public:
     WGuiList(string name, WSyncable* syncme = NULL);
 
-    string failMsg;
+    std::string failMsg;
 
     virtual void Render();
     virtual void confirmChange(bool confirmed);
@@ -598,7 +598,7 @@ public:
     WGuiFilters(string header, WSrcCards* src);
     ~WGuiFilters();
     bool CheckUserInput(JButton key);
-    string getCode();  // For use in filter factory.
+    std::string getCode();  // For use in filter factory.
     void Update(float dt);
     void Render();
     void Entering(JButton key);
@@ -614,8 +614,8 @@ public:
 
 protected:
     void clearArgs();
-    void addArg(string display, string code);
-    vector<pair<string, string> > tempArgs;  // TODO FIXME this is inefficient
+    void addArg(string display, std::string code);
+    std::vector<std::pair<std::string, std::string> > tempArgs;  // TODO FIXME this is inefficient
     bool bFinished;
     int recolorTo;
     WSrcCards* source;
@@ -632,7 +632,7 @@ public:
     WGuiFilterItem(WGuiFilters* parent);
     void updateValue();
     void ButtonPressed(int controllerId, int controlId);
-    string getCode();
+    std::string getCode();
     bool isModal();
     enum {
         STATE_UNSET,
@@ -657,7 +657,7 @@ public:
     };
 
 protected:
-    string mCode;
+    std::string mCode;
     int filterType;
     int filterVal;
     int mState;
@@ -671,7 +671,7 @@ protected:
 */
 class WGuiKeyBinder : public WGuiList {
 public:
-    WGuiKeyBinder(string name, GameStateOptions* parent);
+    WGuiKeyBinder(std::string name, GameStateOptions* parent);
     virtual bool isModal();
     virtual bool CheckUserInput(JButton);
     virtual void setData();
@@ -688,9 +688,9 @@ protected:
     CONFIRM_TYPE confirmed;
     LocalKeySym confirmingKey;
     JButton confirmingButton;
-    set<LocalKeySym> confirmedKeys;
-    set<JButton> confirmedButtons;
-    string confirmationString;
+    std::set<LocalKeySym> confirmedKeys;
+    std::set<JButton> confirmedButtons;
+    std::string confirmationString;
 };
 
 /**@} This comment used by Doxyyen. */

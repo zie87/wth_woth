@@ -11,16 +11,14 @@
 class GameApp;
 class DeckStats;
 
-using namespace std;
-
 class Unlockable {
 private:
     map<string, string> mValues;
 
 public:
     Unlockable();
-    void setValue(string, string);
-    string getValue(string);
+    void setValue(std::string, string);
+    std::string getValue(std::string);
     bool isUnlocked();
     bool tryToUnlock(GameObserver* game);
     static void load();
@@ -31,8 +29,8 @@ public:
 class CreditBonus {
 public:
     int value;
-    string text;
-    CreditBonus(int _value, string _text);
+    std::string text;
+    CreditBonus(int _value, std::string _text);
     void Render(float x, float y, WFont* font);
 };
 
@@ -43,8 +41,8 @@ private:
     int isEvilTwinUnlocked();
     int isRandomDeckUnlocked();
     int IsMoreAIDecksUnlocked(DeckStats* stats);
-    string unlockedTextureName;
-    JQuadPtr GetUnlockedQuad(string texturename);
+    std::string unlockedTextureName;
+    JQuadPtr GetUnlockedQuad(std::string texturename);
 
 public:
     int value;
@@ -53,14 +51,14 @@ public:
     GameApp* app;
     int showMsg;
     int unlocked;
-    string unlockedString;
-    vector<CreditBonus*> bonus;
+    std::string unlockedString;
+    std::vector<CreditBonus*> bonus;
     Credits();
     ~Credits();
     void compute(GameObserver* observer, GameApp* _app);
     void Render();
     static int unlockRandomSet(bool force = false);
-    static int unlockSetByName(string name);
+    static int unlockSetByName(std::string name);
     static int addCreditBonus(int value);
     static int addCardToCollection(int cardId, MTGDeck* collection);
     static int addCardToCollection(int cardId);

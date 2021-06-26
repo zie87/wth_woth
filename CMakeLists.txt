@@ -20,6 +20,17 @@ add_library(woth_options INTERFACE)
 target_compile_options(woth_options INTERFACE "$<$<CONFIG:DEBUG>:-D_DEBUG>")
 target_compile_options(woth_options INTERFACE "$<$<CONFIG:RELEASE>:-O2>")
 
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
+    option(ENABLE_COVERAGE "Enable coverage reporting for gcc/clang" FALSE)
+
+    if(ENABLE_COVERAGE)
+      target_compile_options(woth_options INTERFACE --coverage -O0 -g)
+      target_link_libraries(woth_options INTERFACE --coverage)
+    endif()
+endif()
+
+
 if(DEFINED PSP)
     target_link_libraries(woth_options INTERFACE psp::interface)
     target_compile_definitions(woth_options INTERFACE "WOTH_PLATFORM_PSP")

@@ -17,7 +17,7 @@
 
 const int kButtonHeight = 30;
 
-InteractiveButton::InteractiveButton(JGuiController* _parent, int id, int fontId, string text, float x, float y,
+InteractiveButton::InteractiveButton(JGuiController* _parent, int id, int fontId, std::string text, float x, float y,
                                      JButton actionKey, bool hasFocus, bool autoTranslate)
     : SimpleButton(_parent, id, fontId, text, x, y, hasFocus, autoTranslate) {
     setIsSelectionValid(false);  // by default it's turned off since you can't auto select it.
@@ -56,7 +56,7 @@ void InteractiveButton::Render() {
     if (!isSelectionValid()) return;
     JRenderer* renderer = JRenderer::GetInstance();
     WFont* mainFont = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
-    const string detailedInfoString = _(getText());
+    const std::string detailedInfoString = _(getText());
     float stringWidth = mainFont->GetStringWidth(detailedInfoString.c_str());
     float pspIconsSize = 0.5;
     float mainFontHeight = mainFont->GetHeight();
@@ -91,7 +91,7 @@ void InteractiveButton::setImage(const JQuadPtr imagePtr) {
 
 /* Accessors */
 
-ostream& InteractiveButton::toString(ostream& out) const {
+std::ostream& InteractiveButton::toString(std::ostream& out) const {
     return out << "InteractiveButton ::: mHasFocus : " << hasFocus() << " ; parent : " << getParent()
                << " ; mText : " << getText() << " ; mScale : " << getScale()
                << " ; mTargetScale : " << getTargetScale() << " ; mX,mY : " << getX() << "," << getY();

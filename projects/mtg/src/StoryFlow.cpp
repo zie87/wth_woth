@@ -147,7 +147,7 @@ void StoryReward::Update(float dt) {
     rewardDone = 1;
 }
 
-ostream& StoryText::toString(ostream& out) const { return out << "StoryText ::: text : " << text; }
+std::ostream& StoryText::toString(std::ostream& out) const { return out << "StoryText ::: text : " << text; }
 
 StoryImage::StoryImage(string img, float mX, float mY) : StoryDialogElement(mX, mY), img(img) {}
 void StoryImage::Render() {
@@ -174,7 +174,7 @@ void StoryImage::Update(float dt) {
     // Nothing for now
 }
 
-ostream& StoryImage::toString(ostream& out) const { return out << "StoryImage ::: img : " << img; }
+std::ostream& StoryImage::toString(std::ostream& out) const { return out << "StoryImage ::: img : " << img; }
 
 StoryPage::StoryPage(StoryFlow* mParent) : mParent(mParent) {}
 
@@ -216,7 +216,9 @@ bool StoryChoice::ButtonPressed() { return true; }
 
 bool StoryChoice::hasFocus() { return mHasFocus; }
 
-ostream& StoryChoice::toString(ostream& out) const { return out << "StoryChoice ::: mHasFocus : " << mHasFocus; }
+std::ostream& StoryChoice::toString(std::ostream& out) const {
+    return out << "StoryChoice ::: mHasFocus : " << mHasFocus;
+}
 
 StoryChoice::StoryChoice(string pageId, string text, int JGOid, float mX, float mY, string _align, int _font,
                          bool hasFocus)

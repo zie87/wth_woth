@@ -10,13 +10,13 @@
 
 #include <math.h>
 
-#include "../include/JGE.h"
-#include "../include/JParticleSystem.h"
-#include "../include/JParticleEffect.h"
-#include "../include/JParticleEmitter.h"
+#include "JGE.h"
+#include "JParticleSystem.h"
+#include "JParticleEffect.h"
+#include "JParticleEmitter.h"
 
-#include "../include/JFileSystem.h"
-#include "../include/JResourceManager.h"
+#include "JFileSystem.h"
+#include "JResourceManager.h"
 
 #include "tinyxml/tinyxml.h"
 
@@ -135,7 +135,7 @@ bool JParticleEffect::Load(const char* filename) {
                         }
                     }
 
-                    string quadName = element->Attribute("image");
+                    std::string quadName = element->Attribute("image");
                     JQuad* quad = mResourceManager->GetQuad(quadName);
                     if (quad != NULL) mParticleEmitters[mEmitterCount]->SetQuad(quad);
 

@@ -528,7 +528,6 @@ public:
 
     inline float GetActualHeight() { return mActualHeight; }
 
-private:
     struct TextureInfo {
         u8* mBits;
         int mWidth;
@@ -538,11 +537,7 @@ private:
         bool mVRAM;
     };
 
-#if (defined PSP)
-    void LoadJPG(TextureInfo& textureInfo, const char* filename, int mode = 0, int TextureFormat = TEXTURE_FORMAT);
-    int LoadPNG(TextureInfo& textureInfo, const char* filename, int mode = 0, int TextureFormat = TEXTURE_FORMAT);
-#endif
-
+private:
     static JRenderer* mInstance;
 
 #if (!defined PSP)

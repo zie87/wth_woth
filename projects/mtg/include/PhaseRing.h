@@ -3,8 +3,8 @@
 
 #include <list>
 #include <string>
+
 #include "MTGDefinitions.h"
-using namespace std;
 
 /*
  The class that handles the phases of a turn
@@ -29,14 +29,14 @@ private:
     GameObserver* observer;
 
 public:
-    list<Phase*> ring;
-    list<Phase*>::iterator current;
-    list<Phase*> turn;
-    list<Phase*> currentTurnList;
-    list<Phase*> nextTurnList;
-    list<Phase*> currentTurn();
-    list<Phase*> nextTurn();
-    list<Phase*> extraPhases;
+    std::list<Phase*> ring;
+    std::list<Phase*>::iterator current;
+    std::list<Phase*> turn;
+    std::list<Phase*> currentTurnList;
+    std::list<Phase*> nextTurnList;
+    std::list<Phase*> currentTurn();
+    std::list<Phase*> nextTurn();
+    std::list<Phase*> extraPhases;
     Phase* getCurrentPhase();
     Phase* forward(bool sendEvents = true);
     Phase* goToPhase(int id, Player* player, bool sendEvents = true);

@@ -514,7 +514,7 @@ bool SdlApp::OnInit() {
     window = SDL_CreateWindow(g_launcher->GetName(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_w,
                               window_h, flags);
     if (window == NULL) {
-        WGE_LOG_ERROR(SDL_GetError());
+        WGE_LOG_ERROR( "SDL Error: {}", SDL_GetError());
         return false;
     }
 

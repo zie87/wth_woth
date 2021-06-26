@@ -321,8 +321,7 @@ void GameObserver::resetStartupGame() {
     startupGameSerialized = "";
     stream << *this;
     startupGameSerialized = stream.str();
-    WGE_LOG_TRACE("start Game");
-    WGE_LOG_TRACE(startupGameSerialized);
+    WGE_LOG_TRACE("start game: {} ", startupGameSerialized);
 }
 
 void GameObserver::startGame(GameType gtype, Rules* rules) {
@@ -1469,7 +1468,7 @@ void GameObserver::logAction(const string& s) {
 bool GameObserver::undo() {
     std::stringstream stream;
     stream << *this;
-    WGE_LOG_DEBUG(stream.str());
+    WGE_LOG_DEBUG("{}", stream.str());
     return load(stream.str(), true);
 }
 

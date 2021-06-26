@@ -18,6 +18,8 @@
 #include "ModRules.h"
 #include "CardDescriptor.h"
 
+#include <wge/log.hpp>
+
 const float CardGui::Width = 28.0;
 const float CardGui::Height = 40.0;
 const float CardGui::BigWidth = 200.0;
@@ -508,10 +510,9 @@ void CardGui::AlternateRender(MTGCard* card, const Pos& pos) {
                     if (card->data->types.size())
                         s += _(MTGAllCards::findType(card->data->types[0]));
                     else {
-                        DebugTrace("Typeless card: " << setlist[card->setId].c_str() << card->data->getName()
-                                                     << card->getId());
+                        WGE_LOG_TRACE("Typeless card: \"{}\" \"{}\" {}", setlist[card->setId], card->data->getName(),
+                                      card->getId());
                     }
-
                     formattedfield = FormattedData(formattedfield, "types", s);
                 }
 
@@ -772,8 +773,8 @@ void CardGui::TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad) {
                     if (card->data->types.size())
                         s += _(MTGAllCards::findType(card->data->types[0]));
                     else {
-                        DebugTrace("Typeless card: " << setlist[card->setId].c_str() << card->data->getName()
-                                                     << card->getId());
+                        WGE_LOG_TRACE("Typeless card: \"{}\" \"{}\" {}", setlist[card->setId], card->data->getName(),
+                                      card->getId());
                     }
 
                     formattedfield = FormattedData(formattedfield, "types", s);

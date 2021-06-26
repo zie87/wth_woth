@@ -13,8 +13,10 @@
 #include <iomanip>
 #include "AbilityParser.h"
 
+#include <wge/log.hpp>
+
 #if defined(WIN32) || defined(LINUX)
-    #include <time.h>
+#include <time.h>
 #endif
 
 static inline int getGrade(int v) {
@@ -252,11 +254,9 @@ int MTGAllCards::processConfLine(string& s, MTGCard* card, CardPrimitive* primit
 
     default:
         if (primitive) {
-            DebugTrace(std::endl
-                       << "MTGDECK Parsing Error: "
-                       << " [" << primitive->getName() << "]" << s << std::endl);
+            WGE_LOG_ERROR("Error:  [{}] \"{}\"", primitive->getName(), s);
         } else {
-            DebugTrace(std::endl << "MTGDECK Parsing Generic Error: " << s << std::endl);
+            WGE_LOG_ERROR("Generic Error: \"{}\"", s);
         }
         break;
     }
@@ -308,7 +308,7 @@ int MTGAllCards::load(const char* config_file, const char* set_name, int autoloa
             if (s[0] == '[') {
                 currentGrade = Constants::GRADE_SUPPORTED;  // Default value
                 if (s.size() < 2) {
-                    DebugTrace("FATAL: Card file incorrect");
+                    WGE_LOG_FATAL("Card file incorrect");
                 } else {
                     conf_read_mode =
                         ('m' == s[1]) ? MTGAllCards::READ_METADATA : MTGAllCards::READ_CARD;  // M for metadata.
@@ -344,7 +344,7 @@ int MTGAllCards::load(const char* config_file, const char* set_name, int autoloa
                 tempPrimitive = NULL;
             } else {
                 if (!processConfLine(s, tempCard, tempPrimitive))
-                    DebugTrace("MTGDECK: BAD Line: \n[" << lineNumber << "]: " << s);
+                    WGE_LOG_ERROR("BAD Line: [{}]: \"{}\"", lineNumber, s);
             }
             continue;
         }
@@ -434,7 +434,7 @@ bool MTGAllCards::addCardToCollection(MTGCard* card, int setId) {
 #if defined(_DEBUG)
         string cardName = card->data ? card->data->name : card->getImageName();
         string setName = setId != -1 ? setlist.getInfo(setId)->getName() : "";
-        DebugTrace("warning, card id collision! : " << newId << " -> " << cardName << "(" << setName << ")");
+        WGE_LOG_WARN("card id collision! {} -> \"{}\" (\"{}\"})", newId, cardName, setName);
 #endif
         SAFE_DELETE(card);
         return false;
@@ -471,7 +471,7 @@ CardPrimitive* MTGAllCards::addPrimitive(CardPrimitive* primitive, MTGCard* card
     if (primitives.find(key) != primitives.end()) {
         // ERROR
         // Todo move the deletion somewhere else ?
-        DebugTrace("MTGDECK: primitives conflict: " << key);
+        WGE_LOG_WARN("primitives conflict: {}", key);
         SAFE_DELETE(primitive);
         return NULL;
     }
@@ -667,11 +667,11 @@ MTGDeck::MTGDeck(const char* config_file, MTGAllCards* _allcards, int meta_only,
                     add(card);
                 }
             } else {
-                DebugTrace("could not find Card matching name: " << s);
+                WGE_LOG_ERROR("could not find Card matching name: \"{}\"", s);
             }
         }
     } else {
-        DebugTrace("FATAL:MTGDeck.cpp:MTGDeck - can't load deck file");
+        WGE_LOG_ERROR("can't load deck file");
     }
 }
 
@@ -834,7 +834,7 @@ int MTGDeck::save(const string& destFileName, bool useExpandedDescriptions, cons
     std::ofstream file;
     if (JFileSystem::GetInstance()->openForWrite(file, tmp)) {
         char writer[512];
-        DebugTrace("Saving Deck: " << deckTitle << " to " << destFileName);
+        WGE_LOG_DEBUG("Saving Deck \"{}\" as \"{}\"", deckTitle, destFileName);
         if (meta_name.size()) {
             file << "#NAME:" << deckTitle << '\n';
         }

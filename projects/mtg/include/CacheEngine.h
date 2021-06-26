@@ -1,6 +1,7 @@
 #include "PrecompiledHeader.h"
 
 #include <wge/thread.hpp>
+#include <wge/log.hpp>
 
 #include <queue>
 #include <set>
@@ -37,7 +38,7 @@ protected:
 class UnthreadedCardRetriever : public CardRetrieverBase {
 public:
     UnthreadedCardRetriever(WCache<WCachedTexture, JTexture>& inCache) : CardRetrieverBase(inCache) {
-        DebugTrace("Unthreaded version");
+        WGE_LOG_TRACE("Unthreaded version");
     }
 
     virtual ~UnthreadedCardRetriever() {}
@@ -56,12 +57,12 @@ public:
 class ThreadedCardRetriever : public CardRetrieverBase {
 public:
     ThreadedCardRetriever(WCache<WCachedTexture, JTexture>& inCache) : CardRetrieverBase(inCache), mProcessing(true) {
-        DebugTrace("Threaded Version");
+        WGE_LOG_TRACE("Threaded Version");
         mWorkerThread = wge::thread(ThreadProc, this);
     }
 
     virtual ~ThreadedCardRetriever() {
-        LOG("Tearing down ThreadedCardRetriever");
+        WGE_LOG_TRACE("Tearing down ThreadedCardRetriever");
         mProcessing = false;
         mWorkerThread.join();
     }
@@ -71,11 +72,8 @@ public:
         // mRequestLookup is used to prevent duplicate requests for the same id
         if (mRequestLookup.find(inCacheID) == mRequestLookup.end() &&
             mTextureCache.cache.find(inCacheID) == mTextureCache.cache.end()) {
-#ifdef DOLOG
-            std::ostringstream stream;
-            stream << "Queueing request: " << inFilePath;
-            LOG(stream.str().c_str());
-#endif
+            WGE_LOG_TRACE("Queueing request: {}", inFilePath);
+
             mRequestLookup.insert(inCacheID);
             mRequestQueue.push(CacheRequest(inFilePath, inSubmode, inCacheID));
 
@@ -99,7 +97,8 @@ protected:
     ThreadedCardRetriever();
 
     static void ThreadProc(void* inParam) {
-        LOG("Entering ThreadedCardRetriever::ThreadProc");
+        WGE_LOG_TRACE("Entering");
+
         ThreadedCardRetriever* instance = reinterpret_cast<ThreadedCardRetriever*>(inParam);
         if (instance) {
             while (instance->mProcessing) {
@@ -143,7 +142,7 @@ class CacheEngine {
 public:
     template <class T>
     static void Create(WCache<WCachedTexture, JTexture>& inCache) {
-        LOG("Creating Card Retriever instance");
+        WGE_LOG_TRACE("Creating Card Retriever instance");
         sInstance = NEW T(inCache);
         ThreadedCardRetriever* test = dynamic_cast<ThreadedCardRetriever*>(sInstance);
         sIsThreaded = (test != NULL);

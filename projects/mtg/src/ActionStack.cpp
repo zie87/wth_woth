@@ -16,6 +16,10 @@ The Action Stack contains all information for Game Events that can be interrupte
 #include "ModRules.h"
 #include "AllAbilities.h"
 #include "CardSelector.h"
+
+#include <wge/log.hpp>
+#include <wge/string/format.hpp>
+
 #include <typeinfo>
 
 namespace {
@@ -38,10 +42,7 @@ int NextGamePhase::resolve() {
 }
 
 const string NextGamePhase::getDisplayName() const {
-    std::ostringstream stream;
-    stream << "NextGamePhase.  (Current phase is: " << observer->getCurrentGamePhaseName() << ")";
-
-    return stream.str();
+    return wge::format("NextGamePhase.  (Current phase is: {})", observer->getCurrentGamePhaseName());
 }
 
 void NextGamePhase::Render() {
@@ -488,12 +489,9 @@ int ActionStack::setIsInterrupting(Player* player, bool log) {
 
     // Is it a valid interruption request, or is uninterruptible stuff going on in the game?
     if (observer->getCurrentTargetChooser()) {
-        DebugTrace("ActionStack: WARNING - We were asked to interrupt, During Targetchoosing"
-                   << std::endl
-                   << "source: "
-                   << (observer->getCurrentTargetChooser()->source ? observer->getCurrentTargetChooser()->source->name
-                                                                   : "None")
-                   << std::endl);
+        WGE_LOG_WARN("We were asked to interrupt, During Targetchoosing! source: \"{}\"",
+                     (observer->getCurrentTargetChooser()->source ? observer->getCurrentTargetChooser()->source->name
+                                                                  : "None"));
         return 0;
     }
 
@@ -510,13 +508,12 @@ int ActionStack::addAction(Interruptible* action) {
     }
     Add(action);
     lastActionController = observer->currentlyActing();
-    DebugTrace("Action added to stack: " << action->getDisplayName());
+    WGE_LOG_TRACE("Action added to stack: {}", action->getDisplayName());
 
     return 1;
 }
 
 Spell* ActionStack::addSpell(MTGCardInstance* _source, TargetChooser* tc, ManaCost* mana, int payResult, int storm) {
-    DebugTrace("ACTIONSTACK Add spell");
     if (storm > 0) {
         mana = NULL;
     }
@@ -574,7 +571,7 @@ int ActionStack::resolve() {
 
     if (!action) return 0;
 
-    DebugTrace("Resolving Action on stack: " << action->getDisplayName());
+    WGE_LOG_TRACE("resolving action on stack: {}", action->getDisplayName());
     if (action->resolve()) {
         action->state = RESOLVED_OK;
     } else {
@@ -839,7 +836,7 @@ bool ActionStack::CheckUserInput(JButton inputKey) {
                     if (n != -1 && n != mCurr && mObjects[mCurr]->Leaving(JGE_BTN_UP)) {
                         mCurr = n;
                         mObjects[mCurr]->Entering();
-                        DebugTrace("ACTIONSTACK UP TO mCurr = " << mCurr);
+                        WGE_LOG_TRACE("ACTIONSTACK UP TO: {}", mCurr);
                     }
                 }
                 return true;
@@ -849,12 +846,12 @@ bool ActionStack::CheckUserInput(JButton inputKey) {
                     if (n != -1 && n != mCurr && mObjects[mCurr]->Leaving(JGE_BTN_DOWN)) {
                         mCurr = n;
                         mObjects[mCurr]->Entering();
-                        DebugTrace("ACTIONSTACK DOWN TO mCurr " << mCurr);
+                        WGE_LOG_TRACE("ACTIONSTACK DOWN TO: {}", mCurr);
                     }
                 }
                 return true;
             } else if (JGE_BTN_OK == key) {
-                DebugTrace("ACTIONSTACK CLICKED mCurr = " << mCurr);
+                WGE_LOG_TRACE("ACTIONSTACK CLICKED {}", mCurr);
 
                 observer->stackObjectClicked(((Interruptible*)mObjects[mCurr]));
                 return true;
@@ -893,7 +890,7 @@ int ActionStack::garbageCollect() {
 
 void ActionStack::Fizzle(Interruptible* action) {
     if (!action) {
-        DebugTrace("ACTIONSTACK ==ERROR==: action is NULL in ActionStack::Fizzle");
+        WGE_LOG_ERROR("action is NULL!");
         return;
     }
     if (action->type == ACTION_SPELL) {
@@ -1070,12 +1067,12 @@ void Interruptible::Dump() {
         sstate = "unknown";
         break;
     }
-    DebugTrace("type: " << stype << " " << type << " - state: " << sstate << " " << state
-                        << " - display: " << display);
+
+    WGE_LOG_TRACE("type: {} {} - state: {} {} - display: {}", stype, type, sstate, state, display);
 }
 
 void ActionStack::Dump() {
-    DebugTrace("=====\nDumping Action Stack=====");
+    WGE_LOG_TRACE("===== Dumping Action Stack =====");
     for (size_t i = 0; i < mObjects.size(); i++) {
         Interruptible* current = (Interruptible*)mObjects[i];
         current->Dump();

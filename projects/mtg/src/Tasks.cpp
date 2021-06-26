@@ -14,6 +14,8 @@
 #include <math.h>
 #include "utils.h"
 
+#include <wge/log.hpp>
+
 vector<string> Task::sAIDeckNames;
 
 /*---------------- Task -----------------*/
@@ -69,10 +71,7 @@ void Task::storeCommonAttribs() {
 
 int Task::restoreCommonAttribs() {
     if (persistentAttribs.size() < COMMON_ATTRIBS_COUNT) {
-#if defined(WIN32) || defined(LINUX)
-        DebugTrace("\nTasks.cpp::restoreCommonAttribs: Not enough attributes loaded\n");
-#endif
-
+        WGE_LOG_ERROR("Not enough attributes loaded");
         return -1;
     }
     expiresIn = atoi(persistentAttribs[1].c_str());
@@ -188,16 +187,12 @@ Task* Task::createFromStr(const string params, bool rand) {
         result = NEW TaskPacifism();
         break;
     default:
-#if defined(WIN32) || defined(LINUX)
-        DebugTrace("\nTasks.cpp::createFromStr: Undefined class type\n");
-#endif
+        WGE_LOG_ERROR("Undefined class type");
         result = NEW TaskWinAgainst();
     }
 
     if (!result) {
-#if defined(WIN32) || defined(LINUX)
-        DebugTrace("\nTask::createFromStr: Failed to create task\n");
-#endif
+        WGE_LOG_ERROR("Failed to create task");
         return NULL;
     }
 
@@ -232,17 +227,13 @@ int TaskList::save(string _fileName) {
         fileName = _fileName;
     }
     if (fileName == "") {
-#if defined(WIN32) || defined(LINUX)
-        DebugTrace("\nTaskList::save: No filename specified\n");
-#endif
+        WGE_LOG_ERROR("No filename specified");
         return -1;
     }
 
     std::ofstream file;
     if (JFileSystem::GetInstance()->openForWrite(file, fileName)) {
-#if defined(WIN32) || defined(LINUX)
-        DebugTrace("\nsaving tasks\n");
-#endif
+        WGE_LOG_DEBUG("saving tasks");
 
         file << "# Format: <Type>|<Expiration>|<Accepted>|<Opponent>|<Reward>|<Description>[|Additional attributes]\n";
 
@@ -261,13 +252,13 @@ int TaskList::load(string _fileName) {
         fileName = _fileName;
     }
     if (fileName == "") {
-        DebugTrace("\nTaskList::load: No filename specified\n");
+        WGE_LOG_ERROR("No filename specified");
         return -1;
     }
 
     std::string contents;
     if (!JFileSystem::GetInstance()->readIntoString(fileName, contents)) {
-        DebugTrace("\nTaskList::load: Failed to open file\n");
+        WGE_LOG_ERROR("Failed to open file {}", fileName);
         return -1;
     }
 
@@ -284,7 +275,7 @@ int TaskList::load(string _fileName) {
         if (task) {
             this->addTask(task);
         } else {
-            DebugTrace("\nTaskList::load: error creating task\n");
+            WGE_LOG_ERROR("error creating task");
         }
     }
 

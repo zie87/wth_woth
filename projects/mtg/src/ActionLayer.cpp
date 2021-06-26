@@ -7,6 +7,8 @@
 #include "AllAbilities.h"
 #include "MTGRules.h"
 
+#include <wge/log.hpp>
+
 MTGAbility* ActionLayer::getAbility(int type) {
     for (size_t i = 1; i < mObjects.size(); i++) {
         MTGAbility* a = ((MTGAbility*)mObjects[i]);
@@ -290,7 +292,7 @@ int ActionLayer::reactToClick(MTGCardInstance* card) {
 
 void ActionLayer::setMenuObject(Targetable* object, bool must) {
     if (!object) {
-        DebugTrace("FATAL: ActionLayer::setMenuObject");
+        WGE_LOG_FATAL("invalid object");
         return;
     }
     menuObject = object;
@@ -337,7 +339,7 @@ void ActionLayer::setMenuObject(Targetable* object, bool must) {
 
 void ActionLayer::setCustomMenuObject(Targetable* object, bool must, vector<MTGAbility*> abilities) {
     if (!object) {
-        DebugTrace("FATAL: ActionLayer::setCustomMenuObject");
+        WGE_LOG_FATAL("invalid object");
         return;
     }
     menuObject = object;
@@ -365,7 +367,7 @@ void ActionLayer::setCustomMenuObject(Targetable* object, bool must, vector<MTGA
 void ActionLayer::doReactTo(int menuIndex) {
     if (menuObject) {
         int controlid = abilitiesMenu->mObjects[menuIndex]->GetId();
-        DebugTrace("ActionLayer::doReactTo " << controlid);
+        WGE_LOG_TRACE("react to {}", controlid);
         ButtonPressed(0, controlid);
     }
 }

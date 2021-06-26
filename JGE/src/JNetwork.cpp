@@ -4,34 +4,36 @@
 
 */
 
-#include "DebugRoutines.h"
 #include "JNetwork.h"
 
 #if defined(WIN32) || defined(LINUX)
 #else
-    #ifdef NETWORK_SUPPORT
+#ifdef NETWORK_SUPPORT
 
-        #include <pspkernel.h>
-        #include <pspdebug.h>
-        #include <pspsdk.h>
-        #include <stdlib.h>
-        #include <string.h>
-        #include <unistd.h>
-        #include <psputility.h>
-        #include <pspnet.h>
-        #include <pspnet_inet.h>
-        #include <pspnet_apctl.h>
-        #include <pspnet_resolver.h>
-        #include <netinet/in.h>
-        #include <arpa/inet.h>
-        #include <sys/select.h>
-        #include <errno.h>
-    #endif
+#include <pspkernel.h>
+#include <pspdebug.h>
+#include <pspsdk.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <psputility.h>
+#include <pspnet.h>
+#include <pspnet_inet.h>
+#include <pspnet_apctl.h>
+#include <pspnet_resolver.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/select.h>
+#include <errno.h>
+#endif
 
 #endif
 
-#include <sstream>
 #include "JSocket.h"
+
+#include <wge/log.hpp>
+
+#include <sstream>
 
 std::map<std::string, processCmd> JNetwork::sCommandMap;
 
@@ -61,12 +63,12 @@ bool JNetwork::sendCommand(std::string xString) {
     std::string aString = xString;
     std::lock_guard<wge::mutex> l(sendMutex);
     if (!socket) {
-        DebugTrace("sendCommand failed: no sockeet");
+        WGE_LOG_ERROR("send failed: socket is invalid");
         return false;
     }
     aString = aString + "Command";
     if (sCommandMap.find(aString) == sCommandMap.end()) {
-        DebugTrace("sendCommand failed: command not registered");
+        WGE_LOG_ERROR("send failed: command not registered");
         return false;
     }
     aString = aString + "\n";
@@ -85,11 +87,11 @@ void JNetwork::ThreadProc(void* param) {
     JNetwork* pThis = reinterpret_cast<JNetwork*>(param);
     JSocket* pSocket = NULL;
     if (pThis->serverIP.size()) {
-        DebugTrace("Starting Client Thread");
+        WGE_LOG_TRACE("Starting Client Thread");
         pThis->socket = new JSocket(pThis->serverIP);
         if (pThis->socket->isConnected()) pSocket = pThis->socket;
     } else {
-        DebugTrace("Starting Server Thread");
+        WGE_LOG_TRACE("Starting Server Thread");
         pThis->socket = new JSocket();
         // Wait for some client
         pSocket = pThis->socket->Accept();
@@ -101,7 +103,7 @@ void JNetwork::ThreadProc(void* param) {
             std::lock_guard<wge::mutex> l(pThis->receiveMutex);
             int len = pSocket->Read(buff, sizeof(buff));
             if (len) {
-                DebugTrace("receiving " << len << " bytes : " << buff);
+                WGE_LOG_DEBUG("receiving {} bytes : {}", len, buff);
                 pThis->received << buff;
             }
             // Checking for some command to execute
@@ -109,8 +111,8 @@ void JNetwork::ThreadProc(void* param) {
             if (found != std::string::npos) {
                 auto ite = sCommandMap.find((pThis->received.str()).substr(0, found) + "Command");
                 if (ite != sCommandMap.end()) {
-                    DebugTrace("begin of command received : " << pThis->received.str());
-                    DebugTrace("begin of command toSend : " << pThis->toSend.str());
+                    WGE_LOG_TRACE("begin of command received : {}", pThis->received.str());
+                    WGE_LOG_TRACE("begin of command toSend   : {}", pThis->toSend.str());
 
                     std::lock_guard<wge::mutex> l(pThis->sendMutex);
                     pThis->toSend << pThis->received.str().substr(0, found) + "Response ";
@@ -118,8 +120,8 @@ void JNetwork::ThreadProc(void* param) {
                     processCmd theMethod = (ite)->second;
                     theMethod(pThis->received, pThis->toSend);
 
-                    DebugTrace("end of command received : " << pThis->received.str());
-                    DebugTrace("end of command toSend : " << pThis->toSend.str());
+                    WGE_LOG_TRACE("end of command received : {}", pThis->received.str());
+                    WGE_LOG_TRACE("end of command toSend   : {}", pThis->toSend.str());
                 }
             }
             // Checking for some response to execute
@@ -127,8 +129,8 @@ void JNetwork::ThreadProc(void* param) {
             if (found != std::string::npos) {
                 auto ite = sCommandMap.find((pThis->received.str()).substr(0, found) + "Response");
                 if (ite != sCommandMap.end()) {
-                    DebugTrace("begin of response received : " << pThis->received.str());
-                    DebugTrace("begin of response toSend : " << pThis->toSend.str());
+                    WGE_LOG_TRACE("begin of response received : {}", pThis->received.str());
+                    WGE_LOG_TRACE("begin of response toSend   : {}", pThis->toSend.str());
 
                     std::lock_guard<wge::mutex> l(pThis->sendMutex);
                     std::string aString;
@@ -137,21 +139,21 @@ void JNetwork::ThreadProc(void* param) {
                     theMethod(pThis->received, pThis->toSend);
                     pThis->received.str("");
 
-                    DebugTrace("end of response received : " << pThis->received.str());
-                    DebugTrace("end of response toSend : " << pThis->toSend.str());
+                    WGE_LOG_TRACE("end of response received : {}", pThis->received.str());
+                    WGE_LOG_TRACE("end of response toSend   : {}", pThis->toSend.str());
                 }
             }
         }
 
         std::lock_guard<wge::mutex> l(pThis->sendMutex);
         if (!pThis->toSend.str().empty()) {
-            DebugTrace("sending  " << pThis->toSend.str().size() << " bytes : " << pThis->toSend.str());
+            WGE_LOG_TRACE("sending {} bytes: \"{}\"", pThis->toSend.str().size(), pThis->toSend.str());
             pSocket->Write((char*)pThis->toSend.str().c_str(), pThis->toSend.str().size() + 1);
             pThis->toSend.str("");
         }
     }
 
-    DebugTrace("Quitting Thread");
+    WGE_LOG_TRACE("Quitting Thread");
 }
 
 #if defined(WIN32) || defined(LINUX)
@@ -165,7 +167,7 @@ int JNetwork::connect(std::string ip) {
 #else
 
 int JNetwork::connect(std::string serverIP) {
-    #ifdef NETWORK_SUPPORT
+#ifdef NETWORK_SUPPORT
     int err;
     char buffer[4096];
     if (netthread) return 0;
@@ -194,13 +196,13 @@ int JNetwork::connect(std::string serverIP) {
         sceKernelStartThread(netthread, 0, NULL);
         return netthread;
     }
-    #endif
+#endif
     return 0;
 }
 
 /* Connect to an access point */
 int JNetwork::connect_to_apctl(int config) {
-    #ifdef NETWORK_SUPPORT
+#ifdef NETWORK_SUPPORT
     int err;
     int stateLast = -1;
     char buffer[4096];
@@ -248,7 +250,7 @@ int JNetwork::connect_to_apctl(int config) {
     if (err != 0) {
         return 0;
     }
-    #endif
+#endif
     return 1;
 }
 #endif

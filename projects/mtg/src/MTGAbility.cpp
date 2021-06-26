@@ -14,6 +14,8 @@
 #include "MTGRules.h"
 #include "AbilityParser.h"
 
+#include <wge/log.hpp>
+
 // Used for Lord/This parsing
 const string kLordKeywords[] = {"lord(", "foreach(", "aslongas(", "teach(", "all("};
 const size_t kLordKeywordsCount = 5;
@@ -421,7 +423,7 @@ TargetChooser* AbilityFactory::parseSimpleTC(const std::string& s, const std::st
 
     size_t end = s.find(")", start);
     if (end == string::npos) {
-        DebugTrace("malformed syntax " << s);
+        WGE_LOG_ERROR("malformed syntax {}", s);
         return NULL;
     }
 
@@ -974,7 +976,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
 
             MTGAbility* a = parseMagicLine(s1, id, spell, card, 1);
             if (!a) {
-                DebugTrace("ABILITYFACTORY Error parsing: " << sWithoutTc);
+                WGE_LOG_ERROR("Error parsing: {}", sWithoutTc);
                 return NULL;
             }
             string limit = "";
@@ -1024,7 +1026,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     for (size_t i = 0; i < sizeof(kAlternateCostIds) / sizeof(kAlternateCostIds[0]); ++i) {
         if (s.find(kAlternateCostKeywords[i]) == 0) {
             if (!(spell && spell->FullfilledAlternateCost(kAlternateCostIds[i]))) {
-                DebugTrace("INFO parseMagicLine: Alternative Cost was not fulfilled for " << s);
+                WGE_LOG_INFO("Alternative Cost was not fulfilled for {}", s);
                 SAFE_DELETE(tc);
                 return NULL;
             }
@@ -1175,7 +1177,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
             ThisDescriptor* td = tdf.createThisDescriptor(observer, thisDescriptorString);
 
             if (!td) {
-                DebugTrace("MTGABILITY: Parsing Error:" << s);
+                WGE_LOG_ERROR("Parsing Error: {}", s);
                 return NULL;
             }
 
@@ -1273,7 +1275,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
             TargetChooser* lordTargets = tcf.createTargetChooser(lordTargetsString, card);
 
             if (!lordTargets) {
-                DebugTrace("MTGABILITY: Parsing Error: " << s);
+                WGE_LOG_ERROR("Parsing Error: {}", s);
                 return NULL;
             }
 
@@ -1361,7 +1363,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     if (!activated && tc) {
         MTGAbility* a = parseMagicLine(sWithoutTc, id, spell, card);
         if (!a) {
-            DebugTrace("ABILITYFACTORY Error parsing: " << s);
+            WGE_LOG_ERROR("Error parsing: {}", s);
             return NULL;
         }
         a = NEW GenericTargetAbility(observer, newName, castRestriction, id, card, tc, a);
@@ -1539,7 +1541,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
         string tokenDesc = splitToken[1];
         vector<string> tokenParameters = split(tokenDesc, ',');
         if (tokenParameters.size() < 3) {
-            DebugTrace("incorrect Parameters for Token" << tokenDesc);
+            WGE_LOG_ERROR("incorrect Parameters for Token {}", tokenDesc);
             return NULL;
         }
         string sname = tokenParameters[0];
@@ -1871,7 +1873,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
 
             vector<string> splitValue = parseBetween(splitCast[2], "", " ", false);
             if (!splitValue.size()) {
-                DebugTrace("MTGABILITY: Error parsing Cast/Play Restriction" << s);
+                WGE_LOG_ERROR("Error parsing Cast/Play Restriction {}", s);
                 return NULL;
             }
 
@@ -1904,7 +1906,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
         vector<string> rampageParameters = split(splitRampage[1], ',');
         int power, toughness;
         if (!parsePowerToughness(rampageParameters[0], &power, &toughness)) {
-            DebugTrace("MTGAbility Parse error in rampage" << s);
+            WGE_LOG_ERROR("Parse error in rampage {}", s);
             return NULL;
         }
         int MaxOpponent = atoi(rampageParameters[1].c_str());
@@ -1963,7 +1965,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
         string counterString = splitCounter[1];
         Counter* counter = parseCounter(counterString, target, spell);
         if (!counter) {
-            DebugTrace("MTGAbility: can't parse counter:" << s);
+            WGE_LOG_ERROR("can't parse counter: {}", s);
             return NULL;
         }
 
@@ -1984,7 +1986,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
         } else {
             counter = parseCounter(counterShroudString, target, spell);
             if (!counter) {
-                DebugTrace("MTGAbility: can't parse counter:" << s);
+                WGE_LOG_ERROR("can't parse counter: {}", s);
                 return NULL;
             }
         }
@@ -2014,7 +2016,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
 
         Counter* counter = parseCounter(counterString, target, spell);
         if (!counter) {
-            DebugTrace("MTGAbility: can't parse counter:" << s);
+            WGE_LOG_ERROR("can't parse counter: {}", s);
             return NULL;
         }
 
@@ -2375,7 +2377,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
         return a;
     }
 
-    DebugTrace(" no matching ability found. " << s);
+    WGE_LOG_ERROR("no matching ability for \"{}\" found ", s);
     return NULL;
 }
 
@@ -2405,7 +2407,7 @@ MTGAbility* AbilityFactory::parseUpkeepAbility(string s, MTGCardInstance* card, 
     ManaCost* cost = ManaCost::parseManaCost(s1);
 
     if (!cost) {
-        DebugTrace("MTGABILITY: Parsing Error: " << s);
+        WGE_LOG_ERROR("Parsing Error: {}", s);
         return NULL;
     }
 
@@ -2413,7 +2415,7 @@ MTGAbility* AbilityFactory::parseUpkeepAbility(string s, MTGCardInstance* card, 
     MTGAbility* a = parseMagicLine(sAbility, id, spell, card);
 
     if (!a) {
-        DebugTrace("MTGABILITY: Parsing Error: " << s);
+        WGE_LOG_ERROR("Parsing Error: {}", s);
         delete (cost);
         return NULL;
     }
@@ -2425,7 +2427,7 @@ MTGAbility* AbilityFactory::parsePhaseActionAbility(string s, MTGCardInstance* c
                                                     MTGCardInstance* target, int restrictions, int id) {
     vector<string> splitActions = parseBetween(s, "[", "]");
     if (!splitActions.size()) {
-        DebugTrace("MTGABILITY:Parsing Error " << s);
+        WGE_LOG_ERROR("Parsing Error: {}", s);
         return NULL;
     }
     string s1 = splitActions[1];
@@ -2763,7 +2765,7 @@ int AbilityFactory::getAbilities(vector<MTGAbility*>* v, Spell* spell, MTGCardIn
             v->push_back(a);
             result++;
         } else {
-            DebugTrace("ABILITYFACTORY ERROR: Parser returned NULL");
+            WGE_LOG_ERROR("Parser returned NULL");
         }
     }
     return result;
@@ -2789,7 +2791,7 @@ int AbilityFactory::magicText(int id, Spell* spell, MTGCardInstance* card, int m
     for (size_t i = 0; i < v.size(); ++i) {
         MTGAbility* a = v[i];
         if (!a) {
-            DebugTrace("ABILITYFACTORY ERROR: Parser returned NULL");
+            WGE_LOG_ERROR("Parser returned NULL");
             continue;
         }
 
@@ -3364,7 +3366,7 @@ MTGAbility* AbilityFactory::getManaReduxAbility(string s, int id, Spell* spell, 
         }
     }
     if (color == -1) {
-        DebugTrace("An error has happened in creating a Mana Redux Ability! " << s);
+        WGE_LOG_ERROR("An error has happened in creating a Mana Redux Ability! {}", s);
         return NULL;
     }
     // figure out the mana cost
@@ -3430,7 +3432,7 @@ MTGAbility::MTGAbility(GameObserver* observer, int id, MTGCardInstance* _source,
 
 void MTGAbility::setCost(ManaCost* cost, bool forceDelete) {
     if (mCost) {
-        DebugTrace("WARNING: Mtgability.cpp, attempt to set cost when previous cost is not null");
+        WGE_LOG_WARN("attempt to set cost when previous cost is not null");
         if (forceDelete) delete (mCost);
     }
     mCost = cost;

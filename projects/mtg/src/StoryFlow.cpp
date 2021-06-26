@@ -13,7 +13,10 @@
 #include "PlayerData.h"
 #include "MTGDeck.h"
 #include "WFont.h"
+
 #include <JFileSystem.h>
+
+#include <wge/log.hpp>
 
 #define LINE_SPACE 2
 #define SPACE_BEFORE_CHOICES 10
@@ -482,7 +485,7 @@ bool StoryFlow::parse(string path) {
             if (strcmp(element->Value(), "page") == 0) {
                 string id = element->Attribute("id");
 
-                DebugTrace("parsing " << id << "...");
+                WGE_LOG_TRACE("parsing \"{}\" ...", id);
 
                 StoryPage* sp = loadPage(element);
                 pages[id] = sp;

@@ -11,6 +11,8 @@
     #include "TestSuiteAI.h"
 #endif
 
+#include <wge/log.hpp>
+
 Player::Player(GameObserver* observer, string file, string fileSmall, MTGDeck* deck)
     : Damageable(observer, 20), mAvatarName(""), offerInterruptOnPhase(MTG_PHASE_DRAW) {
     if (deck == NULL && file != "testsuite" && file != "remote" && file != "")
@@ -129,7 +131,7 @@ int Player::gainOrLoseLife(int value) {
 
 int Player::gainLife(int value) {
     if (value < 0) {
-        DebugTrace("PLAYER.CPP: don't call gainLife on a negative value, use loseLife instead");
+        WGE_LOG_WARN("don't call gainLife on a negative value, use loseLife instead");
         return 0;
     }
     return gainOrLoseLife(value);
@@ -137,7 +139,7 @@ int Player::gainLife(int value) {
 
 int Player::loseLife(int value) {
     if (value < 0) {
-        DebugTrace("PLAYER.CPP: don't call loseLife on a negative value, use gainLife instead");
+        WGE_LOG_WARN("don't call loseLife on a negative value, use gainLife instead");
         return 0;
     }
     return gainOrLoseLife(-value);

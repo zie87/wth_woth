@@ -6,6 +6,9 @@
 #include "MTGCardInstance.h"
 #include "WEvent.h"
 #include "AllAbilities.h"
+
+#include <wge/log.hpp>
+
 // TODO:better comments this is too cryptic to work on by anyone but original coder.
 bool compare_aistats(AIStat* first, AIStat* second) {
     float damage1 = static_cast<float>(first->value / first->occurences);
@@ -29,8 +32,9 @@ AIStats::~AIStats() {
 
 void AIStats::updateStatsCard(MTGCardInstance* cardInstance, Damage* damage, float multiplier) {
     MTGCard* card = cardInstance->model;
-    if (!card) return;  // card can be null because some special cardInstances (such as ExtraRules) don't have a
-                        // "model"
+    if (!card)
+        return;  // card can be null because some special cardInstances (such as ExtraRules) don't have a
+                 // "model"
 
     AIStat* stat = find(card);
     if (!stat) {
@@ -131,9 +135,10 @@ void AIStats::load(char* filename) {
             stats.push_back(stat);
         }
     } else {
-        DebugTrace("FATAL: AIStats.cpp:load : can't load" << filename);
+        WGE_LOG_ERROR("can't load {}", filename);
     }
 }
+
 void AIStats::save() {
     std::ofstream file;
     if (JFileSystem::GetInstance()->openForWrite(file, filename)) {

@@ -7,6 +7,8 @@
 #include "Player.h"
 #include "Counters.h"
 
+#include <wge/log.hpp>
+
 SUPPORT_OBJECT_ANALYTICS(ExtraCost)
 
 ExtraCost::ExtraCost(const std::string& inCostRenderString, TargetChooser* _tc)
@@ -674,6 +676,6 @@ ExtraCosts::~ExtraCosts() {
 }
 
 void ExtraCosts::Dump() {
-    DebugTrace("=====\nDumping ExtraCosts=====\n");
-    DebugTrace("NbElements: " << costs.size());
+    WGE_LOG_TRACE("===== Dumping ExtraCosts =====");
+    WGE_LOG_TRACE("NbElements: {}", costs.size());
 }

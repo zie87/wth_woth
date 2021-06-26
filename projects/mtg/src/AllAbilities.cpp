@@ -2,6 +2,8 @@
 #include "AllAbilities.h"
 #include "Translate.h"
 
+#include <wge/log.hpp>
+
 // display a text animation, this is not a real ability.
 MTGEventText::MTGEventText(GameObserver* observer, int _id, MTGCardInstance* card, std::string textToShow)
     : MTGAbility(observer, _id, card) {
@@ -37,9 +39,10 @@ MTGEventText* MTGEventText::clone() const { return NEW MTGEventText(*this); }
 // Activated Abilities
 
 // Generic Activated Abilities
-GenericActivatedAbility::GenericActivatedAbility(GameObserver* observer, std::string newName, std::string castRestriction,
-                                                 int _id, MTGCardInstance* card, MTGAbility* a, ManaCost* _cost,
-                                                 std::string limit, MTGAbility* sideEffects, std::string usesBeforeSideEffects,
+GenericActivatedAbility::GenericActivatedAbility(GameObserver* observer, std::string newName,
+                                                 std::string castRestriction, int _id, MTGCardInstance* card,
+                                                 MTGAbility* a, ManaCost* _cost, std::string limit,
+                                                 MTGAbility* sideEffects, std::string usesBeforeSideEffects,
                                                  int restrictions, MTGGameZone* dest)
     : ActivatedAbility(observer, _id, card, _cost, restrictions, limit, sideEffects, usesBeforeSideEffects,
                        castRestriction),
@@ -191,8 +194,8 @@ const char* AADamager::getMenuText() {
 AADamager* AADamager::clone() const { return NEW AADamager(*this); }
 
 // AADepleter
-AADepleter::AADepleter(GameObserver* observer, int _id, MTGCardInstance* card, Targetable* _target, std::string nbcardsStr,
-                       ManaCost* _cost, int who)
+AADepleter::AADepleter(GameObserver* observer, int _id, MTGCardInstance* card, Targetable* _target,
+                       std::string nbcardsStr, ManaCost* _cost, int who)
     : ActivatedAbilityTP(observer, _id, card, _target, _cost, who), nbcardsStr(nbcardsStr) {}
 int AADepleter::resolve() {
     Player* player = getPlayerFromTarget(getTarget());
@@ -213,8 +216,8 @@ const char* AADepleter::getMenuText() { return "Deplete"; }
 AADepleter* AADepleter::clone() const { return NEW AADepleter(*this); }
 
 // take extra turns or skip turns, values in the negitive will make you skip.
-AAModTurn::AAModTurn(GameObserver* observer, int _id, MTGCardInstance* card, Targetable* _target, std::string nbTurnStr,
-                     ManaCost* _cost, int who)
+AAModTurn::AAModTurn(GameObserver* observer, int _id, MTGCardInstance* card, Targetable* _target,
+                     std::string nbTurnStr, ManaCost* _cost, int who)
     : ActivatedAbilityTP(observer, _id, card, _target, _cost, who), nbTurnStr(nbTurnStr) {}
 int AAModTurn::resolve() {
     Player* player = getPlayerFromTarget(getTarget());
@@ -1395,8 +1398,9 @@ int AADynamic::resolve() {
         _target = _target;
         break;
     }
-    if (amountsource == DYNAMIC_MYSELF_AMOUNT) _target = OriginalSrc->controller();  // looking at controller for
-                                                                                     // amount
+    if (amountsource == DYNAMIC_MYSELF_AMOUNT)
+        _target = OriginalSrc->controller();  // looking at controller for
+                                              // amount
     if (amountsource == DYNAMIC_MYFOE_AMOUNT)
         _target = OriginalSrc->controller()->opponent();  // looking at controllers opponent for amount
     if (!_target) return 0;
@@ -2146,7 +2150,7 @@ AARemoveMana::AARemoveMana(GameObserver* observer, int _id, MTGCardInstance* car
                            std::string manaDesc, int who)
     : ActivatedAbilityTP(observer, _id, card, _target, NULL, who) {
     if (!manaDesc.size()) {
-        DebugTrace("ALL_ABILITIES: AARemoveMana ctor error");
+        WGE_LOG_ERROR("ctor error");
         return;
     }
     mRemoveAll = (manaDesc[0] == '*');
@@ -2615,8 +2619,8 @@ MultiAbility::~MultiAbility() {
     abilities.clear();
 }
 // Generic Target Ability
-GenericTargetAbility::GenericTargetAbility(GameObserver* observer, std::string newName, std::string castRestriction, int _id,
-                                           MTGCardInstance* _source, TargetChooser* _tc, MTGAbility* a,
+GenericTargetAbility::GenericTargetAbility(GameObserver* observer, std::string newName, std::string castRestriction,
+                                           int _id, MTGCardInstance* _source, TargetChooser* _tc, MTGAbility* a,
                                            ManaCost* _cost, std::string limit, MTGAbility* sideEffects,
                                            std::string usesBeforeSideEffects, int restrictions, MTGGameZone* dest,
                                            std::string _tcString)
@@ -2799,9 +2803,9 @@ AAlterCost::~AAlterCost() {}
 
 // ATransformer
 ATransformer::ATransformer(GameObserver* observer, int id, MTGCardInstance* source, MTGCardInstance* target,
-                           std::string stypes, std::string sabilities, std::string newpower, bool newpowerfound, std::string newtoughness,
-                           bool newtoughnessfound, std::vector<std::string> newAbilitiesList, bool newAbilityFound,
-                           bool aForever)
+                           std::string stypes, std::string sabilities, std::string newpower, bool newpowerfound,
+                           std::string newtoughness, bool newtoughnessfound, std::vector<std::string> newAbilitiesList,
+                           bool newAbilityFound, bool aForever)
     : MTGAbility(observer, id, source, target),
       newpower(newpower),
       newpowerfound(newpowerfound),
@@ -2853,7 +2857,7 @@ int ATransformer::addToGame() {
     }
 
     if (!_target) {
-        DebugTrace("ALL_ABILITIES: Target not set in ATransformer::addToGame\n");
+        WGE_LOG_ERROR("Target not set in ATransformer::addToGame\n");
         return 0;
     }
 
@@ -3023,7 +3027,7 @@ int ATransformer::destroy() {
             }
         }
         ////in the case that we removed or added types to a card, so that it retains its original name when the effect
-        ///is removed.
+        /// is removed.
         // if(_target->model->data->name.size())//tokens don't have a model name.
         //    _target->setName(_target->model->data->name.c_str());
 
@@ -3047,9 +3051,10 @@ ATransformer::~ATransformer() {}
 
 // ATransformerInstant
 ATransformerInstant::ATransformerInstant(GameObserver* observer, int id, MTGCardInstance* source,
-                                         MTGCardInstance* target, std::string types, std::string abilities, std::string newpower,
-                                         bool newpowerfound, std::string newtoughness, bool newtoughnessfound,
-                                         std::vector<std::string> newAbilitiesList, bool newAbilityFound, bool aForever)
+                                         MTGCardInstance* target, std::string types, std::string abilities,
+                                         std::string newpower, bool newpowerfound, std::string newtoughness,
+                                         bool newtoughnessfound, std::vector<std::string> newAbilitiesList,
+                                         bool newAbilityFound, bool aForever)
     : InstantAbility(observer, id, source, target),
       newpower(newpower),
       newpowerfound(newpowerfound),
@@ -3180,7 +3185,7 @@ ALoseAbilities::ALoseAbilities(GameObserver* observer, int id, MTGCardInstance* 
 
 int ALoseAbilities::addToGame() {
     if (storedAbilities.size()) {
-        DebugTrace("FATAL:storedAbilities shouldn't be already set inALoseAbilitie\n");
+        WGE_LOG_ERROR("storedAbilities shouldn't be already set inALoseAbilitie");
         return 0;
     }
     MTGCardInstance* _target = (MTGCardInstance*)target;
@@ -3239,13 +3244,13 @@ int ALoseAbilities::destroy() {
         // OneShot abilities are not supposed to stay in the game for long.
         // If we copied one, something wrong probably happened
         if (a->oneShot) {
-            DebugTrace("ALLABILITIES: Ability should not be one shot");
+            WGE_LOG_WARN("Ability should not be one shot");
             continue;
         }
 
         // Avoid inifinite loop of removing/putting back abilities
         if (dynamic_cast<ALoseAbilities*>(a)) {
-            DebugTrace("ALLABILITIES: loseability won't be put in the loseability list");
+            WGE_LOG_INFO("loseability won't be put in the loseability list");
             continue;
         }
 
@@ -3266,7 +3271,7 @@ ALoseSubtypes::ALoseSubtypes(GameObserver* observer, int id, MTGCardInstance* so
 
 int ALoseSubtypes::addToGame() {
     if (storedSubtypes.size()) {
-        DebugTrace("FATAL:storedSubtypes shouldn't be already set inALoseSubtypes\n");
+        WGE_LOG_ERROR("storedSubtypes shouldn't be already set inALoseSubtypes");
         return 0;
     }
     MTGCardInstance* _target = (MTGCardInstance*)target;
@@ -3300,7 +3305,7 @@ APreventDamageTypes::APreventDamageTypes(GameObserver* observer, int id, MTGCard
 
 int APreventDamageTypes::addToGame() {
     if (re) {
-        DebugTrace("FATAL:re shouldn't be already set in APreventDamageTypes\n");
+        WGE_LOG_ERROR("re shouldn't be already set in APreventDamageTypes");
         return 0;
     }
     TargetChooserFactory tcf(game);
@@ -3334,8 +3339,8 @@ APreventDamageTypes* APreventDamageTypes::clone() const {
 APreventDamageTypes::~APreventDamageTypes() { SAFE_DELETE(re); }
 
 // APreventDamageTypesUEOT
-APreventDamageTypesUEOT::APreventDamageTypesUEOT(GameObserver* observer, int id, MTGCardInstance* source, std::string to,
-                                                 std::string from, int type)
+APreventDamageTypesUEOT::APreventDamageTypesUEOT(GameObserver* observer, int id, MTGCardInstance* source,
+                                                 std::string to, std::string from, int type)
     : InstantAbility(observer, id, source) {
     ability = NEW APreventDamageTypes(observer, id, source, to, from, type);
 }
@@ -3503,8 +3508,8 @@ AUpkeep::~AUpkeep() {
 
 // A Phase based Action
 APhaseAction::APhaseAction(GameObserver* observer, int _id, MTGCardInstance* card, MTGCardInstance* target,
-                           std::string sAbility, int restrictions, int _phase, bool forcedestroy, bool next, bool myturn,
-                           bool opponentturn, bool once)
+                           std::string sAbility, int restrictions, int _phase, bool forcedestroy, bool next,
+                           bool myturn, bool opponentturn, bool once)
     : MTGAbility(observer, _id, card),
       sAbility(sAbility),
       phase(_phase),

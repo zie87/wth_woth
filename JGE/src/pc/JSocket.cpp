@@ -1,23 +1,24 @@
 #include <errno.h>
 #ifdef WIN32
-    #pragma comment(lib, "WSOCK32.LIB")
-    #include <stdio.h>
-    #include <conio.h>
-    #include <winsock.h>
-    #include <winsock.h>
-    #include <fcntl.h>
+#pragma comment(lib, "WSOCK32.LIB")
+#include <stdio.h>
+#include <conio.h>
+#include <winsock.h>
+#include <winsock.h>
+#include <fcntl.h>
 #elif LINUX
-    #include <unistd.h>
-    #include <sys/types.h>
-    #include <sys/socket.h>
-    #include <netinet/in.h>
-    #include <netdb.h>
-    #include <fcntl.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <fcntl.h>
 #endif  // WINDOWS
 
-#include "../../include/JSocket.h"
-#include "../../include/DebugRoutines.h"
+#include "JSocket.h"
 // JSocket * JSocket::mInstance = NULL;
+
+#include <wge/log.hpp>
 
 //#define SERVER_PORT 20666
 #define SERVER_PORT 5001
@@ -34,7 +35,7 @@ JSocket::JSocket(std::string ipAddr) : state(NOT_AVAILABLE), mfd(-1) {
     wVersionRequested = MAKEWORD(1, 1);
     result = WSAStartup(wVersionRequested, &wsaData);
     if (result != 0) {
-        DebugTrace("WSAStartup\t");
+        WGE_LOG_ERROR("WSAStartup");
         return;
     }
 #elif LINUX
@@ -43,7 +44,7 @@ JSocket::JSocket(std::string ipAddr) : state(NOT_AVAILABLE), mfd(-1) {
 
     mfd = socket(AF_INET, SOCK_STREAM, 0);
     if (mfd < 0) return;
-    DebugTrace("Connecting " << ipAddr);
+    WGE_LOG_TRACE("Connecting {}", ipAddr);
 
 #ifdef WIN32
     unsigned int addr_dest = inet_addr(ipAddr.c_str());
@@ -52,7 +53,7 @@ JSocket::JSocket(std::string ipAddr) : state(NOT_AVAILABLE), mfd(-1) {
     hostentptr = gethostbyname(ipAddr.c_str());
 #endif
     if (hostentptr == NULL) {
-        DebugTrace("ERROR, no such host\n");
+        WGE_LOG_ERROR("ERROR, no such host");
         return;
     }
 
@@ -68,7 +69,7 @@ JSocket::JSocket(std::string ipAddr) : state(NOT_AVAILABLE), mfd(-1) {
 
     result = connect(mfd, (const struct sockaddr*)&Adresse_Socket_Server, sizeof(Adresse_Socket_Server));
     if (result != 0) {
-        DebugTrace("client connect failed :" << strerror(errno));
+        WGE_LOG_ERROR("client connect failed: {}", strerror(errno));
         state = FATAL_ERROR;
         return;
     }
@@ -104,7 +105,7 @@ JSocket::JSocket() : state(NOT_AVAILABLE), mfd(-1) {
     result = WSAStartup(wVersionRequested, &wsaData);
 
     if (result != 0) {
-        DebugTrace("WSAStartup\t");
+        WGE_LOG_ERROR("WSAStartup");
         return;
     }
 #elif LINUX
@@ -135,14 +136,14 @@ JSocket::JSocket() : state(NOT_AVAILABLE), mfd(-1) {
     result = ::bind(mfd, (struct sockaddr*)&Adresse_Socket_Connection, sizeof(Adresse_Socket_Connection));
     if (result != 0) {
         state = FATAL_ERROR;
-        DebugTrace("bind error:" << strerror(errno));
+        WGE_LOG_ERROR("bind error: {}", strerror(errno));
         return;
     }
 
     result = listen(mfd, 1);
     if (result != 0) {
         state = FATAL_ERROR;
-        DebugTrace("listen error:" << strerror(errno));
+        WGE_LOG_ERROR("listen error: {}", strerror(errno));
         return;
     }
 
@@ -193,7 +194,7 @@ JSocket* JSocket::Accept() {
         if (result > 0 && FD_ISSET(mfd, &set)) {
             Longueur_Adresse = sizeof(Adresse_Socket_Cliente);
             int val = accept(mfd, (struct sockaddr*)&Adresse_Socket_Cliente, &Longueur_Adresse);
-            DebugTrace("connection on client port " << ntohs(Adresse_Socket_Cliente.sin_port));
+            WGE_LOG_ERROR("connection on client port {}", ntohs(Adresse_Socket_Cliente.sin_port));
 
             if (val >= 0) {
                 state = CONNECTED;
@@ -223,7 +224,7 @@ int JSocket::Read(char* buff, int size) {
             int readbytes = read(mfd, buff, size);
 #endif  // WINDOWS
             if (readbytes < 0) {
-                DebugTrace("Error reading from socket\n");
+                WGE_LOG_ERROR("Error reading from socket");
                 return -1;
             } else
                 return readbytes;

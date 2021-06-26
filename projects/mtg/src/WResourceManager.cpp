@@ -6,10 +6,12 @@
 #include "CacheEngine.h"
 
 #if defined(WIN32)
-    #include <sys/types.h>
-    #include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #endif
 #include "WFont.h"
+
+#include <wge/log.hpp>
 
 //#define FORCE_LOW_CACHE_MEMORY
 const unsigned int kConstrainedCacheLimit = 8 * 1024 * 1024;
@@ -169,7 +171,6 @@ void ResourceManagerImpl::FlattenTimes() {
 }
 
 ResourceManagerImpl::ResourceManagerImpl() {
-    DebugTrace("Init ResourceManagerImpl : " << this);
 #ifdef DEBUG_CACHE
     menuCached = 0;
 #endif
@@ -182,7 +183,7 @@ ResourceManagerImpl::ResourceManagerImpl() {
 
     bThemedCards = false;
 
-    LOG("Calling CacheEngine::Create");
+    WGE_LOG_TRACE("Calling CacheEngine::Create");
 
 #ifdef PSP
     CacheEngine::Create<UnthreadedCardRetriever>(textureWCache);
@@ -192,11 +193,11 @@ ResourceManagerImpl::ResourceManagerImpl() {
 }
 
 ResourceManagerImpl::~ResourceManagerImpl() {
-    LOG("==Destroying ResourceManagerImpl==");
+    WGE_LOG_TRACE("== Destroying ResourceManagerImpl ==");
     RemoveWFonts();
 
     CacheEngine::Terminate();
-    LOG("==Successfully Destroyed ResourceManagerImpl==");
+    WGE_LOG_TRACE("== Successfully Destroyed ResourceManagerImpl ==");
 }
 
 bool ResourceManagerImpl::IsThreaded() { return CacheEngine::IsThreaded(); }
@@ -803,17 +804,17 @@ void ResourceManagerImpl::ResetCacheLimits() {
     unsigned int ram = ramAvailable();
     unsigned int myNewSize = ram - OPERATIONAL_SIZE + textureWCache.totalSize;
     if (myNewSize < TEXTURES_CACHE_MINSIZE) {
-        DebugTrace("Error, Not enough RAM for Cache: " << myNewSize << " - total Ram: " << ram);
+        WGE_LOG_ERROR("Not enough RAM for Cache: {} - total RAM {}", myNewSize, ram);
     }
     textureWCache.Resize(MIN(myNewSize, HUGE_CACHE_LIMIT), MAX_CACHE_OBJECTS);
 #else
-    #ifdef FORCE_LOW_CACHE_MEMORY
+#ifdef FORCE_LOW_CACHE_MEMORY
     textureWCache.Resize(kConstrainedCacheLimit, MAX_CACHE_OBJECTS);
-    #else
+#else
     unsigned long cacheSize =
         options["cachesize"].number ? (unsigned long)(options["cachesize"].number) * 1024 * 1024 : HUGE_CACHE_LIMIT;
     textureWCache.Resize(cacheSize, MAX_CACHE_OBJECTS);
-    #endif
+#endif
 
 #endif
     return;
@@ -854,11 +855,7 @@ bool WCache<cacheItem, cacheActual>::RemoveOldest() {
     }
 
     if (oldest != cache.end() && oldest->second && !oldest->second->isLocked()) {
-#ifdef DEBUG_CACHE
-        std::ostringstream stream;
-        stream << "erasing from cache: " << oldest->second->mFilename << " " << oldest->first;
-        LOG(stream.str().c_str());
-#endif
+        WGE_LOG_DEBUG("erasing from cache: {} {}", oldest->second->mFilename, oldest->first);
         Delete(oldest->second);
         cache.erase(oldest);
         return true;
@@ -885,13 +882,9 @@ void WCache<cacheItem, cacheActual>::ClearUnlocked() {
 template <class cacheItem, class cacheActual>
 void WCache<cacheItem, cacheActual>::Resize(unsigned long size, int items) {
     maxCacheSize = size;
-    DebugTrace(typeid(cacheActual).name() << " cache resized to " << size << " bytes");
 
-#ifdef DEBUG_CACHE
-    std::ostringstream stream;
-    stream << "Max cache limit resized to " << size << ", items limit reset to " << items;
-    LOG(stream.str().c_str());
-#endif
+    WGE_LOG_DEBUG("{} cache resized to {} bytes", typeid(cacheActual).name(), size);
+    WGE_LOG_DEBUG("Max cache limit resized to {}, items limit reset to {}", size, items);
 
     if (items > MAX_CACHE_OBJECTS || items < 1)
         maxCached = MAX_CACHE_OBJECTS;
@@ -912,11 +905,11 @@ cacheItem* WCache<cacheItem, cacheActual>::AttemptNew(const string& filename, in
     if (!item->Attempt(filename, submode, mError) || !item->isGood()) {
         // No such file. Fail
         if (mError == CACHE_ERROR_404) {
-            DebugTrace("AttemptNew failed to load. Deleting cache item " << ToHex(item));
+            WGE_LOG_ERROR("AttemptNew failed to load. Deleting cache item {0:#x}", fmt::ptr(item));
             SAFE_DELETE(item);
             return NULL;
         } else {
-            DebugTrace("AttemptNew failed to load (not a 404 error). Deleting cache item " << ToHex(item));
+            WGE_LOG_ERROR("failed to load (not a 404 error). Deleting cache item {0:#x}", fmt::ptr(item));
             SAFE_DELETE(item);
             mError = CACHE_ERROR_BAD;
             return NULL;
@@ -1077,17 +1070,12 @@ cacheItem* WCache<cacheItem, cacheActual>::LoadIntoCache(int id, const string& f
         if (mError == CACHE_ERROR_404 || item) {
             std::lock_guard<wge::mutex> lock(sCacheMutex);
             cache[id] = item;
-            DebugTrace("inserted item ptr " << ToHex(item) << " at index " << id);
+            WGE_LOG_ERROR("inserted item ptr {#x} at index {}", fmt::ptr(item), id);
         }
     }
 
     if (item == NULL) {
-        DebugTrace("Can't locate ");
-        if (submode & TEXTURE_SUB_THUMB) {
-            DebugTrace("thumbnail ");
-        }
-        DebugTrace(filename);
-
+        WGE_LOG_ERROR("Can't locate {}", filename);
         return NULL;  // Failure
     }
 
@@ -1101,12 +1089,8 @@ cacheItem* WCache<cacheItem, cacheActual>::LoadIntoCache(int id, const string& f
         cacheSize += isize;
     }
 
-#ifdef DEBUG_CACHE
-    std::ostringstream stream;
-    stream << "Cache insert: " << filename << " " << id << ", cacheItem count: " << cacheItems
-           << ", cacheSize is now: " << cacheSize;
-    LOG(stream.str().c_str());
-#endif
+    WGE_LOG_DEBUG("Cache insert: {} {}, cacheItem count: {}, cacheSize is now: {}", filename, id, cacheItems,
+                  cacheSize);
 
     return item;
 }
@@ -1264,12 +1248,12 @@ bool WCache<cacheItem, cacheActual>::Delete(cacheItem* item) {
     totalSize -= isize;
     cacheSize -= isize;
 #ifdef DEBUG_CACHE
-    if (cacheItems == 0) DebugTrace("cacheItems out of sync.");
+    if (cacheItems == 0) WGE_LOG_WARN("cacheItems out of sync.");
 #endif
 
     cacheItems--;
 
-    DebugTrace("Deleting cache item " << ToHex(item) << ", cache reduced by " << isize << " bytes");
+    WGE_LOG_DEBUG("Deleting cache item {#x}, cache reduced by {} bytes", fmt::ptr(item), isize);
     SAFE_DELETE(item);
     return true;
 }

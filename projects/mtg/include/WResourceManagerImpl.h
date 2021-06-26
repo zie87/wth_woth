@@ -7,7 +7,9 @@
 #include "WResourceManager.h"
 #include "WCachedResource.h"
 #include "WFont.h"
-#include "JLogger.h"
+
+#include <wge/log.hpp>
+
 #include <sstream>
 
 #define HUGE_CACHE_LIMIT 20000000   // Size of the cache for Windows and Linux (in bytes)
@@ -21,9 +23,9 @@
              // (Total Ram - Operational size)
 #define MIN_LINEAR_RAM 1500000
 #ifdef DEBUG_CACHE
-    #define MAX_CACHE_TIME 2000  // The threshold above which we try to prevent nowTime() from looping.
+#define MAX_CACHE_TIME 2000  // The threshold above which we try to prevent nowTime() from looping.
 #else
-    #define MAX_CACHE_TIME 2000000000
+#define MAX_CACHE_TIME 2000000000
 #endif
 
 #define THUMBNAILS_OFFSET 100000000
@@ -82,22 +84,19 @@ protected:
 
     inline bool RequiresOldItemCleanup() {
         if (cacheItems > MAX_CACHE_OBJECTS || cacheItems > maxCached || cacheSize > maxCacheSize) {
-            std::ostringstream stream;
             if (cacheItems > MAX_CACHE_OBJECTS) {
-                stream << "CacheItems exceeded 300, cacheItems = " << cacheItems;
+                WGE_LOG_INFO("CacheItems exceeded 300, cacheItems = {}", cacheItems);
             } else if (cacheItems > maxCached) {
-                stream << "CacheItems (" << cacheItems << ") exceeded arbitrary limit of " << maxCached;
+                WGE_LOG_INFO("CacheItems ( {} ) exceeded arbitrary limit of {}", cacheItems, maxCached);
             } else {
-                stream << "Cache size (" << cacheSize << ") exceeded max value of " << maxCacheSize;
+                WGE_LOG_INFO("Cache size ( {} ) exceeded max value of {}", cacheItems, maxCacheSize);
             }
-
-            LOG(stream.str().c_str());
             return true;
         }
 
 #ifdef PSP
         if (ramAvailableLineareMax() < MIN_LINEAR_RAM) {
-            DebugTrace("Memory below minimum threshold!!");
+            WGE_LOG_WARN("Memory below minimum threshold!!");
             return true;
         }
 #endif

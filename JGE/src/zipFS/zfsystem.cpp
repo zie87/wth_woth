@@ -12,16 +12,15 @@
 #include "stdafx.h"
 #include "zfsystem.h"
 
-// Debug
-#include "../../include/JLogger.h"
-
 #include "fileio.h"  // I/O facilities
 
 #if defined(WIN32)
-    #include <sys/types.h>
+#include <sys/types.h>
 #endif
 
 #include <sys/stat.h>
+
+#include <wge/log.hpp>
 
 namespace zip_file_system {
 
@@ -120,7 +119,7 @@ void filesystem::closeBufferPool() {
     for (size_t i = 0; i < m_Buffers.size(); ++i) {
         if (m_Buffers[i]) {
             if (m_Buffers[i]->buffer && m_Buffers[i]->buffer->is_used()) {
-                LOG("FATAL: File Buffer still in use but need to close");
+                WGE_LOG_FATAL("File Buffer still in use but need to close");
             }
 
             delete m_Buffers[i];
@@ -346,7 +345,7 @@ void filesystem::InsertZip(const char* Filename, const size_t PackID) {
     string ZipPath = m_BasePath + Filename;
 
     // Open zip
-    LOG(("opening zip:" + ZipPath).c_str());
+    WGE_LOG_TRACE("opening zip: {}", ZipPath);
     ifstream File(ZipPath.c_str(), ios::binary);
 
     if (!File) return;
@@ -357,7 +356,7 @@ void filesystem::InsertZip(const char* Filename, const size_t PackID) {
         return;
     }
 
-    LOG("open zip ok");
+    WGE_LOG_TRACE("open zip ok");
 
     // Check every headers within the zip file
     file_header FileHdr;
@@ -386,7 +385,7 @@ void filesystem::InsertZip(const char* Filename, const size_t PackID) {
     // Add zip file to Zips data base (only if not empty)
     if (ZipInfo.m_NbEntries != 0) m_Zips[PackID] = ZipInfo;
 
-    LOG("--zip file loading DONE");
+    WGE_LOG_TRACE("--zip file loading DONE");
 }
 
 bool filesystem::PreloadZip(const char* Filename, map<string, limited_file_info>& target) {

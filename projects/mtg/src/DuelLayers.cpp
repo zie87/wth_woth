@@ -13,6 +13,8 @@
 #include "Trash.h"
 #include "DuelLayers.h"
 
+#include <wge/log.hpp>
+
 void DuelLayers::init(GameObserver* go) {
     observer = go;
     mCardSelector = NEW CardSelector(go, this);
@@ -127,27 +129,6 @@ void DuelLayers::Render() {
 }
 
 int DuelLayers::receiveEvent(WEvent* e) {
-#if 0
-    #define PRINT_IF(type)                                      \
-        {                                                       \
-            type* foo = dynamic_cast<type*>(e);                 \
-            if (foo) cout << "Is a " #type " " << *foo << endl; \
-        }
-    cout << "Received event " << e << " ";
-    PRINT_IF(WEventZoneChange);
-    PRINT_IF(WEventDamage);
-    PRINT_IF(WEventPhaseChange);
-    PRINT_IF(WEventCardUpdate);
-    PRINT_IF(WEventCardTap);
-    PRINT_IF(WEventCreatureAttacker);
-    PRINT_IF(WEventCreatureBlocker);
-    PRINT_IF(WEventCreatureBlockerRank);
-    PRINT_IF(WEventCombatStepChange);
-    PRINT_IF(WEventEngageMana);
-    PRINT_IF(WEventConsumeMana);
-    PRINT_IF(WEventEmptyManaPool);
-#endif
-
     int used = 0;
     for (int i = 0; i < nbitems; ++i) used |= objects[i]->receiveEventPlus(e);
     if (!used) {

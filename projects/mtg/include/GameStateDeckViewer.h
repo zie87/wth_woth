@@ -2,7 +2,6 @@
 #define _GAME_STATE_DECK_VIEWER_H_
 
 #include <math.h>
-#include <iostream>
 
 #include <JGE.h>
 

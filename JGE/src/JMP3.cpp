@@ -4,23 +4,24 @@
 
 #ifdef MP3_SUPPORT
 
-    #include <pspkernel.h>
-    #include <pspdebug.h>
-    #include <stdio.h>
-    #include <pspaudio.h>
-    #include <pspmp3.h>
-    #include <psputility.h>
+#include <pspkernel.h>
+#include <pspdebug.h>
+#include <stdio.h>
+#include <pspaudio.h>
+#include <pspmp3.h>
+#include <psputility.h>
 
-    #include <unistd.h>
+#include <unistd.h>
 
 #else
-    #define PSP_AUDIO_VOLUME_MAX 100
+#define PSP_AUDIO_VOLUME_MAX 100
 #endif
 
 #include "JAudio.h"
 #include "JFileSystem.h"
 #include "JMP3.h"
-#include "JLogger.h"
+
+#include <wge/log.hpp>
 
 JMP3* JMP3::mInstance = NULL;
 bool JMP3::init_done = false;
@@ -36,7 +37,7 @@ JMP3::JMP3() : m_volume(PSP_AUDIO_VOLUME_MAX), m_samplesPlayed(0), m_paused(true
 JMP3::~JMP3() { unload(); }
 
 bool JMP3::loadModules() {
-    JLOG("loading Audio modules");
+    WGE_LOG_TRACE("loading Audio modules");
 #ifdef MP3_SUPPORT
     int loadAvCodec = sceUtilityLoadModule(PSP_MODULE_AV_AVCODEC);
     if (loadAvCodec < 0) {
@@ -47,15 +48,14 @@ bool JMP3::loadModules() {
     if (loadMp3 < 0) {
         return false;
     }
-    JLOG("Audio modules loaded");
+    WGE_LOG_TRACE("Audio modules loaded");
 #endif
     return true;
 }
 
 bool JMP3::fillBuffers() {
-    // JLOG("Start JMP3::fillBuffers");
     if (!init_done) {
-        JLOG("JMP3::fillBuffers called but init_done is false!");
+        WGE_LOG_WARN("called but init_done is false!");
         return false;
     }
 #ifdef MP3_SUPPORT
@@ -85,7 +85,6 @@ bool JMP3::fillBuffers() {
     ret = sceMp3NotifyAddStreamData(m_mp3Handle, readLength);
     if (ret < 0) return false;
 #endif
-    // JLOG("End JMP3::fillBuffers");
     return true;
 }
 int JMP3::GetID3TagSize(char* fname) {
@@ -115,9 +114,9 @@ int JMP3::GetID3TagSize(char* fname) {
 }
 
 bool JMP3::load(const std::string& filename, int inBufferSize, int outBufferSize) {
-    JLOG("Start JMP3::load");
+    WGE_LOG_TRACE("Start");
     if (!init_done) {
-        JLOG("JMP3::load called but init_done is false!");
+        WGE_LOG_WARN("called but init_done is false!");
         return false;
     }
 #ifdef MP3_SUPPORT
@@ -141,7 +140,7 @@ bool JMP3::load(const std::string& filename, int inBufferSize, int outBufferSize
             m_fileName[len++] = '/';
             strcpy(m_fileName + len, filename.c_str());
         } else {
-            m_fileName[0] = NULL;
+            m_fileName[0] = '\0';
         }
     }
 
@@ -178,14 +177,14 @@ bool JMP3::load(const std::string& filename, int inBufferSize, int outBufferSize
     m_samplingRate = sceMp3GetSamplingRate(m_mp3Handle);
 #endif
 
-    JLOG("End JMP3::load");
+    WGE_LOG_TRACE("End");
     return true;
 }
 
 bool JMP3::unload() {
-    JLOG("Start JMP3::unload");
+    WGE_LOG_TRACE("Start");
     if (!init_done) {
-        JLOG("JMP3::unload called but init_done is false!");
+        WGE_LOG_WARN("called but init_done is false!");
         return false;
     }
 #ifdef MP3_SUPPORT
@@ -198,10 +197,9 @@ bool JMP3::unload() {
     sceIoClose(m_fileHandle);
 
     // delete[] m_inBuffer;
-
     // delete[] m_outBuffer;
 #endif
-    JLOG("End JMP3::unload");
+    WGE_LOG_TRACE("End");
     return true;
 }
 
@@ -265,16 +263,16 @@ bool JMP3::play() { return (m_paused = false); }
 bool JMP3::pause() { return (m_paused = true); }
 
 bool JMP3::setLoop(bool loop) {
-    JLOG("Start JMP3::setLoop");
+    WGE_LOG_TRACE("Start");
     if (!init_done) {
-        JLOG("JMP3::setLoop called but init_done is false!");
+        WGE_LOG_WARN("JMP3::setLoop called but init_done is false!");
         return false;
     }
 #ifdef MP3_SUPPORT
     sceMp3SetLoopNum(m_mp3Handle, (loop == true) ? -1 : 0);
 #endif
     return (m_loop = loop);
-    JLOG("End JMP3::setLoop");
+    WGE_LOG_TRACE("End");
 }
 
 int JMP3::setVolume(int volume) { return (m_volume = volume); }

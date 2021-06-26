@@ -3,6 +3,8 @@
 #include "AbilityParser.h"
 #include "utils.h"
 
+#include <wge/log.hpp>
+
 using std::string;
 using std::vector;
 
@@ -18,7 +20,7 @@ void AutoLineMacro::parse(const string& stringMacro) {
 
     size_t firstSpace = s.find(" ");
     if (firstSpace == string::npos) {
-        DebugTrace("FATAL:error parsing macro : " << s);
+        WGE_LOG_ERROR("error parsing macro : {}", s);
         return;
     }
 
@@ -80,7 +82,7 @@ string AutoLineMacro::process(const string& s) {
 bool AutoLineMacro::AddMacro(const string& s) {
     AutoLineMacro* alm = NEW AutoLineMacro(s);
     if (gAutoLineMacrosIndex[alm->mName]) {
-        DebugTrace("WARNING, Macro already exists: " << alm->mName);
+        WGE_LOG_WARN("Macro already exists: {}", alm->mName);
         delete alm;
         return false;
     }

@@ -17,15 +17,16 @@
 #include "PlayerData.h"
 #include "utils.h"
 #include "WFont.h"
-#include <JLogger.h>
 #include "Rules.h"
 #include "ModRules.h"
 #include "Credits.h"
 #include "AIPlayer.h"
 
 #ifdef NETWORK_SUPPORT
-    #include <JNetwork.h>
+#include <JNetwork.h>
 #endif  // NETWORK_SUPPORT
+
+#include <wge/log.hpp>
 
 static const char* GAME_VERSION = "WTH?! " WAGIC_VERSION_STRING " - wololo.net";
 
@@ -112,7 +113,6 @@ void GameStateMenu::Destroy() {
 }
 
 void GameStateMenu::Start() {
-    LOG("GameStateMenu::Start");
     JRenderer::GetInstance()->EnableVSync(true);
     subMenuController = NULL;
     SAFE_DELETE(mGuiController);
@@ -297,7 +297,6 @@ void GameStateMenu::setLang(int id) {
 }
 
 void GameStateMenu::loadLangMenu() {
-    LOG("GameStateMenu::loadLangMenu");
     subMenuController = NEW SimpleMenu(JGE::GetInstance(), MENU_LANGUAGE_SELECTION, this, Fonts::MENU_FONT, 150, 60);
     if (!subMenuController) return;
 
@@ -324,15 +323,13 @@ void GameStateMenu::loadLangMenu() {
             subMenuController->Add(langs.size(), lang.c_str());
         }
     }
-    LOG("GameStateMenu::loadLangMenu - Done");
 }
 
 void GameStateMenu::listPrimitives() {
-    LOG("GameStateMenu::listPrimitives");
     vector<string> primitiveFiles = JFileSystem::GetInstance()->scanfolder("sets/primitives/");
 
     if (!primitiveFiles.size()) {
-        DebugTrace("GameStateMenu.cpp:WARNING:Primitives folder is missing");
+        WGE_LOG_WARN("Primitives folder is missing!");
         primitivesLoadCounter = 0;
         return;
     }
@@ -345,7 +342,6 @@ void GameStateMenu::listPrimitives() {
         primitives.push_back(filename);
     }
     primitivesLoadCounter = 0;
-    LOG("GameStateMenu::listPrimitives - Done");
 }
 
 void GameStateMenu::ensureMGuiController() {
@@ -414,8 +410,7 @@ void GameStateMenu::Update(float dt) {
 #if _DEBUG
             int endTime = JGEGetTime();
             int elapsedTime = (endTime - startTime);
-            DebugTrace("Time elapsed while loading " << primitives[primitivesLoadCounter] << " : " << elapsedTime
-                                                     << " ms");
+            WGE_LOG_DEBUG("Time elapsed while loading {} : {} ms", primitives[primitivesLoadCounter], elapsedTime);
 #endif
 
             primitivesLoadCounter++;
@@ -431,11 +426,11 @@ void GameStateMenu::Update(float dt) {
             // Remove temporary translations
             Translator::GetInstance()->tempValues.clear();
 
-            DebugTrace(std::endl
-                       << "==" << std::endl
-                       << "Total MTGCards: " << MTGCollection()->collection.size() << std::endl
-                       << "Total CardPrimitives: " << MTGCollection()->primitives.size() << std::endl
-                       << "==");
+            WGE_LOG_DEBUG("=======================");
+            WGE_LOG_DEBUG("Total MTGCards: {}", MTGCollection()->collection.size());
+            WGE_LOG_DEBUG("Total CardPrimitives: {}", MTGCollection()->primitives.size());
+            ;
+            WGE_LOG_DEBUG("=======================");
 
             // Force default, if necessary.
             if (options[Options::ACTIVE_PROFILE].str == "") options[Options::ACTIVE_PROFILE].str = "Default";
@@ -579,7 +574,7 @@ void GameStateMenu::RenderTopMenu() {
             rightTextPos -= 64;
             break;
         default:
-            DebugTrace("not supported yet!");
+            WGE_LOG_WARN("not supported yet!");
             break;
         }
     }
@@ -652,7 +647,7 @@ void GameStateMenu::Render() {
 }
 
 void GameStateMenu::ButtonPressed(int controllerId, int controlId) {
-    DebugTrace("GameStateMenu: controllerId " << controllerId << " selected");
+    WGE_LOG_TRACE("controllerId {} selected", controllerId);
     switch (controllerId) {
     case MENU_LANGUAGE_SELECTION:
         if (controlId == kInfoMenuID) break;

@@ -6,7 +6,6 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-#include <iostream>
 #include "PrecompiledHeader.h"
 
 #include "InteractiveButton.h"

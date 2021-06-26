@@ -8,7 +8,6 @@
 //
 //-------------------------------------------------------------------------------------
 
-#include <iostream>
 #include <map>
 #include <set>
 #include <limits>
@@ -23,7 +22,7 @@
 
 //////////////////////////////////////////////////////////////////////////
 #if defined(WIN32)  // WIN32 specific code
-    #include "../../Dependencies/include/fmod.h"
+#include "../../Dependencies/include/fmod.h"
 
 u8 JGE::GetAnalogX() {
     if (GetButtonState(JGE_BTN_LEFT)) return 0;
@@ -38,10 +37,10 @@ u8 JGE::GetAnalogY() {
 }
 
 #elif defined(LINUX)  // Unix specific code
-    #include <sys/time.h>
-    #ifdef WITH_FMOD
-        #include "../Dependencies/include/fmod.h"
-    #endif  // WITH_FMOD
+#include <sys/time.h>
+#ifdef WITH_FMOD
+#include "../Dependencies/include/fmod.h"
+#endif  // WITH_FMOD
 
 u8 JGE::GetAnalogX() {
     if (GetButtonState(JGE_BTN_LEFT)) return 0;
@@ -274,11 +273,11 @@ JGE::~JGE() {
 // PSP Specific code
 
 void JGE::Init() {
-    #ifdef DEBUG_PRINT
+#ifdef DEBUG_PRINT
     mDebug = true;
-    #else
+#else
     mDebug = false;
-    #endif
+#endif
 
     if (mDebug) pspDebugScreenInit();  // do this so that we can use pspDebugScreenPrintf
 

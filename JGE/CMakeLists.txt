@@ -4,7 +4,6 @@
 #########################################################################
 find_package(ZLIB REQUIRED)
 find_package(PNG REQUIRED)
-find_package(JPEG REQUIRED)
 
 if(DEFINED PSP)
     set(DEPENDENCIES_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/psp")
@@ -105,7 +104,6 @@ target_sources(jge300
         ${CMAKE_CURRENT_SOURCE_DIR}/src/JGE.cpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/JGui.cpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/JLBFont.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/JLogger.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/JGameObject.cpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/JSpline.cpp src/JAnimator.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/JResourceManager.cpp 
@@ -140,7 +138,6 @@ target_sources(jge300
         ${CMAKE_CURRENT_SOURCE_DIR}/src/JMP3.cpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/decoder_prx.c 
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/vram.c
     )
 endif()
 
@@ -169,10 +166,9 @@ target_link_libraries(jge300
         WotH::hge
         WotH::wge
         WotH::freetype
-        JPEG::JPEG
-        PNG::PNG
         ZLIB::ZLIB
     PRIVATE
+        PNG::PNG
         WotH::options
 )
 

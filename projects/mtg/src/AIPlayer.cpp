@@ -9,8 +9,10 @@
 #include "AIPlayerBaka.h"
 
 #ifdef AI_CHANGE_TESTING
-    #include "AIPlayerBakaB.h"
+#include "AIPlayerBakaB.h"
 #endif
+
+#include <wge/log.hpp>
 
 int AIPlayer::totalAIDecks = -1;
 
@@ -124,12 +126,12 @@ int AIPlayer::clickMultiTarget(TargetChooser* tc, vector<Targetable*>& potential
                                          // "confirming click".
         {
             clickstream.push(NEW AIAction(this, card));
-            DebugTrace("Ai clicked source as a target: " << (card ? card->name : "None") << std::endl);
+            WGE_LOG_TRACE("Ai clicked source as a target: {}", (card ? card->name : "None"));
             ite = potentialTargets.erase(ite);
             continue;
         } else if (Player* pTarget = dynamic_cast<Player*>(*ite)) {
             clickstream.push(NEW AIAction(this, pTarget));
-            DebugTrace("Ai clicked Player as a target");
+            WGE_LOG_TRACE("Ai clicked Player as a target");
             ite = potentialTargets.erase(ite);
             continue;
         }
@@ -168,7 +170,7 @@ AIPlayer* AIPlayerFactory::createAIPlayer(GameObserver* observer, MTGAllCards* c
 
     if (deckid == GameStateDuel::MENUITEM_EVIL_TWIN) {  // Evil twin
         sprintf(deckFile, "%s", opponent->deckFile.c_str());
-        DebugTrace("Evil Twin => " << opponent->deckFile);
+        WGE_LOG_TRACE("Evil Twin => {}", opponent->deckFile);
         avatarFilename = "avatar.jpg";
         sprintf(deckFileSmall, "%s", "ai_baka_eviltwin");
     } else {

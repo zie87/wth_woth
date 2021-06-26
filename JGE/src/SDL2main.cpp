@@ -2,7 +2,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #ifdef WIN32
-    #undef GL_VERSION_2_0
+#undef GL_VERSION_2_0
 #endif
 
 #include "JGE.h"
@@ -11,18 +11,18 @@
 #include "JFileSystem.h"
 #include "JRenderer.h"
 #include "JGameLauncher.h"
-#include "DebugRoutines.h"
+
+#include <wge/log.hpp>
 
 #include <stdexcept>
-#include <iostream>
 #include <math.h>
 
 #if (defined FORCE_GLES)
-    #undef GL_ES_VERSION_2_0
-    #undef GL_VERSION_2_0
-    #define GL_VERSION_ES_CM_1_1 1
-    #define glOrthof glOrtho
-    #define glClearDepthf glClearDepth
+#undef GL_ES_VERSION_2_0
+#undef GL_VERSION_2_0
+#define GL_VERSION_ES_CM_1_1 1
+#define glOrthof glOrtho
+#define glClearDepthf glClearDepth
 #endif
 
 #define ACTUAL_SCREEN_WIDTH (SCREEN_WIDTH)
@@ -103,7 +103,7 @@ public:
     bool OnInit();
 
     void OnResize(int width, int height) {
-        DebugTrace("OnResize Width " << width << " height " << height);
+        WGE_LOG_DEBUG("width {} height {}", width, height);
 
         if ((GLfloat)width / (GLfloat)height <= ACTUAL_RATIO) {
             viewPort.x = 0;
@@ -128,11 +128,11 @@ public:
         glMatrixMode(GL_PROJECTION);  // Select The Projection Matrix
         glLoadIdentity();             // Reset The Projection Matrix
 
-    #if (defined GL_VERSION_ES_CM_1_1)
+#if (defined GL_VERSION_ES_CM_1_1)
         glOrthof(0.0f, (float)(viewPort.w) - 1.0f, 0.0f, (float)(viewPort.h) - 1.0f, -1.0f, 1.0f);
-    #else
+#else
         gluOrtho2D(0.0f, (float)(viewPort.w) - 1.0f, 0.0f, (float)(viewPort.h) - 1.0f);
-    #endif
+#endif
         glMatrixMode(GL_MODELVIEW);  // Select The Modelview Matrix
         glLoadIdentity();            // Reset The Modelview Matrix
 
@@ -194,19 +194,18 @@ public:
         case SDL_FINGERMOTION:
         case SDL_FINGERDOWN:
         case SDL_FINGERUP:
-            DebugTrace("Finger Up/Down/Motion detected:");
+            WGE_LOG_DEBUG("Finger Up/Down/Motion detected:");
             OnTouchEvent(Event->tfinger);
             break;
 
         case SDL_MULTIGESTURE:
-            DebugTrace("Multigesture : touchId " << Event->mgesture.touchId << ", x " << Event->mgesture.x << ", y "
-                                                 << Event->mgesture.y << ", dTheta " << Event->mgesture.dTheta
-                                                 << ", dDist " << Event->mgesture.dDist << ", numFingers "
-                                                 << Event->mgesture.numFingers);
+            WGE_LOG_DEBUG("Multigesture : touchId {}, x {}, y {}, dTheta {}, dDist {}, numFingers {}",
+                          Event->mgesture.touchId, Event->mgesture.x, Event->mgesture.y, Event->mgesture.dTheta,
+                          Event->mgesture.dDist, Event->mgesture.numFingers);
             break;
 
         case SDL_JOYBALLMOTION:
-            DebugTrace("Flick gesture detected, x: " << Event->jball.xrel << ", y: " << Event->jball.yrel);
+            WGE_LOG_DEBUG("Flick gesture detected, x: {}, y: {}", Event->jball.xrel, Event->jball.yrel);
             g_engine->Scroll(Event->jball.xrel, Event->jball.yrel);
             break;
         }
@@ -468,21 +467,18 @@ void SdlApp::OnTouchEvent(const SDL_TouchFingerEvent& event) {
 }
 
 bool SdlApp::OnInit() {
-    int window_w, window_h;
+    WGE_LOG_TRACE("init started");
 
-    DebugTrace("I R in da OnInit()");
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         return false;
     }
 
     SDL_DisplayMode currentDisplayMode;
     SDL_GetCurrentDisplayMode(0, &currentDisplayMode);
-    DebugTrace("Video Display : h " << currentDisplayMode.h << ", w " << currentDisplayMode.w);
+    WGE_LOG_DEBUG("Video Display : h {}, w {}", currentDisplayMode.h, currentDisplayMode.w);
 
-    window_w = SCREEN_WIDTH;
-    window_h = SCREEN_HEIGHT;
-
-    int buffers, samples;
+    int window_w = SCREEN_WIDTH;
+    int window_h = SCREEN_HEIGHT;
 
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
@@ -500,6 +496,7 @@ bool SdlApp::OnInit() {
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 2);
 
+    int buffers, samples;
     SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &buffers);
     SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &samples);
     if (buffers == 0 || samples == 0) {  // no multisampling available
@@ -517,7 +514,7 @@ bool SdlApp::OnInit() {
     window = SDL_CreateWindow(g_launcher->GetName(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_w,
                               window_h, flags);
     if (window == NULL) {
-        DebugTrace(SDL_GetError());
+        WGE_LOG_ERROR( "SDL Error: {}", SDL_GetError());
         return false;
     }
 
@@ -526,21 +523,21 @@ bool SdlApp::OnInit() {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);  // Black Background (yes that's the way fuckers)
 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
-    #if (defined GL_ES_VERSION_2_0)
+#if (defined GL_ES_VERSION_2_0)
     glClearDepthf(1.0f);  // Depth Buffer Setup
-    #else
+#else
     glClearDepth(1.0f);  // Depth Buffer Setup
-    #endif  // (defined GL_ES_VERSION_2_0)
+#endif  // (defined GL_ES_VERSION_2_0)
 
     glDepthFunc(GL_LEQUAL);   // The Type Of Depth Testing (Less Or Equal)
     glEnable(GL_DEPTH_TEST);  // Enable Depth Testing
 
 #else
-    #if (defined GL_VERSION_ES_CM_1_1)
+#if (defined GL_VERSION_ES_CM_1_1)
     glClearDepthf(1.0f);                                // Depth Buffer Setup
-    #else
+#else
     glClearDepth(1.0f);  // Depth Buffer Setup
-    #endif
+#endif
     glDepthFunc(GL_LEQUAL);                             // The Type Of Depth Testing (Less Or Equal)
     glEnable(GL_DEPTH_TEST);                            // Enable Depth Testing
     glShadeModel(GL_SMOOTH);                            // Select Smooth Shading
@@ -563,7 +560,7 @@ bool SdlApp::OnInit() {
     JGECreateDefaultBindings();
 
     if (!InitGame()) {
-        std::cerr << "Could not init the game\n";
+        WGE_LOG_FATAL("Could not init the game");
         return false;
     }
 
@@ -573,8 +570,6 @@ bool SdlApp::OnInit() {
 };
 
 int main(int argc, char* argv[]) {
-    DebugTrace("I R in da native");
-
     g_launcher = new JGameLauncher();
 
     u32 flags = g_launcher->GetInitFlags();
@@ -588,11 +583,8 @@ int main(int argc, char* argv[]) {
     int result = g_SdlApp->OnExecute();
 
     if (g_launcher) delete g_launcher;
-
     if (g_SdlApp) delete g_SdlApp;
 
-    // Shutdown
     DestroyGame();
-
     return result;
 }

@@ -10,8 +10,10 @@
 #include "Rules.h"
 #include "Token.h"
 
+#include <wge/log.hpp>
+
 #if defined(WIN32) || defined(LINUX)
-    #include <time.h>
+#include <time.h>
 #endif
 //------------------------------
 // Players Game
@@ -195,7 +197,7 @@ void MTGPlayerCards::drawFromLibrary() {
     // if we're not in text mode, always get the thumb
     if (library->owner->getObserver()->getCardSelector()->GetDrawMode() != DrawMode::kText &&
         library->owner->getObserver()->getResourceManager()) {
-        DebugTrace("Prefetching AI card going into play: " << toMove->getImageName());
+        WGE_LOG_TRACE("Prefetching AI card going into play: {}", toMove->getImageName());
         library->owner->getObserver()->getResourceManager()->RetrieveCard(toMove, RETRIEVE_THUMB);
 
         // also cache the large image if we're using kNormal mode
@@ -935,7 +937,9 @@ MTGGameZone* MTGGameZone::stringToZone(GameObserver* g, string zoneName, MTGCard
 
 std::ostream& MTGGameZone::toString(std::ostream& out) const { return out << "Unknown zone"; }
 std::ostream& MTGLibrary::toString(std::ostream& out) const { return out << "Library " << owner->getDisplayName(); }
-std::ostream& MTGGraveyard::toString(std::ostream& out) const { return out << "Graveyard " << owner->getDisplayName(); }
+std::ostream& MTGGraveyard::toString(std::ostream& out) const {
+    return out << "Graveyard " << owner->getDisplayName();
+}
 std::ostream& MTGHand::toString(std::ostream& out) const { return out << "Hand " << owner->getDisplayName(); }
 std::ostream& MTGRemovedFromGame::toString(std::ostream& out) const {
     return out << "RemovedFromGame " << owner->getDisplayName();
@@ -994,7 +998,7 @@ bool MTGGameZone::parseLine(const string& ss) {
                 addCard(myToken);
                 result = true;
             } else {
-                DebugTrace("Card unfound " << toFind << " " << id);
+                WGE_LOG_TRACE("Card unfound {} {}", toFind, id);
             }
         }
     }

@@ -17,6 +17,7 @@ set(WOTH_CMAKE_MODULES_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/modules)
 list(APPEND CMAKE_MODULE_PATH ${WOTH_CMAKE_MODULES_PATH})
 
 add_library(woth_options INTERFACE)
+target_compile_options(woth_options INTERFACE "$<$<CONFIG:DEBUG>:-DWOTH_DEBUG>")
 target_compile_options(woth_options INTERFACE "$<$<CONFIG:DEBUG>:-D_DEBUG>")
 target_compile_options(woth_options INTERFACE "$<$<CONFIG:RELEASE>:-O2>")
 

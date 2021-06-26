@@ -6,7 +6,6 @@
 #include "Rules.h"
 #include "ExtraCost.h"
 #include "Subtypes.h"
-#include <JLogger.h>
 #include <JRenderer.h>
 #include "MTGGamePhase.h"
 #include "GuiPhaseBar.h"
@@ -15,9 +14,12 @@
 #include "Trash.h"
 #include "DeckManager.h"
 #include "GuiCombat.h"
+
 #ifdef TESTSUITE
-    #include "TestSuiteAI.h"
+#include "TestSuiteAI.h"
 #endif
+
+#include <wge/log.hpp>
 
 void GameObserver::cleanup() {
     SAFE_DELETE(targetChooser);
@@ -47,7 +49,8 @@ void GameObserver::cleanup() {
 }
 
 GameObserver::~GameObserver() {
-    LOG("==Destroying GameObserver==");
+    WGE_LOG_TRACE("== Destroying GameObserver ==");
+
     for (size_t i = 0; i < players.size(); ++i) {
         players[i]->End();
     }
@@ -61,7 +64,9 @@ GameObserver::~GameObserver() {
     players.clear();
     delete[] ExtraRules;
     ExtraRules = 0;
-    LOG("==GameObserver Destroyed==");
+
+    WGE_LOG_TRACE("== GameObserver Destroyed ==");
+
     SAFE_DELETE(mTrash);
     SAFE_DELETE(mDeckManager);
 }
@@ -203,7 +208,7 @@ void GameObserver::nextGamePhase() {
     // Phase Specific actions
     switch (currentGamePhase) {
     case MTG_PHASE_UNTAP:
-        DebugTrace("Untap Phase -------------   Turn " << turn);
+        WGE_LOG_TRACE("Untap Phase -------------   Turn: {}", turn);
         untapPhase();
         break;
     case MTG_PHASE_COMBATBLOCKERS:
@@ -279,13 +284,13 @@ void GameObserver::userRequestNextGamePhase(bool allowInterrupt, bool log) {
 
 void GameObserver::shuffleLibrary(Player* p) {
     if (!p) {
-        DebugTrace("FATAL: No Player To Shuffle");
+        WGE_LOG_ERROR("No Player To Shuffle");
         return;
     }
     logAction(p, "shufflelib");
     MTGLibrary* library = p->game->library;
     if (!library) {
-        DebugTrace("FATAL: Player has no zones");
+        WGE_LOG_ERROR("Player has no zones");
         return;
     }
     library->shuffle();
@@ -316,8 +321,7 @@ void GameObserver::resetStartupGame() {
     startupGameSerialized = "";
     stream << *this;
     startupGameSerialized = stream.str();
-    DebugTrace("startGame\n");
-    DebugTrace(startupGameSerialized);
+    WGE_LOG_TRACE("start game: {} ", startupGameSerialized);
 }
 
 void GameObserver::startGame(GameType gtype, Rules* rules) {
@@ -859,7 +863,7 @@ void GameObserver::Render() {
 }
 
 void GameObserver::ButtonPressed(PlayGuiObject* target) {
-    DebugTrace("GAMEOBSERVER Click");
+    WGE_LOG_TRACE("GAMEOBSERVER Click");
     if (CardView* cardview = dynamic_cast<CardView*>(target)) {
         MTGCardInstance* card = cardview->getCard();
         cardClick(card, card);
@@ -1231,7 +1235,7 @@ bool GameObserver::load(const string& ss, bool undo
     std::string s;
     std::stringstream stream(ss);
 
-    DebugTrace("Loading " + ss);
+    WGE_LOG_TRACE("Loading {}", ss);
     randomGenerator.loadRandValues("");
 
     cleanup();
@@ -1464,7 +1468,7 @@ void GameObserver::logAction(const string& s) {
 bool GameObserver::undo() {
     std::stringstream stream;
     stream << *this;
-    DebugTrace(stream.str());
+    WGE_LOG_DEBUG("{}", stream.str());
     return load(stream.str(), true);
 }
 

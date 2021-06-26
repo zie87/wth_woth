@@ -18,8 +18,6 @@
 #include <pspdebug.h>
 #include <pspdisplay.h>
 
-#include "JLogger.h"
-
 #include <sstream>
 
 #ifdef __cplusplus
@@ -40,6 +38,8 @@ extern "C" {
 #include <wge/video/pixel_format.hpp>
 #include <wge/video/image_loader.hpp>
 #include <wge/video/utils.hpp>
+
+#include <wge/log.hpp>
 
 #include <utility>
 
@@ -461,11 +461,11 @@ void JRenderer::PlotArray(float* x, float* y, int count, PIXEL_TYPE color) {
 //		v3---v4
 void JRenderer::RenderQuad(JQuad* quad, float xo, float yo, float angle, float xScale, float yScale) {
     if (quad == NULL) {
-        JLOG("JRenderer::RenderQuad: NULL quad pointer!");
+        WGE_LOG_WARN("NULL quad pointer!");
         return;
     }
     if (quad->mTex == NULL) {
-        JLOG("JRenderer::RenderQuad:: invalid texture!");
+        WGE_LOG_WARN("invalid texture!");
         return;
     }
 
@@ -804,7 +804,7 @@ JTexture* JRenderer::LoadTexture(const char* filename, int mode, int textureMode
 
     auto* fileSystem = JFileSystem::GetInstance();
     if (!fileSystem->OpenFile(filename)) {
-        printf("Texture %s failed to open\n", filename);
+        WGE_LOG_ERROR("could not open {}", filename);
         return nullptr;
     }
 
@@ -815,7 +815,7 @@ JTexture* JRenderer::LoadTexture(const char* filename, int mode, int textureMode
     fileSystem->CloseFile();
 
     if (!data.pixels) {
-        printf("Texture %s failed to load\n", filename);
+        WGE_LOG_ERROR("could not load {}", filename);
         return nullptr;
     }
 
@@ -837,7 +837,7 @@ JTexture* JRenderer::LoadTexture(const char* filename, int mode, int textureMode
         tex->mBits = reinterpret_cast<PIXEL_TYPE*>(data.pixels.release());
     }
 
-    JLOG("-- OK  -- JRenderer::LoadTexture");
+    WGE_LOG_TRACE("-- OK  --");
     return tex;
 }
 

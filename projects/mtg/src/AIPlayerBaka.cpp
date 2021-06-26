@@ -10,9 +10,7 @@
 #include "ManaCostHybrid.h"
 #include "MTGRules.h"
 
-//
-// AIAction
-//
+#include <wge/log.hpp>
 
 Player* OrderedAIAction::getPlayerTarget() {
     if (playerAbilityTarget) return (Player*)playerAbilityTarget;
@@ -74,7 +72,7 @@ int OrderedAIAction::getEfficiency() {
         }
     }
     if (!a) {
-        DebugTrace("FATAL: Ability is NULL in AIAction::getEfficiency()");
+        WGE_LOG_FATAL("Ability is NULL in AIAction::getEfficiency()");
         return 0;
     }
 
@@ -375,9 +373,9 @@ int OrderedAIAction::getEfficiency() {
     case MTGAbility::STANDARD_DRAW: {
         AADrawer* drawer = (AADrawer*)a;
         // adding this case since i played a few games where Ai litterally decided to mill himself to death. fastest
-        // and easiest win ever. this should help a little, tho ultimately it will be decided later what the best course
-        // of action is. eff of drawing ability is calculated by base 20 + the amount of cards in library minus the
-        // amount of cards in hand times 7. drawing is never going to return a hundred eff because later eff is
+        // and easiest win ever. this should help a little, tho ultimately it will be decided later what the best
+        // course of action is. eff of drawing ability is calculated by base 20 + the amount of cards in library minus
+        // the amount of cards in hand times 7. drawing is never going to return a hundred eff because later eff is
         // multiplied by 1.3 if no cards in hand.
         efficiency = int(20 + p->game->library->nb_cards) - int(p->game->hand->nb_cards * 7);
         if (p->game->hand->nb_cards > 8)  // reduce by 50 if cards in hand are over 8, high chance ai cant play them.
@@ -554,13 +552,11 @@ MTGCardInstance* AIPlayerBaka::chooseCard(TargetChooser* tc, MTGCardInstance* so
 }
 
 bool AIPlayerBaka::payTheManaCost(ManaCost* cost, MTGCardInstance* target, vector<MTGAbility*> gotPayments) {
-    DebugTrace("AIPlayerBaka: AI attempting to pay a mana cost." << std::endl
-                                                                 << "-  Target: " << (target ? target->name : "None")
-                                                                 << std::endl
-                                                                 << "-  Cost: " << (cost ? cost->toString() : "NULL"));
+    WGE_LOG_TRACE("AI attempting to pay a mana cost. Target: \"{}\" - Cost: {}", (target ? target->name : "None"),
+                  (cost ? cost->toString() : "NULL"));
 
     if (!cost) {
-        DebugTrace("AIPlayerBaka: Mana cost is NULL.  ");
+        WGE_LOG_DEBUG("Mana cost is NULL.");
         return false;
     }
 
@@ -583,14 +579,14 @@ bool AIPlayerBaka::payTheManaCost(ManaCost* cost, MTGCardInstance* target, vecto
     }
 
     if (!cost->getConvertedCost()) {
-        DebugTrace("AIPlayerBaka: Card or Ability was free to play.  ");
+        WGE_LOG_TRACE("Card or Ability was free to play.");
         if (!cost->hasX())  // don't return true if it contains {x} but no cost, locks ai in a loop. ie oorchi hatchery
                             // cost {x}{x} to play.
             return true;
         // return true if cost does not contain "x" becuase we don't need to do anything with a cost of 0;
     }
     if (gotPayments.size()) {
-        DebugTrace("AIPlayerBaka: Ai had a payment in mind.");
+        WGE_LOG_TRACE("Ai had a payment in mind.");
         ManaCost* paid = NEW ManaCost();
         vector<AIAction*> clicks;
 
@@ -627,9 +623,8 @@ bool AIPlayerBaka::payTheManaCost(ManaCost* cost, MTGCardInstance* target, vecto
 
     // Didn't have a payment in mind if we reach this point
     // pMana is our main payment form, it is far faster then direct search.
-    DebugTrace(
-        "AIPlayerBaka: the Mana was already in the manapool or could be Paid with potential mana, using potential "
-        "Mana now.");
+    WGE_LOG_TRACE(
+        "the Mana was already in the manapool or could be Paid with potential mana, using potential Mana now.");
 
     ManaCost* pMana = getPotentialMana(target);
     if (!pMana) return false;
@@ -764,9 +759,9 @@ vector<MTGAbility*> AIPlayerBaka::canPayMana(MTGCardInstance* target, ManaCost* 
                 if (amp) {
                     MTGCardInstance* fecard = gmp->source;
                     if (fecard == target) used[fecard] = true;  // http://code.google.com/p/wagic/issues/detail?id=76
-                    if (gmp->getCost() &&
-                        gmp->getCost()->getConvertedCost() > 0) {  // ai stil can't use cabal coffers and mana
-                                                                   // abilities which require mana payments effectively;
+                    if (gmp->getCost() && gmp->getCost()->getConvertedCost() >
+                                              0) {  // ai stil can't use cabal coffers and mana
+                                                    // abilities which require mana payments effectively;
                         used[fecard];
                         continue;
                     }
@@ -1070,7 +1065,7 @@ int AIPlayerBaka::selectHintAbility() {
     if (action && ((randomGenerator.random() % 100) < 95))  // 95% chance
     {
         if (!clickstream.size()) {
-            DebugTrace("AIPlayer:Using Activated ability");
+            WGE_LOG_TRACE("using activated ability");
             if (payTheManaCost(action->ability->getCost(), action->click)) {
                 clickstream.push(action);
                 SAFE_DELETE(totalPotentialMana);
@@ -1152,9 +1147,9 @@ int AIPlayerBaka::selectAbility() {
         if (actionScore >= chance) {
             if (!clickstream.size()) {
                 if (abilityPayment.size()) {
-                    DebugTrace(" Ai knows exactly what mana to use for this ability.");
+                    WGE_LOG_TRACE("Ai knows exactly what mana to use for this ability.");
                 }
-                DebugTrace("AIPlayer:Using Activated ability");
+                WGE_LOG_TRACE("using activated ability");
                 if (payTheManaCost(action.ability->getCost(), action.click, abilityPayment))
                     clickstream.push(NEW AIAction(action));
             }
@@ -1203,7 +1198,7 @@ int AIPlayerBaka::chooseTarget(TargetChooser* _tc, Player* forceTarget, MTGCardI
         // this is a hack, but if we hit this condition we are locked in a infinate loop
         // so lets give the tc to its owner
         // todo:find the root cause of this.
-        DebugTrace("AIPLAYER: Error, was asked to chose targets but I don't own the source of the targetController\n");
+        WGE_LOG_ERROR("was asked to chose targets but I don't own the source of the targetController");
         return 0;
     }
     Player* target = forceTarget;
@@ -1288,8 +1283,8 @@ int AIPlayerBaka::chooseTarget(TargetChooser* _tc, Player* forceTarget, MTGCardI
     // land you own to your hand) so we try again to choose a target in the other player's field...
     int cancel = observer->cancelCurrentAction();
     if (!cancel && !forceTarget) return chooseTarget(tc, target->opponent(), NULL, checkOnly);
-    // ERROR!!!
-    DebugTrace("AIPLAYER: ERROR! AI needs to choose a target but can't decide!!!");
+
+    WGE_LOG_ERROR("AI needs to choose a target but can't decide!!!");
     return 1;
 }
 
@@ -1444,8 +1439,8 @@ MTGCardInstance* AIPlayerBaka::FindCardToPlay(ManaCost* pMana, const char* type)
                                                 card->getManaCost()->kicker->getConvertedCost()));
                 if (shouldPlayPercentage <= 10) shouldPlayPercentage = shouldPlayPercentage / 3;
             }
-            DebugTrace("Should I play " << (card ? card->name : "Nothing") << "?" << std::endl
-                                        << "shouldPlayPercentage = " << shouldPlayPercentage);
+            WGE_LOG_TRACE("Should I play {}? shouldPlayPercentage = {}", (card ? card->name : "Nothing"),
+                          shouldPlayPercentage);
             if (card->getRestrictions().size()) {
                 AbilityFactory af(observer);
                 int canPlay = af.parseCastRestrictions(card, card->controller(), card->getRestrictions());
@@ -1455,7 +1450,7 @@ MTGCardInstance* AIPlayerBaka::FindCardToPlay(ManaCost* pMana, const char* type)
             int chance = randomChance % 100;
             if (chance > shouldPlayPercentage) continue;
             if (shouldPlayPercentage <= 10) {
-                DebugTrace("shouldPlayPercentage was less than 10 this was a lottery roll on RNG");
+                WGE_LOG_TRACE("shouldPlayPercentage was less than 10 this was a lottery roll on RNG");
             }
             nextCardToPlay = card;
             maxCost = currentCost;
@@ -1465,9 +1460,8 @@ MTGCardInstance* AIPlayerBaka::FindCardToPlay(ManaCost* pMana, const char* type)
     if (nextCardToPlay) {
         if (!pMana->canAfford(nextCardToPlay->getManaCost()) || nextCardToPlay->getManaCost()->kicker)
             gotPayments = canPayMana(nextCardToPlay, nextCardToPlay->getManaCost());
-        DebugTrace(" AI wants to play card."
-                   << std::endl
-                   << "- Next card to play: " << (nextCardToPlay ? nextCardToPlay->name : "None") << std::endl);
+        
+        WGE_LOG_TRACE("Next card to play: {}", (nextCardToPlay ? nextCardToPlay->name : "None"));
     }
     return nextCardToPlay;
 }
@@ -1820,7 +1814,7 @@ int AIPlayerBaka::chooseBlockers() {
 
 int AIPlayerBaka::orderBlockers() {
     if (ORDER == observer->combatStep && observer->currentPlayer == this) {
-        DebugTrace("AIPLAYER: order blockers");
+        WGE_LOG_TRACE("order blockers");
         observer->userRequestNextGamePhase();  // TODO clever rank of blockers
         return 1;
     }
@@ -1933,7 +1927,7 @@ int AIPlayerBaka::Act(float dt) {
 
     // computeActions only when i have priority
     if (!(observer->currentlyActing() == this)) {
-        DebugTrace("Cannot interrupt");
+        WGE_LOG_TRACE("Cannot interrupt");
         return 0;
     }
     if (clickstream.empty()) computeActions();

@@ -9,6 +9,8 @@
 #include "WEvent.h"
 #include "AllAbilities.h"
 
+#include <wge/log.hpp>
+
 TargetChooser* TargetChooserFactory::createTargetChooser(string s, MTGCardInstance* card, MTGAbility* ability) {
     if (!s.size()) return NULL;
 
@@ -536,7 +538,7 @@ TargetChooser* TargetChooserFactory::createTargetChooser(MTGCardInstance* card) 
     case 1224:  // Spell blast
     {
 #if defined(WIN32) || defined(LINUX)
-        DebugTrace("Counter Spell !\n");
+        WGE_LOG_TRACE("Counter Spell !");
 #endif
         return NEW SpellTargetChooser(observer, card);
     }
@@ -929,7 +931,7 @@ bool TargetZoneChooser::canTarget(Targetable* target, bool withoutProtections) {
             if (MTGGameZone::intToZone(observer, zones[i], source, card)->hasCard(card)) return true;
         }
     } else if (Spell* spell = dynamic_cast<Spell*>(target)) {
-        DebugTrace("CHECKING Spell\n");
+        WGE_LOG_TRACE("CHECKING Spell");
         if (spell->state == NOT_RESOLVED) {
             MTGCardInstance* card = spell->source;
             for (int i = 0; i < nbzones; i++)

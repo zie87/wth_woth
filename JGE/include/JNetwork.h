@@ -6,7 +6,6 @@
 #include <map>
 
 class JSocket;
-#include <iostream>
 #include <sstream>
 
 #include <wge/thread.hpp>

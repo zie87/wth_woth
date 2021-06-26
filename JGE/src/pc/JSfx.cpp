@@ -7,7 +7,6 @@
 // Copyright (c) 2007 James Hui (a.k.a. Dr.Watson) <jhkhui@gmail.com>
 //
 //-------------------------------------------------------------------------------------
-#include "DebugRoutines.h"
 
 #ifdef WITH_FMOD
     #include "../../Dependencies/include/fmod.h"
@@ -15,8 +14,8 @@
     #define FSOUND_FREE 0
 #endif
 
-#include "../../include/JSoundSystem.h"
-#include "../../include/JFileSystem.h"
+#include "JSoundSystem.h"
+#include "JFileSystem.h"
 
 //////////////////////////////////////////////////////////////////////////
 JMusic::JMusic()
@@ -125,7 +124,7 @@ JMusic* JSoundSystem::LoadMusic(const char* fileName) {
     if (music) {
         music->mOutput = new Phonon::AudioOutput(Phonon::GameCategory, 0);
         music->mMediaObject = new Phonon::MediaObject(0);
-        string fullpath = JFileSystem::GetInstance()->GetResourceFile(fileName);
+        std::string fullpath = JFileSystem::GetInstance()->GetResourceFile(fileName);
         music->mMediaObject->setCurrentSource(QString(fullpath.c_str()));
         Phonon::Path mediapath = Phonon::createPath(music->mMediaObject, music->mOutput);
         Q_ASSERT(mediapath.isValid());
@@ -216,7 +215,7 @@ JSample* JSoundSystem::LoadSample(const char* fileName) {
     if (sample) {
         sample->mOutput = new Phonon::AudioOutput(Phonon::GameCategory, 0);
         sample->mMediaObject = new Phonon::MediaObject(0);
-        string fullpath = JFileSystem::GetInstance()->GetResourceFile(fileName);
+        std::string fullpath = JFileSystem::GetInstance()->GetResourceFile(fileName);
         sample->mMediaObject->setCurrentSource(QString(fullpath.c_str()));
         Phonon::Path mediapath = Phonon::createPath(sample->mMediaObject, sample->mOutput);
         Q_ASSERT(mediapath.isValid());

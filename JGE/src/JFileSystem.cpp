@@ -18,17 +18,16 @@ necessary but provides a nice way to distinguish The content that users should n
 */
 
 #ifdef WIN32
-    #pragma warning(disable : 4786)
-    #include <direct.h>
-    #define MAKEDIR(name) _mkdir(name)
+#pragma warning(disable : 4786)
+#include <direct.h>
+#define MAKEDIR(name) _mkdir(name)
 #else
-    #include <sys/stat.h>
-    #define MAKEDIR(name) mkdir(name, 0777)
+#include <sys/stat.h>
+#define MAKEDIR(name) mkdir(name, 0777)
 #endif
 
 #include "JGE.h"
 #include "JFileSystem.h"
-#include "JLogger.h"
 
 #include <dirent.h>
 

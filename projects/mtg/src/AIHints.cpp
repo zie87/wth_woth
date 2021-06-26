@@ -5,12 +5,14 @@
 #include "utils.h"
 #include "AllAbilities.h"
 
+#include <wge/log.hpp>
+
 #include <sstream>
 
 AIHint::AIHint(string _line) {
     string line = _line;
     if (!line.length()) {
-        DebugTrace("AIHINTS: line is empty");
+        WGE_LOG_TRACE("line is empty");
         return;
     }
     std::transform(line.begin(), line.end(), line.begin(), ::tolower);
@@ -180,7 +182,7 @@ string AIHints::constraintsNotFulfilled(AIAction* action, AIHint* hint, ManaCost
 
     // dummy test: would the ability work if we were sure to fulfill its mana requirements?
     if (!a->isReactingToClick(card, a->getCost())) {
-        DebugTrace("This shouldn't happen, this AIAction doesn't seem like a good choice");
+        WGE_LOG_WARN("This shouldn't happen, this AIAction doesn't seem like a good choice");
         return "not supported";
     }
 
@@ -190,7 +192,7 @@ string AIHints::constraintsNotFulfilled(AIAction* action, AIHint* hint, ManaCost
         for (int i = 0; i < Constants::NB_Colors; i++) {
             if (diff->getCost(i) < 0) {
                 out << "needmana[" << Constants::MTGColorChars[i] << "]";
-                if (Constants::MTGColorChars[i] == 'r') DebugTrace("Got it");
+                if (Constants::MTGColorChars[i] == 'r') WGE_LOG_TRACE("Got it");
                 SAFE_DELETE(diff);
                 return out.str();
             }
@@ -217,8 +219,7 @@ AIAction* AIHints::findAbilityRecursive(AIHint* hint, ManaCost* potentialMana) {
     if (s.size()) {
         SAFE_DELETE(a);
         AIHint* nextHint = getByCondition(s);
-        DebugTrace("**I Need " << s << ", this can be provided by " << (nextHint ? nextHint->mAction : "NULL")
-                               << "\n\n");
+        WGE_LOG_DEBUG("I Need {}, this can be provided by {}", s, (nextHint ? nextHint->mAction : "NULL"));
         if (nextHint && nextHint != hint) return findAbilityRecursive(nextHint, potentialMana);
         return NULL;
     }
@@ -233,8 +234,8 @@ AIAction* AIHints::suggestAbility(ManaCost* potentialMana) {
 
         AIAction* a = findAbilityRecursive(hints[i], potentialMana);
         if (a) {
-            DebugTrace("**I Decided that the best to fulfill " << hints[i]->mAction << " is to play "
-                                                               << a->ability->getMenuText() << "\n\n");
+            WGE_LOG_DEBUG("I Decided that the best to fulfill \"{}\" is to play \"{}\"", hints[i]->mAction,
+                          a->ability->getMenuText());
             return a;
         }
     }

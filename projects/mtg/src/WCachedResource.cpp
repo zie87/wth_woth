@@ -6,8 +6,7 @@
 #include "WCachedResource.h"
 #include <hge/hgeparticle.h>
 
-#ifdef WITH_FMOD
-#endif
+#include <wge/log.hpp>
 
 const std::string kPlaceholderID("placeholder");
 
@@ -50,7 +49,7 @@ void WResource::unlock(bool force) {
 
 void WResource::hit() { lastTime = WResourceManager::Instance()->nowTime(); }
 
-WCachedResource::~WCachedResource() { DebugTrace("Destroying WCachedResource: " << mFilename); }
+WCachedResource::~WCachedResource() { WGE_LOG_TRACE("Destroying WCachedResource: {}", mFilename); }
 
 // WCachedTexture
 WCachedTexture::WCachedTexture() { texture = NULL; }

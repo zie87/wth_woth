@@ -7,6 +7,8 @@
 #include "MTGDeck.h"
 #include "ManaCostHybrid.h"
 
+#include <wge/log.hpp>
+
 DeckStats* DeckStats::mInstance = NULL;
 
 DeckStat::DeckStat(int nbgames, int victories, string manaColorIndex)
@@ -103,7 +105,7 @@ void DeckStats::load(const std::string& filename) {
         DeckMetaData* playerDeckMetaData =
             DeckManager::GetInstance()->getDeckMetaDataByFilename(playerDeckFilePath, false);
         if (!playerDeckMetaData) {
-            DebugTrace("DeckStats.cpp:CONSISTENCY ERROR: DeckStats are set, but no deck meta data");
+            WGE_LOG_ERROR("ERROR: DeckStats are set, but no deck meta data [\"{}\"]", filename);
             return;
         }
         // check if this player deck has already been profiled for manacolors

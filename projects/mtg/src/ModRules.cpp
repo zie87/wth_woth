@@ -5,12 +5,14 @@
 #include "GameState.h"
 #include "../../../JGE/src/tinyxml/tinyxml.h"
 
+#include <wge/log.hpp>
+
 ModRules gModRules;
 
 bool ModRules::load(string filename) {
     std::string xmlBuffer;
     if (!JFileSystem::GetInstance()->readIntoString(filename, xmlBuffer)) {
-        DebugTrace("FATAL: cannot find modrules.xml");
+        WGE_LOG_FATAL("cannot find modrules.xml");
         return false;
     }
 
@@ -176,7 +178,7 @@ SimpleCardEffect* ModRulesCards::parseEffect(string s) {
     if (function.compare("mask") == 0) {
         auto argb = split(params, ',');
         if (argb.size() < 4) {
-            DebugTrace("not enough params in mask");
+            WGE_LOG_ERROR("not enough params in mask");
             return NULL;
         }
         PIXEL_TYPE mask =

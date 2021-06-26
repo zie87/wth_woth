@@ -4,17 +4,17 @@
 #include <JGE.h>
 
 #if defined(PSP)
-    #include <pspkernel.h>
-    #include <pspdisplay.h>
-    #include <pspctrl.h>
-    #include <pspiofilemgr.h>
-    #include <pspdebug.h>
-    #include <psputility.h>
-    #include <pspgu.h>
-    #include <psprtc.h>
+#include <pspkernel.h>
+#include <pspdisplay.h>
+#include <pspctrl.h>
+#include <pspiofilemgr.h>
+#include <pspdebug.h>
+#include <psputility.h>
+#include <pspgu.h>
+#include <psprtc.h>
 
-    #include <psptypes.h>
-    #include <malloc.h>
+#include <psptypes.h>
+#include <malloc.h>
 
 #endif
 
@@ -26,8 +26,6 @@
 #include <iostream>
 #include <algorithm>
 #include <stdlib.h>
-
-#include "DebugRoutines.h"
 
 #include <list>
 #include <vector>
@@ -105,9 +103,9 @@ void dumpStack();
 // *** DEFINES ***
 
 #if defined(WIN32) || defined(LINUX)
-    #define RAM_BLOCK (100 * 1024 * 1024)
+#define RAM_BLOCK (100 * 1024 * 1024)
 #else
-    #define RAM_BLOCK (1024 * 1024)
+#define RAM_BLOCK (1024 * 1024)
 #endif
 
 // *** FUNCTIONS DECLARATIONS ***

@@ -38,7 +38,7 @@ protected:
 class UnthreadedCardRetriever : public CardRetrieverBase {
 public:
     UnthreadedCardRetriever(WCache<WCachedTexture, JTexture>& inCache) : CardRetrieverBase(inCache) {
-        DebugTrace("Unthreaded version");
+        WGE_LOG_TRACE("Unthreaded version");
     }
 
     virtual ~UnthreadedCardRetriever() {}
@@ -57,7 +57,7 @@ public:
 class ThreadedCardRetriever : public CardRetrieverBase {
 public:
     ThreadedCardRetriever(WCache<WCachedTexture, JTexture>& inCache) : CardRetrieverBase(inCache), mProcessing(true) {
-        DebugTrace("Threaded Version");
+        WGE_LOG_TRACE("Threaded Version");
         mWorkerThread = wge::thread(ThreadProc, this);
     }
 

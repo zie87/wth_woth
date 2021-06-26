@@ -23,6 +23,8 @@
     #include "NetworkPlayer.h"
 #endif
 
+#include <wge/log.hpp>
+
 #if defined(WIN32) || defined(LINUX)
     #include <time.h>
 #endif
@@ -204,7 +206,7 @@ void GameStateDuel::loadTestSuitePlayers() {
 #endif
 
 void GameStateDuel::End() {
-    DebugTrace("Ending GameStateDuel");
+    WGE_LOG_TRACE("Ending GameStateDuel");
 
 #ifdef TRACK_OBJECT_USAGE
     ObjectAnalytics::DumpStatistics();

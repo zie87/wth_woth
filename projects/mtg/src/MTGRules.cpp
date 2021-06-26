@@ -7,6 +7,8 @@
 #include "Credits.h"
 #include "AllAbilities.h"
 
+#include <wge/log.hpp>
+
 PermanentAbility::PermanentAbility(GameObserver* observer, int _id) : MTGAbility(observer, _id, NULL) {}
 
 MTGEventBonus::MTGEventBonus(GameObserver* observer, int _id) : PermanentAbility(observer, _id) {
@@ -1199,10 +1201,6 @@ int MTGBlockRule::reactToClick(MTGCardInstance* card) {
         while (!result) {
             currentOpponent = game->currentPlayer->game->inPlay->getNextAttacker(currentOpponent);
             canDefend = card->toggleDefenser(currentOpponent);
-
-            DebugTrace("Defenser Toggle: " << card->getName() << std::endl
-                                           << "- canDefend: " << (canDefend == 0) << std::endl
-                                           << "- currentOpponent: " << currentOpponent);
             result = (canDefend || currentOpponent == NULL);
         }
     return 1;
@@ -1301,7 +1299,7 @@ int MTGMomirRule::genRandomCreatureId(int convertedCost) {
     int total_cards = 0;
     int i = convertedCost;
     while (!total_cards && i >= 0) {
-        DebugTrace("Converted Cost in momir: " << i);
+        WGE_LOG_DEBUG("Converted Cost in momir: {}", i);
         total_cards = pool[i].size();
         convertedCost = i;
         i--;
@@ -1557,7 +1555,7 @@ int MTGPersistRule::receiveEvent(WEvent* event) {
                     MTGCardInstance* copy =
                         p->game->putInZone(e->card, p->game->graveyard, e->card->owner->game->temp);
                     if (!copy) {
-                        DebugTrace("MTGRULES: couldn't move card for persist/undying");
+                        WGE_LOG_ERROR("couldn't move card for persist/undying");
                         return 0;
                     }
                     Spell* spell = NEW Spell(game, copy);

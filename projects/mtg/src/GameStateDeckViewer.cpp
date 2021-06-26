@@ -22,6 +22,8 @@
 #include "utils.h"
 #include "AIPlayer.h"
 
+#include <wge/log.hpp>
+
 //!! helper function; this is probably handled somewhere in the code already.
 // If not, should be placed in general library
 void StringExplode(string str, string separator, vector<string>* results) {
@@ -308,7 +310,7 @@ void GameStateDeckViewer::saveAsAIDeck(string deckName) {
     string deckDesc = oss.str();
     string filepath = "ai/baka/";
     filepath.append(aiDeckName).append(".txt");
-    DebugTrace("saving AI deck " << filepath);
+    WGE_LOG_DEBUG("saving AI deck \"{}\"",filepath);
     myDeck->save(filepath, true, deckName, deckDesc);
     AIPlayer::invalidateTotalAIDecks();  // We added one AI deck, so we need to invalidate the count cache
 }

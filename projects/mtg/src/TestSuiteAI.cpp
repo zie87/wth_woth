@@ -46,7 +46,7 @@ MTGCardInstance* TestSuiteAI::getCard(string action) {
             }
         }
     }
-    DebugTrace("TESTUISTEAI: Can't find card:" << action.c_str());
+    WGE_LOG_ERROR("Can't find card: {}", action);
     return NULL;
 }
 
@@ -94,7 +94,7 @@ int TestSuiteAI::Act(float dt) {
 
     string action = suite->getNextAction();
     observer->mLayers->stackLayer()->Dump();
-    DebugTrace("TESTSUITE command: " << action);
+    WGE_LOG_TRACE("TESTSUITE command: {}", action);
 
     if (observer->mLayers->stackLayer()->askIfWishesToInterrupt == this) {
         if (action.compare("no") != 0 && action.compare("yes") != 0) {
@@ -108,7 +108,7 @@ int TestSuiteAI::Act(float dt) {
         // end of game
         suite->assertGame();
         observer->setLoser(observer->players[0]);
-        DebugTrace("================================    END OF TEST   =======================\n");
+        WGE_LOG_TRACE("================================    END OF TEST   =======================\n");
         return 1;
     }
 
@@ -116,11 +116,11 @@ int TestSuiteAI::Act(float dt) {
         if (observer->getCurrentGamePhase() != MTG_PHASE_CLEANUP) suite->currentAction--;
         observer->userRequestNextGamePhase();
     } else if (action.compare("human") == 0) {
-        DebugTrace("TESTSUITE You have control");
+        WGE_LOG_TRACE("TESTSUITE You have control");
         playMode = MODE_HUMAN;
         return 1;
     } else if (action.compare("ai") == 0) {
-        DebugTrace("TESTSUITE Switching to AI");
+        WGE_LOG_TRACE("TESTSUITE Switching to AI");
         playMode = MODE_AI;
         return 1;
     } else if (action.compare("next") == 0 || action.find("goto") != string::npos) {
@@ -159,7 +159,7 @@ int TestSuiteAI::Act(float dt) {
         if (observer->mLayers->stackLayer()->askIfWishesToInterrupt == this)
             observer->mLayers->stackLayer()->cancelInterruptOffer();
     } else if (action.find("choice ") != string::npos) {
-        DebugTrace("TESTSUITE choice !!!");
+        WGE_LOG_TRACE("TESTSUITE choice !!!");
         int choice = atoi(action.substr(action.find("choice ") + 7).c_str());
         observer->mLayers->actionLayer()->doReactTo(choice);
     } else if (action.find(" -momir- ") != string::npos) {
@@ -178,7 +178,7 @@ int TestSuiteAI::Act(float dt) {
         int mtgid = Rules::getMTGId(action);
         Interruptible* toInterrupt = NULL;
         if (mtgid) {
-            DebugTrace("TESTSUITE CARD ID:" << mtgid);
+            WGE_LOG_TRACE("TESTSUITE CARD ID: {}", mtgid);
             toInterrupt = suite->getActionByMTGId(mtgid);
         }
 
@@ -189,7 +189,7 @@ int TestSuiteAI::Act(float dt) {
 
         MTGCardInstance* card = getCard(action);
         if (card) {
-            DebugTrace("TESTSUITE Clicking ON: " << card->name);
+            WGE_LOG_TRACE("TESTSUITE Clicking ON: {}", card->name);
             card->currentZone->needShuffle = true;  // mimic library shuffle
             observer->cardClick(card, card);
             observer->forceShuffleLibraries();  // mimic library shuffle
@@ -250,7 +250,7 @@ int TestSuiteGame::Log(const char* text) {
         file.close();
     }
 
-    DebugTrace(text);
+    WGE_LOG_DEBUG(text);
     return 1;
 }
 

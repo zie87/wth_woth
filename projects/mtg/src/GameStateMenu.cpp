@@ -23,7 +23,7 @@
 #include "AIPlayer.h"
 
 #ifdef NETWORK_SUPPORT
-    #include <JNetwork.h>
+#include <JNetwork.h>
 #endif  // NETWORK_SUPPORT
 
 #include <wge/log.hpp>
@@ -410,8 +410,7 @@ void GameStateMenu::Update(float dt) {
 #if _DEBUG
             int endTime = JGEGetTime();
             int elapsedTime = (endTime - startTime);
-            DebugTrace("Time elapsed while loading " << primitives[primitivesLoadCounter] << " : " << elapsedTime
-                                                     << " ms");
+            WGE_LOG_DEBUG("Time elapsed while loading {} : {} ms", primitives[primitivesLoadCounter], elapsedTime);
 #endif
 
             primitivesLoadCounter++;
@@ -427,11 +426,11 @@ void GameStateMenu::Update(float dt) {
             // Remove temporary translations
             Translator::GetInstance()->tempValues.clear();
 
-            DebugTrace(std::endl
-                       << "==" << std::endl
-                       << "Total MTGCards: " << MTGCollection()->collection.size() << std::endl
-                       << "Total CardPrimitives: " << MTGCollection()->primitives.size() << std::endl
-                       << "==");
+            WGE_LOG_DEBUG("=======================");
+            WGE_LOG_DEBUG("Total MTGCards: {}", MTGCollection()->collection.size());
+            WGE_LOG_DEBUG("Total CardPrimitives: {}", MTGCollection()->primitives.size());
+            ;
+            WGE_LOG_DEBUG("=======================");
 
             // Force default, if necessary.
             if (options[Options::ACTIVE_PROFILE].str == "") options[Options::ACTIVE_PROFILE].str = "Default";
@@ -575,7 +574,7 @@ void GameStateMenu::RenderTopMenu() {
             rightTextPos -= 64;
             break;
         default:
-            DebugTrace("not supported yet!");
+            WGE_LOG_WARN("not supported yet!");
             break;
         }
     }
@@ -648,7 +647,7 @@ void GameStateMenu::Render() {
 }
 
 void GameStateMenu::ButtonPressed(int controllerId, int controlId) {
-    DebugTrace("GameStateMenu: controllerId " << controllerId << " selected");
+    WGE_LOG_TRACE("controllerId {} selected", controllerId);
     switch (controllerId) {
     case MENU_LANGUAGE_SELECTION:
         if (controlId == kInfoMenuID) break;

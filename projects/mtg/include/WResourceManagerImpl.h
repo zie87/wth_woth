@@ -96,7 +96,7 @@ protected:
 
 #ifdef PSP
         if (ramAvailableLineareMax() < MIN_LINEAR_RAM) {
-            DebugTrace("Memory below minimum threshold!!");
+            WGE_LOG_WARN("Memory below minimum threshold!!");
             return true;
         }
 #endif

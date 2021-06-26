@@ -57,7 +57,7 @@ int Rules::getMTGId(string cardName) {
     if (cardName.compare("*") == 0) return -1;  // Any card
     MTGCard* card = MTGCollection()->getCardByName(cardName);
     if (card) return card->getMTGId();
-    DebugTrace("RULES: Can't find card:" << cardName.c_str());
+    WGE_LOG_ERROR("Can't find card \"{}\"", cardName);
     return 0;
 }
 
@@ -303,7 +303,7 @@ void Rules::initPlayers(GameObserver* g) {
 }
 
 void Rules::initGame(GameObserver* g) {
-    DebugTrace("RULES Init Game\n");
+    WGE_LOG_TRACE("Init Game\n");
 
     // Set the current player/phase
     if (g->currentPlayer->playMode != Player::MODE_TEST_SUITE && g->mRules->gamemode != GAME_TYPE_STORY) {
@@ -358,7 +358,7 @@ void Rules::initGame(GameObserver* g) {
     addExtraRules(g);
 
     postUpdateInitDone = false;
-    DebugTrace("RULES Init Game Done !\n");
+    WGE_LOG_TRACE("init Game Done !");
 }
 
 // This function has all iitialization that can't be done in the "real" init function,

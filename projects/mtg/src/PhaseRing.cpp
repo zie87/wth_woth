@@ -4,6 +4,8 @@
 #include "MTGDefinitions.h"
 #include "Player.h"
 #include "WEvent.h"
+
+#include <wge/log.hpp>
 // Parses a string and gives phase numer
 GamePhase PhaseRing::phaseStrToInt(string s) {
     if (s.compare("untap") == 0) return MTG_PHASE_UNTAP;
@@ -22,7 +24,7 @@ GamePhase PhaseRing::phaseStrToInt(string s) {
     if (s.compare("endofturn") == 0) return MTG_PHASE_ENDOFTURN;
     if (s.compare("end") == 0) return MTG_PHASE_ENDOFTURN;
     if (s.compare("cleanup") == 0) return MTG_PHASE_CLEANUP;
-    DebugTrace("PHASERING: Unknown Phase name: " << s);
+    WGE_LOG_ERROR("Unknown Phase name: {}", s);
     return MTG_PHASE_INVALID;  // was returning first main...why would we return something that is not == s?
 }
 
@@ -39,7 +41,7 @@ string PhaseRing::phaseIntToStr(int id) {
     if (id == MTG_PHASE_SECONDMAIN) return "secondmain";
     if (id == MTG_PHASE_ENDOFTURN) return "endofturn";
     if (id == MTG_PHASE_CLEANUP) return "cleanup";
-    DebugTrace("PHASERING: Unknown Phase id:%i " << id);
+    WGE_LOG_ERROR("Unknown Phase id: {}", id);
     return "";
 }
 
@@ -173,11 +175,11 @@ Phase* PhaseRing::forward(bool sendEvents) {
 Phase* PhaseRing::goToPhase(int id, Player* player, bool sendEvents) {
     Phase* currentPhase = getCurrentPhase();
     while (currentPhase->id != id) {  // Dangerous, risk for inifinte loop !
-        DebugTrace("PhasingRing: goToPhase called, current phase is " << phaseName(currentPhase->id));
+        WGE_LOG_TRACE("current phase is {}", phaseName(currentPhase->id));
         currentPhase = forward(sendEvents);
         if (id == MTG_PHASE_INVALID) {
-            DebugTrace("stopping on  this phase becuase goToPhase was told to go a phase that doesn't exist:"
-                       << phaseName(currentPhase->id));
+            WGE_LOG_WARN("stopping on this phase because goToPhase was told to go a phase that doesn't exist: {}",
+                         phaseName(currentPhase->id));
             break;
         }
         if (currentPhase->player == player && currentPhase->id == id) break;

@@ -11,6 +11,8 @@
 #include "TextScroller.h"
 #include "Tasks.h"
 
+#include <wge/log.hpp>
+
 #include <iomanip>
 
 namespace {
@@ -134,8 +136,7 @@ void DeckMenu::RenderDeckManaColors() {
                 }
             }
         } else if (deckManaColors.compare("") != 0)
-            DebugTrace("Error with color index string for " << mSelectedDeck->getName() << ". [" << deckManaColors
-                                                            << "].");
+            WGE_LOG_ERROR("Error with color index string for \"{}\". [{}]", mSelectedDeck->getName(), deckManaColors);
     }
 }
 

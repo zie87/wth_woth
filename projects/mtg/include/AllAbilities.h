@@ -1,7 +1,6 @@
 #ifndef _CARDS_H_
 #define _CARDS_H_
 
-#include "DebugRoutines.h"
 #include "MTGAbility.h"
 #include "ManaCost.h"
 #include "CardDescriptor.h"
@@ -19,6 +18,9 @@
 #include <JGui.h>
 #include <hge/hgeparticle.h>
 #include "IconButton.h"
+
+
+#include <wge/log.hpp>
 
 #include <map>
 using std::map;
@@ -3815,7 +3817,7 @@ public:
     int isReactingToClick(MTGCardInstance* card, ManaCost* mana = NULL) {
         MTGCardInstance* _target = (MTGCardInstance*)target;
         if (card == source && (!_target || !_target->isInPlay(game))) {
-            DebugTrace("Kudzu Reacts to click !");
+            WGE_LOG_DEBUG("Kudzu Reacts to click !");
             return 1;
         }
         return 0;

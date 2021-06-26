@@ -804,7 +804,7 @@ void ResourceManagerImpl::ResetCacheLimits() {
     unsigned int ram = ramAvailable();
     unsigned int myNewSize = ram - OPERATIONAL_SIZE + textureWCache.totalSize;
     if (myNewSize < TEXTURES_CACHE_MINSIZE) {
-        DebugTrace("Error, Not enough RAM for Cache: " << myNewSize << " - total Ram: " << ram);
+        WGE_LOG_ERROR("Not enough RAM for Cache: {} - total RAM {}", myNewSize, ram);
     }
     textureWCache.Resize(MIN(myNewSize, HUGE_CACHE_LIMIT), MAX_CACHE_OBJECTS);
 #else
@@ -905,11 +905,11 @@ cacheItem* WCache<cacheItem, cacheActual>::AttemptNew(const string& filename, in
     if (!item->Attempt(filename, submode, mError) || !item->isGood()) {
         // No such file. Fail
         if (mError == CACHE_ERROR_404) {
-            DebugTrace("AttemptNew failed to load. Deleting cache item " << ToHex(item));
+            WGE_LOG_ERROR("AttemptNew failed to load. Deleting cache item {0:#x}", fmt::ptr(item));
             SAFE_DELETE(item);
             return NULL;
         } else {
-            DebugTrace("AttemptNew failed to load (not a 404 error). Deleting cache item " << ToHex(item));
+            WGE_LOG_ERROR("failed to load (not a 404 error). Deleting cache item {0:#x}", fmt::ptr(item));
             SAFE_DELETE(item);
             mError = CACHE_ERROR_BAD;
             return NULL;
@@ -1070,17 +1070,12 @@ cacheItem* WCache<cacheItem, cacheActual>::LoadIntoCache(int id, const string& f
         if (mError == CACHE_ERROR_404 || item) {
             std::lock_guard<wge::mutex> lock(sCacheMutex);
             cache[id] = item;
-            DebugTrace("inserted item ptr " << ToHex(item) << " at index " << id);
+            WGE_LOG_ERROR("inserted item ptr {#x} at index {}", fmt::ptr(item), id);
         }
     }
 
     if (item == NULL) {
-        DebugTrace("Can't locate ");
-        if (submode & TEXTURE_SUB_THUMB) {
-            DebugTrace("thumbnail ");
-        }
-        DebugTrace(filename);
-
+        WGE_LOG_ERROR("Can't locate {}", filename);
         return NULL;  // Failure
     }
 
@@ -1253,12 +1248,12 @@ bool WCache<cacheItem, cacheActual>::Delete(cacheItem* item) {
     totalSize -= isize;
     cacheSize -= isize;
 #ifdef DEBUG_CACHE
-    if (cacheItems == 0) DebugTrace("cacheItems out of sync.");
+    if (cacheItems == 0) WGE_LOG_WARN("cacheItems out of sync.");
 #endif
 
     cacheItems--;
 
-    DebugTrace("Deleting cache item " << ToHex(item) << ", cache reduced by " << isize << " bytes");
+    WGE_LOG_DEBUG("Deleting cache item {#x}, cache reduced by {} bytes", fmt::ptr(item), isize);
     SAFE_DELETE(item);
     return true;
 }

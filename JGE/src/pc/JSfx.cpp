@@ -7,7 +7,6 @@
 // Copyright (c) 2007 James Hui (a.k.a. Dr.Watson) <jhkhui@gmail.com>
 //
 //-------------------------------------------------------------------------------------
-#include "DebugRoutines.h"
 
 #ifdef WITH_FMOD
     #include "../../Dependencies/include/fmod.h"
@@ -15,8 +14,8 @@
     #define FSOUND_FREE 0
 #endif
 
-#include "../../include/JSoundSystem.h"
-#include "../../include/JFileSystem.h"
+#include "JSoundSystem.h"
+#include "JFileSystem.h"
 
 //////////////////////////////////////////////////////////////////////////
 JMusic::JMusic()

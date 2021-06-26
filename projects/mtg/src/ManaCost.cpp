@@ -9,7 +9,9 @@
 #include "WEvent.h"
 #include "MTGAbility.h"
 
-#include "iterator"
+#include <wge/log.hpp>
+
+#include <iterator>
 
 SUPPORT_OBJECT_ANALYTICS(ManaCost)
 
@@ -309,7 +311,7 @@ ManaCost::~ManaCost() {
 
 void ManaCost::x() {
     if (cost.size() <= (size_t)Constants::NB_Colors) {
-        DebugTrace("Seems ManaCost was not properly initialized");
+        WGE_LOG_WARN("Seems ManaCost was not properly initialized");
         return;
     }
 
@@ -318,7 +320,7 @@ void ManaCost::x() {
 
 int ManaCost::hasX() {
     if (cost.size() <= (size_t)Constants::NB_Colors) {
-        DebugTrace("Seems ManaCost was not properly initialized");
+        WGE_LOG_WARN("Seems ManaCost was not properly initialized");
         return 0;
     }
     if (xColor > 0) return 0;
@@ -328,7 +330,7 @@ int ManaCost::hasX() {
 
 void ManaCost::specificX(int color) {
     if (cost.size() <= (size_t)Constants::NB_Colors) {
-        DebugTrace("Seems ManaCost was not properly initialized");
+        WGE_LOG_WARN("Seems ManaCost was not properly initialized");
         return;
     }
     xColor = color;
@@ -336,7 +338,7 @@ void ManaCost::specificX(int color) {
 }
 int ManaCost::hasSpecificX() {
     if (cost.size() <= (size_t)Constants::NB_Colors) {
-        DebugTrace("Seems ManaCost was not properly initialized");
+        WGE_LOG_WARN("Seems ManaCost was not properly initialized");
         return 0;
     }
     if (xColor > 0) return cost[Constants::NB_Colors];
@@ -345,7 +347,7 @@ int ManaCost::hasSpecificX() {
 
 int ManaCost::hasAnotherCost() {
     if (cost.size() <= (size_t)Constants::NB_Colors) {
-        DebugTrace("Seems ManaCost was not properly initialized");
+        WGE_LOG_WARN("Seems ManaCost was not properly initialized");
         return 0;
     }
     int result = 0;
@@ -450,7 +452,7 @@ void ManaCost::copy(ManaCost* _manaCost) {
 
 int ManaCost::getCost(int color) {
     if (cost.size() <= (size_t)color) {
-        DebugTrace("Seems ManaCost was not properly initialized");
+        WGE_LOG_WARN("Seems ManaCost was not properly initialized");
         return 0;
     }
     return cost[color];
@@ -721,9 +723,9 @@ void ManaCost::Dump() {
     // if(this->getConvertedCost())//uncomment when this is far too loud and clutters your output making other traces
     // pointless.
     //{
-    DebugTrace("\n===ManaCost===");
-    DebugTrace(this->toString());
-    DebugTrace("\n=============");
+    WGE_LOG_TRACE("=== ManaCost ===");
+    WGE_LOG_TRACE(this->toString());
+    WGE_LOG_TRACE("================");
     //}
 }
 

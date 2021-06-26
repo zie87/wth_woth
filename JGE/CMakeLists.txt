@@ -138,7 +138,6 @@ target_sources(jge300
         ${CMAKE_CURRENT_SOURCE_DIR}/src/JMP3.cpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/decoder_prx.c 
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/vram.c
     )
 endif()
 

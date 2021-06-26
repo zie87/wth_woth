@@ -905,11 +905,11 @@ cacheItem* WCache<cacheItem, cacheActual>::AttemptNew(const string& filename, in
     if (!item->Attempt(filename, submode, mError) || !item->isGood()) {
         // No such file. Fail
         if (mError == CACHE_ERROR_404) {
-            WGE_LOG_ERROR("AttemptNew failed to load. Deleting cache item {0:#x}", fmt::ptr(item));
+            //WGE_LOG_ERROR("AttemptNew failed to load. Deleting cache item {0:#x}", fmt::ptr(item));
             SAFE_DELETE(item);
             return NULL;
         } else {
-            WGE_LOG_ERROR("failed to load (not a 404 error). Deleting cache item {0:#x}", fmt::ptr(item));
+            //WGE_LOG_ERROR("failed to load (not a 404 error). Deleting cache item {0:#x}", fmt::ptr(item));
             SAFE_DELETE(item);
             mError = CACHE_ERROR_BAD;
             return NULL;
@@ -1070,7 +1070,7 @@ cacheItem* WCache<cacheItem, cacheActual>::LoadIntoCache(int id, const string& f
         if (mError == CACHE_ERROR_404 || item) {
             std::lock_guard<wge::mutex> lock(sCacheMutex);
             cache[id] = item;
-            WGE_LOG_ERROR("inserted item ptr {#x} at index {}", fmt::ptr(item), id);
+            //WGE_LOG_ERROR("inserted item ptr {#x} at index {}", reinterpret_cast<>(item), id);
         }
     }
 
@@ -1253,7 +1253,7 @@ bool WCache<cacheItem, cacheActual>::Delete(cacheItem* item) {
 
     cacheItems--;
 
-    WGE_LOG_DEBUG("Deleting cache item {#x}, cache reduced by {} bytes", fmt::ptr(item), isize);
+    //WGE_LOG_DEBUG("Deleting cache item {#x}, cache reduced by {} bytes", fmt::ptr(item), isize);
     SAFE_DELETE(item);
     return true;
 }

@@ -26,7 +26,6 @@
 #endif  // NETWORK_SUPPORT
 #include "GameObserver.h"
 
-#include "Wagic_Version.h"
 class Rules;
 class MTGAllCards;
 class TransitionBase;

@@ -22,13 +22,14 @@
 #include "Credits.h"
 #include "AIPlayer.h"
 
+#include "Version.hpp"
+
 #ifdef NETWORK_SUPPORT
 #include <JNetwork.h>
 #endif  // NETWORK_SUPPORT
 
 #include <wge/log.hpp>
 
-static const char* GAME_VERSION = "WTH?! " WAGIC_VERSION_STRING " - wololo.net";
 
 enum ENUM_MENU_STATE_MAJOR {
     MENU_STATE_MAJOR_MAINMENU = 0x01,
@@ -582,7 +583,8 @@ void GameStateMenu::RenderTopMenu() {
     WFont* mFont = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
     mFont->SetScale(DEFAULT_MAIN_FONT_SCALE);
     mFont->SetColor(ARGB(128, 255, 255, 255));
-    mFont->DrawString(GAME_VERSION, rightTextPos, 5, JGETEXT_RIGHT);
+    const std::string game_name( wth::version_info::fullname );
+    mFont->DrawString(game_name, rightTextPos, 5, JGETEXT_RIGHT);
     mFont->DrawString(nbcardsStr, leftTextPos, 5);
     renderer->FillRect(leftTextPos, 26, 104, 8, ARGB(255, 100, 90, 60));
     renderer->FillRect(leftTextPos + 2, 28, (float)(gamePercentComplete()), 4, ARGB(255, 220, 200, 125));

@@ -17,3 +17,4 @@ It is based on [Wagic the Homebrew] in version 0.18.6 ([released](https://wololo
 
 * [Manual](./doc/manual/index.md)
 * [Building](./doc/build.md)
+* [Scripting](./doc/card_scripting.md)

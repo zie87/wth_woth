@@ -1,7 +1,7 @@
 ![logo](./images/logo.png)
 
 
-*Wagic, the Homebrew?!* is not intended to be used in any way which infringes upon the rights of others. Repeated use of this product may result in dizziness, exhaustion, and involuntary planeswalking.
+*Wagic: War of the Homebrew?!* is not intended to be used in any way which infringes upon the rights of others. Repeated use of this product may result in dizziness, exhaustion, and involuntary planeswalking.
 
 **Please play Wagic responsibly.**
 
@@ -15,7 +15,7 @@ Wagic is a collectible card game engine for the PSP. Its primary design is to si
 
 Players assemble decks and duel, either against each other or the AI. Winning duels unlocks new cards and rewards the player with credits, which can be spent at the shop. There are a number of hidden secrets to unlock, as well. Work hard and something good will happen!
 
-Wagic is continously being updated with new cards and new code. For the latest news, be sure to visit [http://www.wololo.net/wagic](http://www.wololo.net/wagic). The forum (at [http://www.wololo.net/forum](http://www.wololo.net/forum)) is the central hub for game customization, while up-to-the-minute copies of the code can be checked out from SVN at the google code project page [http://code.google.com/p/wagic](http://code.google.com/p/wagic)
+Wagic is continously being updated with new cards and new code. For the latest news, be sure to visit [http://www.wololo.net/wagic](http://www.wololo.net/wagic). The forum (at [http://www.wololo.net/forum](http://www.wololo.net/forum)) is the central hub for game customization, while up-to-the-minute copies of the code can be checked out from Github at the project page [https://github.com/zie87/wth_woth](https://github.com/zie87/wth_woth)
 
 # Setting up
 
@@ -223,7 +223,9 @@ The **extra information** option will display text notifications when cards do t
 
 ## New Cards
 
-Adding new cards to Wagic can be a very rewarding experience. Use an image editing tool to make the card images (we recommend Magic Set Editor 2), then open up a copy of _cards.dat and start editing! The format can be a little confusing at first, but spend some time reading other cards and you’ll figure it out. Or visit [http://www.wololo.net/wagic](http://www.wololo.net/wagic) to view the official card editing guide.
+Adding new cards to Wagic can be a very rewarding experience. Use an image editing tool to make the card images (we recommend Magic Set Editor 2), then open up a copy of _cards.dat and start editing! The format can be a little confusing at first, but spend some time reading other cards and you’ll figure it out. Or visit [Github][0] and take a look at the [card editing guide][1].
+
+[1]: https://github.com/zie87/wth_woth/blob/main/doc/card_scripting.md
 
 ## New Themes
 
@@ -231,8 +233,9 @@ If you’re of a graphical bent, try making your own theme. Save a copy of the g
 
 ## New Code
 
-Want to implement a new card ability, or maybe change the way the system works internally? Check the source out from the SVN [http://code.google.com/p/wagic](http://code.google.com/p/wagic) and hack away to your heart’s content. Contact Wololo on the forums with a good patch and you might even get commit access.
+Want to implement a new card ability, or maybe change the way the system works internally? Check the source out from [Github][0] and hack away to your heart’s content. Create a pull request with a good patch and you might even get commit access.
 
+[0]: https://github.com/zie87/wth_woth
 # Notes
 
 *Take note! A little piece of paper, can provide a little peace of mind.*

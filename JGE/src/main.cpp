@@ -172,7 +172,7 @@ void ExceptionHandler(PspDebugRegBlock* regs) {
         if (pad.Buttons & PSP_CTRL_CROSS) {
             FILE* log = fopen("exception.log", "w");
             if (log != NULL) {
-                char testo[1024];
+                char testo[1024] = {0};
                 fwrite(testo, 1, strlen(testo), log);
                 sprintf(testo, "Exception details:\n\n");
                 fwrite(testo, 1, strlen(testo), log);

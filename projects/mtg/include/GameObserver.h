@@ -149,12 +149,7 @@ public:
     Player* getPlayer(size_t index) { return players[index]; };
     bool isStarted() { return (mLayers != NULL); };
     RandomGenerator* getRandomGenerator() { return &randomGenerator; };
-    WResourceManager* getResourceManager() {
-        if (this)
-            return mResourceManager;
-        else
-            return 0;
-    };
+    WResourceManager* getResourceManager();
     CardSelectorBase* getCardSelector() { return mLayers->mCardSelector; };
     bool operator==(const GameObserver& aGame);
     JGE* getInput() { return mJGE; };

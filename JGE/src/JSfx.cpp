@@ -72,7 +72,7 @@ JMusic* JSoundSystem::LoadMusic(const char* fileName) {
     if (music) {
         music->mTrack = new JMP3();
         if (!music->mTrack->load(s)) {
-            free(music->mTrack);
+            delete music->mTrack;
             music->mTrack = NULL;
         }
     }
@@ -110,7 +110,7 @@ void JSoundSystem::SetVolume(int volume) {
 
 void JSoundSystem::SetMusicVolume(int volume) {
     mMusicVolume = volume;
-    JMP3* mp3 = JMP3::mInstance;
+    JMP3* mp3    = JMP3::mInstance;
     if (mp3) mp3->setVolume((mMusicVolume * .01) * 0x8000);
 }
 

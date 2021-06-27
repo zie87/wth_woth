@@ -4,18 +4,7 @@
 #########################################################################
 find_package(ZLIB REQUIRED)
 find_package(PNG REQUIRED)
-
-if(DEFINED PSP)
-    set(DEPENDENCIES_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/psp")
-    set(DEPENDENCIES_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/psp")
-
-    add_library(old_ft INTERFACE)
-    target_include_directories(old_ft INTERFACE "${DEPENDENCIES_INCLUDE_DIR}" "${DEPENDENCIES_INCLUDE_DIR}/freetype2")
-    set(FREETYPE2_LIBRARY "${DEPENDENCIES_LIBRARY_DIR}/libfreetype.a")
-    target_link_libraries(old_ft INTERFACE ${FREETYPE2_LIBRARY})
-    add_library(WotH::freetype ALIAS old_ft)
-
-endif()
+find_package(Freetype REQUIRED)
 
 if(DEFINED UNIX OR DEFINED WIN32)
     find_package(SDL2 REQUIRED)
@@ -30,23 +19,10 @@ if(DEFINED UNIX OR DEFINED WIN32)
     endif()
 endif()
 
-if(DEFINED UNIX)
-    find_package(Freetype REQUIRED)
-    add_library(ft_alias INTERFACE)
-    target_link_libraries(ft_alias INTERFACE Freetype::Freetype)
-    add_library(WotH::freetype ALIAS ft_alias)
-endif()
-
 if(DEFINED WIN32)
     set(DEPENDENCIES_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/include/")
     set(DEPENDENCIES_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/lib/")
     set(DEPENDENCIES_SHARED_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/dll/")
-
-    add_library(old_ft INTERFACE)
-    target_include_directories(old_ft INTERFACE "${DEPENDENCIES_INCLUDE_DIR}/freetype2")
-    find_library(FREETYPE2_LIBRARY NAMES freetype HINTS "${DEPENDENCIES_LIBRARY_DIR}")
-    target_link_libraries(old_ft INTERFACE ${FREETYPE2_LIBRARY})
-    add_library(WotH::freetype ALIAS old_ft)
 
     add_library(fmod INTERFACE)
     target_include_directories(fmod INTERFACE "${DEPENDENCIES_INCLUDE_DIR}")
@@ -165,7 +141,7 @@ target_link_libraries(jge300
     PUBLIC
         WotH::hge
         WotH::wge
-        WotH::freetype
+        Freetype::Freetype
         ZLIB::ZLIB
     PRIVATE
         PNG::PNG

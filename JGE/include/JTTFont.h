@@ -11,7 +11,7 @@
 #ifndef _JTTFONT_H
 #define _JTTFONT_H
 
-#include "../../JGE/include/JGE.h"
+#include "JGE.h"
 
 #include <ft2build.h>
 #include <freetype/freetype.h>

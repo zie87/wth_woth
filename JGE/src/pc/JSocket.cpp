@@ -26,14 +26,14 @@ unsigned char ADRESSE_IP_SERVEUR[4] = {127, 0, 0, 1};
 
 JSocket::JSocket(std::string ipAddr) : state(NOT_AVAILABLE), mfd(-1) {
     int result;
-    struct hostent* hostentptr;
+    struct hostent* hostentptr = nullptr;
 #ifdef WIN32
     SOCKADDR_IN Adresse_Socket_Server;
     WORD wVersionRequested;
     WSADATA wsaData;
 
     wVersionRequested = MAKEWORD(1, 1);
-    result = WSAStartup(wVersionRequested, &wsaData);
+    result            = WSAStartup(wVersionRequested, &wsaData);
     if (result != 0) {
         WGE_LOG_ERROR("WSAStartup");
         return;
@@ -48,7 +48,7 @@ JSocket::JSocket(std::string ipAddr) : state(NOT_AVAILABLE), mfd(-1) {
 
 #ifdef WIN32
     unsigned int addr_dest = inet_addr(ipAddr.c_str());
-    hostentptr = gethostbyaddr((char*)&addr_dest, 4, AF_INET);
+    hostentptr             = gethostbyaddr((char*)&addr_dest, 4, AF_INET);
 #elif LINUX
     hostentptr = gethostbyname(ipAddr.c_str());
 #endif
@@ -64,8 +64,8 @@ JSocket::JSocket(std::string ipAddr) : state(NOT_AVAILABLE), mfd(-1) {
 #endif  // WINDOWS
 
     Adresse_Socket_Server.sin_family = (*hostentptr).h_addrtype;
-    Adresse_Socket_Server.sin_port = htons(SERVER_PORT);
-    Adresse_Socket_Server.sin_addr = *((struct in_addr*)(*hostentptr).h_addr);
+    Adresse_Socket_Server.sin_port   = htons(SERVER_PORT);
+    Adresse_Socket_Server.sin_addr   = *((struct in_addr*)(*hostentptr).h_addr);
 
     result = connect(mfd, (const struct sockaddr*)&Adresse_Socket_Server, sizeof(Adresse_Socket_Server));
     if (result != 0) {
@@ -102,7 +102,7 @@ JSocket::JSocket() : state(NOT_AVAILABLE), mfd(-1) {
     WSADATA wsaData;
 
     wVersionRequested = MAKEWORD(1, 1);
-    result = WSAStartup(wVersionRequested, &wsaData);
+    result            = WSAStartup(wVersionRequested, &wsaData);
 
     if (result != 0) {
         WGE_LOG_ERROR("WSAStartup");
@@ -131,7 +131,7 @@ JSocket::JSocket() : state(NOT_AVAILABLE), mfd(-1) {
     bzero(&Adresse_Socket_Connection, sizeof(Adresse_Socket_Connection));
 #endif  // WINDOWS
     Adresse_Socket_Connection.sin_family = AF_INET;
-    Adresse_Socket_Connection.sin_port = htons(SERVER_PORT);
+    Adresse_Socket_Connection.sin_port   = htons(SERVER_PORT);
 
     result = ::bind(mfd, (struct sockaddr*)&Adresse_Socket_Connection, sizeof(Adresse_Socket_Connection));
     if (result != 0) {
@@ -187,17 +187,17 @@ JSocket* JSocket::Accept() {
         FD_ZERO(&set);
         FD_SET(mfd, &set);
         struct timeval tv;
-        tv.tv_sec = 0;
+        tv.tv_sec  = 0;
         tv.tv_usec = 1000 * 100;
 
         int result = select(mfd + 1, &set, NULL, NULL, &tv);
         if (result > 0 && FD_ISSET(mfd, &set)) {
             Longueur_Adresse = sizeof(Adresse_Socket_Cliente);
-            int val = accept(mfd, (struct sockaddr*)&Adresse_Socket_Cliente, &Longueur_Adresse);
+            int val          = accept(mfd, (struct sockaddr*)&Adresse_Socket_Cliente, &Longueur_Adresse);
             WGE_LOG_ERROR("connection on client port {}", ntohs(Adresse_Socket_Cliente.sin_port));
 
             if (val >= 0) {
-                state = CONNECTED;
+                state  = CONNECTED;
                 socket = new JSocket(val);
             }
             break;
@@ -213,7 +213,7 @@ int JSocket::Read(char* buff, int size) {
         FD_ZERO(&set);
         FD_SET(mfd, &set);
         struct timeval tv;
-        tv.tv_sec = 0;
+        tv.tv_sec  = 0;
         tv.tv_usec = 1000 * 100;
 
         int result = select(mfd + 1, &set, NULL, NULL, &tv);
@@ -242,7 +242,7 @@ int JSocket::Write(char* buff, int size) {
         FD_ZERO(&set);
         FD_SET(mfd, &set);
         struct timeval tv;
-        tv.tv_sec = 0;
+        tv.tv_sec  = 0;
         tv.tv_usec = 1000 * 100;
 
         int result = select(mfd + 1, NULL, &set, NULL, &tv);

@@ -288,9 +288,9 @@ JQuad::JQuad(JTexture* tex, float x, float y, float width, float height)
 }
 
 void JQuad::SetTextureRect(float x, float y, float w, float h) {
-    mX = x;
-    mY = y;
-    mWidth = w;
+    mX      = x;
+    mY      = y;
+    mWidth  = w;
     mHeight = h;
 
     mTX0 = x / mTex->mTexWidth;
@@ -340,7 +340,7 @@ void JTexture::UpdateBits(int x, int y, int width, int height, PIXEL_TYPE* bits)
 //////////////////////////////////////////////////////////////////////////
 
 JRenderer* JRenderer::mInstance = NULL;
-bool JRenderer::m3DEnabled = false;
+bool JRenderer::m3DEnabled      = false;
 
 void JRenderer::Set3DFlag(bool flag) { m3DEnabled = flag; }
 
@@ -464,15 +464,15 @@ void esRotate(ESMatrix* result, GLfloat angle, GLfloat x, GLfloat y, GLfloat z) 
         y /= mag;
         z /= mag;
 
-        xx = x * x;
-        yy = y * y;
-        zz = z * z;
-        xy = x * y;
-        yz = y * z;
-        zx = z * x;
-        xs = x * sinAngle;
-        ys = y * sinAngle;
-        zs = z * sinAngle;
+        xx          = x * x;
+        yy          = y * y;
+        zz          = z * z;
+        xy          = x * y;
+        yz          = y * z;
+        zx          = z * x;
+        xs          = x * sinAngle;
+        ys          = y * sinAngle;
+        zs          = z * sinAngle;
         oneMinusCos = 1.0f - cosAngle;
 
         // Note: matrixes in OpenGL ES are stored in column-major order!
@@ -636,14 +636,14 @@ GLuint esLoadProgram(const char* vertShaderSrc, const char* fragShaderSrc) {
 void JRenderer::InitRenderer() {
     checkGlError();
     mCurrentTextureFilter = TEX_FILTER_NONE;
-    mImageFilter = NULL;
+    mImageFilter          = NULL;
 
-    mCurrTexBlendSrc = BLEND_SRC_ALPHA;
+    mCurrTexBlendSrc  = BLEND_SRC_ALPHA;
     mCurrTexBlendDest = BLEND_ONE_MINUS_SRC_ALPHA;
 
     //	mLineWidth = 1.0f;
     mCurrentTex = -1;
-    mFOV = 75.0f;
+    mFOV        = 75.0f;
 
 #ifdef USING_MATH_TABLE
     for (int i = 0; i < 360; i++) {
@@ -711,7 +711,7 @@ void JRenderer::InitRenderer() {
     prog1 = esLoadProgram(vShader, fShader);
     // Get the attribute locations
     prog1_positionLoc = glGetAttribLocation(prog1, "a_position");
-    prog1_colorLoc = glGetAttribLocation(prog1, "a_color");
+    prog1_colorLoc    = glGetAttribLocation(prog1, "a_color");
     // Get the uniform locations
     prog1_mvpLoc = glGetUniformLocation(prog1, "u_mvp_matrix");
 
@@ -720,7 +720,7 @@ void JRenderer::InitRenderer() {
     // Get the attribute locations
     prog2_positionLoc = glGetAttribLocation(prog2, "a_position");
     prog2_texCoordLoc = glGetAttribLocation(prog2, "a_texCoord");
-    prog2_colorLoc = glGetAttribLocation(prog2, "a_color");
+    prog2_colorLoc    = glGetAttribLocation(prog2, "a_color");
     // Get the uniform locations
     prog2_mvpLoc = glGetUniformLocation(prog2, "u_mvp_matrix");
     // Get the sampler location
@@ -793,18 +793,18 @@ void JRenderer::EnableTextureFilter(bool flag) {
 
 void Swap(float* a, float* b) {
     float n = *a;
-    *a = *b;
-    *b = n;
+    *a      = *b;
+    *b      = n;
 }
 
 void JRenderer::RenderQuad(JQuad* quad, float xo, float yo, float angle, float xScale, float yScale) {
     checkGlError();
 
     // yo = SCREEN_HEIGHT-yo-1;//-(quad->mHeight);
-    float width = quad->mWidth;
+    float width  = quad->mWidth;
     float height = quad->mHeight;
-    float x = -quad->mHotSpotX;
-    float y = quad->mHotSpotY;
+    float x      = -quad->mHotSpotX;
+    float y      = quad->mHotSpotY;
 
     Vector2D pt[4];
     pt[3] = Vector2D(x, y);
@@ -962,7 +962,7 @@ void JRenderer::RenderQuad(JQuad* quad, VertexColor* pt) {
     checkGlError();
 
     for (int i = 0; i < 4; i++) {
-        pt[i].y = SCREEN_HEIGHT_F - pt[i].y;
+        pt[i].y               = SCREEN_HEIGHT_F - pt[i].y;
         quad->mColor[i].color = pt[i].color;
     }
 
@@ -1432,13 +1432,13 @@ void JRenderer::PlotArray(float* x, float* y, int count, PIXEL_TYPE color) {
     checkGlError();
 }
 
-void JRenderer::ScreenShot(const char* filename __attribute__((unused))) {}
+void JRenderer::ScreenShot([[maybe_unused]] const char* filename) {}
 
 #if (defined QT_CONFIG)
 JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureFormat __attribute__((unused))) {
-    JTexture* tex = NULL;
-    int rawsize = 0;
-    wge::byte_t* rawdata = NULL;
+    JTexture* tex           = NULL;
+    int rawsize             = 0;
+    wge::byte_t* rawdata    = NULL;
     JFileSystem* fileSystem = JFileSystem::GetInstance();
 
     do {
@@ -1466,12 +1466,12 @@ JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureForm
             if (mImageFilter != NULL)
                 mImageFilter->ProcessImage((PIXEL_TYPE*)tmpImage.bits(), tmpImage.width(), tmpImage.height());
 
-            tex->mFilter = TEX_FILTER_LINEAR;
-            tex->mWidth = tmpImage.width();
-            tex->mHeight = tmpImage.height();
-            tex->mTexWidth = wge::math::nearest_superior_power_of_2(tmpImage.width());
+            tex->mFilter    = TEX_FILTER_LINEAR;
+            tex->mWidth     = tmpImage.width();
+            tex->mHeight    = tmpImage.height();
+            tex->mTexWidth  = wge::math::nearest_superior_power_of_2(tmpImage.width());
             tex->mTexHeight = wge::math::nearest_superior_power_of_2(tmpImage.height());
-            tex->mBuffer = new wge::byte_t[tex->mTexWidth * tex->mTexHeight * 4];
+            tex->mBuffer    = new wge::byte_t[tex->mTexWidth * tex->mTexHeight * 4];
 
             for (int i = 0; i < tex->mHeight; i++) {
                 memcpy(tex->mBuffer + (i * 4 * tex->mTexWidth), tmpImage.constScanLine(i), tmpImage.bytesPerLine());
@@ -1527,7 +1527,7 @@ void JRenderer::TransferTextureToGLContext(JTexture& inTexture) {
         checkGlError();
         glGenTextures(1, &texid);
         inTexture.mTexId = texid;
-        mCurrentTex = texid;
+        mCurrentTex      = texid;
 
         //    glError = glGetError();
 
@@ -1580,13 +1580,13 @@ JTexture* JRenderer::CreateTexture(int width, int height, int mode __attribute__
     JTexture* tex = new JTexture();
 
     if (tex) {
-        int size = width * height * sizeof(PIXEL_TYPE);  // RGBA
+        int size     = width * height * sizeof(PIXEL_TYPE);  // RGBA
         auto* buffer = new wge::byte_t[size];
         if (buffer) {
-            tex->mFilter = TEX_FILTER_LINEAR;
-            tex->mWidth = width;
-            tex->mHeight = height;
-            tex->mTexWidth = width;
+            tex->mFilter    = TEX_FILTER_LINEAR;
+            tex->mWidth     = width;
+            tex->mHeight    = height;
+            tex->mTexWidth  = width;
             tex->mTexHeight = height;
 
             GLuint texid;
@@ -1642,7 +1642,7 @@ void JRenderer::ClearScreen(PIXEL_TYPE color) {
 void JRenderer::SetTexBlend(int src, int dest) {
     checkGlError();
     if (src != mCurrTexBlendSrc || dest != mCurrTexBlendDest) {
-        mCurrTexBlendSrc = src;
+        mCurrTexBlendSrc  = src;
         mCurrTexBlendDest = dest;
 
         glBlendFunc(src, dest);
@@ -1839,7 +1839,7 @@ void JRenderer::FillPolygon(float* x, float* y, int count, PIXEL_TYPE color) {
     int i;
 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
-    GLubyte* colors = new GLubyte[count * 4];
+    GLubyte* colors    = new GLubyte[count * 4];
     GLfloat* vVertices = new GLfloat[count * 3];
 
     for (i = 0; i < count; i++) {
@@ -1931,9 +1931,9 @@ void JRenderer::DrawPolygon(float* x, float* y, int count, PIXEL_TYPE color) {
     int i;
 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
-    int number = count + 1;
+    int number         = count + 1;
     GLfloat* vVertices = new GLfloat[3 * number];
-    GLubyte* colors = new GLubyte[4 * number];
+    GLubyte* colors    = new GLubyte[4 * number];
 
     for (i = 0; i < number; i++) {
         colors[4 * i + 0] = col.r;
@@ -2283,7 +2283,7 @@ void JRenderer::DrawPolygon(float x, float y, float size, int count, float start
 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
     GLfloat* vVertices = new GLfloat[3 * count];
-    GLubyte* colors = new GLubyte[4 * count];
+    GLubyte* colors    = new GLubyte[4 * count];
 
     for (i = 0; i < count; i++) {
         colors[4 * i + 0] = col.r;
@@ -2379,15 +2379,15 @@ void JRenderer::FillPolygon(float x, float y, float size, int count, float start
     JColor col;
     col.color = color;
 
-    float angle = startingAngle * RAD2DEG;
+    float angle      = startingAngle * RAD2DEG;
     float firstAngle = angle;
-    float steps = 360.0f / count;
+    float steps      = 360.0f / count;
     size /= 2;
     int i;
 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
     GLfloat* vVertices = new GLfloat[3 * (count + 2)];
-    GLubyte* colors = new GLubyte[4 * (count + 2)];
+    GLubyte* colors    = new GLubyte[4 * (count + 2)];
 
     for (i = 0; i < count + 2; i++) {
         colors[4 * i + 0] = col.r;
@@ -2510,9 +2510,9 @@ void JRenderer::DrawRoundRect(float x, float y, float w, float h, float radius, 
     int i;
 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
-    int number = 360;
+    int number         = 360;
     GLfloat* vVertices = new GLfloat[3 * number];
-    GLubyte* colors = new GLubyte[4 * number];
+    GLubyte* colors    = new GLubyte[4 * number];
 
     for (i = 0; i < number; i++) {
         colors[4 * i + 0] = col.r;
@@ -2665,9 +2665,9 @@ void JRenderer::FillRoundRect(float x, float y, float w, float h, float radius, 
 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
     int i, offset;
-    int number = 2 + 360;
+    int number         = 2 + 360;
     GLfloat* vVertices = new GLfloat[3 * number];
-    GLubyte* colors = new GLubyte[4 * number];
+    GLubyte* colors    = new GLubyte[4 * number];
 
     for (i = 0; i < number; i++) {
         colors[4 * i + 0] = col.r;
@@ -2679,7 +2679,7 @@ void JRenderer::FillRoundRect(float x, float y, float w, float h, float radius, 
     vVertices[0] = x - 5;
     vVertices[1] = SCREEN_HEIGHT_F - y;
     vVertices[2] = 0.0f;
-    offset = 1;
+    offset       = 1;
     for (i = 0; i < 90; i++) {
         vVertices[3 * (offset + i) + 0] = x + radius * COSF(i);
         vVertices[3 * (offset + i) + 1] = SCREEN_HEIGHT_F - y + radius * SINF(i);

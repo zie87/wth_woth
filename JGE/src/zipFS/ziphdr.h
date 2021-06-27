@@ -76,27 +76,27 @@ struct file_header {
 
     static const headerid m_ConstSign = FILE;
 
-    uint_least32_t m_Signature;
-    uint_least16_t m_VersionMade;
-    uint_least16_t m_VersionExtract;
-    uint_least16_t m_GeneralFlags;
-    uint_least16_t m_CompMethod;
-    uint_least16_t m_Time;
-    uint_least16_t m_Date;
-    uint_least32_t m_CRC32;
-    uint_least32_t m_CompSize;
-    uint_least32_t m_UncompSize;
-    uint_least16_t m_FilenameSize;
-    uint_least16_t m_FieldSize;
-    uint_least16_t m_CommentSize;
-    uint_least16_t m_DiskNb;
-    uint_least16_t m_IntAttrib;
-    uint_least32_t m_ExtAttrib;
-    uint_least32_t m_RelOffset;
+    uint_least32_t m_Signature      = 0;
+    uint_least16_t m_VersionMade    = 0;
+    uint_least16_t m_VersionExtract = 0;
+    uint_least16_t m_GeneralFlags   = 0;
+    uint_least16_t m_CompMethod     = 0;
+    uint_least16_t m_Time           = 0;
+    uint_least16_t m_Date           = 0;
+    uint_least32_t m_CRC32          = 0;
+    uint_least32_t m_CompSize       = 0;
+    uint_least32_t m_UncompSize     = 0;
+    uint_least16_t m_FilenameSize   = 0;
+    uint_least16_t m_FieldSize      = 0;
+    uint_least16_t m_CommentSize    = 0;
+    uint_least16_t m_DiskNb         = 0;
+    uint_least16_t m_IntAttrib      = 0;
+    uint_least32_t m_ExtAttrib      = 0;
+    uint_least32_t m_RelOffset      = 0;
 
-    std::vector<char> m_Filename;
-    std::vector<char> m_ExtraField;
-    std::vector<char> m_Comment;
+    std::vector<char> m_Filename   = {};
+    std::vector<char> m_ExtraField = {};
+    std::vector<char> m_Comment    = {};
 };
 
 // Zip file "end of central dir" header class

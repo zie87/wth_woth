@@ -2,10 +2,7 @@
 #define _J_FILE_SYSTEM_H_
 
 #include "zfsystem.h"
-
 namespace zfs = zip_file_system;
-
-#include "unzip/unzip.h"
 
 //////////////////////////////////////////////////////////////////////////
 /// Interface for low level file access with ZIP archive support. All

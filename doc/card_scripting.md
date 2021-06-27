@@ -60,7 +60,7 @@ So what can be put in contents? Contents is a list of keys and values spearated 
 
 **Example:** `primitive=Grizzly Bears`
 
-**Usage:** The idea of this feature is to allow you to add "reprints" of cards into your set very easily. For example, if you want to add a reprint of "Royal Assassin" to your set, you only have to specify its id, its rarity, and the line "primitive=Royal Assassin". Since Royal Assassin has already been coded (and inlcuded in the primitives file), all other data for the card will be taken from there.
+**Usage:** The idea of this feature is to allow you to add "reprints" of cards into your set very easily. For example, if you want to add a reprint of *Royal Assassin* to your set, you only have to specify its id, its rarity, and the line `primitive=Royal Assassin`. Since *Royal Assassin* has already been coded (and inlcuded in the primitives file), all other data for the card will be taken from there.
 
 This also means that you don't need to update your set when wechange the coding of Royal Assassin - your set will always load the information from the primitives file, which in this case will contain the updated version of Royal Assassin.
 

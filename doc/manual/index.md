@@ -177,45 +177,45 @@ The **extra information** option will display text notifications when cards do t
 
 |                                   |                                       |
 |-----------------------------------|---------------------------------------|
-|![circle](./images/psp_circle.png) | Confirms selection                    |
-|![x](./images/psp_x.png)           | Cancels                               |
-|![start](./images/psp_start.png)   | Opens menu (usually to save or exit)  |
+|![circle](./images/large/psp_circle.png) | Confirms selection                    |
+|![x](./images/large/psp_x.png)           | Cancels                               |
+|![start](./images/large/psp_start.png)   | Opens menu (usually to save or exit)  |
 
 ## Deck Editor
 
 |                                   |                                       |
 |-----------------------------------|---------------------------------------|
-|![circle](./images/psp_circle.png) | Add/remove card from deck             |
-|![x](./images/psp_x.png)           | Sell card                             |
-|![tri](./images/psp_triangle.png)  | Switch between deck and collection    |
-|![rect](./images/psp_rectangle.png)| Show help screen/statistics           |
-|![select](./images/psp_select.png) | Change browsing speed                 |
-|![start](./images/psp_start.png)   | Save or cancel changes                |
-|![start](./images/psp_start.png)   | Save or cancel changes                |
-|![shoulder l](./images/psp_l.png) ![shoulder r](./images/psp_r.png) | Browse statistics pages |
+|![circle](./images/large/psp_circle.png) | Add/remove card from deck             |
+|![x](./images/large/psp_x.png)           | Sell card                             |
+|![tri](./images/large/psp_triangle.png)  | Switch between deck and collection    |
+|![rect](./images/large/psp_rectangle.png)| Show help screen/statistics           |
+|![select](./images/large/psp_select.png) | Change browsing speed                 |
+|![start](./images/large/psp_start.png)   | Save or cancel changes                |
+|![start](./images/large/psp_start.png)   | Save or cancel changes                |
+|![shoulder l](./images/large/psp_l.png) ![shoulder r](./images/psp_r.png) | Browse statistics pages |
 
 ## Shop
 
 |                                   |                                       |
 |-----------------------------------|---------------------------------------|
-|![circle](./images/psp_circle.png) | Ask for price of card, buy card       |
-|![rect](./images/psp_rectangle.png)| Ask to see different cards            |
-|![start](./images/psp_start.png)   | Menu to exit (all purchases are saved)|
+|![circle](./images/large/psp_circle.png) | Ask for price of card, buy card       |
+|![rect](./images/large/psp_rectangle.png)| Ask to see different cards            |
+|![start](./images/large/psp_start.png)   | Menu to exit (all purchases are saved)|
 
 ## Play
 
 
 |                                   |                                               |
 |-----------------------------------|-----------------------------------------------|
-|![circle](./images/psp_circle.png) | ***On card:*** activate card (tap, attack, etc)   |
-|![circle](./images/psp_circle.png) | ***On player:*** select as target                 |
-|![circle](./images/psp_circle.png) | ***On card pile:*** browse pile, if allowed to    |
-|![circle](./images/psp_circle.png) | ***Asked to interrupt:*** don’t interrupt         |
-|![x](./images/psp_x.png)           | ***Asked to interrupt:*** decide to interrupt     |
-|![x](./images/psp_x.png)           | Cancel interrupt, spell, or ability           |
-|![shoulder l](./images/psp_l.png)  | Open and close hand                           |
-|![shoulder r](./images/psp_r.png)  | Advance to next game step                     |
-|![start](./images/psp_start.png)   | Menu to exit                                  |
+|![circle](./images/large/psp_circle.png) | ***On card:*** activate card (tap, attack, etc)   |
+|![circle](./images/large/psp_circle.png) | ***On player:*** select as target                 |
+|![circle](./images/large/psp_circle.png) | ***On card pile:*** browse pile, if allowed to    |
+|![circle](./images/large/psp_circle.png) | ***Asked to interrupt:*** don’t interrupt         |
+|![x](./images/large/psp_x.png)           | ***Asked to interrupt:*** decide to interrupt     |
+|![x](./images/large/psp_x.png)           | Cancel interrupt, spell, or ability           |
+|![shoulder l](./images/large/psp_l.png)  | Open and close hand                           |
+|![shoulder r](./images/large/psp_r.png)  | Advance to next game step                     |
+|![start](./images/large/psp_start.png)   | Menu to exit                                  |
 
 # Customization
 

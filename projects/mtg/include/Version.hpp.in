@@ -1,0 +1,19 @@
+#ifndef WOTH_WTH_VERSION_HPP
+#define WOTH_WTH_VERSION_HPP
+
+#include <string_view>
+
+namespace wth {
+
+struct version_info {
+    static constexpr unsigned int major = @VERSION_MAJOR@;
+    static constexpr unsigned int minor = @VERSION_MINOR@;
+    static constexpr unsigned int patch = @VERSION_PATCH@;
+
+    static constexpr std::string_view version{"@VERSION@"};
+    static constexpr std::string_view git_hash{"@GIT_HASH@"};
+    static constexpr std::string_view fullname{"WotH!? @VERSION@-@GIT_HASH@"};
+};
+
+}  // namespace wth
+#endif  // WOTH_WTH_VERSION_HPP

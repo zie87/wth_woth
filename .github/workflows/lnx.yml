@@ -14,19 +14,20 @@ jobs:
       matrix:
         cxx: [g++-10, clang++-11]
         build_type: [Debug, Release]
-        std: [17]
+        std: [17, 20]
         os: [ubuntu-20.04]
         include:
           - cxx: g++-10
-            install: sudo apt update && sudo apt install libsdl2-dev libpng-dev libjpeg-dev libz-dev
+            install: sudo apt update && sudo apt install git libsdl2-dev libpng-dev libjpeg-dev libz-dev
           - cxx: clang++-11
             cxxflags: -stdlib=libc++
-            install: sudo apt update && sudo apt install libc++-11-dev libc++abi-11-dev libsdl2-dev libpng-dev libjpeg-dev libz-dev
+            install: sudo apt update && sudo apt install git libc++-11-dev libc++abi-11-dev libsdl2-dev libpng-dev libjpeg-dev libz-dev
 
     steps:
     - uses: actions/checkout@v2
       with:
-        submodules: true
+        submodules: true   
+        fetch-depth: 0
 
     - name: Create Build Environment
       run: |

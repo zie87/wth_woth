@@ -1,6 +1,8 @@
 compile_commands.json
 
 build
+build_20
+build_tidy
 build_psp
 build_qt
 build_sdl

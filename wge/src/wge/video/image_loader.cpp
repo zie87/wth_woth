@@ -1,9 +1,10 @@
 #include <wge/video/image_loader.hpp>
-#include <wge/video/utils.hpp>
 
+#include <wge/types.hpp>
 #include <wge/memory.hpp>
 #include <wge/math/utils.hpp>
-#include <wge/types.hpp>
+#include <wge/utils/warnings.hpp>
+#include <wge/video/utils.hpp>
 
 #include <jpeglib.h>
 #include <png.h>
@@ -86,12 +87,12 @@ namespace video {
 const int image_loader::number_of_channels = 4;
 
 texture_data::texture_data(wge::size_t w, wge::size_t h, wge::size_t tw, wge::size_t th, wge::byte_t* buf,
-                           wge::size_t channels) noexcept
-    : width(w), height(h), texture_width(tw), texture_height(th), pixels(buf), channels(channels) {}
+                           wge::size_t num_channels) noexcept
+    : width(w), height(h), texture_width(tw), texture_height(th), pixels(buf), channels(num_channels) {}
 
 texture_data::texture_data(wge::size_t w, wge::size_t h, wge::size_t tw, wge::size_t th, vram_ptr<wge::byte_t>&& buf,
-                           wge::size_t channels) noexcept
-    : width(w), height(h), texture_width(tw), texture_height(th), pixels(std::move(buf)), channels(channels) {}
+                           wge::size_t num_channels) noexcept
+    : width(w), height(h), texture_width(tw), texture_height(th), pixels(std::move(buf)), channels(num_channels) {}
 
 texture_data image_loader::load_image(std::istream& stream, pixel_format format, bool use_vram,
                                       bool swizzle) noexcept {
@@ -101,7 +102,7 @@ texture_data image_loader::load_image(std::istream& stream, pixel_format format,
     wge::byte_t check_buf[min_check_size];
 
     stream.read(reinterpret_cast<char*>(check_buf), min_check_size);
-    const auto img_type = ::get_image_type(check_buf, stream.gcount());
+    const auto img_type = ::get_image_type(check_buf, static_cast<wge::size_t>(stream.gcount()));
     stream.seekg(pos);
 
     if (img_type == image_types::jpg) {
@@ -148,8 +149,8 @@ struct stream_wrapper {
     }
 
 private:
-    wge::size_t offset = 0U;
-    wge::size_t length = 0U;
+    wge::size_t offset        = 0U;
+    wge::size_t length        = 0U;
     const wge::byte_t* buffer = nullptr;
 };
 }  // namespace
@@ -169,34 +170,35 @@ static boolean jpg_fill_input_buffer([[maybe_unused]] j_decompress_ptr cinfo) {
 }
 
 static void jpg_skip_input_data(j_decompress_ptr cinfo, long num_bytes) {
-    cinfo->src->next_input_byte += (size_t)num_bytes;
-    cinfo->src->bytes_in_buffer -= (size_t)num_bytes;
+    cinfo->src->next_input_byte += static_cast<wge::size_t>(num_bytes);
+    cinfo->src->bytes_in_buffer -= static_cast<wge::size_t>(num_bytes);
 
     //// if (cinfo->src->bytes_in_buffer < 0)
     ////		ri.Con_Printf(PRINT_ALL, "Premature end of JPEG data\n");
 }
 
 void make_jpeg_info(jpeg_decompress_struct& cinfo, const wge::byte_t* const buffer, wge::size_t buffer_size) noexcept {
-    cinfo.src = (struct jpeg_source_mgr*)(*cinfo.mem->alloc_small)((j_common_ptr)&cinfo, JPOOL_PERMANENT,
-                                                                   sizeof(struct jpeg_source_mgr));
-    cinfo.src->init_source = jpg_null;
+    cinfo.src = reinterpret_cast<jpeg_source_mgr*>((*cinfo.mem->alloc_small)(
+        reinterpret_cast<j_common_ptr>(&cinfo), JPOOL_PERMANENT, sizeof(struct jpeg_source_mgr)));
+
+    cinfo.src->init_source       = jpg_null;
     cinfo.src->fill_input_buffer = jpg_fill_input_buffer;
-    cinfo.src->skip_input_data = jpg_skip_input_data;
+    cinfo.src->skip_input_data   = jpg_skip_input_data;
     cinfo.src->resync_to_restart = jpeg_resync_to_restart;
-    cinfo.src->term_source = jpg_null;
-    cinfo.src->bytes_in_buffer = buffer_size;
-    cinfo.src->next_input_byte = buffer;
+    cinfo.src->term_source       = jpg_null;
+    cinfo.src->bytes_in_buffer   = buffer_size;
+    cinfo.src->next_input_byte   = buffer;
 }
 
 template <wge::video::pixel_format Format>
 inline void convert_image_line(wge::byte_t* line, wge::size_t width, wge::size_t num_channels,
-                               typename wge::video::pixel_converter<Format>::pixel_t* out) noexcept {
+                               typename wge::video::pixel_converter<Format>::pixel_type* out) noexcept {
     using Converter = wge::video::pixel_converter<Format>;
     for (wge::size_t x = 0; x < width; ++x) {
-        int r = line[0];
-        int g = line[1];
-        int b = line[2];
-        int a = (num_channels == 4) ? line[3] : 255;
+        wge::u32 r = line[0];
+        wge::u32 g = line[1];
+        wge::u32 b = line[2];
+        wge::u32 a = (num_channels == 4) ? line[3] : 255;
 
         *(out + x) = Converter::convert(r, g, b, a);
         line += num_channels;
@@ -211,15 +213,17 @@ struct jpeg_stream final {
 };
 
 void init_source(j_decompress_ptr cinfo) noexcept {
-    auto* src = reinterpret_cast<jpeg_stream*>(cinfo->src);
+    auto* src          = reinterpret_cast<jpeg_stream*>(cinfo->src);
     src->start_of_file = true;
 }
 
 boolean fill_buffer(j_decompress_ptr cinfo) noexcept {
-    auto* src = reinterpret_cast<jpeg_stream*>(cinfo->src);
+    auto* src            = reinterpret_cast<jpeg_stream*>(cinfo->src);
     std::istream& stream = *(src->stream);
-    stream.read(reinterpret_cast<char*>(src->buffer.data()), src->buffer.size());
-    auto nbytes = stream.gcount();
+
+    const auto size = static_cast<std::streamsize>(src->buffer.size());
+    stream.read(reinterpret_cast<char*>(src->buffer.data()), size);
+    auto nbytes = static_cast<wge::size_t>(stream.gcount());
 
     if (nbytes <= 0) {
         if (src->start_of_file) {
@@ -229,40 +233,39 @@ boolean fill_buffer(j_decompress_ptr cinfo) noexcept {
         // WARNMS(cinfo, JWRN_JPEG_EOF);
 
         /* Insert a fake EOI marker */
-        src->buffer[0] = (JOCTET)0xFF;
-        src->buffer[1] = (JOCTET)JPEG_EOI;
-        nbytes = 2;
+        src->buffer[0] = static_cast<JOCTET>(0xFF);
+        src->buffer[1] = static_cast<JOCTET>(JPEG_EOI);
+        nbytes         = 2;
     }
 
     src->pub.next_input_byte = src->buffer.data();
     src->pub.bytes_in_buffer = nbytes;
-    src->start_of_file = false;
+    src->start_of_file       = false;
 
     return TRUE;
 }
 
 void skip(j_decompress_ptr cinfo, long num_bytes) noexcept {
     auto* src = reinterpret_cast<jpeg_stream*>(cinfo->src);
-    std::istream& stream = *(src->stream);
-
     /* Just a dumb implementation for now.  Could use fseek() except
      * it doesn't work on pipes.  Not clear that being smart is worth
      * any trouble anyway --- large skips are infrequent.
      */
     if (num_bytes > 0) {
-        while (num_bytes > src->pub.bytes_in_buffer) {
-            num_bytes -= src->pub.bytes_in_buffer;
+        auto remaining = static_cast<wge::size_t>(num_bytes);
+        while (remaining > src->pub.bytes_in_buffer) {
+            remaining -= src->pub.bytes_in_buffer;
             (void)fill_buffer(cinfo);
             /* note we assume that fill_input_buffer will never return FALSE,
              * so suspension need not be handled.
              */
         }
-        src->pub.next_input_byte += (size_t)num_bytes;
-        src->pub.bytes_in_buffer -= (size_t)num_bytes;
+        src->pub.next_input_byte += remaining;
+        src->pub.bytes_in_buffer -= remaining;
     }
 }
 
-void term(j_decompress_ptr cinfo) noexcept {
+void term([[maybe_unused]] j_decompress_ptr cinfo) noexcept {
     // Close the stream, can be nop
 }
 
@@ -276,20 +279,23 @@ void make_jpeg_info(jpeg_decompress_struct& cinfo, std::istream& is) noexcept {
      */
     if (cinfo.src == nullptr) {
         /* first time for this JPEG object? */
-        cinfo.src = (struct jpeg_source_mgr*)(*cinfo.mem->alloc_small)((j_common_ptr)&cinfo, JPOOL_PERMANENT,
-                                                                       sizeof(jpeg_stream));
+        cinfo.src = reinterpret_cast<jpeg_source_mgr*>(
+            (*cinfo.mem->alloc_small)(reinterpret_cast<j_common_ptr>(&cinfo), JPOOL_PERMANENT, sizeof(jpeg_stream)));
     }
 
-    auto* src = reinterpret_cast<jpeg_stream*>(cinfo.src);
-    src->stream = &is;
-    src->pub.init_source = init_source;
+    auto* src                  = reinterpret_cast<jpeg_stream*>(cinfo.src);
+    src->stream                = &is;
+    src->pub.init_source       = init_source;
     src->pub.fill_input_buffer = fill_buffer;
-    src->pub.skip_input_data = skip;
+    src->pub.skip_input_data   = skip;
     src->pub.resync_to_restart = jpeg_resync_to_restart; /* use default method */
-    src->pub.term_source = term;
-    src->pub.bytes_in_buffer = 0;       /* forces fill_input_buffer on first read */
-    src->pub.next_input_byte = nullptr; /* until buffer loaded */
+    src->pub.term_source       = term;
+    src->pub.bytes_in_buffer   = 0;       /* forces fill_input_buffer on first read */
+    src->pub.next_input_byte   = nullptr; /* until buffer loaded */
 }
+
+WGE_DISABLE_WARNING_PUSH
+WGE_DISABLE_WARNING_CAST_ALIGN
 
 void read_jpg_line(jpeg_decompress_struct& cinfo, wge::byte_t* scanline, pixel_format format,
                    wge::byte_t* buf) noexcept {
@@ -297,23 +303,25 @@ void read_jpg_line(jpeg_decompress_struct& cinfo, wge::byte_t* scanline, pixel_f
     const auto width = cinfo.output_width;
 
     switch (format) {
-    case pixel_format::format_5650:
-        convert_image_line<pixel_format::format_5650>(scanline, width, 3, reinterpret_cast<wge::u16*>(buf));
+    case pixel_format::bgr_5650:
+        convert_image_line<pixel_format::bgr_5650>(scanline, width, 3, reinterpret_cast<wge::u16*>(buf));
         break;
-    case pixel_format::format_5551:
-        convert_image_line<pixel_format::format_5551>(scanline, width, 3, reinterpret_cast<wge::u16*>(buf));
+    case pixel_format::abgr_5551:
+        convert_image_line<pixel_format::abgr_5551>(scanline, width, 3, reinterpret_cast<wge::u16*>(buf));
         break;
-    case pixel_format::format_4444:
-        convert_image_line<pixel_format::format_4444>(scanline, width, 3, reinterpret_cast<wge::u16*>(buf));
+    case pixel_format::abgr_4444:
+        convert_image_line<pixel_format::abgr_4444>(scanline, width, 3, reinterpret_cast<wge::u16*>(buf));
         break;
-    case pixel_format::format_8888:
-        convert_image_line<pixel_format::format_8888>(scanline, width, 3, reinterpret_cast<wge::u32*>(buf));
+    case pixel_format::abgr_8888:
+        convert_image_line<pixel_format::abgr_8888>(scanline, width, 3, reinterpret_cast<wge::u32*>(buf));
         break;
     case pixel_format::none:
         convert_image_line<pixel_format::none>(scanline, width, 3, reinterpret_cast<wge::u32*>(buf));
         break;
     }
 }
+
+WGE_DISABLE_WARNING_POP
 
 texture_data read_jpg_data(jpeg_decompress_struct& cinfo, pixel_format format, bool use_vram, bool swizzle) noexcept {
     jpeg_read_header(&cinfo, true);
@@ -325,9 +333,9 @@ texture_data read_jpg_data(jpeg_decompress_struct& cinfo, pixel_format format, b
     }
 
     const auto pixel_size = get_pixel_size(format);
-    const wge::size_t tw = wge::math::nearest_superior_power_of_2(cinfo.output_width);
-    const wge::size_t th = wge::math::nearest_superior_power_of_2(cinfo.output_height);
-    const auto size = tw * th * pixel_size;
+    const wge::size_t tw  = wge::math::nearest_superior_power_of_2(cinfo.output_width);
+    const wge::size_t th  = wge::math::nearest_superior_power_of_2(cinfo.output_height);
+    const auto size       = tw * th * pixel_size;
 
     auto ram_ptr = wge::video::make_vram_ptr<wge::byte_t>(size, use_vram);
     if (!ram_ptr) {
@@ -424,22 +432,25 @@ static void PNGCustomWarningFn([[maybe_unused]] png_structp png_ptr, [[maybe_unu
 
 namespace {
 
+WGE_DISABLE_WARNING_PUSH
+WGE_DISABLE_WARNING_CAST_ALIGN
+
 void read_png_line(png_structp& png_ptr, wge::byte_t* scanline, wge::size_t width, pixel_format format,
                    wge::byte_t* buf) noexcept {
     png_read_row(png_ptr, scanline, nullptr);
 
     switch (format) {
-    case pixel_format::format_5650:
-        convert_image_line<pixel_format::format_5650>(scanline, width, 4, reinterpret_cast<wge::u16*>(buf));
+    case pixel_format::bgr_5650:
+        convert_image_line<pixel_format::bgr_5650>(scanline, width, 4, reinterpret_cast<wge::u16*>(buf));
         break;
-    case pixel_format::format_5551:
-        convert_image_line<pixel_format::format_5551>(scanline, width, 4, reinterpret_cast<wge::u16*>(buf));
+    case pixel_format::abgr_5551:
+        convert_image_line<pixel_format::abgr_5551>(scanline, width, 4, reinterpret_cast<wge::u16*>(buf));
         break;
-    case pixel_format::format_4444:
-        convert_image_line<pixel_format::format_4444>(scanline, width, 4, reinterpret_cast<wge::u16*>(buf));
+    case pixel_format::abgr_4444:
+        convert_image_line<pixel_format::abgr_4444>(scanline, width, 4, reinterpret_cast<wge::u16*>(buf));
         break;
-    case pixel_format::format_8888:
-        convert_image_line<pixel_format::format_8888>(scanline, width, 4, reinterpret_cast<wge::u32*>(buf));
+    case pixel_format::abgr_8888:
+        convert_image_line<pixel_format::abgr_8888>(scanline, width, 4, reinterpret_cast<wge::u32*>(buf));
         break;
     case pixel_format::none:
         convert_image_line<pixel_format::none>(scanline, width, 4, reinterpret_cast<wge::u32*>(buf));
@@ -447,11 +458,13 @@ void read_png_line(png_structp& png_ptr, wge::byte_t* scanline, wge::size_t widt
     }
 }
 
+WGE_DISABLE_WARNING_POP
+
 texture_data read_png_data(png_structp& png_ptr, png_infop& info_ptr, bool use_vram, pixel_format format,
                            bool swizzle) noexcept {
     const unsigned int sig_read = 0;
     png_uint_32 width, height;
-    int bit_depth, color_type, interlace_type, x, y;
+    int bit_depth, color_type, interlace_type;
 
     png_set_sig_bytes(png_ptr, sig_read);
     png_read_info(png_ptr, info_ptr);
@@ -466,9 +479,9 @@ texture_data read_png_data(png_structp& png_ptr, png_infop& info_ptr, bool use_v
     const wge::size_t tw = wge::math::nearest_superior_power_of_2(width);
     const wge::size_t th = wge::math::nearest_superior_power_of_2(height);
 
-    const auto pixel_size = get_pixel_size(format);
+    const auto pixel_size  = get_pixel_size(format);
     const wge::size_t size = tw * th * pixel_size;
-    auto ram_ptr = make_vram_ptr<wge::byte_t>(size, use_vram);
+    auto ram_ptr           = make_vram_ptr<wge::byte_t>(size, use_vram);
     if (!ram_ptr) {
         return {};
     }
@@ -476,7 +489,7 @@ texture_data read_png_data(png_structp& png_ptr, png_infop& info_ptr, bool use_v
     wge::byte_t* work_buf = nullptr;
 
     constexpr wge::size_t vertical_block_size = 8U;
-    const auto swizzle_size = tw * vertical_block_size * pixel_size;
+    const auto swizzle_size                   = tw * vertical_block_size * pixel_size;
     if (swizzle) {
         work_buf = new wge::byte_t[swizzle_size];
     } else {
@@ -501,11 +514,11 @@ texture_data read_png_data(png_structp& png_ptr, png_infop& info_ptr, bool use_v
 
         const auto num_vertical_blocks = height / vertical_block_size;
 
-        wge::byte_t* dst = ram_ptr.get();
+        wge::byte_t* dst     = ram_ptr.get();
         wge::byte_t* tmp_ptr = work_buf;
 
         for (wge::size_t block = 0; block < num_vertical_blocks; ++block) {
-            for (y = 0; y < vertical_block_size; y++) {
+            for (wge::size_t y = 0; y < vertical_block_size; y++) {
                 read_png_line(png_ptr, scanline.get(), width, format, tmp_ptr);
                 tmp_ptr += row_size;
             }
@@ -529,7 +542,7 @@ texture_data read_png_data(png_structp& png_ptr, png_infop& info_ptr, bool use_v
         }
 
         if (swizzle) {
-            utils::swizzle_lines(work_buf, dst, tw, remaining_lines);
+            utils::swizzle_lines(work_buf, dst, static_cast<wge::u32>(tw), static_cast<wge::u32>(remaining_lines));
         }
     }
 
@@ -538,14 +551,14 @@ texture_data read_png_data(png_structp& png_ptr, png_infop& info_ptr, bool use_v
 
 }  // namespace
 
-static void read_png_from_buffer(png_structp png_ptr, png_bytep outBytes, png_size_t byteCountToRead) {
+static void read_png_from_buffer(png_structp png_ptr, png_bytep outBytes, png_size_t num_bytes) {
     png_voidp io_ptr = png_get_io_ptr(png_ptr);
     if (io_ptr == nullptr) return;  // add custom error handling here
 
-    auto& input_stream = *(stream_wrapper*)io_ptr;
-    const auto bytesRead = input_stream.read(outBytes, byteCountToRead);
+    auto& input_stream    = *reinterpret_cast<stream_wrapper*>(io_ptr);
+    const auto bytes_read = input_stream.read(outBytes, num_bytes);
 
-    if ((png_size_t)bytesRead != byteCountToRead) {
+    if (bytes_read != num_bytes) {
         png_error(png_ptr, "Read Error!");
     }
 }
@@ -554,12 +567,11 @@ static void read_png_from_stream(png_structp png_ptr, png_bytep outBytes, png_si
     png_voidp io_ptr = png_get_io_ptr(png_ptr);
     if (io_ptr == nullptr) return;  // add custom error handling here
 
-    auto& input_stream = *(std::istream*)io_ptr;
+    auto& input_stream = *reinterpret_cast<std::istream*>(io_ptr);
+    input_stream.read(reinterpret_cast<char*>(outBytes), static_cast<std::streamsize>(byteCountToRead));
 
-    input_stream.read(reinterpret_cast<char*>(outBytes), byteCountToRead);
-
-    const auto bytesRead = input_stream.gcount();
-    if ((png_size_t)bytesRead != byteCountToRead) {
+    const auto bytes_read = input_stream.gcount();
+    if (static_cast<png_size_t>(bytes_read) != byteCountToRead) {
         png_error(png_ptr, "Read Error!");
     }
 }

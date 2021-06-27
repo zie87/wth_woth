@@ -3,20 +3,20 @@
 
 #include <JGE.h>
 
-#if defined(PSP)
-#include <pspkernel.h>
-#include <pspdisplay.h>
-#include <pspctrl.h>
-#include <pspiofilemgr.h>
-#include <pspdebug.h>
-#include <psputility.h>
-#include <pspgu.h>
-#include <psprtc.h>
-
-#include <psptypes.h>
-#include <malloc.h>
-
-#endif
+//#if defined(PSP)
+//#include <pspkernel.h>
+//#include <pspdisplay.h>
+//#include <pspctrl.h>
+//#include <pspiofilemgr.h>
+//#include <pspdebug.h>
+//#include <psputility.h>
+//#include <pspgu.h>
+//#include <psprtc.h>
+//
+//#include <psptypes.h>
+//#include <malloc.h>
+//
+//#endif
 
 #include <math.h>
 #include <stdio.h>
@@ -30,9 +30,6 @@
 #include <vector>
 #include <string>
 
-using std::string;
-
-// std::string manipulation methods
 std::string& trim(std::string& str);
 std::string& ltrim(std::string& str);
 std::string& rtrim(std::string& str);
@@ -112,14 +109,6 @@ void dumpStack();
 u32 ramAvailableLineareMax(void);
 u32 ramAvailable(void);
 
-/*
-#ifdef WIN32
-#include <direct.h>
-#else
-#include <sys/stat.h>
-#endif
-*/
-
 inline void ReplaceString(std::string& subject, const std::string& search, const std::string& replace) {
     size_t pos = 0;
     while ((pos = subject.find(search, pos)) != std::string::npos) {
@@ -132,20 +121,5 @@ bool fileExists(const char* filename);
 bool FileExists(const std::string& filename);
 std::string buildFilePath(const std::vector<string>& folders, const std::string& filename);
 std::string ensureFolder(const std::string& folderName);
-/*
-template <class T> istream& operator>>(istream& in, T& p)
-{
-    std::string s;
 
-    while(std::getline(in, s))
-    {
-        if(!p.parseLine(s))
-        {
-            break;
-        }
-    }
-
-    return in;
-}
-*/
 #endif

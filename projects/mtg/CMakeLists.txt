@@ -128,9 +128,14 @@ target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-DDEBUG_CACHE>")
 target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-DTESTSUITE>")
 target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-DAI_CHANGE_TESTING>")
 
+
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/include/Version.hpp.in 
+                ${PROJECT_BINARY_DIR}/include/generated/Version.hpp)
+
 target_include_directories(wth_woth 
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${PROJECT_BINARY_DIR}/include/generated/
 )
 
 target_link_libraries(wth_woth

@@ -18,7 +18,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        submodules: true
+        submodules: true    
+        fetch-depth: 0
+
 
     - name: build
       uses: docker://zie87/wth_woth_pspdev:latest

@@ -1,6 +1,18 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(wth_woth LANGUAGES C CXX)
+set(WOTH_CMAKE_MODULES_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/modules)
+list(APPEND CMAKE_MODULE_PATH ${WOTH_CMAKE_MODULES_PATH})
+
+find_package(Git REQUIRED)
+include( MunkeiVersionFromGit )
+
+version_from_git(
+    GIT_EXECUTABLE ${GIT_EXECUTABLE}
+    LOG       ON
+    TIMESTAMP "%Y%m%d%H%M%S"
+)
+
+project(wth_woth LANGUAGES C CXX VERSION ${VERSION})
 
 # Set a default build type if none was specified
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -13,24 +25,21 @@ endif()
 # Generate compile_commands.json to make it easier to work with clang based tools
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(WOTH_CMAKE_MODULES_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/modules)
-list(APPEND CMAKE_MODULE_PATH ${WOTH_CMAKE_MODULES_PATH})
+include(CompilerWarnings)
+
+add_library(woth_warnings INTERFACE)
+set_project_warnings(woth_warnings)
+add_library(WotH::warnings ALIAS woth_warnings)
 
 add_library(woth_options INTERFACE)
 target_compile_options(woth_options INTERFACE "$<$<CONFIG:DEBUG>:-DWOTH_DEBUG>")
 target_compile_options(woth_options INTERFACE "$<$<CONFIG:DEBUG>:-D_DEBUG>")
 target_compile_options(woth_options INTERFACE "$<$<CONFIG:RELEASE>:-O2>")
 
+include(Sanitizers)
+enable_sanitizers(woth_options)
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
-    option(ENABLE_COVERAGE "Enable coverage reporting for gcc/clang" FALSE)
-
-    if(ENABLE_COVERAGE)
-      target_compile_options(woth_options INTERFACE --coverage -O0 -g)
-      target_link_libraries(woth_options INTERFACE --coverage)
-    endif()
-endif()
-
+include(StaticAnalyzers)
 
 if(DEFINED PSP)
     target_link_libraries(woth_options INTERFACE psp::interface)
@@ -39,7 +48,7 @@ if(DEFINED PSP)
     target_compile_definitions(woth_options INTERFACE "DEVHOOK")
     target_compile_definitions(woth_options INTERFACE "PSPFW3XX")
     
-    include(psp_tools) 
+    include(PspTools) 
     set(WOTH_PSP_BUILD ON)
 elseif(DEFINED UNIX)
     target_compile_definitions(woth_options INTERFACE "WOTH_PLATFORM_UNIX")

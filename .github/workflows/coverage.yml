@@ -18,11 +18,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        submodules: true
+        submodules: true   
+        fetch-depth: 0
 
     - name: Create Build Environment
       run: |
-        sudo apt update && sudo apt install lcov libsdl2-dev libpng-dev libjpeg-dev libz-dev
+        sudo apt update && sudo apt install git lcov libsdl2-dev libpng-dev libjpeg-dev libz-dev
         cmake -E make_directory ${{runner.workspace}}/build
 
     - name: Configure

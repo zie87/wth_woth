@@ -250,7 +250,7 @@ int TestSuiteGame::Log(const char* text) {
         file.close();
     }
 
-    WGE_LOG_DEBUG(text);
+    WGE_LOG_DEBUG("test result: {}", text);
     return 1;
 }
 

@@ -434,7 +434,7 @@ bool MTGAllCards::addCardToCollection(MTGCard* card, int setId) {
 #if defined(_DEBUG)
         string cardName = card->data ? card->data->name : card->getImageName();
         string setName = setId != -1 ? setlist.getInfo(setId)->getName() : "";
-        WGE_LOG_WARN("card id collision! {} -> \"{}\" (\"{}\"})", newId, cardName, setName);
+        WGE_LOG_WARN("card id collision! {} -> \"{}\" (\"{}\")", newId, cardName, setName);
 #endif
         SAFE_DELETE(card);
         return false;

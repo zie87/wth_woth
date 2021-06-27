@@ -1,3 +1,4 @@
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/d8e41d16dc114f95806e050515c2dbc0)](https://www.codacy.com/gh/zie87/wth_woth/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=zie87/wth_woth&amp;utm_campaign=Badge_Grade)
 [![Coverage Status](https://coveralls.io/repos/github/zie87/wth_woth/badge.svg)](https://coveralls.io/github/zie87/wth_woth)
 
 # Wagic: War of the Homebrew

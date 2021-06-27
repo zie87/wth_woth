@@ -50,22 +50,28 @@ To compile *WotH* you need to provide:
 # Compiling for Linux
 
 1. Download and install the build dependencies
-  ```
-  # Ubuntu
-  sudo apt update
-  sudo apt install build-essential g++ cmake git libsdl2-dev libpng-dev libjpeg-dev libfreetype-dev libz-dev
-  ```
-  ```
-  # Arch Linux
-  sudo pacman -Sy
-  sudo base-devel pacman -S cmake gcc git sdl2 libpng libjpeg-turbo freetype2 zlib
-  ```
+    ```
+    # Ubuntu
+    sudo apt update
+    sudo apt install build-essential g++ cmake git libsdl2-dev libpng-dev libjpeg-dev libfreetype-dev libz-dev
+    ```
+    ```
+    # Arch Linux
+    sudo pacman -Sy
+    sudo base-devel pacman -S cmake gcc git sdl2 libpng libjpeg-turbo freetype2 zlib
+    ```
 2. Download the [source code][0] from *git*:
-  - `git clone --recursive https://github.com/zie87/wth_woth wth_woth`
+    ```
+    git clone --recursive https://github.com/zie87/wth_woth wth_woth
+    ```
 3. Start the configuration process via [CMake][2]. We need *only* to define the build type (`Debug` or `Release`).
-  - `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`
+    ```
+    cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+    ```
 4. Start the compiling of the source code via [CMake][2] with this command:
-  - `cmake --build build -- -j $(nproc)`
+    ```
+    cmake --build build -- -j $(nproc)
+    ```
 
 [3]: https://ubuntu.com/
 [4]: https://archlinux.org/
@@ -84,9 +90,13 @@ To run *WotH* on the PSP, you need to compile a new **EBOOT.PBP**. For the compi
     * [Ubuntu][3]: `sudo apt update && sudo apt install docker`
     * [Arch][4]: `sudo pacman -Sy && sudo pacman -S docker`
 2. Pull the [docker image][6]:
-    * `docker pull zie87/wth_woth_pspdev:main`
+    ```
+    docker pull zie87/wth_woth_pspdev:main
+    ```
 3. Download the [source code][0] from *git*:
-    * `git clone --recursive https://github.com/zie87/wth_woth wth_woth`
+    ```
+    git clone --recursive https://github.com/zie87/wth_woth wth_woth
+    ```
 4. Build the source code inside the Docker Container. A script is provided which will start the build process. We only need to start the script inside the container:
     ```
     docker run --rm -u $UID --init -v $PWD:/opt/workspace -e LANG=$LANG -w /opt/workspace -it zie87/wth_woth_pspdev /bin/bash "./.github/tools/psp/build.sh" Debug

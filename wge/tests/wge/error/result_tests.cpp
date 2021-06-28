@@ -35,6 +35,20 @@ WTEST_CASE(WgeErrorResult, construction_with_value) {
     WTEST_ASSERT_EQUAL(val, result.value());
 }
 
+WTEST_CASE(WgeErrorResult, construction_with_move_value) {
+    using value_type       = none_copyable<wge::u32>;
+    using result_type      = wge::result_t<value_type, wge::u32>;
+    constexpr wge::u32 val = 145;
+
+    result_type result{value_type(val)};
+
+    WTEST_ASSERT_TRUE(result.has_value());
+    WTEST_ASSERT_FALSE(result.has_error());
+
+    auto result_val = std::move(result.value());
+    WTEST_ASSERT_EQUAL(val, result_val.val);
+}
+
 WTEST_CASE(WgeErrorResult, construction_with_error) {
     using result_type      = wge::result_t<wge::u32, wge::u32>;
     constexpr wge::u32 val = 145;
@@ -46,20 +60,19 @@ WTEST_CASE(WgeErrorResult, construction_with_error) {
     WTEST_ASSERT_EQUAL(val, result.error());
 }
 
+WTEST_CASE(WgeErrorResult, construction_with_move_error) {
+    using error_type       = none_copyable<wge::u32>;
+    using result_type      = wge::result_t<wge::u32, error_type>;
+    constexpr wge::u32 val = 145;
 
-// WTEST_CASE(WgeErrorResult, construction_with_move_value) {
-//     using value_type = none_copyable<wge::u32>;
-//     using result_type      = wge::result_t<value_type, wge::u32>;
-//     constexpr wge::u32 val = 145;
-//
-//     result_type result{value_type(val)};
-//
-//     WTEST_ASSERT_TRUE(result.has_value());
-//     WTEST_ASSERT_FALSE(result.has_error());
-//
-//     auto result_val = result.value();
-//     WTEST_ASSERT_EQUAL(val, result.value().val);
-// }
+    result_type result = wge::make_error_result(error_type(val));
+
+    WTEST_ASSERT_FALSE(result.has_value());
+    WTEST_ASSERT_TRUE(result.has_error());
+
+    auto result_err = std::move(result.error());
+    WTEST_ASSERT_EQUAL(val, result_err.val);
+}
 
 WTEST_CASE(WgeErrorResult, value_access_options) {
     using result_type      = wge::result_t<wge::u32, wge::u32>;
@@ -79,17 +92,12 @@ WTEST_CASE(WgeErrorResult, value_access_options) {
         result.value() = new_val;
         WTEST_ASSERT_EQUAL(new_val, result.value());
     }
-
-    // move value out
-    {
-        result_type result(val);
-        const auto ret_val = std::move(result.value());
-        WTEST_ASSERT_EQUAL(val, ret_val);
-    }
 }
 
 WTEST_SUITE_RUNNER(WgeErrorResult) {
     RUN_TEST_CASE(WgeErrorResult, construction_with_value);
     RUN_TEST_CASE(WgeErrorResult, construction_with_error);
+    RUN_TEST_CASE(WgeErrorResult, construction_with_move_value);
+    RUN_TEST_CASE(WgeErrorResult, construction_with_move_error);
     RUN_TEST_CASE(WgeErrorResult, value_access_options);
 }

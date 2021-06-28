@@ -46,8 +46,13 @@ struct storage {
         m_is_constructed = true;
     }
 
-    void construct(detail::result_error<E> error) {
+    void construct(const detail::result_error<E>& error) {
         new (&m_storage) E(error.err);
+        m_is_constructed = true;
+    }
+
+    void construct(detail::result_error<E>&& error) {
+        new (&m_storage) E(std::move(error.err));
         m_is_constructed = true;
     }
 
@@ -99,21 +104,6 @@ public:
 
     constexpr explicit operator bool() const noexcept { return has_value(); }
 
-    //  template <class U = T,
-    //            detail::enable_if_t<!std::is_void<U>::value> * = nullptr>
-    //  TL_EXPECTED_11_CONSTEXPR const U &&value() const && {
-    //    if (!has_value())
-    //      detail::throw_exception(bad_expected_access<E>(std::move(err()).value()));
-    //    return std::move(val());
-    //  }
-    //  template <class U = T,
-    //            detail::enable_if_t<!std::is_void<U>::value> * = nullptr>
-    //  TL_EXPECTED_11_CONSTEXPR U &&value() && {
-    //    if (!has_value())
-    //      detail::throw_exception(bad_expected_access<E>(std::move(err()).value()));
-    //    return std::move(val());
-    //  }
-
     template <typename U = Value, std::enable_if_t<!std::is_void<U>::value>* = nullptr>
     constexpr auto value() const& -> const U& {
         if (has_error()) {
@@ -155,6 +145,14 @@ public:
         }
 
         return get_error();
+    }
+
+    constexpr auto error() && -> error_type&& {
+        if (has_value()) {
+            ErrorPolicy::handle_error("Attempting to unwrap an error on value result\n");
+        }
+
+        return std::move(get_error());
     }
 
 private:

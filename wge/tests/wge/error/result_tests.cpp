@@ -120,22 +120,24 @@ WTEST_CASE(WgeErrorResult, value_is_destructed) {
     using result_type = wge::result_t<destruction_track, char>;
 
     wge::u32 tracker = 0;
+    wge::u32 counter = 0;
     {
         const result_type result{destruction_track(tracker)};
-        WTEST_ASSERT_EQUAL(2U, tracker);
+        counter = tracker;
     }
-    WTEST_ASSERT_EQUAL(3U, tracker);
+    WTEST_ASSERT_EQUAL((counter + 1), tracker);
 }
 
 WTEST_CASE(WgeErrorResult, error_is_destructed) {
     using result_type = wge::result_t<char, destruction_track>;
 
     wge::u32 tracker = 0;
+    wge::u32 counter = 0;
     {
         const result_type result = wge::make_error_result(destruction_track(tracker));
-        WTEST_ASSERT_EQUAL(2U, tracker);
+        counter                  = tracker;
     }
-    WTEST_ASSERT_EQUAL(3U, tracker);
+    WTEST_ASSERT_EQUAL((counter + 1), tracker);
 }
 
 WTEST_SUITE_RUNNER(WgeErrorResult) {
@@ -146,7 +148,7 @@ WTEST_SUITE_RUNNER(WgeErrorResult) {
 
     RUN_TEST_CASE(WgeErrorResult, value_is_destructed);
     RUN_TEST_CASE(WgeErrorResult, error_is_destructed);
-    
+
     RUN_TEST_CASE(WgeErrorResult, value_access_options);
     RUN_TEST_CASE(WgeErrorResult, value_or_alternative);
 }

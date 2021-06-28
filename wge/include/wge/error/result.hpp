@@ -1,201 +1,279 @@
 #ifndef WOTH_WGE_ERROR_RESULT_HPP
 #define WOTH_WGE_ERROR_RESULT_HPP
 
-#include <wge/string/view.hpp>
-
 #include <type_traits>
 #include <utility>
-#include <exception>
-
-#include <cstdio>
 
 namespace wge {
 
 namespace detail {
 
-template <typename V>
-struct result_value {
-    result_value(const V& v) : val(v) {}
-    result_value(V&& v) noexcept : val(std::move(v)) {}
+template <typename T, typename E>
+class storage_impl {
+public:
+    using value_type = T;
+    using error_type = E;
 
-    V val;
+    constexpr storage_impl() noexcept {}
+    ~storage_impl() noexcept {}
+
+    explicit constexpr storage_impl(bool has_value) noexcept : m_has_value(has_value) {}
+
+    void construct_value(value_type const& e) { new (std::addressof(m_value)) value_type(e); }
+    void construct_value(value_type&& e) { new (std::addressof(m_value)) value_type(std::move(e)); }
+
+    void construct_error(error_type const& e) { new (std::addressof(m_error)) error_type(e); }
+    void construct_error(error_type&& e) { new (std::addressof(m_error)) error_type(std::move(e)); }
+
+    void destruct_value() { m_value.~value_type(); }
+    void destruct_error() { m_error.~error_type(); }
+
+    template <class... Args>
+    void emplace_value(Args&&... args) {
+        new (std::addressof(m_value)) value_type(std::forward<Args>(args)...);
+    }
+
+    template <class U, class... Args>
+    void emplace_value(std::initializer_list<U> il, Args&&... args) {
+        new (std::addressof(m_value)) value_type(il, std::forward<Args>(args)...);
+    }
+
+    template <class... Args>
+    void emplace_error(Args&&... args) {
+        new (std::addressof(m_error)) error_type(std::forward<Args>(args)...);
+    }
+
+    template <class U, class... Args>
+    void emplace_error(std::initializer_list<U> il, Args&&... args) {
+        new (std::addressof(m_error)) error_type(il, std::forward<Args>(args)...);
+    }
+
+    constexpr auto value() const& noexcept -> const value_type& { return m_value; }
+    constexpr auto value() & noexcept -> value_type& { return m_value; }
+    constexpr auto value() const&& noexcept -> const value_type&& { return std::move(m_value); }
+    constexpr auto value() && noexcept -> value_type&& { return std::move(m_value); }
+
+    constexpr auto error() const& noexcept -> const error_type& { return m_error; }
+    constexpr auto error() & noexcept -> error_type& { return m_error; }
+    constexpr auto error() const&& noexcept -> const error_type&& { return std::move(m_error); }
+    constexpr auto error() && noexcept -> error_type&& { return std::move(m_error); }
+
+    auto value_ptr() const noexcept -> const value_type* { return std::addressof(m_value); }
+    auto value_ptr() noexcept -> value_type* { return std::addressof(m_value); }
+
+    constexpr bool has_value() const noexcept { return m_has_value; }
+    void set_has_value(bool v) { m_has_value = v; }
+
+private:
+    union {
+        value_type m_value;
+        error_type m_error;
+    };
+    bool m_has_value = false;
 };
 
 template <typename E>
-struct result_error {
-    result_error(const E& e) : err(e) {}
-    result_error(E&& e) noexcept : err(std::move(e)) {}
+class storage_impl<void, E> {
+public:
+    using error_type = E;
 
-    E err;
-};
+    void construct_error(const error_type& e) { new (std::addressof(m_error)) error_type(e); }
+    void construct_error(error_type&& e) { new (std::addressof(m_error)) error_type(std::move(e)); }
 
-struct result_value_tag {};
-struct result_error_tag {};
+    void destruct_error() { m_error.~error_type(); }
 
-template <typename V, typename E>
-struct storage {
-    static constexpr auto size  = sizeof(V) > sizeof(E) ? sizeof(V) : sizeof(E);
-    static constexpr auto align = sizeof(V) > sizeof(E) ? alignof(V) : alignof(E);
-
-    using type = typename std::aligned_storage_t<size, align>;
-
-    void construct(const detail::result_value<V>& value) {
-        new (&m_storage) V(value.val);
-        m_is_constructed = true;
+    template <class... Args>
+    void emplace_error(Args&&... args) {
+        new (std::addressof(m_error)) error_type(std::forward<Args>(args)...);
     }
 
-    void construct(detail::result_value<V>&& value) {
-        new (&m_storage) V(std::move(value.val));
-        m_is_constructed = true;
+    template <class U, class... Args>
+    void emplace_error(std::initializer_list<U> il, Args&&... args) {
+        new (std::addressof(m_error)) error_type(il, std::forward<Args>(args)...);
     }
 
-    void construct(const detail::result_error<E>& error) {
-        new (&m_storage) E(error.err);
-        m_is_constructed = true;
-    }
+    constexpr auto error() const& noexcept -> const error_type& { return m_error; }
+    constexpr auto error() & noexcept -> error_type& { return m_error; }
+    constexpr auto error() const&& noexcept -> const error_type&& { return std::move(m_error); }
+    constexpr auto error() && noexcept -> error_type&& { return std::move(m_error); }
 
-    void construct(detail::result_error<E>&& error) {
-        new (&m_storage) E(std::move(error.err));
-        m_is_constructed = true;
-    }
+    constexpr bool has_value() const noexcept { return m_has_value; }
+    void set_has_value(bool v) { m_has_value = v; }
 
-    template <typename U>
-    auto get() const& noexcept -> const U& {
-        return *reinterpret_cast<const U*>(&m_storage);
-    }
+protected:
+    constexpr storage_impl() noexcept {}
+    ~storage_impl() noexcept {}
 
-    template <typename U>
-    auto get() & noexcept -> U& {
-        return *reinterpret_cast<U*>(&m_storage);
-    }
-
-    void destroy(result_value_tag) noexcept {
-        if (m_is_constructed) {
-            get<V>().~V();
-            m_is_constructed = false;
-        }
-    }
-
-    void destroy(result_error_tag) noexcept {
-        if (m_is_constructed) {
-            get<E>().~E();
-            m_is_constructed = false;
-        }
-    }
+    explicit constexpr storage_impl(bool has_value) noexcept : m_has_value(has_value) {}
 
 private:
-    bool m_is_constructed = false;
-    type m_storage        = {};
+    union {
+        char m_dummy;
+        error_type m_error;
+    };
+    bool m_has_value = false;
 };
 
-struct terminate_on_error {
-    static void handle_error(const char* msg) noexcept {
-        std::fprintf(stderr, "%s", msg);
-        std::terminate();
+template <typename T, typename E, bool IsConstructable, bool IsMoveable>
+class storage_t;
+
+template <typename T, typename E>
+class storage_t<T, E, true, true> final : public storage_impl<T, E> {
+public:
+    constexpr storage_t() noexcept = default;
+    ~storage_t() noexcept          = default;
+
+    explicit constexpr storage_t(bool has_value) noexcept : storage_impl<T, E>(has_value) {}
+
+    storage_t(const storage_t& other) : storage_impl<T, E>(other.has_value()) {
+        if (this->has_value()) {
+            this->construct_value(other.value());
+        } else {
+            this->construct_error(other.error());
+        }
+    }
+
+    storage_t(storage_t&& other) : storage_impl<T, E>(other.has_value()) {
+        if (this->has_value()) {
+            this->construct_value(std::move(other.value()));
+        } else {
+            this->construct_error(std::move(other.error()));
+        }
+    }
+};
+
+template <typename E>
+class storage_t<void, E, true, true> final : public storage_impl<void, E> {
+public:
+    constexpr storage_t() noexcept = default;
+    ~storage_t() noexcept          = default;
+
+    explicit constexpr storage_t(bool has_value) noexcept : storage_impl<void, E>(has_value) {}
+
+    storage_t(const storage_t& other) : storage_impl<void, E>(other.has_value()) {
+        if (!this->has_value()) {
+            this->construct_error(other.error());
+        }
+    }
+
+    storage_t(storage_t&& other) : storage_impl<void, E>(other.has_value()) {
+        if (!this->has_value()) {
+            this->construct_error(std::move(other.error()));
+        }
+    }
+};
+
+template <typename T, typename E>
+class storage_t<T, E, true, false> final : public storage_impl<T, E> {
+public:
+    constexpr storage_t() noexcept = default;
+    ~storage_t() noexcept          = default;
+
+    explicit constexpr storage_t(bool has_value) noexcept : storage_impl<T, E>(has_value) {}
+
+    storage_t(const storage_t& other) : storage_impl<T, E>(other.has_value()) {
+        if (this->has_value()) {
+            this->construct_value(other.value());
+        } else {
+            this->construct_error(other.error());
+        }
+    }
+    storage_t(storage_t&& other) = delete;
+};
+
+template <typename E>
+class storage_t<void, E, true, false> final : public storage_impl<void, E> {
+public:
+    constexpr storage_t() noexcept = default;
+    ~storage_t() noexcept          = default;
+
+    explicit constexpr storage_t(bool has_value) noexcept : storage_impl<void, E>(has_value) {}
+
+    storage_t(const storage_t& other) : storage_impl<void, E>(other.has_value()) {
+        if (!this->has_value()) {
+            this->construct_error(other.error());
+        }
+    }
+    storage_t(storage_t&& other) = delete;
+};
+
+template <typename T, typename E>
+class storage_t<T, E, false, true> final : public storage_impl<T, E> {
+public:
+    constexpr storage_t() noexcept = default;
+    ~storage_t() noexcept          = default;
+
+    explicit constexpr storage_t(bool has_value) noexcept : storage_impl<T, E>(has_value) {}
+
+    storage_t(const storage_t& other) = delete;
+    storage_t(storage_t&& other) : storage_impl<T, E>(other.has_value()) {
+        if (this->has_value()) {
+            this->construct_value(std::move(other.value()));
+        } else {
+            this->construct_error(std::move(other.error()));
+        }
+    }
+};
+
+template <typename E>
+class storage_t<void, E, false, true> final : public storage_impl<void, E> {
+public:
+    constexpr storage_t() noexcept = default;
+    ~storage_t() noexcept          = default;
+
+    explicit constexpr storage_t(bool has_value) noexcept : storage_impl<void, E>(has_value) {}
+
+    storage_t(const storage_t& other) = delete;
+    storage_t(storage_t&& other) : storage_impl<void, E>(other.has_value()) {
+        if (!this->has_value()) {
+            this->construct_error(std::move(other.error()));
+        }
     }
 };
 
 }  // namespace detail
 
-template <typename Value, typename Error, class ErrorPolicy>
-class basic_result_t {
-    static_assert(!std::is_same<Error, void>::value, "void error type is not allowed");
-
-    using storage_type = typename detail::storage<Value, Error>;
-
-    using result_value_type = detail::result_value<Value>;
-    using result_error_type = detail::result_error<Error>;
-
+template <typename T, typename E>
+class result_base {
 public:
-    using value_type = Value;
-    using error_type = Error;
+    using value_type = T;
+    using error_type = E;
 
-    basic_result_t(const value_type& val) : basic_result_t(result_value_type(val)) {}
-    basic_result_t(value_type&& val) : basic_result_t(result_value_type(std::move(val))) {}
-
-    basic_result_t(result_value_type val) : m_is_value(true) { m_storage.construct(std::move(val)); }
-    basic_result_t(result_error_type err) : m_is_value(false) { m_storage.construct(std::move(err)); }
-
-    ~basic_result_t() noexcept {
-        if (m_is_value) {
-            m_storage.destroy(detail::result_value_tag());
+    template <bool B = std::is_default_constructible<T>::value, typename std::enable_if<B, int>::type = 0>
+    constexpr result_base() : m_storage(true) {
+        m_storage.construct_value(value_type());
+    }
+    ~result_base() {
+        if (has_value()) {
+            m_storage.destruct_value();
         } else {
-            m_storage.destroy(detail::result_error_tag());
+            m_storage.destruct_error();
         }
     }
 
-    [[nodiscard]] constexpr bool has_value() const noexcept { return m_is_value; }
-    [[nodiscard]] constexpr bool has_error() const noexcept { return !(has_value()); }
+    constexpr result_base(const result_base&)     = default;
+    constexpr result_base(result_base&&) noexcept = default;
+
+    template <typename U = T, typename std::enable_if<std::is_copy_constructible<U>::value, int>::type = 0>
+    constexpr result_base(const value_type& value) : m_storage(true) {
+        m_storage.construct_value(value);
+    }
 
     constexpr explicit operator bool() const noexcept { return has_value(); }
-
-    constexpr auto error() const& -> const error_type& {
-        if (has_value()) {
-            ErrorPolicy::handle_error("Attempting to unwrap an error on value result\n");
-        }
-
-        return get_error();
-    }
-
-    constexpr auto error() & -> error_type& {
-        if (has_value()) {
-            ErrorPolicy::handle_error("Attempting to unwrap an error on value result\n");
-        }
-
-        return get_error();
-    }
-
-    template <typename U = Value, std::enable_if_t<!std::is_void<U>::value>* = nullptr>
-    constexpr auto value() const& -> const U& {
-        if (has_error()) {
-            ErrorPolicy::handle_error("Attempting to unwrap an value on error Result\n");
-        }
-
-        return get_value();
-    }
-
-    template <typename U = Value, std::enable_if_t<!std::is_void<U>::value>* = nullptr>
-    constexpr auto value() & -> U& {
-        if (has_error()) {
-            ErrorPolicy::handle_error("Attempting to unwrap an value on error Result\n");
-        }
-
-        return get_value();
-    }
-
-    template <typename U = Value, std::enable_if_t<!std::is_void<U>::value>* = nullptr>
-    constexpr auto value_or(U&& v) const& -> value_type {
-        static_assert(std::is_copy_constructible<value_type>::value && std::is_convertible<U&&, value_type>::value,
-                      "T must be copy-constructible and convertible to from U&&");
-        return has_value() ? get_value() : static_cast<value_type>(std::forward<U>(v));
-    }
+    constexpr bool has_value() const noexcept { return m_storage.has_value(); }
 
 private:
-    template <typename U = Value, std::enable_if_t<!std::is_void<U>::value>* = nullptr>
-    constexpr auto get_value() const noexcept -> const U& {
-        return m_storage.template get<U>();
-    }
-
-    template <typename U = Value, std::enable_if_t<!std::is_void<U>::value>* = nullptr>
-    constexpr auto get_value() noexcept -> U& {
-        return m_storage.template get<U>();
-    }
-
-    constexpr auto get_error() const noexcept -> const error_type& { return m_storage.template get<error_type>(); }
-    constexpr auto get_error() noexcept -> error_type& { return m_storage.template get<error_type>(); }
-
-    bool m_is_value = false;
-    storage_type m_storage{};
+    using storage_type =
+        detail::storage_t<T, E, std::is_copy_constructible<T>::value && std::is_copy_constructible<E>::value,
+                          std::is_move_constructible<T>::value && std::is_move_constructible<E>::value>;
+    storage_type m_storage;
 };
-
-template <class E>
-detail::result_error<typename std::decay<E>::type> make_error_result(E&& e) {
-    return detail::result_error<typename std::decay<E>::type>(std::forward<E>(e));
-}
-
-template <typename Value, typename Error>
-using result_t = basic_result_t<Value, Error, detail::terminate_on_error>;
 
 }  // namespace wge
 
 #endif  // WOTH_WGE_ERROR_RESULT_HPP
+
+//#define nsel_REQUIRES_0(...) template <bool B = (__VA_ARGS__), typename std::enable_if<B, int>::type = 0>
+//#define nsel_REQUIRES_T(...) , typename std::enable_if<(__VA_ARGS__), int>::type = 0
+//#define nsel_REQUIRES_R(R, ...) typename std::enable_if<(__VA_ARGS__), R>::type
+//#define nsel_REQUIRES_A(...) , typename std::enable_if<(__VA_ARGS__), void*>::type = nullptr

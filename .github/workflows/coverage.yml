@@ -8,7 +8,7 @@ on:
     - cron: '0 4 * * 0' # Weekly on Sundays at 04:00
 
 jobs:
-  build:
+build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -40,8 +40,7 @@ jobs:
     - name: lcov prepare
       working-directory: ${{runner.workspace}}
       run : |
-        lcov --zerocounters --directory ${{runner.workspace}}/build
-        lcov --capture --initial --directory . --output-file cov_base.info
+        ./.github/tools/lnx/lcov_init.sh ${{runner.workspace}}/build ${{runner.workspace}}
 
     - name: Tests
       working-directory: ${{runner.workspace}}/build
@@ -50,9 +49,7 @@ jobs:
     - name: lcov creation
       working-directory: ${{runner.workspace}}
       run : |
-        lcov --capture --directory . --output-file cov.info
-        lcov --add-tracefile ./cov_base.info --add-tracefile ./cov.info --output-file cov_total.info
-        lcov --remove ./cov_total.info '/usr/include/*' '/usr/lib/*' '*/extern/*' '*/tests/*' '*/playground/*' -o cov_filter.info
+        ./.github/tools/lnx/lcov_gen.sh ${{runner.workspace}}/build ${{runner.workspace}}
 
     - name: Coveralls
       uses: coverallsapp/github-action@master

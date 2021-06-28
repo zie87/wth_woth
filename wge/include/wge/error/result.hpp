@@ -29,6 +29,9 @@ struct result_error {
     E err;
 };
 
+struct result_value_tag {};
+struct result_error_tag {};
+
 template <typename V, typename E>
 struct storage {
     static constexpr auto size  = sizeof(V) > sizeof(E) ? sizeof(V) : sizeof(E);
@@ -66,6 +69,20 @@ struct storage {
         return *reinterpret_cast<U*>(&m_storage);
     }
 
+    void destroy(result_value_tag) noexcept {
+        if (m_is_constructed) {
+            get<V>().~V();
+            m_is_constructed = false;
+        }
+    }
+
+    void destroy(result_error_tag) noexcept {
+        if (m_is_constructed) {
+            get<E>().~E();
+            m_is_constructed = false;
+        }
+    }
+
 private:
     bool m_is_constructed = false;
     type m_storage        = {};
@@ -73,7 +90,7 @@ private:
 
 struct terminate_on_error {
     static void handle_error(const char* msg) noexcept {
-        std::fprintf(stderr, msg);
+        std::fprintf(stderr, "%s", msg);
         std::terminate();
     }
 };
@@ -99,10 +116,34 @@ public:
     basic_result_t(result_value_type val) : m_is_value(true) { m_storage.construct(std::move(val)); }
     basic_result_t(result_error_type err) : m_is_value(false) { m_storage.construct(std::move(err)); }
 
+    ~basic_result_t() noexcept {
+        if (m_is_value) {
+            m_storage.destroy(detail::result_value_tag());
+        } else {
+            m_storage.destroy(detail::result_error_tag());
+        }
+    }
+
     [[nodiscard]] constexpr bool has_value() const noexcept { return m_is_value; }
     [[nodiscard]] constexpr bool has_error() const noexcept { return !(has_value()); }
 
     constexpr explicit operator bool() const noexcept { return has_value(); }
+
+    constexpr auto error() const& -> const error_type& {
+        if (has_value()) {
+            ErrorPolicy::handle_error("Attempting to unwrap an error on value result\n");
+        }
+
+        return get_error();
+    }
+
+    constexpr auto error() & -> error_type& {
+        if (has_value()) {
+            ErrorPolicy::handle_error("Attempting to unwrap an error on value result\n");
+        }
+
+        return get_error();
+    }
 
     template <typename U = Value, std::enable_if_t<!std::is_void<U>::value>* = nullptr>
     constexpr auto value() const& -> const U& {
@@ -123,36 +164,10 @@ public:
     }
 
     template <typename U = Value, std::enable_if_t<!std::is_void<U>::value>* = nullptr>
-    constexpr auto value() && -> U&& {
-        if (has_error()) {
-            ErrorPolicy::handle_error("Attempting to unwrap an value on error Result\n");
-        }
-
-        return std::move(get_value());
-    }
-
-    constexpr auto error() const& -> const error_type& {
-        if (has_value()) {
-            ErrorPolicy::handle_error("Attempting to unwrap an error on value result\n");
-        }
-
-        return get_error();
-    }
-
-    constexpr auto error() & -> error_type& {
-        if (has_value()) {
-            ErrorPolicy::handle_error("Attempting to unwrap an error on value result\n");
-        }
-
-        return get_error();
-    }
-
-    constexpr auto error() && -> error_type&& {
-        if (has_value()) {
-            ErrorPolicy::handle_error("Attempting to unwrap an error on value result\n");
-        }
-
-        return std::move(get_error());
+    constexpr auto value_or(U&& v) const& -> value_type {
+        static_assert(std::is_copy_constructible<value_type>::value && std::is_convertible<U&&, value_type>::value,
+                      "T must be copy-constructible and convertible to from U&&");
+        return has_value() ? get_value() : static_cast<value_type>(std::forward<U>(v));
     }
 
 private:
@@ -167,7 +182,6 @@ private:
     }
 
     constexpr auto get_error() const noexcept -> const error_type& { return m_storage.template get<error_type>(); }
-
     constexpr auto get_error() noexcept -> error_type& { return m_storage.template get<error_type>(); }
 
     bool m_is_value = false;

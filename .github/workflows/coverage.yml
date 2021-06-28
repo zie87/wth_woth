@@ -40,7 +40,8 @@ jobs:
     - name: lcov prepare
       working-directory: ${{runner.workspace}}
       run : |
-        .github/tools/lnx/lcov_init.sh ${{runner.workspace}}/build ${{runner.workspace}}
+        lcov --zerocounters --directory ${{runner.workspace}}/build
+        lcov --capture --initial --directory . --output-file cov_base.info
 
     - name: Tests
       working-directory: ${{runner.workspace}}/build
@@ -49,7 +50,9 @@ jobs:
     - name: lcov creation
       working-directory: ${{runner.workspace}}
       run : |
-        .github/tools/lnx/lcov_gen.sh ${{runner.workspace}}/build ${{runner.workspace}}
+        lcov --capture --directory . --output-file cov.info
+        lcov --add-tracefile ./cov_base.info --add-tracefile ./cov.info --output-file cov_total.info
+        lcov --remove ./cov_total.info '/usr/include/*' '/usr/lib/*' '*/extern/*' '*/tests/*' '*/playground/*' -o cov_filter.info
 
     - name: Coveralls
       uses: coverallsapp/github-action@master

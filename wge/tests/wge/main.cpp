@@ -63,6 +63,7 @@ static void RunAllTests() {
     RUN_TEST_GROUP(WgeMath);
     RUN_TEST_GROUP(WgeUtilsDefer);
     RUN_TEST_GROUP(WgeVideoImageLoader);
+    RUN_TEST_GROUP(WgeErrorResult)
 }
 
 int main(int argc, const char* argv[]) {

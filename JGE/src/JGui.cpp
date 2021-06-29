@@ -25,7 +25,7 @@ bool JGuiObject::ButtonPressed() { return false; }
 
 void JGuiObject::Entering() {}
 
-int JGuiObject::GetId() { return mId; }
+int JGuiObject::GetId() const { return mId; }
 
 void JGuiObject::Update(float dt __attribute__((unused))) {}
 
@@ -228,5 +228,5 @@ void JGuiController::Remove(JGuiObject* ctrl) {
 void JGuiController::SetActionButton(JButton button) { mActionButton = button; }
 void JGuiController::SetStyle(int style) { mStyle = style; }
 void JGuiController::SetCursor(JSprite* cursor) { mCursor = cursor; }
-bool JGuiController::IsActive() { return mActive; }
+bool JGuiController::IsActive() const { return mActive; }
 void JGuiController::SetActive(bool flag) { mActive = flag; }

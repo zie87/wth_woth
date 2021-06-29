@@ -233,7 +233,7 @@ void JParticleEmitter::SetBlending(int srcBlend, int destBlend) {
     mDestBlending = destBlend;
 }
 
-bool JParticleEmitter::Done() { return !mActive && mActiveParticleCount == 0; }
+bool JParticleEmitter::Done() const { return !mActive && mActiveParticleCount == 0; }
 
 void JParticleEmitter::SetActive(bool flag) { mActive = flag; }
 

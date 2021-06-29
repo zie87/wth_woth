@@ -350,7 +350,7 @@ int JGBKFont::GetStringHeight(BYTE* str) {
     GetStringArea(str, &w, &h);
     return h;
 }
-void JGBKFont::GetStringArea(BYTE* str, int* w, int* h) {
+void JGBKFont::GetStringArea(BYTE* str, int* w, int* h) const {
     BYTE* src = str;
     float len = 0;
     float xx = 0;

@@ -245,7 +245,7 @@ void JGE::LeftClickedProcessed() {
     mlastLeftClickY = -1;
 }
 
-bool JGE::GetLeftClickCoordinates(int& x, int& y) {
+bool JGE::GetLeftClickCoordinates(int& x, int& y) const {
     if (mLastLeftClickX != -1 || mlastLeftClickY != -1) {
         x = mLastLeftClickX;
         y = mlastLeftClickY;
@@ -377,9 +377,9 @@ int JGE::GetTime() { return JGEGetTime(); }
 
 void JGE::SetDelta(float delta) { mDeltaTime = delta; }
 
-float JGE::GetDelta() { return mDeltaTime; }
+float JGE::GetDelta() const { return mDeltaTime; }
 
-float JGE::GetFPS() { return mDeltaTime > 0 ? 1.0f / mDeltaTime : 0; }
+float JGE::GetFPS() const { return mDeltaTime > 0 ? 1.0f / mDeltaTime : 0; }
 
 JGE* JGE::GetInstance() {
     if (mInstance == nullptr) mInstance = new JGE();

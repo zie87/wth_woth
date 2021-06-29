@@ -63,7 +63,7 @@ protected:
     JRenderer();
     ~JRenderer();
     void InitRenderer();
-    void DestroyRenderer();
+    void DestroyRenderer() const;
 
     float mActualWidth;
     float mActualHeight;

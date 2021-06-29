@@ -141,7 +141,7 @@ void JSpline::GetPixel(Point& point, int index) {
     }
 }
 
-int JSpline::GetPixelCount() { return mCount; }
+int JSpline::GetPixelCount() const { return mCount; }
 
 void JSpline::Render(float x, float y, PIXEL_TYPE color, PIXEL_TYPE controlColor) {
     if (mCount > 0) {

@@ -231,9 +231,9 @@ void JParticleEffect::SetPosition(float x, float y) {
 
 JParticleSystem* JParticleEffect::GetParticleSystem() { return mParticleSystem; }
 
-float JParticleEffect::GetX() { return mX; }
+float JParticleEffect::GetX() const { return mX; }
 
-float JParticleEffect::GetY() { return mY; }
+float JParticleEffect::GetY() const { return mY; }
 
 void JParticleEffect::Update(float dt) {
     //	mTimer += dt;

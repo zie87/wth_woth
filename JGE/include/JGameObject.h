@@ -88,7 +88,7 @@ public:
     /// @return height - Height of the bounding box.
     ///
     //////////////////////////////////////////////////////////////////////////
-    void GetBBox(float x, float y, float* xNow, float* yNow, float* width, float* height);
+    void GetBBox(float x, float y, float* xNow, float* yNow, float* width, float* height) const;
 
     //////////////////////////////////////////////////////////////////////////
     /// Set up a circle for collision detection. All the following collision
@@ -136,7 +136,7 @@ public:
     ///
     /// @return Damage point.
     //////////////////////////////////////////////////////////////////////////
-    int GetHitPoint();
+    int GetHitPoint() const;
 
     //////////////////////////////////////////////////////////////////////////
     /// Set blood of this object.
@@ -150,7 +150,7 @@ public:
     ///
     /// @return Blood value.
     //////////////////////////////////////////////////////////////////////////
-    int GetBlood();
+    int GetBlood() const;
 
     //////////////////////////////////////////////////////////////////////////
     /// Enable alpha animation during update.
@@ -205,7 +205,7 @@ public:
     /// @return Flashing status.
     ///
     //////////////////////////////////////////////////////////////////////////
-    bool IsFlashing();
+    bool IsFlashing() const;
 
 private:
     u32 mRenderFlags;

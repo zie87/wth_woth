@@ -202,11 +202,11 @@ void JAnimator::Render() {
     mFrames[mCurrentFrame]->Render(mX - mHotSpotX, mY - mHotSpotY);
 }
 
-bool JAnimator::IsActive() { return mActive; }
+bool JAnimator::IsActive() const { return mActive; }
 
-bool JAnimator::IsAnimating() { return mAnimating; }
+bool JAnimator::IsAnimating() const { return mAnimating; }
 
-int JAnimator::GetCurrentFrameIndex() { return mCurrentFrame; }
+int JAnimator::GetCurrentFrameIndex() const { return mCurrentFrame; }
 
 void JAnimator::SetCurrentFrameIndex(int index) {
     if (index < (int)mFrames.size()) mCurrentFrame = index;

@@ -75,6 +75,6 @@ void JParticleSystem::StopAllEffects() {
     }
 }
 
-bool JParticleSystem::IsActive() { return mActive; }
+bool JParticleSystem::IsActive() const { return mActive; }
 
 void JParticleSystem::SetActive(bool flag) { mActive = flag; }

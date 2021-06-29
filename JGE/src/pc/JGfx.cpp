@@ -299,7 +299,7 @@ void JQuad::SetTextureRect(float x, float y, float w, float h) {
     mTY1 = (y + h) / mTex->mTexHeight;
 }
 
-void JQuad::GetTextureRect(float* x, float* y, float* w, float* h) {
+void JQuad::GetTextureRect(float* x, float* y, float* w, float* h) const {
     *x = mX;
     *y = mY;
     *w = mWidth;
@@ -729,7 +729,7 @@ void JRenderer::InitRenderer() {
     checkGlError();
 }
 
-void JRenderer::DestroyRenderer() {
+void JRenderer::DestroyRenderer() const {
     checkGlError();
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
     // Delete program object

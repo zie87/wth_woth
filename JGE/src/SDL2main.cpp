@@ -142,8 +142,8 @@ public:
 
     void OnKeyPressed(const SDL_KeyboardEvent& event);
     void OnMouseDoubleClicked(const SDL_MouseButtonEvent& event);
-    void OnMouseClicked(const SDL_MouseButtonEvent& event);
-    void OnMouseMoved(const SDL_MouseMotionEvent& event);
+    void OnMouseClicked(const SDL_MouseButtonEvent& event) const;
+    void OnMouseMoved(const SDL_MouseMotionEvent& event) const;
     void OnMouseWheel(int x, int y);
 
     void OnTouchEvent(const SDL_TouchFingerEvent& event);
@@ -211,9 +211,9 @@ public:
         }
     }
 
-    void OnUpdate();
+    void OnUpdate() const;
 
-    void OnCleanup() {
+    void OnCleanup() const {
         SDL_GL_DeleteContext(gl_context);
         SDL_Quit();
     }
@@ -340,7 +340,7 @@ void DestroyGame(void) {
     g_engine = nullptr;
 }
 
-void SdlApp::OnUpdate() {
+void SdlApp::OnUpdate() const {
     static int tickCount = 0;
     tickCount = JGEGetTime();
     int64_t dt = (tickCount - lastTickCount);
@@ -372,7 +372,7 @@ void SdlApp::OnKeyPressed(const SDL_KeyboardEvent& event) {
     }
 }
 
-void SdlApp::OnMouseMoved(const SDL_MouseMotionEvent& event) {
+void SdlApp::OnMouseMoved(const SDL_MouseMotionEvent& event) const {
     int actualWidth = (int)JRenderer::GetInstance()->GetActualWidth();
     int actualHeight = (int)JRenderer::GetInstance()->GetActualHeight();
 
@@ -399,7 +399,7 @@ void SdlApp::OnMouseWheel(int x, int y) {
     }
 }
 
-void SdlApp::OnMouseClicked(const SDL_MouseButtonEvent& event) {
+void SdlApp::OnMouseClicked(const SDL_MouseButtonEvent& event) const {
     if (event.type == SDL_MOUSEBUTTONDOWN) {
         if (event.button == SDL_BUTTON_LEFT) /* Left button */
         {

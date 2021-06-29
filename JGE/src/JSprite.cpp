@@ -209,7 +209,7 @@ void JSprite::StartAnimation() {
 }
 
 void JSprite::StopAnimation() { mAnimating = false; }
-bool JSprite::IsAnimating() { return mAnimating; }
+bool JSprite::IsAnimating() const { return mAnimating; }
 
 void JSprite::SetAlpha(float alpha) { mAlpha = alpha; }
 void JSprite::SetScale(float hscale, float vscale) {
@@ -220,16 +220,16 @@ void JSprite::SetScale(float scale) {
     mHScale = scale;
     mVScale = scale;
 }
-float JSprite::GetScale() { return mHScale; }
+float JSprite::GetScale() const { return mHScale; }
 void JSprite::SetRotation(float rot) { mRotation = rot; }
 
 // JQuad* JSprite::GetQuad() { return mQuad; }
 
-float JSprite::GetXVelocity() { return cosf(mDirection) * mSpeed; }
-float JSprite::GetYVelocity() { return sinf(mDirection) * mSpeed; }
+float JSprite::GetXVelocity() const { return cosf(mDirection) * mSpeed; }
+float JSprite::GetYVelocity() const { return sinf(mDirection) * mSpeed; }
 
 void JSprite::SetSpeed(float speed) { mSpeed = speed; }
-float JSprite::GetSpeed() { return mSpeed; }
+float JSprite::GetSpeed() const { return mSpeed; }
 void JSprite::SetDirection(float angle) { mDirection = angle; }
 
 void JSprite::SetHotSpot(float x, float y, int index) {
@@ -265,14 +265,14 @@ void JSprite::SetColor(PIXEL_TYPE color) { mColor = (color & 0x00ffffff); }
 //
 // }
 
-float JSprite::GetAlpha() { return mAlpha; }
-float JSprite::GetDirection() { return mDirection; }
-float JSprite::GetRotation() { return mRotation; }
+float JSprite::GetAlpha() const { return mAlpha; }
+float JSprite::GetDirection() const { return mDirection; }
+float JSprite::GetRotation() const { return mRotation; }
 
 void JSprite::SetId(int id) { mId = id; }
-int JSprite::GetId() { return mId; }
+int JSprite::GetId() const { return mId; }
 
-int JSprite::GetCurrentFrameIndex() { return mCurrentFrame; }
+int JSprite::GetCurrentFrameIndex() const { return mCurrentFrame; }
 void JSprite::SetCurrentFrameIndex(int frame) {
     if (frame < (int)mFrames.size()) mCurrentFrame = frame;
 }
@@ -293,8 +293,8 @@ JQuad* JSprite::GetFrame(int index) {
         return nullptr;
 }
 
-float JSprite::GetX() { return mX; }
-float JSprite::GetY() { return mY; }
+float JSprite::GetX() const { return mX; }
+float JSprite::GetY() const { return mY; }
 
 void JSprite::SetX(float x) { mX = x; }
 void JSprite::SetY(float y) { mY = y; }
@@ -306,7 +306,7 @@ void JSprite::SetActive(bool f) {
     }
 }
 
-bool JSprite::IsActive() { return mActive; }
+bool JSprite::IsActive() const { return mActive; }
 
 void JSprite::Move(float dx, float dy) {
     mX += dx;

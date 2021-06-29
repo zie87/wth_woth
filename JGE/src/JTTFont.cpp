@@ -119,7 +119,7 @@ FT_Library JTTFont::GetFontLibrary() { return mLibrary; }
 
 FT_Byte* JTTFont::GetFontBits() { return mFontBits; }
 
-int JTTFont::GetFontBitsSize() { return mFontBitsSize; }
+int JTTFont::GetFontBitsSize() const { return mFontBitsSize; }
 
 bool JTTFont::Load(JTTFont* fontSource, int size, int mode) {
     mLibrary = fontSource->GetFontLibrary();

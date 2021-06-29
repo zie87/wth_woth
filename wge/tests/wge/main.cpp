@@ -61,6 +61,7 @@ void close_sys() {}
 
 static void RunAllTests() {
     RUN_TEST_GROUP(WgeMath);
+    RUN_TEST_GROUP(WgeUtilsDefer);
     RUN_TEST_GROUP(WgeVideoImageLoader);
 }
 

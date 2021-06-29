@@ -279,7 +279,7 @@ JQuad::JQuad(JTexture* tex, float x, float y, float width, float height)
     mHotSpotX = 0.0f;
     mHotSpotY = 0.0f;
     // mBlend = BLEND_DEFAULT;
-    for (int i = 0; i < 4; i++) mColor[i].color = 0xFFFFFFFF;
+    for (auto& i : mColor) i.color = 0xFFFFFFFF;
 
     mHFlipped = false;
     mVFlipped = false;
@@ -307,7 +307,7 @@ void JQuad::GetTextureRect(float* x, float* y, float* w, float* h) {
 }
 
 void JQuad::SetColor(PIXEL_TYPE color) {
-    for (int i = 0; i < 4; i++) mColor[i].color = color;
+    for (auto& i : mColor) i.color = color;
 }
 
 void JQuad::SetHotSpot(float x, float y) {

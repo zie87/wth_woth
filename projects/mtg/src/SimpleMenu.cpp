@@ -213,8 +213,8 @@ bool SimpleMenu::CheckUserInput(JButton key) {
 
     if ((key == JGE_BTN_NONE) && mEngine->GetLeftClickCoordinates(x, y)) {
         // first scan the buttons on the screen and then process the other gui elements
-        for (size_t i = 0; i < mButtons.size(); i++) {
-            if (mButtons[i]->ButtonPressed()) {
+        for (auto& mButton : mButtons) {
+            if (mButton->ButtonPressed()) {
                 mEngine->LeftClickedProcessed();
                 return true;
             }

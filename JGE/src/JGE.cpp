@@ -163,12 +163,12 @@ void JGE::ReleaseKey(const JButton sym) {
     keyBuffer = r;
 }
 void JGE::Update(float dt) {
-    for (auto it = holds.begin(); it != holds.end(); ++it) {
-        if (it->second < 0) {
-            keyBuffer.push(triplet(LOCAL_KEY_NONE, it->first, true));
-            it->second = REPEAT_PERIOD;
+    for (auto& hold : holds) {
+        if (hold.second < 0) {
+            keyBuffer.push(triplet(LOCAL_KEY_NONE, hold.first, true));
+            hold.second = REPEAT_PERIOD;
         }
-        it->second -= dt;
+        hold.second -= dt;
     }
 
     if (mApp != nullptr) mApp->Update();

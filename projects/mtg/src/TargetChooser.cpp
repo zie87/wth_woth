@@ -670,8 +670,7 @@ bool TargetChooser::validTargetsExist(int maxTargets) {
         if (canTarget(p)) return true;
         MTGGameZone* zones[] = {p->game->inPlay,  p->game->graveyard, p->game->hand,
                                 p->game->library, p->game->exile,     p->game->stack};
-        for (int k = 0; k < 6; k++) {
-            MTGGameZone* z = zones[k];
+        for (auto z : zones) {
             if (targetsZone(z)) {
                 for (int j = 0; j < z->nb_cards; j++) {
                     if (canTarget(z->cards[j])) maxAmount++;
@@ -696,8 +695,7 @@ int TargetChooser::countValidTargets() {
         Player* p = observer->players[i];
         if (canTarget(p)) result++;
         MTGGameZone* zones[] = {p->game->inPlay, p->game->graveyard, p->game->hand, p->game->library, p->game->exile};
-        for (int k = 0; k < 5; k++) {
-            MTGGameZone* z = zones[k];
+        for (auto z : zones) {
             if (targetsZone(z)) {
                 for (int j = 0; j < z->nb_cards; j++) {
                     if (canTarget(z->cards[j])) result++;
@@ -1177,8 +1175,7 @@ bool TriggerTargetChooser::equals(TargetChooser* tc) {
 
 /*my curses */
 bool myCursesChooser::canTarget(Targetable* target, bool withoutProtections) {
-    for (unsigned int i = 0; i < source->controller()->curses.size(); ++i) {
-        MTGCardInstance* compare = source->controller()->curses[i];
+    for (auto compare : source->controller()->curses) {
         if (compare == dynamic_cast<MTGCardInstance*>(target)) return true;
     }
     return false;
@@ -1247,8 +1244,7 @@ bool ParentChildChooser::canTarget(Targetable* target, bool withoutProtections) 
     if (auto* card = dynamic_cast<MTGCardInstance*>(target)) {
         if (type == 1) {
             if (!source->childrenCards.size()) return false;
-            for (unsigned int w = 0; w < source->childrenCards.size(); w++) {
-                MTGCardInstance* child = source->childrenCards[w];
+            for (auto child : source->childrenCards) {
                 if (child == card) {
                     if (deeperTargeting) {
                         if (!deeperTargeting->canTarget(child)) return false;
@@ -1258,8 +1254,7 @@ bool ParentChildChooser::canTarget(Targetable* target, bool withoutProtections) 
             }
         } else {
             if (!source->parentCards.size()) return false;
-            for (unsigned int w = 0; w < source->parentCards.size(); w++) {
-                MTGCardInstance* parent = source->parentCards[w];
+            for (auto parent : source->parentCards) {
                 if (parent == card) {
                     if (deeperTargeting) {
                         if (!deeperTargeting->canTarget(parent)) return false;

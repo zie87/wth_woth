@@ -18,8 +18,8 @@ void GameStateStory::loadStoriesMenu(const char* root) {
     stories.clear();
     vector<string> subFolders = JFileSystem::GetInstance()->scanfolder(root);
 
-    for (size_t i = 0; i < subFolders.size(); ++i) {
-        string subfolder = ensureFolder(subFolders[i]);
+    for (auto& subFolder : subFolders) {
+        string subfolder = ensureFolder(subFolder);
         string filename = root + subfolder + "story.xml";
         if (FileExists(filename)) {
             subfolder.resize(subfolder.length() - 1);  // remove trailing slash

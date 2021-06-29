@@ -36,8 +36,7 @@ MTGCardInstance* TestSuiteAI::getCard(string action) {
     for (int i = 0; i < 2; i++) {
         Player* p = observer->players[i];
         MTGGameZone* zones[] = {p->game->library, p->game->hand, p->game->inPlay, p->game->graveyard};
-        for (int j = 0; j < 4; j++) {
-            MTGGameZone* zone = zones[j];
+        for (auto zone : zones) {
             for (int k = 0; k < zone->nb_cards; k++) {
                 MTGCardInstance* card = zone->cards[k];
                 if (!card) return nullptr;
@@ -466,8 +465,8 @@ int TestSuite::loadNext() {
 void TestSuiteActions::cleanup() { nbitems = 0; }
 
 void TestSuiteState::cleanup(TestSuiteGame* tsGame) {
-    for (size_t i = 0; i < players.size(); i++) {
-        SAFE_DELETE(players[i]);
+    for (auto& player : players) {
+        SAFE_DELETE(player);
     }
     players.clear();
 
@@ -721,9 +720,9 @@ MTGPlayerCards* TestSuiteGame::buildDeck(Player* player, int playerId) {
             initState.players[playerId]->game->graveyard, initState.players[playerId]->game->library,
             initState.players[playerId]->game->hand, initState.players[playerId]->game->inPlay};
 
-        for (int j = 0; j < 4; j++) {
-            for (size_t k = 0; k < loadedPlayerZones[j]->cards.size(); k++) {
-                int cardid = loadedPlayerZones[j]->cards[k]->getId();
+        for (auto& loadedPlayerZone : loadedPlayerZones) {
+            for (size_t k = 0; k < loadedPlayerZone->cards.size(); k++) {
+                int cardid    = loadedPlayerZone->cards[k]->getId();
                 list[nbcards] = cardid;
                 nbcards++;
             }

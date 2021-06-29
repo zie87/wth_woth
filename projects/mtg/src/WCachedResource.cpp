@@ -131,8 +131,8 @@ void WCachedTexture::Refresh() {
 
     JRenderer::GetInstance()->TransferTextureToGLContext(*texture);
 
-    for (auto it = mTrackedQuads.begin(); it != mTrackedQuads.end(); ++it) {
-        if (it->second.get()) it->second->mTex = texture;
+    for (auto& mTrackedQuad : mTrackedQuads) {
+        if (mTrackedQuad.second.get()) mTrackedQuad.second->mTex = texture;
     }
 }
 

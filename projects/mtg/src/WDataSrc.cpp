@@ -369,7 +369,7 @@ void WSrcDeck::updateCounts() {
 void WSrcDeck::clearCounts() {
     counts[UNFILTERED_MIN_COPIES] = -1;
     counts[UNFILTERED_MAX_COPIES] = 0;
-    for (int i = 0; i < MAX_COUNTS; i++) counts[i] = 0;
+    for (int& count : counts) count = 0;
 }
 
 void WSrcDeck::addCount(MTGCard* c, int qty) {

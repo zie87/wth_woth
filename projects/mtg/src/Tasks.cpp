@@ -218,7 +218,7 @@ TaskList::TaskList(string _fileName) {
         fileName = options.profileFile(PLAYER_TASKS).c_str();
     }
     load(fileName);
-    for (int i = 0; i < 9; i++) mBg[i] = nullptr;
+    for (auto& i : mBg) i = nullptr;
     mBgTex = nullptr;  // We only load the background if we use the task screen.
 }
 
@@ -237,8 +237,8 @@ int TaskList::save(string _fileName) {
 
         file << "# Format: <Type>|<Expiration>|<Accepted>|<Opponent>|<Reward>|<Description>[|Additional attributes]\n";
 
-        for (auto it = tasks.begin(); it != tasks.end(); it++) {
-            file << (*it)->toString() << "\n";
+        for (auto& task : tasks) {
+            file << task->toString() << "\n";
         }
         file.close();
     }
@@ -309,7 +309,7 @@ void TaskList::Start() {
         auto unitW = static_cast<float>(mBgTex->mWidth / 4);
         if (unitH == 0 || unitW == 0) return;
 
-        for (int i = 0; i < 9; i++) SAFE_DELETE(mBg[i]);
+        for (auto& i : mBg) SAFE_DELETE(i);
         if (mBgTex) {
             mBg[0] = NEW JQuad(mBgTex, 0, 0, unitW, unitH);
             mBg[1] = NEW JQuad(mBgTex, unitW, 0, unitW * 2, unitH);
@@ -347,9 +347,9 @@ void TaskList::passOneDay() {
 void TaskList::getDoneTasks(GameObserver* observer, GameApp* _app, vector<Task*>* result) {
     result->clear();
     // TODO: Return only accepted tasks
-    for (auto it = tasks.begin(); it != tasks.end(); it++) {
-        if ((*it)->isDone(observer, _app)) {
-            result->push_back(*it);
+    for (auto& task : tasks) {
+        if (task->isDone(observer, _app)) {
+            result->push_back(task);
         }
     }
 }
@@ -419,19 +419,19 @@ void TaskList::Render() {
         return;
     }
 
-    for (auto it = tasks.begin(); it != tasks.end(); it++) {
-        sprintf(buffer, "%s", (*it)->getShortDesc().c_str());
+    for (auto& task : tasks) {
+        sprintf(buffer, "%s", task->getShortDesc().c_str());
         f2->DrawString(buffer, posX, posY);
         if (mBgTex) {
             f->SetScale(.8f);
         }
-        sprintf(buffer, _("Days left: %i").c_str(), (*it)->getExpiration());
+        sprintf(buffer, _("Days left: %i").c_str(), task->getExpiration());
         f->DrawString(buffer, SCREEN_WIDTH - 190, posY);
-        sprintf(buffer, _("Reward: %i").c_str(), (*it)->getReward());
+        sprintf(buffer, _("Reward: %i").c_str(), task->getReward());
         f->DrawString(buffer, SCREEN_WIDTH - 100, posY);
         posY += 15;
 
-        sprintf(buffer, "%s", (*it)->getDesc().c_str());
+        sprintf(buffer, "%s", task->getDesc().c_str());
         f->DrawString(buffer, posX + 10, posY);
         posY += 15;
         if (mBgTex) {
@@ -453,11 +453,11 @@ void TaskList::addRandomTask(int diff) {
 }
 
 TaskList::~TaskList() {
-    for (unsigned int i = 0; i < tasks.size(); i++) {
-        SAFE_DELETE(tasks[i]);
+    for (auto& task : tasks) {
+        SAFE_DELETE(task);
     }
     if (mBgTex) WResourceManager::Instance()->Release(mBgTex);
-    for (int i = 0; i < 9; i++) SAFE_DELETE(mBg[i]);
+    for (auto& i : mBg) SAFE_DELETE(i);
 }
 
 /*----------------------------------------*/
@@ -752,8 +752,8 @@ bool TaskMassiveBurial::isDone(GameObserver* observer, GameApp* _app) {
     int countColor = 0;
     vector<MTGCardInstance*> cards = observer->players[1]->game->graveyard->cards;
 
-    for (auto it = cards.begin(); it != cards.end(); it++) {
-        if ((*it)->hasColor(color)) {
+    for (auto& card : cards) {
+        if (card->hasColor(color)) {
             countColor++;
         }
     }
@@ -831,8 +831,8 @@ bool TaskWisdom::isDone(GameObserver* observer, GameApp* _app) {
     int countColor = 0;
     vector<MTGCardInstance*> cards = observer->players[0]->game->hand->cards;
 
-    for (auto it = cards.begin(); it != cards.end(); it++) {
-        if ((*it)->hasColor(color)) {
+    for (auto& card : cards) {
+        if (card->hasColor(color)) {
             countColor++;
         }
     }

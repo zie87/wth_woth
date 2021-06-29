@@ -45,15 +45,15 @@ AIHints::AIHints(AIPlayerBaka* player) : mPlayer(player) {}
 void AIHints::add(string line) { hints.push_back(NEW AIHint(line)); }
 
 AIHints::~AIHints() {
-    for (size_t i = 0; i < hints.size(); ++i) SAFE_DELETE(hints[i]);
+    for (auto& hint : hints) SAFE_DELETE(hint);
     hints.clear();
 }
 
 AIHint* AIHints::getByCondition(string condition) {
     if (!condition.size()) return nullptr;
 
-    for (size_t i = 0; i < hints.size(); ++i) {
-        if (hints[i]->mCondition.compare(condition) == 0) return hints[i];
+    for (auto& hint : hints) {
+        if (hint->mCondition.compare(condition) == 0) return hint;
     }
     return nullptr;
 }
@@ -61,9 +61,9 @@ AIHint* AIHints::getByCondition(string condition) {
 bool AIHints::HintSaysDontAttack(GameObserver* observer, MTGCardInstance* card) {
     TargetChooserFactory tfc(observer);
     TargetChooser* hintTc = nullptr;
-    for (unsigned int i = 0; i < hints.size(); i++) {
-        if (hints[i]->mCombatAttackTip.size()) {
-            hintTc = tfc.createTargetChooser(hints[i]->mCombatAttackTip, card);
+    for (auto& hint : hints) {
+        if (hint->mCombatAttackTip.size()) {
+            hintTc = tfc.createTargetChooser(hint->mCombatAttackTip, card);
             if (hintTc && hintTc->canTarget(card, true)) {
                 SAFE_DELETE(hintTc);
                 return true;
@@ -75,9 +75,9 @@ bool AIHints::HintSaysDontAttack(GameObserver* observer, MTGCardInstance* card) 
 }
 
 vector<string> AIHints::mCastOrder() {
-    for (unsigned int i = 0; i < hints.size(); i++) {
-        if (hints[i]->castOrder.size()) {
-            return hints[i]->castOrder;
+    for (auto& hint : hints) {
+        if (hint->castOrder.size()) {
+            return hint->castOrder;
         }
     }
     return vector<string>();
@@ -134,9 +134,7 @@ RankingContainer AIHints::findActions(AIHint* hint) {
 
     vector<MTGAbility*> abilities = findAbilities(hint);
 
-    for (size_t i = 0; i < abilities.size(); ++i) {
-        MTGAbility* a = abilities[i];
-
+    for (auto a : abilities) {
         for (int j = 0; j < mPlayer->game->inPlay->nb_cards; j++) {
             MTGCardInstance* card = mPlayer->game->inPlay->cards[j];
             if (a->isReactingToClick(card, a->getCost())) {
@@ -228,13 +226,13 @@ AIAction* AIHints::findAbilityRecursive(AIHint* hint, ManaCost* potentialMana) {
 }
 
 AIAction* AIHints::suggestAbility(ManaCost* potentialMana) {
-    for (size_t i = 0; i < hints.size(); ++i) {
+    for (auto& hint : hints) {
         // Don't suggest abilities that require a condition, for now
-        if (hints[i]->mCondition.size()) continue;
+        if (hint->mCondition.size()) continue;
 
-        AIAction* a = findAbilityRecursive(hints[i], potentialMana);
+        AIAction* a = findAbilityRecursive(hint, potentialMana);
         if (a) {
-            WGE_LOG_DEBUG("I Decided that the best to fulfill \"{}\" is to play \"{}\"", hints[i]->mAction,
+            WGE_LOG_DEBUG("I Decided that the best to fulfill \"{}\" is to play \"{}\"", hint->mAction,
                           a->ability->getMenuText());
             return a;
         }

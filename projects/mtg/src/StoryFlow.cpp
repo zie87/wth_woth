@@ -374,8 +374,8 @@ StoryDialog::StoryDialog(TiXmlElement* root, StoryFlow* mParent)
 }
 
 void StoryDialog::Update(float dt) {
-    for (size_t i = 0; i < graphics.size(); ++i) {
-        graphics[i]->Update(dt);
+    for (auto& graphic : graphics) {
+        graphic->Update(dt);
     }
 
     if (StoryReward::collection) {
@@ -400,8 +400,8 @@ void StoryDialog::RenderElement(StoryDialogElement* elmt) {
 void StoryDialog::Render() {
     currentY = 2;
     previousY = currentY;
-    for (size_t i = 0; i < graphics.size(); ++i) {
-        auto* elmt = (StoryDialogElement*)(graphics[i]);
+    for (auto& graphic : graphics) {
+        auto* elmt = (StoryDialogElement*)graphic;
         if (mCount && elmt == mObjects[0]) currentY += SPACE_BEFORE_CHOICES;
         RenderElement(elmt);
     }
@@ -416,8 +416,8 @@ void StoryDialog::ButtonPressed(int controllerid, int controlid) {
 
 StoryDialog::~StoryDialog() {
     mCount = 0;  // avoid parent deleting
-    for (size_t i = 0; i < graphics.size(); ++i) {
-        delete (graphics[i]);
+    for (auto& graphic : graphics) {
+        delete graphic;
     }
 }
 

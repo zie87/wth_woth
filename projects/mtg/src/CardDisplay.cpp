@@ -48,8 +48,8 @@ void CardDisplay::init(MTGGameZone* zone) {
 
 void CardDisplay::rotateLeft() {
     if (start_item == 0) return;
-    for (size_t i = 0; i < mObjects.size(); i++) {
-        auto* cardg = (CardGui*)mObjects[i];
+    for (auto& mObject : mObjects) {
+        auto* cardg = (CardGui*)mObject;
         cardg->x += 30;
     }
     start_item--;
@@ -57,8 +57,8 @@ void CardDisplay::rotateLeft() {
 
 void CardDisplay::rotateRight() {
     if (start_item == (int)(mObjects.size()) - 1) return;
-    for (size_t i = 0; i < mObjects.size(); i++) {
-        auto* cardg = (CardGui*)mObjects[i];
+    for (auto& mObject : mObjects) {
+        auto* cardg = (CardGui*)mObject;
         cardg->x -= 30;
     }
     start_item++;

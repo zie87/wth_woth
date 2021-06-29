@@ -58,8 +58,8 @@ int PlayerData::save() {
         file << writer;
 
         // Story Saves
-        for (auto it = storySaves.begin(); it != storySaves.end(); ++it) {
-            sprintf(writer, "s %s=%s\n", it->first.c_str(), it->second.c_str());
+        for (auto& storySave : storySaves) {
+            sprintf(writer, "s %s=%s\n", storySave.first.c_str(), storySave.second.c_str());
             file << writer;
         }
 

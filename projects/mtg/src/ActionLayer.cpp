@@ -56,8 +56,8 @@ bool ActionLayer::moveToGarbage(ActionElement* e) {
 }
 
 void ActionLayer::cleanGarbage() {
-    for (size_t i = 0; i < garbage.size(); ++i) {
-        SAFE_DELETE(garbage[i]);
+    for (auto& i : garbage) {
+        SAFE_DELETE(i);
     }
     garbage.clear();
 }
@@ -82,9 +82,9 @@ bool ActionLayer::CheckUserInput(JButton key) {
     if (menuObject) {
         return false;
     }
-    for (size_t i = 0; i < mObjects.size(); i++) {
-        if (mObjects[i] != nullptr) {
-            auto* currentAction = (ActionElement*)mObjects[i];
+    for (auto& mObject : mObjects) {
+        if (mObject != nullptr) {
+            auto* currentAction = (ActionElement*)mObject;
             if (currentAction->CheckUserInput(key)) return true;
         }
     }
@@ -112,9 +112,9 @@ void ActionLayer::Update(float dt) {
         }
     }
     GamePhase newPhase = observer->getCurrentGamePhase();
-    for (size_t i = 0; i < mObjects.size(); i++) {
-        if (mObjects[i] != nullptr) {
-            auto* currentAction     = (ActionElement*)mObjects[i];
+    for (auto& mObject : mObjects) {
+        if (mObject != nullptr) {
+            auto* currentAction     = (ActionElement*)mObject;
             currentAction->newPhase = newPhase;
             currentAction->Update(dt);
             currentAction->currentPhase = newPhase;
@@ -155,9 +155,9 @@ void ActionLayer::Render() {
         return;
     }
 
-    for (size_t i = 0; i < mObjects.size(); i++) {
-        if (mObjects[i] != nullptr) {
-            auto* currentAction = (ActionElement*)mObjects[i];
+    for (auto& mObject : mObjects) {
+        if (mObject != nullptr) {
+            auto* currentAction = (ActionElement*)mObject;
             currentAction->Render();
         }
     }
@@ -190,8 +190,8 @@ ActionElement* ActionLayer::isWaitingForAnswer() {
 }
 
 int ActionLayer::stillInUse(MTGCardInstance* card) {
-    for (size_t i = 0; i < mObjects.size(); i++) {
-        auto* currentAction = (ActionElement*)mObjects[i];
+    for (auto& mObject : mObjects) {
+        auto* currentAction = (ActionElement*)mObject;
         if (currentAction->stillInUse(card)) return 1;
     }
     return 0;
@@ -199,8 +199,8 @@ int ActionLayer::stillInUse(MTGCardInstance* card) {
 
 int ActionLayer::receiveEventPlus(WEvent* event) {
     int result = 0;
-    for (size_t i = 0; i < mObjects.size(); i++) {
-        auto* currentAction = (ActionElement*)mObjects[i];
+    for (auto& mObject : mObjects) {
+        auto* currentAction = (ActionElement*)mObject;
         result += currentAction->receiveEvent(event);
     }
     return 0;
@@ -211,8 +211,8 @@ int ActionLayer::isReactingToTargetClick(Targetable* card) {
 
     if (isWaitingForAnswer()) return -1;
 
-    for (size_t i = 0; i < mObjects.size(); i++) {
-        auto* currentAction = (ActionElement*)mObjects[i];
+    for (auto& mObject : mObjects) {
+        auto* currentAction = (ActionElement*)mObject;
         result += currentAction->isReactingToTargetClick(card);
     }
     return result;
@@ -224,8 +224,8 @@ int ActionLayer::reactToTargetClick(Targetable* card) {
     ActionElement* ae = isWaitingForAnswer();
     if (ae) return reactToTargetClick(ae, card);
 
-    for (size_t i = 0; i < mObjects.size(); i++) {
-        auto* currentAction = (ActionElement*)mObjects[i];
+    for (auto& mObject : mObjects) {
+        auto* currentAction = (ActionElement*)mObject;
         result += currentAction->reactToTargetClick(card);
     }
     return result;
@@ -233,8 +233,8 @@ int ActionLayer::reactToTargetClick(Targetable* card) {
 
 bool ActionLayer::getMenuIdFromCardAbility(MTGCardInstance* card, MTGAbility* ability, int& menuId) {
     int ctr = 0;
-    for (size_t i = 0; i < mObjects.size(); i++) {
-        auto* currentAction = (ActionElement*)mObjects[i];
+    for (auto& mObject : mObjects) {
+        auto* currentAction = (ActionElement*)mObject;
         if (currentAction->isReactingToClick(card)) {
             if (currentAction == ability) {
                 // code corresponding to that is in setMenuObject
@@ -256,8 +256,8 @@ int ActionLayer::isReactingToClick(MTGCardInstance* card) {
 
     if (isWaitingForAnswer()) return -1;
 
-    for (size_t i = 0; i < mObjects.size(); i++) {
-        auto* currentAction = (ActionElement*)mObjects[i];
+    for (auto& mObject : mObjects) {
+        auto* currentAction = (ActionElement*)mObject;
         if (currentAction->isReactingToClick(card)) {
             ++result;
             mReactions.insert(currentAction);

@@ -595,16 +595,16 @@ ExtraCosts::ExtraCosts() {
 ExtraCosts* ExtraCosts::clone() const {
     auto* ec = NEW ExtraCosts(*this);
     ec->costs.clear();
-    for (size_t i = 0; i < costs.size(); i++) {
-        ec->costs.push_back(costs[i]->clone());
+    for (auto cost : costs) {
+        ec->costs.push_back(cost->clone());
     }
     return ec;
 }
 
 void ExtraCosts::Render() {
     // TODO cool window and stuff...
-    for (size_t i = 0; i < costs.size(); i++) {
-        costs[i]->Render();
+    for (auto& cost : costs) {
+        cost->Render();
     }
 }
 
@@ -612,8 +612,8 @@ int ExtraCosts::setAction(MTGAbility* _action, MTGCardInstance* _card) {
     action = _action;
     source = _card;
     source->storedCard = nullptr;
-    for (size_t i = 0; i < costs.size(); i++) {
-        costs[i]->setSource(_card);
+    for (auto& cost : costs) {
+        cost->setSource(_card);
     }
     return 1;
 }
@@ -627,12 +627,12 @@ int ExtraCosts::reset() {
 }
 
 int ExtraCosts::tryToSetPayment(MTGCardInstance* card) {
-    for (size_t i = 0; i < costs.size(); i++) {
-        if (!costs[i]->isPaymentSet()) {
-            for (size_t k = 0; k < costs.size(); k++) {
-                if (card == costs[k]->target) return 0;
+    for (auto& cost : costs) {
+        if (!cost->isPaymentSet()) {
+            for (auto& k : costs) {
+                if (card == k->target) return 0;
             }
-            if (int result = costs[i]->setPayment(card)) {
+            if (int result = cost->setPayment(card)) {
                 card->isExtraCostTarget = true;
                 return result;
             }
@@ -642,16 +642,16 @@ int ExtraCosts::tryToSetPayment(MTGCardInstance* card) {
 }
 
 int ExtraCosts::isPaymentSet() {
-    for (size_t i = 0; i < costs.size(); i++) {
-        if (!costs[i]->isPaymentSet()) return 0;
+    for (auto& cost : costs) {
+        if (!cost->isPaymentSet()) return 0;
     }
     return 1;
 }
 
 int ExtraCosts::canPay() {
-    for (size_t i = 0; i < costs.size(); i++) {
-        if (!costs[i]->canPay()) {
-            if (costs[i]->target) costs[i]->target->isExtraCostTarget = false;
+    for (auto& cost : costs) {
+        if (!cost->canPay()) {
+            if (cost->target) cost->target->isExtraCostTarget = false;
             return 0;
         }
     }
@@ -660,18 +660,18 @@ int ExtraCosts::canPay() {
 
 int ExtraCosts::doPay() {
     int result = 0;
-    for (size_t i = 0; i < costs.size(); i++) {
-        if (costs[i]->target) {
-            costs[i]->target->isExtraCostTarget = false;
+    for (auto& cost : costs) {
+        if (cost->target) {
+            cost->target->isExtraCostTarget = false;
         }
-        result += costs[i]->doPay();
+        result += cost->doPay();
     }
     return result;
 }
 
 ExtraCosts::~ExtraCosts() {
-    for (size_t i = 0; i < costs.size(); i++) {
-        SAFE_DELETE(costs[i]);
+    for (auto& cost : costs) {
+        SAFE_DELETE(cost);
     }
 }
 

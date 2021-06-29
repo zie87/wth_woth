@@ -134,8 +134,8 @@ void GuiPlay::BattleField::Render() {
 GuiPlay::GuiPlay(GameObserver* game) : GuiLayer(game) { end_spells = cards.end(); }
 
 GuiPlay::~GuiPlay() {
-    for (auto it = cards.begin(); it != cards.end(); ++it) {
-        delete (*it);
+    for (auto& card : cards) {
+        delete card;
     }
 }
 
@@ -262,7 +262,7 @@ void GuiPlay::Render() {
 }
 void GuiPlay::Update(float dt) {
     battleField.Update(dt);
-    for (auto it = cards.begin(); it != cards.end(); ++it) (*it)->Update(dt);
+    for (auto& card : cards) card->Update(dt);
 }
 
 int GuiPlay::receiveEventPlus(WEvent* e) {

@@ -473,8 +473,8 @@ ExtraCost* ManaCost::getExtraCost(unsigned int i) {
 
 int ManaCost::hasColor(int color) {
     if (getCost(color)) return 1;
-    for (size_t i = 0; i < hybrids.size(); i++) {
-        if (hybrids[i].hasColor(color)) return 1;
+    for (auto& hybrid : hybrids) {
+        if (hybrid.hasColor(color)) return 1;
     }
     return 0;
 }
@@ -490,12 +490,12 @@ int ManaCost::getConvertedCost() {
     for (int i = 0; i < Constants::NB_Colors; i++) {
         result += cost[i];
     }
-    for (size_t i = 0; i < hybrids.size(); i++) {
-        result += hybrids[i].getConvertedCost();
+    for (auto& hybrid : hybrids) {
+        result += hybrid.getConvertedCost();
     }
     if (extraCosts && extraCosts->costs.size()) {
-        for (unsigned int i = 0; i < extraCosts->costs.size(); i++) {
-            ExtraCost* pMana = dynamic_cast<LifeorManaCost*>(extraCosts->costs[i]);
+        for (auto& cost : extraCosts->costs) {
+            ExtraCost* pMana = dynamic_cast<LifeorManaCost*>(cost);
             if (pMana) result++;
         }
     }
@@ -559,7 +559,7 @@ int ManaCost::addExtraCosts(ExtraCosts* _ecost) {
         return 1;
     }
     if (!extraCosts) extraCosts = NEW ExtraCosts();
-    for (size_t i = 0; i < _ecost->costs.size(); i++) extraCosts->costs.push_back(_ecost->costs[i]->clone());
+    for (auto& cost : _ecost->costs) extraCosts->costs.push_back(cost->clone());
     return 1;
 }
 
@@ -618,8 +618,7 @@ int ManaCost::isPositive() {
 }
 
 void ManaCost::randomDiffHybrids(ManaCost* _cost, std::vector<int8_t>& diff) {
-    for (size_t i = 0; i < _cost->hybrids.size(); i++) {
-        ManaCostHybrid& h = _cost->hybrids[i];
+    for (auto& h : _cost->hybrids) {
         diff[h.color1 * 2 + 1] -= h.value1;
     }
 }
@@ -712,8 +711,8 @@ std::string ManaCost::toString() {
         }
     }
 
-    for (size_t i = 0; i < hybrids.size(); i++) {
-        oss << hybrids[i];
+    for (auto& hybrid : hybrids) {
+        oss << hybrid;
     }
     return oss.str();
 }

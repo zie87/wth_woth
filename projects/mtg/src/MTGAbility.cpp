@@ -179,8 +179,7 @@ int AbilityFactory::parseCastRestrictions(MTGCardInstance* card, Player* player,
                             Player* p = observer->players[w];
                             MTGGameZone* zones[] = {p->game->inPlay,  p->game->graveyard, p->game->hand,
                                                     p->game->library, p->game->stack,     p->game->exile};
-                            for (int k = 0; k < 6; k++) {
-                                MTGGameZone* z = zones[k];
+                            for (auto z : zones) {
                                 if (stc->targetsZone(z)) {
                                     if (i == 2) {
                                         secondAmount += seenType != string::npos
@@ -231,8 +230,7 @@ int AbilityFactory::parseCastRestrictions(MTGCardInstance* card, Player* player,
                 if (player->opponent()->game->stack->seenThisTurn(tc, Constants::CAST_ALL) < 1) return 0;
             } else if (tc.find("this") != string::npos) {
                 int count = 0;
-                for (unsigned int k = 0; k < player->game->stack->cardsSeenThisTurn.size(); k++) {
-                    MTGCardInstance* stackCard = player->game->stack->cardsSeenThisTurn[k];
+                for (auto stackCard : player->game->stack->cardsSeenThisTurn) {
                     if (stackCard->next && stackCard->next == card) count++;
                     if (stackCard == card) count++;
                 }
@@ -245,8 +243,7 @@ int AbilityFactory::parseCastRestrictions(MTGCardInstance* card, Player* player,
             for (int cp = 0; cp < 2; cp++) {
                 Player* checkCurrent = observer->players[cp];
                 MTGGameZone* grave = checkCurrent->game->graveyard;
-                for (unsigned int gy = 0; gy < grave->cardsSeenThisTurn.size(); gy++) {
-                    MTGCardInstance* checkCard = grave->cardsSeenThisTurn[gy];
+                for (auto checkCard : grave->cardsSeenThisTurn) {
                     if (checkCard->isCreature()) {
                         isMorbid = true;
                         break;
@@ -319,9 +316,9 @@ int AbilityFactory::countCards(TargetChooser* tc, Player* player, int option) {
         if (player && player != observer->players[i]) continue;
         MTGGameZone* zones[] = {observer->players[i]->game->inPlay, observer->players[i]->game->graveyard,
                                 observer->players[i]->game->hand};
-        for (int k = 0; k < 3; k++) {
-            for (int j = zones[k]->nb_cards - 1; j >= 0; j--) {
-                MTGCardInstance* current = zones[k]->cards[j];
+        for (auto& zone : zones) {
+            for (int j = zone->nb_cards - 1; j >= 0; j--) {
+                MTGCardInstance* current = zone->cards[j];
                 if (tc->canTarget(current)) {
                     switch (option) {
                     case COUNT_POWER:
@@ -531,12 +528,12 @@ TriggeredAbility* AbilityFactory::parseTrigger(string s, string magicText, int i
         bool attackBlockedTrigger = false;
         bool blockingTrigger = false;
         vector<string> combatTriggerVector = split(combatTrigger, ',');
-        for (unsigned int i = 0; i < combatTriggerVector.size(); i++) {
-            if (combatTriggerVector[i] == "attacking") attackingTrigger = true;
-            if (combatTriggerVector[i] == "attackedalone") attackedAloneTrigger = true;
-            if (combatTriggerVector[i] == "notblocked") notBlockedTrigger = true;
-            if (combatTriggerVector[i] == "blocked") attackBlockedTrigger = true;
-            if (combatTriggerVector[i] == "blocking") blockingTrigger = true;
+        for (auto& i : combatTriggerVector) {
+            if (i == "attacking") attackingTrigger = true;
+            if (i == "attackedalone") attackedAloneTrigger = true;
+            if (i == "notblocked") notBlockedTrigger = true;
+            if (i == "blocked") attackBlockedTrigger = true;
+            if (i == "blocking") blockingTrigger = true;
         }
         // build triggers TCs
         TargetChooser* tc = parseSimpleTC(s, "source", card);
@@ -952,8 +949,8 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
         ManaCost* cost = ManaCost::parseManaCost(sWithoutTc.substr(0, delimiter + 1), nullptr, card);
         int doTap = 0;  // Tap in the cost ?
         if (cost && cost->extraCosts) {
-            for (unsigned int i = 0; i < cost->extraCosts->costs.size(); i++) {
-                ExtraCost* tapper = dynamic_cast<TapCost*>(cost->extraCosts->costs[i]);
+            for (auto& i : cost->extraCosts->costs) {
+                ExtraCost* tapper = dynamic_cast<TapCost*>(i);
                 if (tapper) doTap = 1;
             }
         }
@@ -1142,8 +1139,8 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     if (found != string::npos) neverRemove = true;
     // rather dirty way to stop thises and lords from conflicting with each other.
     size_t lord = string::npos;
-    for (size_t j = 0; j < kLordKeywordsCount; ++j) {
-        size_t found2 = s.find(kLordKeywords[j]);
+    for (const auto& kLordKeyword : kLordKeywords) {
+        size_t found2 = s.find(kLordKeyword);
         if (found2 != string::npos && ((found == string::npos) || found2 < found)) {
             lord = found2;
         }
@@ -1232,9 +1229,9 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
         SAFE_DELETE(tc);
         vector<string> multiEffects = split(s, '&');
         auto* multi                 = NEW MultiAbility(observer, id, card, target, nullptr);
-        for (unsigned int i = 0; i < multiEffects.size(); i++) {
-            if (!multiEffects[i].empty()) {
-                MTGAbility* addAbility = parseMagicLine(multiEffects[i], id, spell, card, activated);
+        for (auto& multiEffect : multiEffects) {
+            if (!multiEffect.empty()) {
+                MTGAbility* addAbility = parseMagicLine(multiEffect, id, spell, card, activated);
                 multi->Add(addAbility);
             }
         }
@@ -2112,21 +2109,21 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
         for (unsigned int i = 0; i < abilities.size(); i++) {
             if (abilities[i].empty()) abilities.erase(abilities.begin() + i);
         }
-        for (unsigned int j = 0; j < abilities.size(); j++) {
-            vector<string> splitPower = parseBetween(abilities[j], "setpower=", ",", false);
+        for (auto& abilitie : abilities) {
+            vector<string> splitPower = parseBetween(abilitie, "setpower=", ",", false);
             if (splitPower.size()) {
                 newpowerfound = true;
                 newpower = splitPower[1];
             }
-            vector<string> splitToughness = parseBetween(abilities[j], "settoughness=", ",", false);
+            vector<string> splitToughness = parseBetween(abilitie, "settoughness=", ",", false);
             if (splitToughness.size()) {
                 newtoughnessfound = true;
                 newtoughness = splitToughness[1];
             }
-            if (abilities[j].find("newability[") != string::npos) {
-                size_t NewSkill = abilities[j].find("newability[");
-                size_t NewSkillEnd = abilities[j].find_last_of("]");
-                string newAbilities = abilities[j].substr(NewSkill + 11, NewSkillEnd - NewSkill - 11);
+            if (abilitie.find("newability[") != string::npos) {
+                size_t NewSkill     = abilitie.find("newability[");
+                size_t NewSkillEnd  = abilitie.find_last_of("]");
+                string newAbilities = abilitie.substr(NewSkill + 11, NewSkillEnd - NewSkill - 11);
                 newAbilitiesList.push_back(newAbilities);
                 newAbilityFound = true;
             }
@@ -2557,8 +2554,8 @@ int AbilityFactory::abilityEfficiency(MTGAbility* a, Player* p, int mode, Target
             testDummy->storedSourceCard = atac->source;
             vector<string> magictextlines = split(atac->sabilities, '_');
             if (magictextlines.size()) {
-                for (unsigned int i = 0; i < magictextlines.size(); i++) {
-                    MTGAbility* ata = parseMagicLine(magictextlines[i], -1, nullptr, testDummy);
+                for (auto& magictextline : magictextlines) {
+                    MTGAbility* ata = parseMagicLine(magictextline, -1, nullptr, testDummy);
                     if (ata) {
                         result += abilityEfficiency(getCoreAbility(ata), targetedPlyr, mode);
                         SAFE_DELETE(ata);
@@ -2794,7 +2791,7 @@ int AbilityFactory::magicText(int id, Spell* spell, MTGCardInstance* card, int m
 
         if (dryMode) {
             result = abilityEfficiency(a, card->controller(), mode, tc);
-            for (size_t i = 0; i < v.size(); ++i) SAFE_DELETE(v[i]);
+            for (auto& i : v) SAFE_DELETE(i);
             return result;
         }
 
@@ -3567,8 +3564,8 @@ int ActivatedAbility::isReactingToClick(MTGCardInstance* card, ManaCost* mana) {
         ManaCost* cost = getCost();
         if (!cost) return 1;
         if (card->hasType(Subtypes::TYPE_PLANESWALKER)) {
-            for (unsigned int k = 0; k < card->cardsAbilities.size(); ++k) {
-                auto* check = dynamic_cast<ActivatedAbility*>(card->cardsAbilities[k]);
+            for (auto& cardsAbilitie : card->cardsAbilities) {
+                auto* check = dynamic_cast<ActivatedAbility*>(cardsAbilitie);
                 if (check && check->counters) return 0;
             }
             if (player != game->currentPlayer) return 0;
@@ -3649,8 +3646,8 @@ int ActivatedAbility::activateAbility() {
     auto* femp     = dynamic_cast<AManaProducer*>(fmp);
     ManaCost* cost = getCost();
     if ((amp || femp) && cost && cost->extraCosts) {
-        for (unsigned int i = 0; i < cost->extraCosts->costs.size(); i++) {
-            ExtraCost* tapper = dynamic_cast<TapCost*>(cost->extraCosts->costs[i]);
+        for (auto& i : cost->extraCosts->costs) {
+            ExtraCost* tapper = dynamic_cast<TapCost*>(i);
             if (tapper) needsTapping = 1;
             wasTappedForMana = true;
         }
@@ -3934,15 +3931,15 @@ bool ListMaintainerAbility::canTarget(MTGGameZone* zone) {
 void ListMaintainerAbility::updateTargets() {
     // remove invalid ones
     map<MTGCardInstance*, bool> temp;
-    for (auto it = cards.begin(); it != cards.end(); ++it) {
-        MTGCardInstance* card = (*it).first;
+    for (auto& it : cards) {
+        MTGCardInstance* card = it.first;
         if (!canBeInList(card) || card->mPropertiesChangedSinceLastUpdate) {
             temp[card] = true;
         }
     }
 
-    for (auto it = temp.begin(); it != temp.end(); ++it) {
-        MTGCardInstance* card = (*it).first;
+    for (auto& it : temp) {
+        MTGCardInstance* card = it.first;
         cards.erase(card);
         removed(card);
     }
@@ -3951,8 +3948,7 @@ void ListMaintainerAbility::updateTargets() {
     for (int i = 0; i < 2; i++) {
         Player* p = game->players[i];
         MTGGameZone* zones[] = {p->game->inPlay, p->game->graveyard, p->game->hand, p->game->library};
-        for (int k = 0; k < 4; k++) {
-            MTGGameZone* zone = zones[k];
+        for (auto zone : zones) {
             if (canTarget(zone)) {
                 for (int j = 0; j < zone->nb_cards; j++) {
                     MTGCardInstance* card = zone->cards[j];
@@ -3966,8 +3962,8 @@ void ListMaintainerAbility::updateTargets() {
         }
     }
 
-    for (auto it = temp.begin(); it != temp.end(); ++it) {
-        MTGCardInstance* card = (*it).first;
+    for (auto& it : temp) {
+        MTGCardInstance* card = it.first;
         cards[card] = true;
         added(card);
     }
@@ -3989,15 +3985,15 @@ void ListMaintainerAbility::updateTargets() {
 void ListMaintainerAbility::checkTargets() {
     // remove invalid ones
     map<MTGCardInstance*, bool> tempCheck;
-    for (auto it = checkCards.begin(); it != checkCards.end(); ++it) {
-        MTGCardInstance* card = (*it).first;
+    for (auto& checkCard : checkCards) {
+        MTGCardInstance* card = checkCard.first;
         if (!canBeInList(card) || card->mPropertiesChangedSinceLastUpdate) {
             tempCheck[card] = true;
         }
     }
 
-    for (auto it = tempCheck.begin(); it != tempCheck.end(); ++it) {
-        MTGCardInstance* card = (*it).first;
+    for (auto& it : tempCheck) {
+        MTGCardInstance* card = it.first;
         checkCards.erase(card);
     }
 
@@ -4007,8 +4003,7 @@ void ListMaintainerAbility::checkTargets() {
     for (int i = 0; i < 2; i++) {
         Player* p = game->players[i];
         MTGGameZone* zones[] = {p->game->inPlay, p->game->graveyard, p->game->hand, p->game->library};
-        for (int k = 0; k < 4; k++) {
-            MTGGameZone* zone = zones[k];
+        for (auto zone : zones) {
             if (canTarget(zone)) {
                 for (int j = 0; j < zone->nb_cards; j++) {
                     MTGCardInstance* card = zone->cards[j];
@@ -4021,8 +4016,8 @@ void ListMaintainerAbility::checkTargets() {
             }
         }
     }
-    for (auto it = tempCheck.begin(); it != tempCheck.end(); ++it) {
-        MTGCardInstance* card = (*it).first;
+    for (auto& it : tempCheck) {
+        MTGCardInstance* card = it.first;
         checkCards[card] = true;
     }
 }
@@ -4171,8 +4166,8 @@ Targetable* GenericTriggeredAbility::getTriggerTarget(WEvent* e, MTGAbility* a) 
 
     auto* ma = dynamic_cast<MultiAbility*>(a);
     if (ma) {
-        for (size_t i = 0; i < ma->abilities.size(); i++) {
-            return getTriggerTarget(e, ma->abilities[i]);
+        for (auto& abilitie : ma->abilities) {
+            return getTriggerTarget(e, abilitie);
         }
     }
 
@@ -4191,8 +4186,8 @@ void GenericTriggeredAbility::setTriggerTargets(Targetable* ta, MTGAbility* a) {
 
     auto* ma = dynamic_cast<MultiAbility*>(a);
     if (ma) {
-        for (size_t i = 0; i < ma->abilities.size(); i++) {
-            setTriggerTargets(ta, ma->abilities[i]);
+        for (auto& abilitie : ma->abilities) {
+            setTriggerTargets(ta, abilitie);
         }
     }
 }

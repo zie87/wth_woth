@@ -30,8 +30,8 @@ MaxPerTurnRestriction* PlayRestrictions::getMaxPerTurnRestrictionByTargetChooser
     TargetChooser* _tc = tc->clone();
     _tc->setAllZones();  // we don't care about the actual zone for the "equals" check
 
-    for (auto iter = restrictions.begin(); iter != restrictions.end(); ++iter) {
-        auto* mptr = dynamic_cast<MaxPerTurnRestriction*>(*iter);
+    for (auto& restriction : restrictions) {
+        auto* mptr = dynamic_cast<MaxPerTurnRestriction*>(restriction);
         if (mptr && mptr->tc->equals(_tc)) {
             delete _tc;
             return mptr;
@@ -59,16 +59,17 @@ void PlayRestrictions::removeRestriction(PlayRestriction* restriction) {
 int PlayRestrictions::canPutIntoZone(MTGCardInstance* card, MTGGameZone* destZone) {
     if (!card) return PlayRestriction::CANT_PLAY;
 
-    for (auto iter = restrictions.begin(); iter != restrictions.end(); ++iter) {
-        if ((*iter)->canPutIntoZone(card, destZone) == PlayRestriction::CANT_PLAY) return PlayRestriction::CANT_PLAY;
+    for (auto& restriction : restrictions) {
+        if (restriction->canPutIntoZone(card, destZone) == PlayRestriction::CANT_PLAY)
+            return PlayRestriction::CANT_PLAY;
     }
 
     return PlayRestriction::CAN_PLAY;
 }
 
 PlayRestrictions::~PlayRestrictions() {
-    for (auto iter = restrictions.begin(); iter != restrictions.end(); ++iter) {
-        SAFE_DELETE(*iter);
+    for (auto& restriction : restrictions) {
+        SAFE_DELETE(restriction);
     }
     restrictions.clear();
 }

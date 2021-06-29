@@ -88,8 +88,8 @@ int MTGPack::assemblePack(MTGDeck* to) {
     if (!p) return -1;
     p->Shuffle();
 
-    for (size_t i = 0; i < slotss.size(); i++) {
-        carryover = slotss[i]->add(p, to, carryover);
+    for (auto& slots : slotss) {
+        carryover = slots->add(p, to, carryover);
         if (carryover > 0) carryover = carryover;  // This means we're failing.
     }
     SAFE_DELETE(p);
@@ -98,8 +98,7 @@ int MTGPack::assemblePack(MTGDeck* to) {
 void MTGPack::countCards() {
     minCards = 0;
     maxCards = 0;
-    for (size_t i = 0; i < slotss.size(); i++) {
-        MTGPackSlot* ps = slotss[i];
+    for (auto ps : slotss) {
         int top = 0;
         int bot = 999999999;
         for (size_t y = 0; y < ps->entries.size(); y++) {
@@ -206,20 +205,20 @@ void MTGPack::load(string filename) {
     return;
 }
 MTGPackSlot::~MTGPackSlot() {
-    for (size_t t = 0; t < entries.size(); t++) {
-        SAFE_DELETE(entries[t]);
+    for (auto& entrie : entries) {
+        SAFE_DELETE(entrie);
     }
     entries.clear();
 }
 MTGPack::~MTGPack() {
-    for (size_t t = 0; t < slotss.size(); t++) {
-        SAFE_DELETE(slotss[t]);
+    for (auto& slots : slotss) {
+        SAFE_DELETE(slots);
     }
     slotss.clear();
 }
 MTGPacks::~MTGPacks() {
-    for (size_t t = 0; t < packs.size(); t++) {
-        SAFE_DELETE(packs[t]);
+    for (auto& pack : packs) {
+        SAFE_DELETE(pack);
     }
     packs.clear();
 }
@@ -231,8 +230,7 @@ MTGPack* MTGPacks::randomPack(int key) {
 }
 void MTGPacks::loadAll() {
     vector<string> packFiles = JFileSystem::GetInstance()->scanfolder("packs/");
-    for (size_t i = 0; i < packFiles.size(); ++i) {
-        string relative = packFiles[i];
+    for (auto relative : packFiles) {
         char myFilename[4096];
         sprintf(myFilename, "packs/%s", relative.c_str());
         if (relative[0] == '.') continue;
@@ -305,8 +303,8 @@ MTGPack* MTGPacks::getDefault() {
             defaultBooster.slotss.push_back(ps);
             defaultBooster.bValid = true;
             defaultBooster.unlockStatus = 1;
-            for (size_t i = 0; i < defaultBooster.slotss.size(); ++i) {
-                defaultBooster.slotss[i]->addEntry(NEW MTGPackEntryRandom("rarity:special;"));
+            for (auto& slots : defaultBooster.slotss) {
+                slots->addEntry(NEW MTGPackEntryRandom("rarity:special;"));
             }
         }
     }
@@ -314,7 +312,7 @@ MTGPack* MTGPacks::getDefault() {
 }
 
 void MTGPacks::refreshUnlocked() {
-    for (size_t t = 0; t < packs.size(); t++) {
-        if (packs[t]->unlockStatus < 0) packs[t]->unlockStatus = 0;
+    for (auto& pack : packs) {
+        if (pack->unlockStatus < 0) pack->unlockStatus = 0;
     }
 }

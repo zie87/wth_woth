@@ -49,8 +49,8 @@ vector<DeckMetaData*> GameState::BuildDeckList(const string& path, const string&
             // Check if the deck is unlocked based on sets etc...
             bool unlocked = true;
             vector<int> unlockRequirements = meta->getUnlockRequirements();
-            for (size_t i = 0; i < unlockRequirements.size(); ++i) {
-                if (!options[unlockRequirements[i]].number) {
+            for (int unlockRequirement : unlockRequirements) {
+                if (!options[unlockRequirement].number) {
                     unlocked = false;
                     break;
                 }
@@ -93,9 +93,8 @@ vector<DeckMetaData*> GameState::BuildDeckList(const string& path, const string&
 // build a menu with the given deck list and return a vector of the deck ids created.
 void GameState::renderDeckMenu(SimpleMenu* _menu, const vector<DeckMetaData*>& deckMetaDataList) {
     int deckNumber = 1;
-    for (auto i = deckMetaDataList.begin(); i != deckMetaDataList.end(); i++) {
-        DeckMetaData* deckMetaData = *i;
-        string deckName = deckMetaData->getName();
+    for (auto deckMetaData : deckMetaDataList) {
+        string deckName        = deckMetaData->getName();
         string deckDescription = deckMetaData->getDescription();
         _menu->Add(deckNumber++, deckName.c_str(), deckDescription.c_str());
     }
@@ -104,9 +103,8 @@ void GameState::renderDeckMenu(SimpleMenu* _menu, const vector<DeckMetaData*>& d
 // build a menu with the given deck list and return a vector of the deck ids created.
 void GameState::renderDeckMenu(DeckMenu* _menu, const vector<DeckMetaData*>& deckMetaDataList) {
     int deckNumber = 1;
-    for (auto i = deckMetaDataList.begin(); i != deckMetaDataList.end(); i++) {
-        DeckMetaData* deckMetaData = *i;
-        string deckName = deckMetaData->getName();
+    for (auto deckMetaData : deckMetaDataList) {
+        string deckName        = deckMetaData->getName();
         string deckDescription = deckMetaData->getDescription();
         _menu->Add(deckNumber++, deckName.c_str(), deckDescription.c_str(), false, deckMetaData);
     }

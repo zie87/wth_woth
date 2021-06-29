@@ -16,7 +16,7 @@
 SimpleKey::SimpleKey(string _ds, int _id) {
     displayValue = _ds;
     id = _id;
-    for (int x = 0; x < 4; x++) adjacency[x] = KPD_NOWHERE;
+    for (unsigned char& x : adjacency) x = KPD_NOWHERE;
 }
 
 void SimplePad::linkKeys(int from, int to, int dir) {
@@ -47,7 +47,7 @@ SimplePad::SimplePad() {
     buf[1] = '\0';
     SimpleKey* k;
 
-    for (int x = 0; x < KPD_MAX; x++) keys[x] = nullptr;
+    for (auto& key : keys) key = nullptr;
 
     // Add the alphabet. We cheat a bit here.
     for (int x = 'a'; x <= 'z'; x++) {
@@ -108,7 +108,7 @@ SimplePad::SimplePad() {
 }
 
 SimplePad::~SimplePad() {
-    for (int x = 0; x < KPD_MAX; x++) SAFE_DELETE(keys[x]);
+    for (auto& key : keys) SAFE_DELETE(key);
 }
 
 SimpleKey* SimplePad::Add(string display, unsigned char id) {

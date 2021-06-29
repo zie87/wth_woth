@@ -106,7 +106,7 @@ DuelLayers::~DuelLayers() {
         }
     }
 
-    for (size_t i = 0; i < waiters.size(); ++i) delete (waiters[i]);
+    for (auto& waiter : waiters) delete waiter;
     observer->mTrash->cleanup();
 
     SAFE_DELETE(mCardSelector);

@@ -793,8 +793,8 @@ WFont* ResourceManagerImpl::GetWFont(int id) {
 }
 
 void ResourceManagerImpl::RemoveWFonts() {
-    for (auto font = mWFontMap.begin(); font != mWFontMap.end(); ++font) {
-        delete font->second;
+    for (auto& font : mWFontMap) {
+        delete font.second;
     }
     mWFontMap.clear();
 }

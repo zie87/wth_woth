@@ -33,8 +33,8 @@ void GameObserver::cleanup() {
     SAFE_DELETE(mLayers);
     SAFE_DELETE(phaseRing);
     SAFE_DELETE(replacementEffects);
-    for (size_t i = 0; i < players.size(); ++i) {
-        SAFE_DELETE(players[i]);
+    for (auto& player : players) {
+        SAFE_DELETE(player);
     }
     players.clear();
 
@@ -58,15 +58,15 @@ void GameObserver::cleanup() {
 GameObserver::~GameObserver() {
     WGE_LOG_TRACE("== Destroying GameObserver ==");
 
-    for (size_t i = 0; i < players.size(); ++i) {
-        players[i]->End();
+    for (auto& player : players) {
+        player->End();
     }
     SAFE_DELETE(targetChooser);
     SAFE_DELETE(mLayers);
     SAFE_DELETE(phaseRing);
     SAFE_DELETE(replacementEffects);
-    for (size_t i = 0; i < players.size(); ++i) {
-        SAFE_DELETE(players[i]);
+    for (auto& player : players) {
+        SAFE_DELETE(player);
     }
     players.clear();
     delete[] ExtraRules;
@@ -528,8 +528,8 @@ void GameObserver::gameStateBasedEffects() {
             ///////////////////////////
             card->isExtraCostTarget = false;
             if (mExtraPayment != nullptr) {
-                for (unsigned int ec = 0; ec < mExtraPayment->costs.size(); ec++) {
-                    if (mExtraPayment->costs[ec]->target) mExtraPayment->costs[ec]->target->isExtraCostTarget = true;
+                for (auto& cost : mExtraPayment->costs) {
+                    if (cost->target) cost->target->isExtraCostTarget = true;
                 }
             }
             //////////////////////
@@ -802,8 +802,7 @@ void GameObserver::Affinity() {
                         Player* p            = this->players[w];
                         MTGGameZone* zones[] = {p->game->inPlay,  p->game->graveyard, p->game->hand,
                                                 p->game->library, p->game->stack,     p->game->exile};
-                        for (int k = 0; k < 6; k++) {
-                            MTGGameZone* z = zones[k];
+                        for (auto z : zones) {
                             if (tcn->targetsZone(z)) {
                                 reducem += z->countByCanTarget(tcn);
                             }
@@ -864,8 +863,8 @@ void GameObserver::Render() {
         JRenderer::GetInstance()->DrawRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, ARGB(255, 255, 0, 0));
     if (mExtraPayment) mExtraPayment->Render();
 
-    for (size_t i = 0; i < players.size(); ++i) {
-        players[i]->Render();
+    for (auto& player : players) {
+        player->Render();
     }
 }
 
@@ -1207,8 +1206,8 @@ std::ostream& operator<<(std::ostream& out, const GameObserver& g) {
 
     out << "[do]" << std::endl;
 
-    for (auto it = g.actionsList.begin(); it != (g.actionsList.end()); it++) {
-        out << (*it) << std::endl;
+    for (const auto& it : g.actionsList) {
+        out << it << std::endl;
     }
 
     out << "[end]" << std::endl;

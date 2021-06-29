@@ -118,9 +118,9 @@ void ModRulesMenu::parse(TiXmlElement* element) {
 }
 
 ModRulesMenu::~ModRulesMenu() {
-    for (size_t i = 0; i < main.size(); ++i) SAFE_DELETE(main[i]);
+    for (auto& i : main) SAFE_DELETE(i);
 
-    for (size_t i = 0; i < other.size(); ++i) SAFE_DELETE(other[i]);
+    for (auto& i : other) SAFE_DELETE(i);
 
     main.clear();
     other.clear();
@@ -382,9 +382,9 @@ void ModRulesCardGui::parse(TiXmlElement* element) {
 }
 
 ModRulesCardGui::~ModRulesCardGui() {
-    for (size_t i = 0; i < background.size(); ++i) SAFE_DELETE(background[i]);
-    for (size_t i = 0; i < renderbig.size(); ++i) SAFE_DELETE(renderbig[i]);
-    for (size_t i = 0; i < rendertinycrop.size(); ++i) SAFE_DELETE(rendertinycrop[i]);
+    for (auto& i : background) SAFE_DELETE(i);
+    for (auto& i : renderbig) SAFE_DELETE(i);
+    for (auto& i : rendertinycrop) SAFE_DELETE(i);
 
     background.clear();
     renderbig.clear();

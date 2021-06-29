@@ -36,8 +36,8 @@ void DeckMetaData::LoadDeck() {
         mDeckId = atoi((mFilename.substr(mFilename.find("deck") + 4, mFilename.find(".txt"))).c_str());
 
         vector<string> requirements = split(deck.meta_unlockRequirements, ',');
-        for (size_t i = 0; i < requirements.size(); ++i) {
-            mUnlockRequirements.push_back(Options::getID(requirements[i]));
+        for (auto& requirement : requirements) {
+            mUnlockRequirements.push_back(Options::getID(requirement));
         }
 
         mDeckLoaded = true;

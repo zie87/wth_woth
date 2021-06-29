@@ -358,11 +358,11 @@ void DeckMenu::updateScroller() {
     TaskList taskList;
     mScroller->Reset();
 
-    for (auto it = taskList.tasks.begin(); it != taskList.tasks.end(); it++) {
+    for (auto& task : taskList.tasks) {
         std::ostringstream taskDescription;
-        taskDescription << "Credits: " << std::setw(4) << (*it)->getReward() << " / "
-                        << "Days Left: " << (*it)->getExpiration() << std::endl
-                        << (*it)->getDesc() << std::endl
+        taskDescription << "Credits: " << std::setw(4) << task->getReward() << " / "
+                        << "Days Left: " << task->getExpiration() << std::endl
+                        << task->getDesc() << std::endl
                         << std::endl;
         mScroller->Add(taskDescription.str());
     }

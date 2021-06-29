@@ -76,8 +76,8 @@ void CardSelector::Remove(CardSelector::Target* card) {
 
 CardSelector::Target* CardSelector::fetchMemory(SelectorMemory& memory) {
     if (nullptr == memory.object) return nullptr;
-    for (auto it = cards.begin(); it != cards.end(); ++it)
-        if (*it == memory.object) {
+    for (auto& card : cards)
+        if (card == memory.object) {
             if ((nullptr == limitor) || (limitor->select(memory.object)))
                 return memory.object;
             else
@@ -118,9 +118,9 @@ void CardSelector::Pop() {
 
 bool CardSelector::CheckUserInput(JButton key) {
     if (!active) {
-        for (auto it = cards.begin(); it != cards.end(); ++it)
-            if ((nullptr == limitor) || (limitor->select(*it))) {
-                active = *it;
+        for (auto& card : cards)
+            if ((nullptr == limitor) || (limitor->select(card))) {
+                active = card;
                 active->Entering();
                 return true;
             }
@@ -270,9 +270,9 @@ void CardSelector::Limit(LimitorFunctor<PlayGuiObject>* limitor, CardView::Selec
 
         if (limitor && !limitor->select(active)) {
             active = nullptr;
-            for (auto it = cards.begin(); it != cards.end(); ++it)
-                if (limitor->select(*it)) {
-                    active = *it;
+            for (auto& card : cards)
+                if (limitor->select(card)) {
+                    active = card;
                     break;
                 }
         }

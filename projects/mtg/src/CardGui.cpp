@@ -147,8 +147,7 @@ void CardGui::Render() {
         // Am I a parent of a selected card, or am I a parent and myself being selected?
         bool isActiveConnectedParent = mHasFocus && card->childrenCards.size();
         if (!isActiveConnectedParent) {
-            for (size_t i = 0; i < card->childrenCards.size(); ++i) {
-                MTGCardInstance* child = card->childrenCards[i];
+            for (auto child : card->childrenCards) {
                 if (auto* cv = dynamic_cast<CardView*>(child->view)) {
                     if (cv->mHasFocus) {
                         isActiveConnectedParent = true;
@@ -168,8 +167,7 @@ void CardGui::Render() {
         // Am I a child of a selected card, or am I a child and myself being selected?
         bool isActiveConnectedChild = mHasFocus && card->parentCards.size();
         if (!isActiveConnectedChild) {
-            for (size_t i = 0; i < card->parentCards.size(); ++i) {
-                MTGCardInstance* parent = card->parentCards[i];
+            for (auto parent : card->parentCards) {
                 if (auto* cv = dynamic_cast<CardView*>(parent->view)) {
                     if (cv->mHasFocus) {
                         isActiveConnectedChild = true;
@@ -350,8 +348,7 @@ void CardGui::AlternateRender(MTGCard* card, const Pos& pos) {
     font->SetColor(ARGB((int)pos.actA, 0, 0, 0));
     string sFormattedData = "";
 
-    for (size_t i = 0; i < Carditems.size(); i++) {
-        ModRulesRenderCardGuiItem* Carditem = Carditems[i];
+    for (auto Carditem : Carditems) {
         if (Carditem->mFilter.length() == 0 || FilterCard(card, Carditem->mFilter.c_str())) {
             if (Carditem->mFont) {
                 font->SetColor(Carditem->mFontColor);
@@ -612,8 +609,7 @@ void CardGui::TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad) {
     WFont* font = WResourceManager::Instance()->GetWFont(Fonts::MAGIC_FONT);
     float backup_scale = font->GetScale();
     string sFormattedData = "";
-    for (size_t i = 0; i < Carditems.size(); i++) {
-        ModRulesRenderCardGuiItem* Carditem = Carditems[i];
+    for (auto Carditem : Carditems) {
         if (Carditem->mFilter.length() == 0 || FilterCard(card, Carditem->mFilter.c_str())) {
             if (Carditem->mFont) {
                 font->SetColor(Carditem->mFontColor);

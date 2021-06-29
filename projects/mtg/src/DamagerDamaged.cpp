@@ -15,7 +15,7 @@ DamagerDamaged::~DamagerDamaged() {}
 
 int DamagerDamaged::sumDamages() {
     int total = 0;
-    for (auto i = damages.begin(); i != damages.end(); ++i) total += i->damage;
+    for (auto& damage : damages) total += damage.damage;
     return total;
 }
 
@@ -74,5 +74,5 @@ AttackerDamaged::AttackerDamaged(MTGCardInstance* card, const Pos& ref, bool sho
     : DamagerDamaged(card, ref, show, damageSelecter) {}
 
 AttackerDamaged::~AttackerDamaged() {
-    for (auto q = blockers.begin(); q != blockers.end(); ++q) delete (*q);
+    for (auto& blocker : blockers) delete blocker;
 }

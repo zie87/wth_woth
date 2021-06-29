@@ -70,9 +70,9 @@ int MTGAllCards::processConfLine(string& s, MTGCard* card, CardPrimitive* primit
             // Specific Abilities
             std::transform(value.begin(), value.end(), value.begin(), ::tolower);
             vector<string> values = split(value, ',');
-            for (size_t values_i = 0; values_i < values.size(); ++values_i) {
+            for (auto& value : values) {
                 for (int j = Constants::NB_BASIC_ABILITIES - 1; j >= 0; --j) {
-                    if (values[values_i].find(Constants::MTGBasicAbilities[j]) != string::npos) {
+                    if (value.find(Constants::MTGBasicAbilities[j]) != string::npos) {
                         primitive->basicAbilities[j] = 1;
                         break;
                     }
@@ -97,8 +97,8 @@ int MTGAllCards::processConfLine(string& s, MTGCard* card, CardPrimitive* primit
             std::transform(value.begin(), value.end(), value.begin(), ::tolower);
             vector<string> values = split(value, ',');
             int removeAllOthers = 1;
-            for (size_t values_i = 0; values_i < values.size(); ++values_i) {
-                primitive->setColor(values[values_i], removeAllOthers);
+            for (auto& value : values) {
+                primitive->setColor(value, removeAllOthers);
                 removeAllOthers = 0;
             }
         }
@@ -232,7 +232,7 @@ int MTGAllCards::processConfLine(string& s, MTGCard* card, CardPrimitive* primit
         } else {
             if (!primitive) primitive = NEW CardPrimitive();
             vector<string> values = split(val, ' ');
-            for (size_t values_i = 0; values_i < values.size(); ++values_i) primitive->setSubtype(values[values_i]);
+            for (auto& value : values) primitive->setSubtype(value);
         }
         break;
     }
@@ -247,7 +247,7 @@ int MTGAllCards::processConfLine(string& s, MTGCard* card, CardPrimitive* primit
             primitive->setText(val);
         else if (0 == strcmp("type", key)) {
             vector<string> values = split(val, ' ');
-            for (size_t values_i = 0; values_i < values.size(); ++values_i) primitive->setType(values[values_i]);
+            for (auto& value : values) primitive->setType(value);
         } else if (0 == strcmp("toughness", key))
             primitive->setToughness(atoi(val));
         break;
@@ -358,11 +358,11 @@ MTGAllCards* MTGAllCards::instance = nullptr;
 MTGAllCards::MTGAllCards() { init(); }
 
 MTGAllCards::~MTGAllCards() {
-    for (auto it = collection.begin(); it != collection.end(); it++) delete (it->second);
+    for (auto& it : collection) delete (it.second);
     collection.clear();
     ids.clear();
 
-    for (auto it = primitives.begin(); it != primitives.end(); it++) delete (it->second);
+    for (auto& primitive : primitives) delete (primitive.second);
     primitives.clear();
 }
 
@@ -954,8 +954,8 @@ MTGSets setlist;  // Our global.
 MTGSets::MTGSets() {}
 
 MTGSets::~MTGSets() {
-    for (size_t i = 0; i < setinfo.size(); ++i) {
-        delete (setinfo[i]);
+    for (auto& i : setinfo) {
+        delete i;
     }
 }
 
@@ -1068,7 +1068,7 @@ MTGSetInfo::MTGSetInfo(string _id) {
     block = -1;
     year = -1;
 
-    for (int i = 0; i < MTGSetInfo::MAX_COUNT; i++) counts[i] = 0;
+    for (int& count : counts) count = 0;
 
     char myFilename[4096];
     sprintf(myFilename, "sets/%s/booster.txt", id.c_str());

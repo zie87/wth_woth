@@ -230,8 +230,8 @@ int DamageStack::receiveEvent(WEvent* e) {
 
 void DamageStack::Render() {
     float currenty = y;
-    for (size_t i = 0; i < mObjects.size(); i++) {
-        auto* damage = (Damage*)mObjects[i];
+    for (auto& mObject : mObjects) {
+        auto* damage = (Damage*)mObject;
         if (damage->state == NOT_RESOLVED) {
             damage->x = x;
             damage->y = currenty;

@@ -261,10 +261,10 @@ void OptionLanguage::confirmChange(bool confirmed) {
 
 void OptionLanguage::Reload() {
     vector<string> langFiles = JFileSystem::GetInstance()->scanfolder("lang/");
-    for (size_t i = 0; i < langFiles.size(); ++i) {
+    for (auto& langFile : langFiles) {
         zfs::izfstream file;
         string filePath = "lang/";
-        filePath.append(langFiles[i]);
+        filePath.append(langFile);
         if (!JFileSystem::GetInstance()->openForRead(file, filePath)) continue;
 
         string s;
@@ -285,7 +285,7 @@ void OptionLanguage::Reload() {
         file.close();
 
         if (lang.size()) {
-            string filen = langFiles[i];
+            string filen = langFile;
             addSelection(filen.substr(0, filen.size() - 4), lang);
         }
     }
@@ -317,10 +317,10 @@ bool OptionLanguage::Selectable() {
 // OptionDirectory
 void OptionDirectory::Reload() {
     vector<string> subfolders = JFileSystem::GetInstance()->scanfolder(root);
-    for (size_t i = 0; i < subfolders.size(); ++i) {
-        string filename = root + "/" + subfolders[i] + "/" + type;
+    for (auto& subfolder : subfolders) {
+        string filename = root + "/" + subfolder + "/" + type;
         if (!JFileSystem::GetInstance()->FileExists(filename)) continue;
-        if (find(selections.begin(), selections.end(), subfolders[i]) == selections.end()) addSelection(subfolders[i]);
+        if (find(selections.begin(), selections.end(), subfolder) == selections.end()) addSelection(subfolder);
     }
     initSelections();
 }
@@ -329,10 +329,9 @@ OptionDirectory::OptionDirectory(string root, int id, string displayValue, strin
     : OptionSelect(id, displayValue), root(root), type(type) {
     vector<string> subfolders = JFileSystem::GetInstance()->scanfolder(root);
 
-    for (size_t i = 0; i < subfolders.size(); ++i) {
-        string subfolder = subfolders[i].substr(0, subfolders[i].length());
-        if (subfolder[subfolders[i].length() - 1] == '/')
-            subfolder = subfolders[i].substr(0, subfolders[i].length() - 1);  // remove trailing "/"
+    for (auto& i : subfolders) {
+        string subfolder = i.substr(0, i.length());
+        if (subfolder[i.length() - 1] == '/') subfolder = i.substr(0, i.length() - 1);  // remove trailing "/"
         vector<string> path;
         path.push_back(root);
         path.push_back(subfolder);

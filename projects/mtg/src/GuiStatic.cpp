@@ -158,7 +158,7 @@ void GuiGameZone::Render() {
     mFont->DrawString(buffer, x0, actY);
 
     if (showCards) cd->Render();
-    for (auto it = cards.begin(); it != cards.end(); ++it) (*it)->Render();
+    for (auto& card : cards) card->Render();
     PlayGuiObject::Render();
 }
 
@@ -195,7 +195,7 @@ GuiGameZone::GuiGameZone(float x, float y, bool hasFocus, MTGGameZone* zone, Gui
 
 GuiGameZone::~GuiGameZone() {
     if (cd) delete cd;
-    for (auto it = cards.begin(); it != cards.end(); ++it) delete (*it);
+    for (auto& card : cards) delete card;
 }
 
 std::ostream& GuiGameZone::toString(std::ostream& out) const {

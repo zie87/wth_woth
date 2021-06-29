@@ -57,8 +57,8 @@ void MTGCardInstance::copy(MTGCardInstance* card) {
     CardPrimitive* data = source->data;
 
     basicAbilities = card->basicAbilities;
-    for (size_t i = 0; i < data->types.size(); i++) {
-        types.push_back(data->types[i]);
+    for (int type : data->types) {
+        types.push_back(type);
     }
 
     colors = data->colors;
@@ -156,7 +156,7 @@ void MTGCardInstance::initMTGCI() {
     storedCard                        = nullptr;
     storedSourceCard                  = nullptr;
 
-    for (int i = 0; i < ManaCost::MANA_PAID_WITH_RETRACE + 1; i++) alternateCostPaid[i] = 0;
+    for (int& i : alternateCostPaid) i = 0;
 
     paymenttype = MTGAbility::PUT_INTO_PLAY;
     reduxamount = 0;
@@ -184,10 +184,10 @@ void MTGCardInstance::initMTGCI() {
     if (observer &&
         basicAbilities[(int)Constants::CHANGELING]) {  // if the card is a changeling, it gains all creature subtypes
         vector<string> values = MTGAllCards::getCreatureValuesById();
-        for (size_t i = 0; i < values.size(); ++i) {
+        for (auto& value : values) {
             // Don' want to send any event to the gameObserver inside of initMCGI, so calling the parent setSubtype
             // method instead of mine
-            CardPrimitive::setSubtype(values[i].c_str());
+            CardPrimitive::setSubtype(value.c_str());
         }
     }
 
@@ -657,9 +657,9 @@ int MTGCardInstance::raiseBlockerRankOrder(MTGCardInstance* blocker) {
 
 int MTGCardInstance::getDefenserRank(MTGCardInstance* blocker) {
     int result = 0;
-    for (auto it1 = blockers.begin(); it1 != blockers.end(); ++it1) {
+    for (auto& it1 : blockers) {
         result++;
-        if ((*it1) == blocker) return result;
+        if (it1 == blocker) return result;
     }
     return 0;
 };
@@ -784,8 +784,8 @@ int MTGCardInstance::protectedAgainst(MTGCardInstance* card) {
     }
 
     // General protections
-    for (size_t i = 0; i < protections.size(); i++) {
-        if (protections[i]->canTarget(card)) return 1;
+    for (auto& protection : protections) {
+        if (protection->canTarget(card)) return 1;
     }
     return 0;
 }
@@ -808,8 +808,8 @@ int MTGCardInstance::removeCantBeTarget(TargetChooser* tc, int erase) {
 }
 
 int MTGCardInstance::CantBeTargetby(MTGCardInstance* card) {
-    for (size_t i = 0; i < canttarget.size(); i++) {
-        if (canttarget[i]->canTarget(card)) return 1;
+    for (auto& i : canttarget) {
+        if (i->canTarget(card)) return 1;
     }
     return 0;
 }
@@ -831,8 +831,8 @@ int MTGCardInstance::removeCantBeBlockedBy(TargetChooser* tc, int erase) {
 }
 
 int MTGCardInstance::cantBeBlockedBy(MTGCardInstance* card) {
-    for (size_t i = 0; i < cantBeBlockedBys.size(); i++) {
-        if (cantBeBlockedBys[i]->canTarget(card)) return 1;
+    for (auto& cantBeBlockedBy : cantBeBlockedBys) {
+        if (cantBeBlockedBy->canTarget(card)) return 1;
     }
     return 0;
 }

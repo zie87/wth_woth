@@ -36,11 +36,11 @@ GuiHand::GuiHand(GameObserver* observer, MTGHand* hand) : GuiLayer(observer), ha
 }
 
 GuiHand::~GuiHand() {
-    for (auto it = cards.begin(); it != cards.end(); ++it) delete (*it);
+    for (auto& card : cards) delete card;
 }
 
 void GuiHand::Update(float dt) {
-    for (auto it = cards.begin(); it != cards.end(); ++it) (*it)->Update(dt);
+    for (auto& card : cards) card->Update(dt);
 }
 
 bool GuiHand::isInHand(CardView* card) {
@@ -61,11 +61,11 @@ void GuiHandOpponent::Render() {
     JQuadPtr quad = WResourceManager::Instance()->GetQuad(kGenericCardThumbnailID);
 
     float x = 45;
-    for (auto it = cards.begin(); it != cards.end(); ++it) {
-        (*it)->x = x;
-        (*it)->y = 2;
-        (*it)->zoom = 0.3f;
-        (*it)->Render(quad.get());
+    for (auto& card : cards) {
+        card->x    = x;
+        card->y    = 2;
+        card->zoom = 0.3f;
+        card->Render(quad.get());
         x += 18;
     }
 }
@@ -97,9 +97,9 @@ void GuiHandSelf::Repos() {
             dist = 20.0;
         else
             y = 40.0;
-        for (auto it = cards.begin(); it != cards.end(); ++it) {
-            (*it)->x = ClosedRowX;
-            (*it)->y = y;
+        for (auto& card : cards) {
+            card->x = ClosedRowX;
+            card->y = y;
             y += dist;
         }
     } else {
@@ -122,12 +122,12 @@ void GuiHandSelf::Repos() {
             float dist = 224.0f / ((cards.size() + 1) / 2);
             if (dist > 65) dist = 65;
             bool flip = false;
-            for (auto it = cards.begin(); it != cards.end(); ++it) {
-                (*it)->x = flip ? RightRowX : LeftRowX;
-                (*it)->y = y;
+            for (auto& card : cards) {
+                card->x = flip ? RightRowX : LeftRowX;
+                card->y = y;
                 if (flip) y += dist;
                 flip = !flip;
-                (*it)->alpha = static_cast<float>(q ? 0 : 255);
+                card->alpha = static_cast<float>(q ? 0 : 255);
             }
         }
     }
@@ -146,14 +146,14 @@ bool GuiHandSelf::CheckUserInput(JButton key) {
             backpos.x = Open == state ? OpenX : ClosedX;
         if (Open == state && OptionClosedHand::INVISIBLE == options[Options::CLOSEDHAND].number) {
             if (OptionHandDirection::HORIZONTAL == options[Options::HANDDIRECTION].number)
-                for (auto it = cards.begin(); it != cards.end(); ++it) {
-                    (*it)->y = SCREEN_HEIGHT + 30;
-                    (*it)->UpdateNow();
+                for (auto& card : cards) {
+                    card->y = SCREEN_HEIGHT + 30;
+                    card->UpdateNow();
                 }
             else
-                for (auto it = cards.begin(); it != cards.end(); ++it) {
-                    (*it)->x = SCREEN_WIDTH + 30;
-                    (*it)->UpdateNow();
+                for (auto& card : cards) {
+                    card->x = SCREEN_WIDTH + 30;
+                    card->UpdateNow();
                 }
         }
         Repos();
@@ -185,14 +185,14 @@ void GuiHandSelf::Render() {
 
     backpos.Render(back.get());
     if (OptionClosedHand::VISIBLE == options[Options::CLOSEDHAND].number || state == Open)
-        for (auto it = cards.begin(); it != cards.end(); ++it) (*it)->Render();
+        for (auto& card : cards) card->Render();
 }
 
 float GuiHandSelf::LeftBoundary() {
     float min = SCREEN_WIDTH + 10;
     if (OptionClosedHand::VISIBLE == options[Options::CLOSEDHAND].number || state == Open)
-        for (auto it = cards.begin(); it != cards.end(); ++it)
-            if ((*it)->x - CardGui::Width / 2 < min) min = (*it)->x - CardGui::Width / 2;
+        for (auto& card : cards)
+            if (card->x - CardGui::Width / 2 < min) min = card->x - CardGui::Width / 2;
     return min;
 }
 

@@ -508,8 +508,8 @@ int OrderedAIAction::getEfficiency() {
     if (cost) {
         ExtraCosts* ec = cost->extraCosts;
         if (ec) {
-            for (unsigned int i = 0; i < ec->costs.size(); i++) {
-                ExtraCost* tapper = dynamic_cast<TapCost*>(ec->costs[i]);
+            for (auto& cost : ec->costs) {
+                ExtraCost* tapper = dynamic_cast<TapCost*>(cost);
                 if (tapper)
                     continue;
                 else
@@ -536,8 +536,7 @@ MTGCardInstance* AIPlayerBaka::chooseCard(TargetChooser* tc, MTGCardInstance* so
     for (int players = 0; players < 2; ++players) {
         MTGGameZone* zones[] = {playerZones->hand, playerZones->library, playerZones->inPlay, playerZones->graveyard,
                                 playerZones->stack};
-        for (int j = 0; j < 5; j++) {
-            MTGGameZone* zone = zones[j];
+        for (auto zone : zones) {
             for (int k = 0; k < zone->nb_cards; k++) {
                 MTGCardInstance* card = zone->cards[k];
                 if (card != source && !tc->alreadyHasTarget(card) && tc->canTarget(card)) {
@@ -609,13 +608,13 @@ bool AIPlayerBaka::payTheManaCost(ManaCost* cost, MTGCardInstance* target, vecto
             if (paid->canAfford(cost)) {
                 if ((!cost->hasX() && !cost->hasAnotherCost()) || k == gotPayments.size() - 1) {
                     SAFE_DELETE(paid);
-                    for (size_t clicking = 0; clicking < clicks.size(); ++clicking) clickstream.push(clicks[clicking]);
+                    for (auto& click : clicks) clickstream.push(click);
                     return true;
                 }
             }
         }
         // clean up temporary "clicks" structure if its content wasn't used above
-        for (size_t i = 0; i < clicks.size(); ++i) SAFE_DELETE(clicks[i]);
+        for (auto& click : clicks) SAFE_DELETE(click);
         clicks.clear();
         SAFE_DELETE(paid);
         return false;
@@ -677,9 +676,9 @@ bool AIPlayerBaka::payTheManaCost(ManaCost* cost, MTGCardInstance* target, vecto
 ManaCost* AIPlayerBaka::getPotentialMana(MTGCardInstance* target) {
     auto* result = NEW ManaCost();
     map<MTGCardInstance*, bool> used;
-    for (size_t i = 0; i < observer->mLayers->actionLayer()->manaObjects.size(); i++) {
+    for (auto& manaObject : observer->mLayers->actionLayer()->manaObjects) {
         // Make sure we can use the ability
-        MTGAbility* a = ((MTGAbility*)observer->mLayers->actionLayer()->manaObjects[i]);
+        MTGAbility* a = ((MTGAbility*)manaObject);
         auto* amp     = dynamic_cast<AManaProducer*>(a);
         auto* gmp     = dynamic_cast<GenericActivatedAbility*>(a);
         if (gmp && canHandleCost(gmp)) {
@@ -726,8 +725,8 @@ vector<MTGAbility*> AIPlayerBaka::canPayMana(MTGCardInstance* target, ManaCost* 
     }
     int needColorConverted = cost->getConvertedCost() - int(cost->getCost(0) + cost->getCost(7));
     int fullColor = 0;
-    for (size_t i = 0; i < observer->mLayers->actionLayer()->manaObjects.size(); i++) {
-        MTGAbility* a = ((MTGAbility*)observer->mLayers->actionLayer()->manaObjects[i]);
+    for (auto& manaObject : observer->mLayers->actionLayer()->manaObjects) {
+        MTGAbility* a = ((MTGAbility*)manaObject);
         auto* amp     = dynamic_cast<AManaProducer*>(a);
         if (amp && (amp->getCost() && amp->getCost()->extraCosts && !amp->getCost()->extraCosts->canPay())) continue;
         if (fullColor == needColorConverted && result->getConvertedCost() < cost->getConvertedCost()) {
@@ -810,8 +809,8 @@ vector<MTGAbility*> AIPlayerBaka::canPayMana(MTGCardInstance* target, ManaCost* 
             //{rw}{ub} would be 2 runs of this.90% of the time ai finds it's hybrid in pMana check.
             bool foundColor1 = false;
             bool foundColor2 = false;
-            for (size_t i = 0; i < observer->mLayers->actionLayer()->manaObjects.size(); i++) {
-                MTGAbility* a = ((MTGAbility*)observer->mLayers->actionLayer()->manaObjects[i]);
+            for (auto& manaObject : observer->mLayers->actionLayer()->manaObjects) {
+                MTGAbility* a = ((MTGAbility*)manaObject);
                 auto* amp     = dynamic_cast<AManaProducer*>(a);
                 if (amp && canHandleCost(amp)) {
                     foundColor1 = amp->output->hasColor(hybridCost->color1) ? true : false;
@@ -866,9 +865,9 @@ vector<MTGAbility*> AIPlayerBaka::canPayMana(MTGCardInstance* target, ManaCost* 
             while (keepLooking) {
                 kickerPayment = canPayMana(target, withKickerCost, used, true);
                 if (kickerPayment.size()) {
-                    for (unsigned int w = 0; w < kickerPayment.size(); ++w) {
-                        if (used[kickerPayment[w]->source]) {
-                            payments.push_back(kickerPayment[w]);
+                    for (auto& w : kickerPayment) {
+                        if (used[w->source]) {
+                            payments.push_back(w);
                         }
                     }
                     canKick += 1;
@@ -884,8 +883,8 @@ vector<MTGAbility*> AIPlayerBaka::canPayMana(MTGCardInstance* target, ManaCost* 
     if (cost->hasX()) {
         // if we decided to play an "x" ability/card, lets go all out, these effects tend to be game winners.
         // add the rest of the mana.
-        for (size_t i = 0; i < observer->mLayers->actionLayer()->manaObjects.size(); i++) {
-            MTGAbility* a = ((MTGAbility*)observer->mLayers->actionLayer()->manaObjects[i]);
+        for (auto& manaObject : observer->mLayers->actionLayer()->manaObjects) {
+            MTGAbility* a = ((MTGAbility*)manaObject);
             auto* amp     = dynamic_cast<AManaProducer*>(a);
             if (amp && canHandleCost(amp)) {
                 if (!used[amp->source] && amp->isReactingToClick(amp->source) &&
@@ -911,12 +910,12 @@ vector<MTGAbility*> AIPlayerBaka::canPaySunBurst(ManaCost* cost) {
     int needColorConverted = 6;
     int fullColor = 0;
     result->add(this->getManaPool());
-    for (size_t i = 0; i < observer->mLayers->actionLayer()->manaObjects.size(); i++) {
+    for (auto& manaObject : observer->mLayers->actionLayer()->manaObjects) {
         // Make sure we can use the ability
         if (fullColor == needColorConverted || fullColor == cost->getConvertedCost()) {
             break;
         }
-        MTGAbility* a = ((MTGAbility*)observer->mLayers->actionLayer()->manaObjects[i]);
+        MTGAbility* a = ((MTGAbility*)manaObject);
         auto* amp     = dynamic_cast<AManaProducer*>(a);
         if (amp && amp->getCost() && amp->getCost()->extraCosts && !amp->getCost()->extraCosts->canPay())
             continue;  // pentid prism, has no cost but contains a counter cost, without this check ai will think it
@@ -946,8 +945,8 @@ vector<MTGAbility*> AIPlayerBaka::canPaySunBurst(ManaCost* cost) {
     }
 
     for (int i = fullColor; i < cost->getConvertedCost(); i++) {
-        for (size_t i = 0; i < observer->mLayers->actionLayer()->manaObjects.size(); i++) {
-            MTGAbility* a = ((MTGAbility*)observer->mLayers->actionLayer()->manaObjects[i]);
+        for (auto& manaObject : observer->mLayers->actionLayer()->manaObjects) {
+            MTGAbility* a = ((MTGAbility*)manaObject);
             auto* amp     = dynamic_cast<AManaProducer*>(a);
             if (amp && canHandleCost(amp)) {
                 MTGCardInstance* card = amp->source;
@@ -975,11 +974,11 @@ int AIPlayerBaka::CanHandleCost(ManaCost* cost, MTGCardInstance* card) {
     ExtraCosts* ec = cost->extraCosts;
     if (!ec) return 1;
 
-    for (size_t i = 0; i < ec->costs.size(); ++i) {
-        if (ec->costs[i]->tc) {
-            ec->costs[i]->setSource(card);
-            if (!ec->costs[i]->tc->countValidTargets()) return 0;
-            if (!chooseCard(ec->costs[i]->tc, card)) return 0;
+    for (auto& cost : ec->costs) {
+        if (cost->tc) {
+            cost->setSource(card);
+            if (!cost->tc->countValidTargets()) return 0;
+            if (!chooseCard(cost->tc, card)) return 0;
         }
     }
     return 1;
@@ -1005,8 +1004,7 @@ int AIPlayerBaka::createAbilityTargets(MTGAbility* a, MTGCardInstance* c, Rankin
             } else
                 potentialTargets.push_back(p);
         }
-        for (int j = 0; j < 5; j++) {
-            MTGGameZone* zone = playerZones[j];
+        for (auto zone : playerZones) {
             for (int k = 0; k < zone->nb_cards; k++) {
                 MTGCardInstance* t = zone->cards[k];
                 if (a->getActionTc()->canTarget(t)) {
@@ -1119,8 +1117,8 @@ int AIPlayerBaka::selectAbility() {
                 ManaCost* fullPayment = nullptr;
                 if (abilityPayment.size()) {
                     fullPayment = NEW ManaCost();
-                    for (int ch = 0; ch < int(abilityPayment.size()); ch++) {
-                        auto* ampp = dynamic_cast<AManaProducer*>(abilityPayment[ch]);
+                    for (auto& ch : abilityPayment) {
+                        auto* ampp = dynamic_cast<AManaProducer*>(ch);
                         if (ampp) fullPayment->add(ampp->output);
                     }
                     if (fullPayment && a->isReactingToClick(card, fullPayment)) createAbilityTargets(a, card, ranking);
@@ -1226,8 +1224,7 @@ int AIPlayerBaka::chooseTarget(TargetChooser* _tc, Player* forceTarget, MTGCardI
         MTGPlayerCards* playerZones = target->game;
         MTGGameZone* zones[] = {playerZones->hand, playerZones->library, playerZones->inPlay, playerZones->graveyard,
                                 playerZones->stack};
-        for (int j = 0; j < 5; j++) {
-            MTGGameZone* zone = zones[j];
+        for (auto zone : zones) {
             for (int k = 0; k < zone->nb_cards; k++) {
                 MTGCardInstance* card = zone->cards[k];
                 if (!tc->alreadyHasTarget(card) && tc->canTarget(card) && potentialTargets.size() < 50) {
@@ -1581,12 +1578,12 @@ int AIPlayerBaka::computeActions() {
             // look for the most expensive creature we can afford. If not found, try enchantment, then artifact, etc...
             if (hints && hints->mCastOrder().size()) {
                 vector<string> findType = hints->mCastOrder();
-                for (unsigned int j = 0; j < findType.size(); j++) {
+                for (auto& j : findType) {
                     if (clickstream.size()) {
                         SAFE_DELETE(currentMana);
                         return 0;
                     }
-                    nextCardToPlay = FindCardToPlay(currentMana, findType[j].c_str());
+                    nextCardToPlay = FindCardToPlay(currentMana, j.c_str());
                     if (game->playRestrictions->canPutIntoZone(nextCardToPlay, game->stack) ==
                         PlayRestriction::CANT_PLAY)
                         nextCardToPlay = nullptr;
@@ -1874,7 +1871,7 @@ AIPlayerBaka::AIPlayerBaka(GameObserver* observer, string file, string fileSmall
     hints = nullptr;
     if (mDeck && mDeck->meta_AIHints.size()) {
         hints = NEW AIHints(this);
-        for (size_t i = 0; i < mDeck->meta_AIHints.size(); ++i) hints->add(mDeck->meta_AIHints[i]);
+        for (auto& meta_AIHint : mDeck->meta_AIHints) hints->add(meta_AIHint);
     }
 
     if (avatarFile != "") {

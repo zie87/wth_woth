@@ -347,10 +347,10 @@ int MTGPlayerCards::isInZone(MTGCardInstance* card, MTGGameZone* zone) {
 MTGGameZone::MTGGameZone() : nb_cards(0), lastCardDrawn(nullptr), needShuffle(false) {}
 
 MTGGameZone::~MTGGameZone() {
-    for (size_t i = 0; i < cards.size(); i++) {
-        cards[i]->stillNeeded = false;
-        SAFE_DELETE(cards[i]->previous);
-        SAFE_DELETE(cards[i]);
+    for (auto& card : cards) {
+        card->stillNeeded = false;
+        SAFE_DELETE(card->previous);
+        SAFE_DELETE(card);
     }
     cards.clear();
     cardsMap.clear();
@@ -359,8 +359,8 @@ MTGGameZone::~MTGGameZone() {
 
 void MTGGameZone::beforeBeginPhase() {
     cardsSeenLastTurn.clear();
-    for (size_t k = 0; k < cardsSeenThisTurn.size(); k++) {
-        cardsSeenLastTurn.push_back(cardsSeenThisTurn[k]);
+    for (auto k : cardsSeenThisTurn) {
+        cardsSeenLastTurn.push_back(k);
     }
     cardsSeenThisTurn.clear();
 };
@@ -545,13 +545,11 @@ int MTGGameZone::seenThisTurn(TargetChooser* tc, int castMethod, bool lastTurn) 
 
     int count = 0;
     if (lastTurn) {
-        for (auto iter = cardsSeenLastTurn.begin(); iter != cardsSeenLastTurn.end(); ++iter) {
-            MTGCardInstance* c = (*iter);
+        for (auto c : cardsSeenLastTurn) {
             if (c && c->matchesCastFilter(castMethod) && tc->canTarget(c)) count++;
         }
     } else {
-        for (auto iter = cardsSeenThisTurn.begin(); iter != cardsSeenThisTurn.end(); ++iter) {
-            MTGCardInstance* c = (*iter);
+        for (auto c : cardsSeenThisTurn) {
             if (c->matchesCastFilter(castMethod) && tc->canTarget(c)) count++;
         }
     }

@@ -395,8 +395,7 @@ void StatsWrapper::updateStats(DeckDataWrapper* myDeck) {
         string thisstring = current->data->magicText;
         abilitiesVector = split(thisstring, '\n');
 
-        for (int v = 0; v < (int)abilitiesVector.size(); v++) {
-            string s = abilitiesVector[v];
+        for (auto s : abilitiesVector) {
             size_t t = s.find("add");
             if (t != string::npos) {
                 s = s.substr(t + 3);

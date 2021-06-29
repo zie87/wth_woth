@@ -80,9 +80,9 @@ filesystem::filesystem(const char* BasePath, const char* FileExt, bool DefaultFS
 zbuffer* filesystem::getValidBuffer(const std::string& filename, const std::string& externalFilename,
                                     std::streamoff Offset, std::streamoff Size) {
     // if exists filename in pool and is not in use, return that
-    for (size_t i = 0; i < m_Buffers.size(); ++i) {
-        if (m_Buffers[i]->filename != filename) continue;
-        zbuffer* buffer = m_Buffers[i]->buffer;
+    for (auto& m_Buffer : m_Buffers) {
+        if (m_Buffer->filename != filename) continue;
+        zbuffer* buffer = m_Buffer->buffer;
         if (buffer && !buffer->is_used()) {
             buffer->use(Offset, Size);
             return buffer;
@@ -116,13 +116,13 @@ zbuffer* filesystem::getValidBuffer(const std::string& filename, const std::stri
 }
 
 void filesystem::closeBufferPool() {
-    for (size_t i = 0; i < m_Buffers.size(); ++i) {
-        if (m_Buffers[i]) {
-            if (m_Buffers[i]->buffer && m_Buffers[i]->buffer->is_used()) {
+    for (auto& m_Buffer : m_Buffers) {
+        if (m_Buffer) {
+            if (m_Buffer->buffer && m_Buffer->buffer->is_used()) {
                 WGE_LOG_FATAL("File Buffer still in use but need to close");
             }
 
-            delete m_Buffers[i];
+            delete m_Buffer;
         }
     }
     m_Buffers.clear();
@@ -459,8 +459,8 @@ ostream& operator<<(ostream& Out, const filesystem& FS) {
     size_t NbFiles = 0;
     filesystem::zipfile_info AllZipsInfo;
 
-    for (auto It = FS.m_Zips.begin(); It != FS.m_Zips.end(); ++It) {
-        const filesystem::zipfile_info& ZInfo = (*It).second;
+    for (const auto& m_Zip : FS.m_Zips) {
+        const filesystem::zipfile_info& ZInfo = m_Zip.second;
 
         // Print zip filename
         Out << setiosflags(ios::left) << setw(32) << "-> \"" + ZInfo.m_Filename + "\"" << resetiosflags(ios::left);

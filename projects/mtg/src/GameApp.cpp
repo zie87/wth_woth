@@ -64,7 +64,7 @@ GameApp::GameApp()
 
     mScreenShotCount = 0;
 
-    for (int i = 0; i < GAME_STATE_MAX; i++) mGameStates[i] = nullptr;
+    for (auto& mGameState : mGameStates) mGameState = nullptr;
 
     mShowDebugInfo = false;
     players[0] = PLAYER_TYPE_CPU;
@@ -122,8 +122,8 @@ void GameApp::Create() {
                                  "packs",    "player",  "player/stats",  "profiles",  "rules",    "sets",
                                  "settings", "sound",   "sound/sfx",     "themes",    "test"};
 
-        for (size_t i = 0; i < sizeof(folders) / sizeof(folders[0]); ++i) {
-            JFileSystem::GetInstance()->MakeDir(string(folders[i]));
+        for (auto& folder : folders) {
+            JFileSystem::GetInstance()->MakeDir(string(folder));
         }
     }
 
@@ -164,8 +164,7 @@ void GameApp::Create() {
     // Load all icons from gModRules and save in manaIcons -> todo. Change the icons positions on menuicons.png to
     // avoid use item->mColorId
     vector<ModRulesBackGroundCardGuiItem*> items = gModRules.cardgui.background;
-    for (size_t i = 0; i < items.size(); i++) {
-        ModRulesBackGroundCardGuiItem* item = items[i];
+    for (auto item : items) {
         if (item->mMenuIcon == 1) {
             manaIcons.push_back(WResourceManager::Instance()->RetrieveQuad("menuicons.png",
                                                                            2 + (float)item->mColorId * 36, 38, 32, 32,

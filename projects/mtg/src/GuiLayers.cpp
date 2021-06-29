@@ -53,28 +53,28 @@ int GuiLayer::Remove(JGuiObject* object) {
 int GuiLayer::getMaxId() { return (int)(mObjects.size()); }
 
 void GuiLayer::Render() {
-    for (size_t i = 0; i < mObjects.size(); i++)
-        if (mObjects[i] != nullptr) mObjects[i]->Render();
+    for (auto& mObject : mObjects)
+        if (mObject != nullptr) mObject->Render();
 }
 
 void GuiLayer::Update(float dt) {
-    for (size_t i = 0; i < mObjects.size(); i++)
-        if (mObjects[i] != nullptr) mObjects[i]->Update(dt);
+    for (auto& mObject : mObjects)
+        if (mObject != nullptr) mObject->Update(dt);
 }
 
 void GuiLayer::resetObjects() {
-    for (size_t i = 0; i < mObjects.size(); i++)
-        if (mObjects[i]) {
+    for (auto& mObject : mObjects)
+        if (mObject) {
             // big, ugly hack around CardView / MTGCardInstance ownership problem - these two classes have an
             // interdependency with naked pointers, but the order of destruction can leave a dangling pointer reference
             // inside of a CardView, which attempts to clean up its own pointer reference in an MTGCardInstance when
             // it's destroyed.  Ideally, CardView should only hold onto a weak reference, but that's a bigger overhaul.
             // For now, if we get here, clear out the MTGCardInstance pointer of a CardView before calling delete.
-            auto* cardView = dynamic_cast<CardView*>(mObjects[i]);
+            auto* cardView = dynamic_cast<CardView*>(mObject);
             if (cardView) {
                 cardView->card = nullptr;
             }
-            delete mObjects[i];
+            delete mObject;
         }
     mObjects.clear();
     mCurr = 0;

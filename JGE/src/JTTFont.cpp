@@ -79,7 +79,7 @@ JTTFont::JTTFont(int cacheImageSize) {
 JTTFont::~JTTFont() {
     SAFE_DELETE(mTexture);
 
-    for (int i = 0; i < TTF_CACHE_SIZE; i++) SAFE_DELETE(mQuads[i]);
+    for (auto& mQuad : mQuads) SAFE_DELETE(mQuad);
 }
 
 void JTTFont::SetColor(PIXEL_TYPE color) { mColor = color; }
@@ -108,7 +108,7 @@ bool JTTFont::SetSize(int size) {
         FT_Set_Transform(mFace, nullptr, nullptr);
 
         // JTTFont.h says setting font size will clear the cache
-        for (int i = 0; i < TTF_CACHE_SIZE; i++) mCachedCode[i] = 0;
+        for (unsigned short& i : mCachedCode) i = 0;
 
         return true;
     } else

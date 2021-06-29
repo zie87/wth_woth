@@ -32,16 +32,16 @@ int RandomGenerator::random() {
 }
 
 std::ostream& RandomGenerator::saveUsedRandValues(std::ostream& out) const {
-    for (auto ite = usedRandomValues.begin(); ite != usedRandomValues.end(); ite++) {
-        out << *ite << ",";
+    for (int usedRandomValue : usedRandomValues) {
+        out << usedRandomValue << ",";
     }
 
     return out;
 }
 
 std::ostream& RandomGenerator::saveLoadedRandValues(std::ostream& out) {
-    for (auto ite = loadedRandomValues.begin(); ite != loadedRandomValues.end(); ite++) {
-        out << *ite << ",";
+    for (int& loadedRandomValue : loadedRandomValues) {
+        out << loadedRandomValue << ",";
     }
 
     return out;
@@ -209,8 +209,8 @@ std::vector<std::string>& split(const std::string& s, char delim, std::vector<st
 
 std::string join(vector<string>& v, string delim) {
     std::string retVal;
-    for (auto it = v.begin(); it != v.end(); ++it) {
-        retVal.append(*it);
+    for (auto& it : v) {
+        retVal.append(it);
         retVal.append(delim);
     }
 
@@ -300,8 +300,8 @@ unsigned long hash_djb2(const char* str) {
 
 std::string buildFilePath(const vector<string>& folders, const string& filename) {
     string result = "";
-    for (size_t i = 0; i < folders.size(); ++i) {
-        result.append(folders[i]);
+    for (const auto& folder : folders) {
+        result.append(folder);
         if (result[result.length() - 1] != '/') {
             result.append("/");
         }

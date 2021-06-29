@@ -60,8 +60,8 @@ void GameStateAwards::Start() {
     btn = NEW WGuiButton(aw, GUI_AWARD_BUTTON, Options::DIFFICULTY_MODE_UNLOCKED, this);
     listview->Add(btn);
 
-    for (auto it = Unlockable::unlockables.begin(); it != Unlockable::unlockables.end(); ++it) {
-        Unlockable* award = it->second;
+    for (auto& unlockable : Unlockable::unlockables) {
+        Unlockable* award = unlockable.second;
         aw = NEW WGuiAward(award->getValue("id"), award->getValue("name"), award->getValue("trophyroom_text"));
         btn = NEW WGuiButton(aw, GUI_AWARD_BUTTON, 0, this);
         listview->Add(btn);

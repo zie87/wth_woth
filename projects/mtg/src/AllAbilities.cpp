@@ -257,8 +257,7 @@ int AALibraryBottom::resolve() {
         vector<MTGCardInstance*> oldOrder = library->cards;
         vector<MTGCardInstance*> newOrder;
         newOrder.push_back(_target);
-        for (unsigned int k = 0; k < oldOrder.size(); ++k) {
-            MTGCardInstance* rearranged = oldOrder[k];
+        for (auto rearranged : oldOrder) {
             if (rearranged != _target) newOrder.push_back(rearranged);
         }
         library->cards = newOrder;
@@ -597,8 +596,7 @@ int AAProliferate::resolve() {
         pcounters.push_back(a);
     } else if (cTarget && cTarget->counters) {
         Counters* counters = cTarget->counters;
-        for (size_t i = 0; i < counters->counters.size(); ++i) {
-            Counter* counter = counters->counters[i];
+        for (auto counter : counters->counters) {
             MTGAbility* a = NEW AACounter(game, game->mLayers->actionLayer()->getMaxId(), source, cTarget, "",
                                           counter->name.c_str(), counter->power, counter->toughness, 1, 0);
             a->oneShot = true;
@@ -1187,8 +1185,7 @@ int AAMorph::resolve() {
         _target->isMorphed = false;
         _target->turningOver = true;
         af.getAbilities(&currentAbilities, nullptr, _target, 0);
-        for (size_t i = 0; i < currentAbilities.size(); ++i) {
-            MTGAbility* a = currentAbilities[i];
+        for (auto a : currentAbilities) {
             a->source = (MTGCardInstance*)_target;
             if (a && dynamic_cast<AAMorph*>(a)) {
                 a->removeFromGame();
@@ -1263,16 +1260,15 @@ int AAFlip::resolve() {
             _target->formattedText = myFlip->formattedText;
             _target->basicAbilities = myFlip->basicAbilities;
 
-            for (unsigned int i = 0; i < _target->cardsAbilities.size(); i++) {
-                auto* a = dynamic_cast<MTGAbility*>(_target->cardsAbilities[i]);
+            for (auto& cardsAbilitie : _target->cardsAbilities) {
+                auto* a = dynamic_cast<MTGAbility*>(cardsAbilitie);
 
                 if (a) game->removeObserver(a);
             }
             _target->cardsAbilities.clear();
             _target->magicText = myFlip->magicText;
             af.getAbilities(&currentAbilities, nullptr, _target);
-            for (size_t i = 0; i < currentAbilities.size(); ++i) {
-                MTGAbility* a = currentAbilities[i];
+            for (auto a : currentAbilities) {
                 a->source = (MTGCardInstance*)_target;
                 if (a) {
                     if (a->oneShot) {
@@ -2069,8 +2065,8 @@ int AARandomMover::resolve() {
             rTc->targetter     = nullptr;
             rTc->setAllZones();
             vector<MTGCardInstance*> selectedCards;
-            for (unsigned int i = 0; i < fromDest->cards.size(); ++i) {
-                if (rTc->canTarget(fromDest->cards[i])) selectedCards.push_back(fromDest->cards[i]);
+            for (auto& card : fromDest->cards) {
+                if (rTc->canTarget(card)) selectedCards.push_back(card);
             }
             SAFE_DELETE(rTc);
             if (!selectedCards.size()) return 0;
@@ -2535,10 +2531,10 @@ MenuAbility* MenuAbility::clone() const {
 
 MenuAbility::~MenuAbility() {
     if (abilities.size()) {
-        for (int i = 0; i < int(abilities.size()); i++) {
-            auto* chooseA = dynamic_cast<AASetColorChosen*>(abilities[i]);
+        for (auto& abilitie : abilities) {
+            auto* chooseA = dynamic_cast<AASetColorChosen*>(abilitie);
             if (chooseA && chooseA->abilityAltered) SAFE_DELETE(chooseA->abilityAltered);
-            SAFE_DELETE(abilities[i]);
+            SAFE_DELETE(abilitie);
         }
     } else
         SAFE_DELETE(ability);
@@ -2558,27 +2554,26 @@ int MultiAbility::Add(MTGAbility* ability) {
 
 int MultiAbility::resolve() {
     Targetable* Phaseactiontarget = nullptr;
-    for (size_t i = 0; i < abilities.size(); ++i) {
-        if (abilities[i] == nullptr) continue;
-        Targetable* backup = abilities[i]->target;
+    for (auto& abilitie : abilities) {
+        if (abilitie == nullptr) continue;
+        Targetable* backup = abilitie->target;
 
-        if (target && target != source && abilities[i]->target == abilities[i]->source) {
-            abilities[i]->target = target;
+        if (target && target != source && abilitie->target == abilitie->source) {
+            abilitie->target  = target;
             Phaseactiontarget = target;
         }
-        abilities[i]->resolve();
-        abilities[i]->target = backup;
-        if (Phaseactiontarget && dynamic_cast<APhaseActionGeneric*>(abilities[i]))
-            abilities[i]->target = Phaseactiontarget;
+        abilitie->resolve();
+        abilitie->target = backup;
+        if (Phaseactiontarget && dynamic_cast<APhaseActionGeneric*>(abilitie)) abilitie->target = Phaseactiontarget;
     }
     return 1;
 }
 
 int MultiAbility::addToGame() {
-    for (size_t i = 0; i < abilities.size(); ++i) {
-        if (abilities[i] == nullptr) continue;
+    for (auto& abilitie : abilities) {
+        if (abilitie == nullptr) continue;
 
-        MTGAbility* a = abilities[i]->clone();
+        MTGAbility* a = abilitie->clone();
         a->target = target;
         a->addToGame();
         clones.push_back(a);
@@ -2588,10 +2583,10 @@ int MultiAbility::addToGame() {
 }
 
 int MultiAbility::destroy() {
-    for (size_t i = 0; i < clones.size(); ++i) {
+    for (auto& clone : clones) {
         // I'd like to call game->removeObserver here instead of using forceDestroy, but I get a weird crash after
         // that, need to investigate a bit
-        clones[i]->forceDestroy = 1;
+        clone->forceDestroy = 1;
     }
     clones.clear();
     return ActivatedAbility::destroy();
@@ -2605,15 +2600,15 @@ const char* MultiAbility::getMenuText() {
 MultiAbility* MultiAbility::clone() const {
     auto* a = NEW MultiAbility(*this);
     a->abilities.clear();
-    for (size_t i = 0; i < abilities.size(); ++i) {
-        a->abilities.push_back(abilities[i]->clone());
+    for (auto abilitie : abilities) {
+        a->abilities.push_back(abilitie->clone());
     }
     return a;
 }
 
 MultiAbility::~MultiAbility() {
-    for (size_t i = 0; i < abilities.size(); ++i) {
-        SAFE_DELETE(abilities[i]);
+    for (auto& abilitie : abilities) {
+        SAFE_DELETE(abilitie);
     }
 
     abilities.clear();
@@ -2865,7 +2860,7 @@ int ATransformer::addToGame() {
     for (int j = 0; j < Constants::NB_Colors; j++) {
         if (_target->hasColor(j)) oldcolors.push_back(j);
     }
-    for (size_t j = 0; j < _target->types.size(); ++j) oldtypes.push_back(_target->types[j]);
+    for (int& type : _target->types) oldtypes.push_back(type);
 
     std::list<int>::iterator it;
     for (it = colors.begin(); it != colors.end(); it++) {
@@ -2904,9 +2899,9 @@ int ATransformer::addToGame() {
     }
 
     if (newAbilityFound) {
-        for (unsigned int k = 0; k < newAbilitiesList.size(); k++) {
+        for (auto& k : newAbilitiesList) {
             AbilityFactory af(game);
-            MTGAbility* aNew = af.parseMagicLine(newAbilitiesList[k], 0, nullptr, _target);
+            MTGAbility* aNew = af.parseMagicLine(k, 0, nullptr, _target);
             if (!aNew) continue;
             auto* gta = dynamic_cast<GenericTargetAbility*>(aNew);
             if (gta) {
@@ -2983,8 +2978,8 @@ int ATransformer::destroy() {
         if (!remove) {
             for (it = types.begin(); it != types.end(); it++) {
                 bool removing = true;
-                for (unsigned int k = 0; k < dontremove.size(); k++) {
-                    if (dontremove[k] == *it) removing = false;
+                for (int k : dontremove) {
+                    if (k == *it) removing = false;
                 }
                 if (removing) _target->removeType(*it);
             }
@@ -3219,8 +3214,8 @@ int ALoseAbilities::addToGame() {
                 // based on the fact that we usually remove abilities AND change the type of the card
                 // Also in a general way we don't want to remove the card's abilities if it is provided by a Lord,
                 // although there is also a problem with us not handling the P/T layer correctly
-                for (size_t i = 0; i < lordsInGame.size(); ++i) {
-                    if (lordsInGame[i]->isParentOf(_target, currentAction)) {
+                for (auto& i : lordsInGame) {
+                    if (i->isParentOf(_target, currentAction)) {
                         canRemove = false;
                         break;
                     }
@@ -3238,8 +3233,7 @@ int ALoseAbilities::addToGame() {
 }
 
 int ALoseAbilities::destroy() {
-    for (size_t i = 0; i < storedAbilities.size(); ++i) {
-        MTGAbility* a = storedAbilities[i];
+    for (auto a : storedAbilities) {
         // OneShot abilities are not supposed to stay in the game for long.
         // If we copied one, something wrong probably happened
         if (a->oneShot) {
@@ -3288,7 +3282,7 @@ int ALoseSubtypes::addToGame() {
 
 int ALoseSubtypes::destroy() {
     auto* _target = (MTGCardInstance*)target;
-    for (size_t i = 0; i < storedSubtypes.size(); ++i) _target->addType(storedSubtypes[i]);
+    for (int storedSubtype : storedSubtypes) _target->addType(storedSubtype);
     storedSubtypes.clear();
     return 1;
 }
@@ -3352,8 +3346,8 @@ int APreventDamageTypesUEOT::resolve() {
 }
 
 int APreventDamageTypesUEOT::destroy() {
-    for (size_t i = 0; i < clones.size(); ++i) {
-        clones[i]->forceDestroy = 0;
+    for (auto& clone : clones) {
+        clone->forceDestroy = 0;
     }
     clones.clear();
     return 1;
@@ -3871,7 +3865,7 @@ ATutorialMessage::ATutorialMessage(GameObserver* observer, MTGCardInstance* sour
     mElapsed = 0;
     mIsImage = false;
 
-    for (int i = 0; i < 9; i++) mBg[i] = nullptr;
+    for (auto& i : mBg) i = nullptr;
 
     if (game->getResourceManager()) {
         std::string gfx = game->getResourceManager()->graphicsFile(message);
@@ -4091,7 +4085,7 @@ ATutorialMessage* ATutorialMessage::clone() const {
 ATutorialMessage::~ATutorialMessage() {
     if (mBgTex) {
         game->getResourceManager()->Release(mBgTex);
-        for (int i = 0; i < 9; i++) SAFE_DELETE(mBg[i]);
+        for (auto& i : mBg) SAFE_DELETE(i);
     }
 }
 
@@ -4100,8 +4094,8 @@ ATutorialMessage::~ATutorialMessage() {
 // Given a delimited std::string of abilities, add the ones to the list that are "Basic"  MTG abilities
 void PopulateAbilityIndexVector(std::list<int>& abilities, const string& abilityStringList, char delimiter) {
     std::vector<std::string> abilitiesList = split(abilityStringList, delimiter);
-    for (auto iter = abilitiesList.begin(); iter != abilitiesList.end(); ++iter) {
-        int abilityIndex = Constants::GetBasicAbilityIndex(*iter);
+    for (auto& iter : abilitiesList) {
+        int abilityIndex = Constants::GetBasicAbilityIndex(iter);
 
         if (abilityIndex != -1) abilities.push_back(abilityIndex);
     }
@@ -4109,11 +4103,11 @@ void PopulateAbilityIndexVector(std::list<int>& abilities, const string& ability
 
 void PopulateColorIndexVector(std::list<int>& colors, const string& colorStringList, char delimiter) {
     std::vector<std::string> abilitiesList = split(colorStringList, delimiter);
-    for (auto iter = abilitiesList.begin(); iter != abilitiesList.end(); ++iter) {
+    for (auto& iter : abilitiesList) {
         for (int colorIndex = Constants::MTG_COLOR_ARTIFACT; colorIndex < Constants::NB_Colors; ++colorIndex) {
             // if the text is not a basic ability but contains a valid color add it to the color vector
-            if ((Constants::GetBasicAbilityIndex(*iter) == -1) &&
-                ((*iter).find(Constants::MTGColorStrings[colorIndex]) != string::npos))
+            if ((Constants::GetBasicAbilityIndex(iter) == -1) &&
+                (iter.find(Constants::MTGColorStrings[colorIndex]) != string::npos))
                 colors.push_back(colorIndex);
         }
     }
@@ -4121,8 +4115,7 @@ void PopulateColorIndexVector(std::list<int>& colors, const string& colorStringL
 
 void PopulateSubtypesIndexVector(std::list<int>& types, const string& subTypesStringList, char delimiter) {
     std::vector<std::string> subTypesList = split(subTypesStringList, delimiter);
-    for (auto it = subTypesList.begin(); it != subTypesList.end(); ++it) {
-        std::string subtype = *it;
+    for (auto subtype : subTypesList) {
         size_t id = MTGAllCards::findType(subtype);
         if (id != string::npos) types.push_back(id);
     }

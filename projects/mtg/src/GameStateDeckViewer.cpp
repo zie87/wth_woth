@@ -1381,8 +1381,8 @@ void GameStateDeckViewer::Render() {
     renderCard(4, mRotation);
     renderCard(0, mRotation);
 
-    for (int i = 0; i < 3; i++) {
-        renderCard(order[i], mRotation);
+    for (int i : order) {
+        renderCard(i, mRotation);
     }
 
     if (displayed_deck->Size() > 0) {

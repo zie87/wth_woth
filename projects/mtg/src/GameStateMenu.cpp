@@ -170,8 +170,8 @@ void GameStateMenu::fillScroller() {
     if (!options[Options::DIFFICULTY_MODE_UNLOCKED].number)
         scroller->Add(_("Unlock the difficult mode for more challenging duels!"));
 
-    for (auto it = Unlockable::unlockables.begin(); it != Unlockable::unlockables.end(); ++it) {
-        Unlockable* award = it->second;
+    for (auto& unlockable : Unlockable::unlockables) {
+        Unlockable* award = unlockable.second;
         if (!award->isUnlocked()) {
             if (award->getValue("teaser").size()) scroller->Add(_(award->getValue("teaser")));
         }
@@ -205,9 +205,9 @@ int GameStateMenu::gamePercentComplete() {
     total++;
     if (options[Options::DIFFICULTY_MODE_UNLOCKED].number) done++;
 
-    for (auto it = Unlockable::unlockables.begin(); it != Unlockable::unlockables.end(); ++it) {
+    for (auto& unlockable : Unlockable::unlockables) {
         total++;
-        if (it->second->isUnlocked()) total++;
+        if (unlockable.second->isUnlocked()) total++;
     }
 
     total++;
@@ -300,10 +300,10 @@ void GameStateMenu::loadLangMenu() {
     if (!subMenuController) return;
 
     vector<string> langFiles = JFileSystem::GetInstance()->scanfolder("lang/");
-    for (size_t i = 0; i < langFiles.size(); ++i) {
+    for (auto& langFile : langFiles) {
         zfs::izfstream file;
         string filePath = "lang/";
-        filePath.append(langFiles[i]);
+        filePath.append(langFile);
         if (!JFileSystem::GetInstance()->openForRead(file, filePath)) continue;
 
         string s;
@@ -317,7 +317,7 @@ void GameStateMenu::loadLangMenu() {
 
         if (lang.size()) {
             langChoices = true;
-            string filen = langFiles[i];
+            string filen = langFile;
             langs.push_back(filen.substr(0, filen.size() - 4));
             subMenuController->Add(langs.size(), lang.c_str());
         }
@@ -333,9 +333,9 @@ void GameStateMenu::listPrimitives() {
         return;
     }
 
-    for (size_t i = 0; i < primitiveFiles.size(); ++i) {
+    for (auto& primitiveFile : primitiveFiles) {
         string filename = "sets/primitives/";
-        filename.append(primitiveFiles[i]);
+        filename.append(primitiveFile);
 
         if (!JFileSystem::GetInstance()->FileExists(filename)) continue;
         primitives.push_back(filename);
@@ -463,11 +463,11 @@ void GameStateMenu::Update(float dt) {
 
         // Hook for Top Menu actions
         vector<ModRulesOtherMenuItem*> items = gModRules.menu.other;
-        for (size_t i = 0; i < items.size(); ++i) {
-            if (mEngine->GetButtonState(items[i]->mKey) && items[i]->getMatchingGameState())
+        for (auto& item : items) {
+            if (mEngine->GetButtonState(item->mKey) && item->getMatchingGameState())
                 mParent->DoTransition(
                     TRANSITION_FADE,
-                    items[i]->getMatchingGameState());  // TODO: Add the transition as a parameter in the rules file
+                    item->getMatchingGameState());  // TODO: Add the transition as a parameter in the rules file
         }
         break;
     }
@@ -564,8 +564,8 @@ void GameStateMenu::RenderTopMenu() {
     JRenderer* renderer = JRenderer::GetInstance();
 
     vector<ModRulesOtherMenuItem*> items = gModRules.menu.other;
-    for (size_t i = 0; i < items.size(); ++i) {
-        switch (items[i]->mKey) {
+    for (auto& item : items) {
+        switch (item->mKey) {
         case JGE_BTN_PREV:
             leftTextPos += 64;
             break;

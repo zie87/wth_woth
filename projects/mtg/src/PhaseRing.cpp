@@ -52,8 +52,8 @@ PhaseRing::PhaseRing(GameObserver* observer) : observer(observer) {
         if (observer->players[i]->phaseRing.size()) {
             addPhase(NEW Phase(MTG_PHASE_BEFORE_BEGIN, observer->players[i]));
             vector<string> customRing = split(observer->players[i]->phaseRing, ',');
-            for (unsigned int k = 0; k < customRing.size(); k++) {
-                GamePhase customOrder = phaseStrToInt(customRing[k]);
+            for (auto& k : customRing) {
+                GamePhase customOrder = phaseStrToInt(k);
                 auto* phase           = NEW Phase(customOrder, observer->players[i]);
                 addPhase(phase);
                 turnRing.push_back(phase);
@@ -78,8 +78,7 @@ PhaseRing::PhaseRing(GameObserver* observer) : observer(observer) {
 std::list<Phase*> PhaseRing::currentTurn() {
     std::list<Phase*> temp = observer->gameTurn[observer->currentPlayer->getId()];
     currentTurnList.clear();
-    for (auto tempiter = temp.begin(); tempiter != temp.end(); tempiter++) {
-        Phase* currentIter = *tempiter;
+    for (auto currentIter : temp) {
         currentTurnList.push_back(currentIter);
     }
     return currentTurnList;
@@ -89,20 +88,18 @@ std::list<Phase*> PhaseRing::nextTurn() {
     std::list<Phase*> temp = observer->gameTurn[observer->nextTurnsPlayer()->getId()];
     Phase* currentIter     = nullptr;
     nextTurnList.clear();
-    for (auto tempiter = temp.begin(); tempiter != temp.end(); tempiter++) {
-        currentIter = *tempiter;
+    for (auto& tempiter : temp) {
+        currentIter = tempiter;
         nextTurnList.push_back(currentIter);
     }
     return nextTurnList;
 }
 
 PhaseRing::~PhaseRing() {
-    for (auto it = ring.begin(); it != ring.end(); it++) {
-        Phase* currentPhase = *it;
+    for (auto currentPhase : ring) {
         delete (currentPhase);
     }
-    for (auto it = extraPhases.begin(); it != extraPhases.end(); it++) {
-        Phase* currentPhase = *it;
+    for (auto currentPhase : extraPhases) {
         SAFE_DELETE(currentPhase);
     }
 }
@@ -200,8 +197,8 @@ int PhaseRing::addCombatAfter(Player* player, int after_id, bool withMain) {
             beforeLeaving = currentPhase;
             it++;
             Phase* addPhase = nullptr;
-            for (auto findP = ring.begin(); findP != ring.end(); findP++) {
-                addPhase = *findP;
+            for (auto& findP : ring) {
+                addPhase     = findP;
                 Phase* toAdd = nullptr;
                 bool add = false;
                 if (addPhase->player == player) {
@@ -263,8 +260,7 @@ int PhaseRing::addCombatAfter(Player* player, int after_id, bool withMain) {
 }
 
 Phase* PhaseRing::getPhase(int _id) {
-    for (auto it = turn.begin(); it != turn.end(); it++) {
-        Phase* currentPhase = *it;
+    for (auto currentPhase : turn) {
         if (currentPhase->id == _id) {
             return currentPhase;
         }
@@ -278,8 +274,8 @@ int PhaseRing::addPhaseAfter(GamePhase id, Player* player, int after_id) {
         if (currentPhase->id == after_id) {
             it++;
             Phase* addPhase = nullptr;
-            for (auto findP = ring.begin(); findP != ring.end(); findP++) {
-                addPhase = *findP;
+            for (auto& findP : ring) {
+                addPhase = findP;
                 if (addPhase->id == id && addPhase->player == player) {
                     auto* toAdd    = NEW Phase(*addPhase);
                     toAdd->isExtra = true;

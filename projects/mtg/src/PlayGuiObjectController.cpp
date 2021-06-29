@@ -73,9 +73,9 @@ int PlayGuiObjectController::getClosestItem(int direction, float tolerance) {
 
 void PlayGuiObjectController::Update(float dt) {
     last_user_move += dt;
-    for (size_t i = 0; i < mObjects.size(); i++) {
-        if (mObjects[i] != nullptr) {
-            mObjects[i]->Update(dt);
+    for (auto& mObject : mObjects) {
+        if (mObject != nullptr) {
+            mObject->Update(dt);
         }
     }
 }

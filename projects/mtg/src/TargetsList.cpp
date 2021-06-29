@@ -32,8 +32,8 @@ int TargetsList::addTarget(Targetable* target) {
 }
 
 int TargetsList::alreadyHasTarget(Targetable* target) {
-    for (size_t i = 0; i < targets.size(); i++) {
-        if (targets[i] == target) return 1;
+    for (auto& i : targets) {
+        if (i == target) return 1;
     }
     return 0;
 }

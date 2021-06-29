@@ -22,17 +22,17 @@ struct RulesMenuCmp {
 } RulesMenuCmp_;
 
 Rules* Rules::getRulesByFilename(string _filename) {
-    for (size_t i = 0; i < RulesList.size(); ++i) {
-        if (RulesList[i]->filename == _filename) return RulesList[i];
+    for (auto& i : RulesList) {
+        if (i->filename == _filename) return i;
     }
     return nullptr;
 }
 
 int Rules::loadAllRules() {
     vector<string> rulesFiles = JFileSystem::GetInstance()->scanfolder("rules");
-    for (size_t i = 0; i < rulesFiles.size(); ++i) {
+    for (auto& rulesFile : rulesFiles) {
         auto* rules = NEW Rules();
-        if (rules->load(rulesFiles[i])) {
+        if (rules->load(rulesFile)) {
             RulesList.push_back(rules);
         } else {
             SAFE_DELETE(rules);
@@ -45,8 +45,8 @@ int Rules::loadAllRules() {
 }
 
 void Rules::unloadAllRules() {
-    for (size_t i = 0; i < RulesList.size(); ++i) {
-        SAFE_DELETE(RulesList[i]);
+    for (auto& i : RulesList) {
+        SAFE_DELETE(i);
     }
     RulesList.clear();
 }
@@ -65,8 +65,7 @@ MTGCardInstance* Rules::getCardByMTGId(GameObserver* g, int mtgid) {
     for (int i = 0; i < 2; i++) {
         Player* p = g->players[i];
         MTGGameZone* zones[] = {p->game->library, p->game->hand, p->game->inPlay, p->game->graveyard};
-        for (int j = 0; j < 4; j++) {
-            MTGGameZone* zone = zones[j];
+        for (auto zone : zones) {
             for (int k = 0; k < zone->nb_cards; k++) {
                 MTGCardInstance* card = zone->cards[k];
                 if (!card) return nullptr;
@@ -171,9 +170,9 @@ void Rules::addExtraRules(GameObserver* g) {
         }
     }
 
-    for (size_t j = 0; j < extraRules.size(); ++j) {
+    for (auto& extraRule : extraRules) {
         AbilityFactory af(g);
-        MTGAbility* a = af.parseMagicLine(extraRules[j], id++, nullptr, &(g->ExtraRules[0]));
+        MTGAbility* a = af.parseMagicLine(extraRule, id++, nullptr, &(g->ExtraRules[0]));
         if (a) {
             if (a->oneShot) {
                 a->resolve();
@@ -274,9 +273,9 @@ MTGDeck* Rules::buildDeck(int playerId) {
         initState.playerData[playerId].player->game->graveyard, initState.playerData[playerId].player->game->library,
         initState.playerData[playerId].player->game->hand, initState.playerData[playerId].player->game->inPlay};
 
-    for (int j = 0; j < 4; j++) {
-        for (size_t k = 0; k < loadedPlayerZones[j]->cards.size(); k++) {
-            int cardid = loadedPlayerZones[j]->cards[k]->getId();
+    for (auto& loadedPlayerZone : loadedPlayerZones) {
+        for (size_t k = 0; k < loadedPlayerZone->cards.size(); k++) {
+            int cardid = loadedPlayerZone->cards[k]->getId();
             deck->add(cardid);
             nbcards++;
         }
@@ -334,8 +333,8 @@ void Rules::initGame(GameObserver* g) {
             initState.playerData[i].player->game->hand, initState.playerData[i].player->game->inPlay};
         for (int j = 0; j < 4; j++) {
             MTGGameZone* zone = playerZones[j];
-            for (size_t k = 0; k < loadedPlayerZones[j]->cards.size(); k++) {
-                MTGCardInstance* card = getCardByMTGId(g, loadedPlayerZones[j]->cards[k]->getId());
+            for (auto& k : loadedPlayerZones[j]->cards) {
+                MTGCardInstance* card = getCardByMTGId(g, k->getId());
                 if (card && zone != p->game->library) {
                     if (zone == p->game->inPlay) {
                         MTGCardInstance* copy = p->game->putInZone(card, p->game->library, p->game->stack);
@@ -379,8 +378,8 @@ void RulesPlayerData::cleanup() {
 }
 
 void RulesState::cleanup() {
-    for (int i = 0; i < 2; i++) {
-        playerData[i].cleanup();
+    for (auto& i : playerData) {
+        i.cleanup();
     }
 }
 

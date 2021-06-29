@@ -49,8 +49,8 @@ void WGuiBase::renderBack(WGuiBase* it) {
 }
 
 WGuiBase::CONFIRM_TYPE WGuiBase::needsConfirm() {
-    for (auto it = items.begin(); it != items.end(); ++it) {
-        switch ((*it)->needsConfirm()) {
+    for (auto& item : items) {
+        switch (item->needsConfirm()) {
         case CONFIRM_NEED:
             return CONFIRM_NEED;
         case CONFIRM_CANCEL:
@@ -62,8 +62,8 @@ WGuiBase::CONFIRM_TYPE WGuiBase::needsConfirm() {
     return CONFIRM_OK;
 }
 bool WGuiBase::yieldFocus() {
-    for (auto it = items.begin(); it != items.end(); ++it)
-        if ((*it)->yieldFocus()) {
+    for (auto& item : items)
+        if (item->yieldFocus()) {
             return true;
         }
     return false;
@@ -254,9 +254,9 @@ WGuiList::WGuiList(string name, WSyncable* syncme)
     displayValue = name;
 }
 void WGuiList::confirmChange(bool confirmed) {
-    for (size_t x = 0; x < items.size(); x++) {
-        if (!items[x]) continue;
-        items[x]->confirmChange(confirmed);
+    for (auto& item : items) {
+        if (!item) continue;
+        item->confirmChange(confirmed);
     }
 }
 void WGuiList::Render() {
@@ -366,8 +366,8 @@ void WGuiList::Render() {
 }
 
 void WGuiList::setData() {
-    for (size_t i = 0; i < items.size(); i++) {
-        items[i]->setData();
+    for (auto& item : items) {
+        item->setData();
     }
 }
 
@@ -778,21 +778,21 @@ WGuiMenu::WGuiMenu(JButton next, JButton prev, bool dPad, WSyncable* syncme) : W
     held = JGE_BTN_NONE;
 }
 WGuiMenu::~WGuiMenu() {
-    for (auto it = items.begin(); it != items.end(); it++) SAFE_DELETE(*it);
+    for (auto& item : items) SAFE_DELETE(item);
 }
 void WGuiMenu::setData() {
-    for (auto it = items.begin(); it != items.end(); it++) (*it)->setData();
+    for (auto& item : items) item->setData();
 };
 
 void WGuiMenu::Reload() {
-    for (auto it = items.begin(); it != items.end(); it++) (*it)->Reload();
+    for (auto& item : items) item->Reload();
 };
 
 void WGuiMenu::Render() {
-    for (auto it = items.begin(); it != items.end(); it++) (*it)->Render();
+    for (auto& item : items) item->Render();
 }
 void WGuiMenu::confirmChange(bool confirmed) {
-    for (auto it = items.begin(); it != items.end(); it++) (*it)->confirmChange(confirmed);
+    for (auto& item : items) item->confirmChange(confirmed);
 }
 
 void WGuiMenu::ButtonPressed(int controllerId, int controlId) {
@@ -992,11 +992,11 @@ void WGuiTabMenu::Render() {
 
     float offset = x;
     mFont->SetScale(0.8f);
-    for (auto it = items.begin(); it != items.end(); it++) {
-        float w = mFont->GetStringWidth(_((*it)->getDisplay()).c_str());
-        mFont->SetColor((*it)->getColor(WGuiColor::TEXT_TAB));
-        renderer->FillRoundRect(offset + 5, 5, w + 5, 25, 2, (*it)->getColor(WGuiColor::BACK_TAB));
-        mFont->DrawString(_((*it)->getDisplay()).c_str(), offset + 10, 10);
+    for (auto& item : items) {
+        float w = mFont->GetStringWidth(_(item->getDisplay()).c_str());
+        mFont->SetColor(item->getColor(WGuiColor::TEXT_TAB));
+        renderer->FillRoundRect(offset + 5, 5, w + 5, 25, 2, item->getColor(WGuiColor::BACK_TAB));
+        mFont->DrawString(_(item->getDisplay()).c_str(), offset + 10, 10);
         offset += w + 10 + 2;
     }
     mFont->SetScale(1);
@@ -1317,7 +1317,7 @@ void WGuiCardDistort::Render() {
 
 // WDistort
 WDistort::WDistort() {
-    for (int i = 0; i < 8; i++) xy[i] = 0;
+    for (float& i : xy) i = 0;
 }
 
 float& WDistort::operator[](int p) { return xy[p]; }
@@ -1726,8 +1726,7 @@ void WGuiFilterItem::updateValue() {
                 }
             }
             std::sort(stlist.begin(), stlist.end());
-            for (size_t t = 0; t < stlist.size(); t++) {
-                string s = stlist[t];
+            for (auto s : stlist) {
                 char buf[1024];
                 sprintf(buf, "t:%s;", s.c_str());
                 mParent->addArg(s, buf);
@@ -1884,13 +1883,13 @@ void WGuiKeyBinder::Update(float dt) {
         items.insert(items.begin(), NEW OptionKey(parent, LOCAL_KEY_NONE, JGE_BTN_NONE));
         if (0 == currentItem) ++currentItem;
     }
-    for (auto it = items.begin(); it != items.end(); ++it) (*it)->Update(dt);
+    for (auto& item : items) item->Update(dt);
     if (confirmMenu) confirmMenu->Update(dt);
 }
 
 bool WGuiKeyBinder::isModal() {
-    for (auto it = items.begin(); it != items.end(); ++it)
-        if ((*it)->isModal()) return true;
+    for (auto& item : items)
+        if (item->isModal()) return true;
     return modal;
 }
 
@@ -1904,8 +1903,8 @@ bool WGuiKeyBinder::CheckUserInput(JButton key) {
 void WGuiKeyBinder::setData() {
     JGE* j = JGE::GetInstance();
     j->ClearBindings();
-    for (auto it = items.begin(); it != items.end(); ++it) {
-        auto* o = static_cast<OptionKey*>(*it);
+    for (auto& item : items) {
+        auto* o = static_cast<OptionKey*>(item);
         if (o && LOCAL_KEY_NONE != o->from && JGE_BTN_NONE != o->to) j->BindKey(o->from, o->to);
     }
     j->ResetInput();
@@ -1966,8 +1965,8 @@ WGuiBase::CONFIRM_TYPE WGuiKeyBinder::needsConfirm() {
     for (signed int i = (sizeof(btnToCheck) / sizeof(btnToCheck[0])) - 1; i >= 0; --i) {
         if (confirmedButtons.end() != find(confirmedButtons.begin(), confirmedButtons.end(), btnToCheck[i])) continue;
         bool found = false;
-        for (auto it = items.begin(); it != items.end(); ++it)
-            if (btnToCheck[i] == C(*it)->to) {
+        for (auto& item : items)
+            if (btnToCheck[i] == C(item)->to) {
                 found = true;
                 break;
             }

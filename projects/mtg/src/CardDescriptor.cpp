@@ -68,15 +68,15 @@ bool CardDescriptor::valueInRange(int comparisonMode, int value, int criterion) 
 
 MTGCardInstance* CardDescriptor::match_or(MTGCardInstance* card) {
     int found = 1;
-    for (size_t i = 0; i < types.size(); i++) {
+    for (int type : types) {
         found = 0;
-        if (types[i] >= 0) {
-            if (card->hasSubtype(types[i]) || (MTGAllCards::findType(card->getLCName(), false) == types[i])) {
+        if (type >= 0) {
+            if (card->hasSubtype(type) || (MTGAllCards::findType(card->getLCName(), false) == type)) {
                 found = 1;
                 break;
             }
         } else {
-            if (!card->hasSubtype(-types[i]) && (MTGAllCards::findType(card->getLCName(), false) != -types[i])) {
+            if (!card->hasSubtype(-type) && (MTGAllCards::findType(card->getLCName(), false) != -type)) {
                 found = 1;
                 break;
             }
@@ -107,13 +107,13 @@ MTGCardInstance* CardDescriptor::match_or(MTGCardInstance* card) {
 
 MTGCardInstance* CardDescriptor::match_and(MTGCardInstance* card) {
     MTGCardInstance* match = card;
-    for (size_t i = 0; i < types.size(); i++) {
-        if (types[i] >= 0) {
-            if (!card->hasSubtype(types[i]) && !(MTGAllCards::findType(card->getLCName(), false) == types[i])) {
+    for (int type : types) {
+        if (type >= 0) {
+            if (!card->hasSubtype(type) && !(MTGAllCards::findType(card->getLCName(), false) == type)) {
                 match = nullptr;
             }
         } else {
-            if (card->hasSubtype(-types[i]) || (MTGAllCards::findType(card->getLCName(), false) == -types[i])) {
+            if (card->hasSubtype(-type) || (MTGAllCards::findType(card->getLCName(), false) == -type)) {
                 match = nullptr;
             }
         }

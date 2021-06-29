@@ -31,7 +31,7 @@ CardPrimitive::CardPrimitive(CardPrimitive* source) {
     if (!source) return;
     basicAbilities = source->basicAbilities;
 
-    for (size_t i = 0; i < source->types.size(); ++i) types.push_back(source->types[i]);
+    for (int type : source->types) types.push_back(type);
     colors = source->colors;
     manaCost.copy(source->getManaCost());
     // reducedCost.copy(source->getReducedManaCost());
@@ -154,9 +154,9 @@ void CardPrimitive::addType(char* _type_text) { setSubtype(_type_text); }
 void CardPrimitive::setSubtype(const string& value) {
     // find the parent type for this card
     int parentType = 0;
-    for (size_t i = 0; i < types.size(); ++i) {
-        if (MTGAllCards::isType(types[i])) {
-            parentType = types[i];
+    for (int type : types) {
+        if (MTGAllCards::isType(type)) {
+            parentType = type;
             break;
         }
     }
@@ -238,8 +238,8 @@ const string& CardPrimitive::getLCName() const { return lcname; }
 ManaCost* CardPrimitive::getManaCost() { return &manaCost; }
 
 bool CardPrimitive::hasType(int _type) {
-    for (size_t i = 0; i < types.size(); i++)
-        if (types[i] == _type) return true;
+    for (int type : types)
+        if (type == _type) return true;
     return false;
 }
 

@@ -81,8 +81,8 @@ int AIStats::receiveEvent(WEvent* event) {
         }
     }
     if (size_t nb = lords.size()) {
-        for (auto it = lords.begin(); it != lords.end(); ++it) {
-            updateStatsCard(it->first, damage, STATS_LORD_MULTIPLIER / nb);
+        for (auto& lord : lords) {
+            updateStatsCard(lord.first, damage, STATS_LORD_MULTIPLIER / nb);
         }
     }
 

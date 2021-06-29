@@ -198,8 +198,8 @@ void ManaIcon::Drop() {
 GuiMana::GuiMana(float x, float y, Player* p) : GuiLayer(p->getObserver()), x(x), y(y), owner(p) {}
 
 GuiMana::~GuiMana() {
-    for (auto it = manas.begin(); it != manas.end(); ++it) {
-        delete (*it);
+    for (auto& mana : manas) {
+        delete mana;
     }
 }
 
@@ -210,10 +210,10 @@ void GuiMana::RenderStatic() {
     WFont* mFont = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
     JRenderer* r = JRenderer::GetInstance();
     for (int i = 0; i < Constants::NB_Colors; ++i) values[i] = 0;
-    for (auto it = manas.begin(); it != manas.end(); ++it)
-        if (ManaIcon::ALIVE == (*it)->mode) {
-            values[(*it)->color]++;
-            if (values[(*it)->color] == 1) totalColors++;
+    for (auto& mana : manas)
+        if (ManaIcon::ALIVE == mana->mode) {
+            values[mana->color]++;
+            if (values[mana->color] == 1) totalColors++;
         }
 
     if (!totalColors) return;
@@ -244,7 +244,7 @@ void GuiMana::RenderStatic() {
 }
 
 void GuiMana::Render() {
-    for (auto it = manas.begin(); it != manas.end(); ++it) (*it)->Render();
+    for (auto& mana : manas) mana->Render();
 
     if (OptionManaDisplay::DYNAMIC != options[Options::MANADISPLAY].number &&
         OptionManaDisplay::NOSTARSDYNAMIC != options[Options::MANADISPLAY].number)
@@ -256,8 +256,8 @@ bool remove_dead(ManaIcon* m) { return ManaIcon::DEAD != m->mode; }
 void GuiMana::Update(float dt) {
     if (observer->getResourceManager()) {
         float shift = 0;
-        for (auto it = manas.begin(); it != manas.end(); ++it) {
-            (*it)->Update(dt, shift);
+        for (auto& mana : manas) {
+            mana->Update(dt, shift);
             shift += 15;
         }
     }
@@ -283,15 +283,15 @@ int GuiMana::receiveEventPlus(WEvent* e) {
 int GuiMana::receiveEventMinus(WEvent* e) {
     if (auto* event = dynamic_cast<WEventConsumeMana*>(e)) {
         if (event->source != owner->getManaPool()) return 0;
-        for (auto it = manas.begin(); it != manas.end(); ++it)
-            if ((event->color == (*it)->color) && (ManaIcon::ALIVE == (*it)->mode)) {
-                (*it)->Wither();
+        for (auto& mana : manas)
+            if ((event->color == mana->color) && (ManaIcon::ALIVE == mana->mode)) {
+                mana->Wither();
                 return 1;
             }
         return 1;
     } else if (auto* event2 = dynamic_cast<WEventEmptyManaPool*>(e)) {
         if (event2->source != owner->getManaPool()) return 0;
-        for (auto it = manas.begin(); it != manas.end(); ++it) (*it)->Drop();
+        for (auto& mana : manas) mana->Drop();
         return 1;
     }
     return 0;

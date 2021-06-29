@@ -105,9 +105,9 @@ WCardFilter* WCFilterFactory::Leaf(string src) {
 
 WCardFilter* WCFilterFactory::Terminal(string src, string arg) {
     string type;
-    for (size_t x = 0; x < src.size(); x++) {
-        if (isspace(src[x])) continue;
-        type += src[x];
+    for (char x : src) {
+        if (isspace(x)) continue;
+        type += x;
     }
     std::transform(type.begin(), type.end(), type.begin(), ::tolower);
 

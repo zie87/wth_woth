@@ -1229,8 +1229,8 @@ MTGMomirRule::MTGMomirRule(GameObserver* observer, int _id, MTGAllCards* _collec
     : PermanentAbility(observer, _id), initialized(false) {
     collection = _collection;
     if (!initialized) {
-        for (size_t i = 0; i < collection->ids.size(); i++) {
-            MTGCard* card = collection->collection[collection->ids[i]];
+        for (int& id : collection->ids) {
+            MTGCard* card = collection->collection[id];
             if (card->data->isCreature() && (card->getRarity() != Constants::RARITY_T) &&  // remove tokens
                 card->setId !=
                     MTGSets::INTERNAL_SET  // remove cards that are defined in primitives. Those are
@@ -1346,8 +1346,8 @@ MTGStoneHewerRule::MTGStoneHewerRule(GameObserver* observer, int _id, MTGAllCard
     : PermanentAbility(observer, _id), initialized(false) {
     collection = _collection;
     if (!initialized) {
-        for (size_t i = 0; i < collection->ids.size(); i++) {
-            MTGCard* card = collection->collection[collection->ids[i]];
+        for (int& id : collection->ids) {
+            MTGCard* card = collection->collection[id];
             if (card->data->hasSubtype("equipment") && (card->getRarity() != Constants::RARITY_T) &&  // remove tokens
                 card->setId !=
                     MTGSets::INTERNAL_SET  // remove cards that are defined in primitives. Those are
@@ -1523,8 +1523,7 @@ HUDDisplay::HUDDisplay(GameObserver* observer, int _id) : PermanentAbility(obser
 }
 
 HUDDisplay::~HUDDisplay() {
-    for (auto it = events.begin(); it != events.end(); ++it) {
-        HUDString* hs = *it;
+    for (auto hs : events) {
         delete hs;
     }
     events.clear();
@@ -1735,8 +1734,8 @@ int MTGPlaneWalkerRule::canBeInList(MTGCardInstance* card) {
 
 int MTGPlaneWalkerRule::added(MTGCardInstance* card) {
     int destroy = 0;
-    for (auto it = cards.begin(); it != cards.end(); it++) {
-        MTGCardInstance* comparison = (*it).first;
+    for (auto& it : cards) {
+        MTGCardInstance* comparison = it.first;
         if (comparison != card && comparison->types == card->types) {
             comparison->controller()->game->putInGraveyard(comparison);
             destroy = 1;

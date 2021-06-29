@@ -120,8 +120,8 @@ Credits::Credits() {
 }
 
 Credits::~Credits() {
-    for (unsigned int i = 0; i < bonus.size(); ++i)
-        if (bonus[i]) delete bonus[i];
+    for (auto& bonu : bonus)
+        if (bonu) delete bonu;
     bonus.clear();
 }
 
@@ -182,11 +182,11 @@ void Credits::compute(GameObserver* g, GameApp* _app) {
 
         char buffer[512];
 
-        for (auto it = finishedTasks.begin(); it != finishedTasks.end(); it++) {
-            sprintf(buffer, _("Task: %s").c_str(), (*it)->getShortDesc().c_str());
-            auto* b = NEW CreditBonus((*it)->getReward(), buffer);
+        for (auto& finishedTask : finishedTasks) {
+            sprintf(buffer, _("Task: %s").c_str(), finishedTask->getShortDesc().c_str());
+            auto* b = NEW CreditBonus(finishedTask->getReward(), buffer);
             bonus.push_back(b);
-            playerdata->taskList->removeTask(*it);
+            playerdata->taskList->removeTask(finishedTask);
         }
         // </Tasks handling>
 
@@ -199,8 +199,8 @@ void Credits::compute(GameObserver* g, GameApp* _app) {
                 goa = (GameOptionAward*)&options[Options::DIFFICULTY_MODE_UNLOCKED];
                 goa->giveAward();
             } else {
-                for (auto it = Unlockable::unlockables.begin(); it != Unlockable::unlockables.end(); ++it) {
-                    Unlockable* award = it->second;
+                for (auto& unlockable : Unlockable::unlockables) {
+                    Unlockable* award = unlockable.second;
                     if (award->tryToUnlock(g)) {
                         unlocked = 1;
                         unlockedString = award->getValue("unlock_text");

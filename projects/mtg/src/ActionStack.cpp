@@ -503,8 +503,8 @@ int ActionStack::setIsInterrupting(Player* player, bool log) {
 }
 
 int ActionStack::addAction(Interruptible* action) {
-    for (int i = 0; i < 2; i++) {
-        interruptDecision[i] = NOT_DECIDED;
+    for (auto& i : interruptDecision) {
+        i = NOT_DECIDED;
     }
     Add(action);
     lastActionController = observer->currentlyActing();
@@ -532,7 +532,7 @@ Interruptible* ActionStack::getAt(int id) {
 }
 
 ActionStack::ActionStack(GameObserver* game) : GuiLayer(game), currentTutorial(nullptr) {
-    for (int i = 0; i < 2; i++) interruptDecision[i] = NOT_DECIDED;
+    for (auto& i : interruptDecision) i = NOT_DECIDED;
     askIfWishesToInterrupt = nullptr;
     timer = -1;
     currentState = -1;
@@ -550,9 +550,9 @@ ActionStack::ActionStack(GameObserver* game) : GuiLayer(game), currentTutorial(n
 }
 
 int ActionStack::has(MTGAbility* ability) {
-    for (size_t i = 0; i < mObjects.size(); i++) {
-        if (((Interruptible*)mObjects[i])->type == ACTION_ABILITY) {
-            StackAbility* action = ((StackAbility*)mObjects[i]);
+    for (auto& mObject : mObjects) {
+        if (((Interruptible*)mObject)->type == ACTION_ABILITY) {
+            StackAbility* action = ((StackAbility*)mObject);
             if (action->state == NOT_RESOLVED && action->ability == ability) return 1;
         }
     }
@@ -560,8 +560,8 @@ int ActionStack::has(MTGAbility* ability) {
 }
 
 int ActionStack::has(Interruptible* action) {
-    for (size_t i = 0; i < mObjects.size(); i++) {
-        if (mObjects[i] == action) return 1;
+    for (auto& mObject : mObjects) {
+        if (mObject == action) return 1;
     }
     return 0;
 }
@@ -579,12 +579,12 @@ int ActionStack::resolve() {
     }
     if (action->type == ACTION_DAMAGE) ((Damage*)action)->target->afterDamage();
     if (!getNext(nullptr, NOT_RESOLVED)) {
-        for (int i = 0; i < 2; i++) {
-            if (interruptDecision[i] != 2) interruptDecision[i] = NOT_DECIDED;
+        for (auto& i : interruptDecision) {
+            if (i != 2) i = NOT_DECIDED;
         }
     } else {
-        for (int i = 0; i < 2; i++) {
-            if (interruptDecision[i] != DONT_INTERRUPT_ALL) interruptDecision[i] = NOT_DECIDED;
+        for (auto& i : interruptDecision) {
+            if (i != DONT_INTERRUPT_ALL) i = NOT_DECIDED;
         }
     }
     lastActionController = nullptr;
@@ -614,8 +614,8 @@ int ActionStack::getPreviousIndex(Interruptible* next, int type, int state, int 
 
 int ActionStack::count(int type, int state, int display) {
     int result = 0;
-    for (size_t i = 0; i < mObjects.size(); i++) {
-        auto* current = (Interruptible*)mObjects[i];
+    for (auto& mObject : mObjects) {
+        auto* current = (Interruptible*)mObject;
         if ((type == 0 || current->type == type) && (state == 0 || current->state == state) &&
             (display == -1 || current->display == display)) {
             result++;
@@ -626,8 +626,8 @@ int ActionStack::count(int type, int state, int display) {
 
 Interruptible* ActionStack::getActionElementFromCard(MTGCardInstance* card) {
     if (!card) return nullptr;
-    for (size_t i = 0; i < mObjects.size(); i++) {
-        auto* current = (Interruptible*)mObjects[i];
+    for (auto& mObject : mObjects) {
+        auto* current = (Interruptible*)mObject;
         if (current->source == card) {
             return current;
         }
@@ -666,8 +666,8 @@ Interruptible* ActionStack::getLatest(int state) {
 
 int ActionStack::receiveEventPlus(WEvent* event) {
     int result = 0;
-    for (size_t i = 0; i < mObjects.size(); ++i) {
-        auto* current = (Interruptible*)mObjects[i];
+    for (auto& mObject : mObjects) {
+        auto* current = (Interruptible*)mObject;
         result += current->receiveEvent(event);
     }
     return result;
@@ -915,8 +915,8 @@ void ActionStack::Render() {
     if (mode == ACTIONSTACK_STANDARD) {
         if (!askIfWishesToInterrupt || !askIfWishesToInterrupt->displayStack()) return;
 
-        for (size_t i = 0; i < mObjects.size(); i++) {
-            auto* current = (Interruptible*)mObjects[i];
+        for (auto& mObject : mObjects) {
+            auto* current = (Interruptible*)mObject;
             if (current->state == NOT_RESOLVED) height += current->mHeight;
         }
 
@@ -983,8 +983,8 @@ void ActionStack::Render() {
 
         currenty += kIconVerticalOffset + kSpacer;
 
-        for (size_t i = 0; i < mObjects.size(); i++) {
-            auto* current = (Interruptible*)mObjects[i];
+        for (auto& mObject : mObjects) {
+            auto* current = (Interruptible*)mObject;
             if (current && current->state == NOT_RESOLVED) {
                 current->x = x0;
                 current->y = currenty;
@@ -994,8 +994,8 @@ void ActionStack::Render() {
             }
         }
     } else if (mode == ACTIONSTACK_TARGET && modal) {
-        for (size_t i = 0; i < mObjects.size(); i++) {
-            auto* current = (Interruptible*)mObjects[i];
+        for (auto& mObject : mObjects) {
+            auto* current = (Interruptible*)mObject;
             if (current->display) height += current->mHeight;
         }
 
@@ -1073,8 +1073,8 @@ void Interruptible::Dump() {
 
 void ActionStack::Dump() {
     WGE_LOG_TRACE("===== Dumping Action Stack =====");
-    for (size_t i = 0; i < mObjects.size(); i++) {
-        auto* current = (Interruptible*)mObjects[i];
+    for (auto& mObject : mObjects) {
+        auto* current = (Interruptible*)mObject;
         current->Dump();
     }
 }

@@ -199,18 +199,18 @@ PIXEL_TYPE GameOption::asColor(PIXEL_TYPE fallback) {
     // The absolute shortest a color could be is 5 characters: "0,0,0" (implicit 255 alpha)
     if (str.length() < 5) return fallback;
 
-    for (size_t i = 0; i < str.length(); i++) {
-        if (isspace(str[i])) continue;
-        if (str[i] == ',') {
+    for (char i : str) {
+        if (isspace(i)) continue;
+        if (i == ',') {
             if (temp == "") return fallback;
             color[subpixel] = (unsigned char)atoi(temp.c_str());
             temp = "";
             subpixel++;
             continue;
-        } else if (!isdigit(str[i]))
+        } else if (!isdigit(i))
             return fallback;
         if (subpixel > 3) return fallback;
-        temp += str[i];
+        temp += i;
     }
 
     if (temp != "") color[subpixel] = (unsigned char)atoi(temp.c_str());
@@ -227,8 +227,8 @@ bool GameOption::read(string input) {
     if (!input.size()) return true;  // Default reader doesn't care about invalid formatting.
 
     // Is it a number?
-    for (size_t x = 0; x < input.size(); x++) {
-        if (!isdigit(input[x])) {
+    for (char x : input) {
+        if (!isdigit(x)) {
             bNumeric = false;
             break;
         }
@@ -331,12 +331,12 @@ int GameOptions::save() {
             opt->write(&file, name);
         }
 
-        for (auto it = unknownMap.begin(); it != unknownMap.end(); it++) {
-            if (it->second) {
-                if (it->second->str.size())
-                    file << it->first << "=" << it->second->str << "\n";
-                else if (it->second->number)
-                    file << it->first << "=" << it->second->number << "\n";
+        for (auto& it : unknownMap) {
+            if (it.second) {
+                if (it.second->str.size())
+                    file << it.first << "=" << it.second->str << "\n";
+                else if (it.second->number)
+                    file << it.first << "=" << it.second->number << "\n";
             }
         }
         file.close();
@@ -449,7 +449,7 @@ GameOption* GameOptions::get(int optionID) {
 }
 
 GameOptions::~GameOptions() {
-    for (auto it = values.begin(); it != values.end(); it++) SAFE_DELETE(*it);
+    for (auto& value : values) SAFE_DELETE(value);
     values.clear();
 
     for (auto it = unknownMap.begin(); it != unknownMap.end(); it++) SAFE_DELETE(it->second);
@@ -499,8 +499,8 @@ void GameSettings::automaticStyle(Player* p1, Player* p2) {
         }
     }
     styleMan->determineActive(decks[0], decks[1]);
-    for (int i = 0; i < 2; i++) {
-        SAFE_DELETE(decks[i]);
+    for (auto& deck : decks) {
+        SAFE_DELETE(deck);
     }
 }
 
@@ -996,8 +996,7 @@ bool GameOptionKeyBindings::read(string input) {
     JGE* j = JGE::GetInstance();
 
     j->ClearBindings();
-    for (auto it = assoc.begin(); it != assoc.end(); ++it)
-        j->BindKey(it->first, it->second);
+    for (auto& it : assoc) j->BindKey(it.first, it.second);
 
     return true;
 }

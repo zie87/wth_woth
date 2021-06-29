@@ -112,17 +112,27 @@ target_sources(jge300
         ${CMAKE_CURRENT_SOURCE_DIR}/src/JSfx.cpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/JAudio.cpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/JMP3.cpp 
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/decoder_prx.c 
     )
 endif()
 
 if(DEFINED UNIX OR WIN32)
+
+    if(NOT STANDALONE_TESTSUITE)
 target_sources(jge300
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/SDL2main.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JSfx.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JGfx.cpp
+    )
+else()
+target_sources(jge300
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JSfx_dummy.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JGfx_dummy.cpp
+    )
+endif()
+target_sources(jge300
+    PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JSocket.cpp
     )
 endif()
@@ -149,8 +159,10 @@ target_link_libraries(jge300
 )
 
 
-if(DEFINED UNIX OR DEFINED WIN32)
-    target_link_libraries(jge300 PUBLIC SDL2::SDL2 OpenGL::GL OpenGL::GLU )
+if(NOT STANDALONE_TESTUITE)
+    if(DEFINED UNIX OR DEFINED WIN32)
+        target_link_libraries(jge300 PUBLIC SDL2::SDL2 OpenGL::GL OpenGL::GLU )
+    endif()
 endif()
 
 if(DEFINED WIN32)

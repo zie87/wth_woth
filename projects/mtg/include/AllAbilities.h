@@ -25,6 +25,8 @@
 #include <map>
 using std::map;
 
+#include <cassert>
+
 //
 // Misc classes
 //

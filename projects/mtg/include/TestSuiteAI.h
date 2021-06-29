@@ -3,12 +3,13 @@
 
 #ifdef TESTSUITE
 
-    #define MAX_TESTSUITE_ACTIONS 100
-    #define MAX_TESTUITE_CARDS 100
+#define MAX_TESTSUITE_ACTIONS 100
+#define MAX_TESTUITE_CARDS 100
 
-    #include "AIPlayerBaka.h"
+#include "AIPlayerBaka.h"
 
-    #include <wge/thread.hpp>
+#include <wge/types.hpp>
+#include <wge/thread.hpp>
 
 class TestSuiteActions {
 public:
@@ -101,6 +102,8 @@ public:
     static void ThreadProc(void* inParam);
     void setRules(Rules* rules) { mRules = rules; };
     void handleResults(bool wasAI, int error);
+
+    wge::size_t run();
 };
 
 class TestSuiteAI : public AIPlayerBaka {

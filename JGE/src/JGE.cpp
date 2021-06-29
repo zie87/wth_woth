@@ -61,12 +61,19 @@ static std::map<JButton, float> oldHolds;
 #define REPEAT_DELAY 0.5
 #define REPEAT_PERIOD 0.07
 
+int JGEGetTime() { return JGE::GetInstance()->GetTime(); }
+
 static inline bool held(const JButton sym) { return holds.end() != holds.find(sym); }
 static inline std::pair<std::pair<LocalKeySym, JButton>, bool> triplet(LocalKeySym k, JButton b, bool h) {
     return std::make_pair(std::make_pair(k, b), h);
 }
 static inline std::pair<std::pair<LocalKeySym, JButton>, bool> triplet(std::pair<LocalKeySym, JButton> p, bool h) {
     return std::make_pair(p, h);
+}
+
+int JGE::GetTime() const {
+    const auto current_time = wge::clock::now();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(current_time - m_start_time).count();
 }
 
 void JGE::PressKey(const LocalKeySym sym) {
@@ -290,10 +297,13 @@ void JGE::Init() {
     // JFileSystem::GetInstance(); Lazy loading
     // JSoundSystem::GetInstance(); let's do lazy loading
 
-    mDone = false;
-    mPaused = false;
+    mDone           = false;
+    mPaused         = false;
     mCriticalAssert = false;
+    m_start_time    = wge::clock::now();
 }
+
+
 
 u8 JGE::GetAnalogX() { return JGEGetAnalogX(); }
 
@@ -330,7 +340,7 @@ void JGE::Run() {
     while (!mDone) {
         if (!mPaused) {
             sceRtcGetCurrentTick(&curr);
-            float dt = (curr - lastTime) / (float)gTickFrequency;
+            float dt   = (curr - lastTime) / (float)gTickFrequency;
             mDeltaTime = dt;
             sceCtrlPeekBufferPositive(&gCtrlPad, 1);
             for (signed int i = sizeof(keyCodeList) / sizeof(keyCodeList[0]) - 1; i >= 0; --i) {
@@ -358,8 +368,8 @@ void JGE::Run() {
 //////////////////////////////////////////////////////////////////////////
 #else  ///// Non PSP code
 void JGE::Init() {
-    mDone = false;
-    mPaused = false;
+    mDone           = false;
+    mPaused         = false;
     mCriticalAssert = false;
     // JRenderer::GetInstance(); Lazy loading
     // JFileSystem::GetInstance(); Lazy loading
@@ -371,9 +381,6 @@ void JGE::Init() {
 
 //////////////////////////////////////////////////////////////////////////
 JGE* JGE::mInstance = nullptr;
-
-// returns number of milliseconds since game started
-int JGE::GetTime() { return JGEGetTime(); }
 
 void JGE::SetDelta(float delta) { mDeltaTime = delta; }
 
@@ -439,8 +446,8 @@ void JGE::Resume() {
 }
 
 void JGE::Assert(const char* filename, long lineNumber) {
-    mAssertFile = filename;
-    mAssertLine = lineNumber;
+    mAssertFile     = filename;
+    mAssertLine     = lineNumber;
     mCriticalAssert = true;
 }
 

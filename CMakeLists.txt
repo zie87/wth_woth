@@ -22,6 +22,11 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
+option(STANDALONE_TESTSUITE "build commandline testsuite" OFF)
+if(STANDALONE_TESTSUITE AND NOT DEFINED UNIX AND NOT DEFINED WIN32 )
+    message(FATAL_ERROR "standalone testsuite is only supported for windows or linux")
+endif()
+
 # Generate compile_commands.json to make it easier to work with clang based tools
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -41,6 +46,15 @@ enable_sanitizers(woth_options)
 
 include(StaticAnalyzers)
 
+if(NOT STANDALONE_TESTSUITE)
+    if(DEFINED PSP)
+        set(WOTH_PSP_BUILD ON)
+    else()
+        target_compile_definitions(woth_options INTERFACE "SDL_CONFIG")
+        set(WOTH_SDL_BUILD ON)
+    endif()
+endif()
+
 if(DEFINED PSP)
     target_link_libraries(woth_options INTERFACE psp::interface)
     target_compile_definitions(woth_options INTERFACE "WOTH_PLATFORM_PSP")
@@ -49,12 +63,9 @@ if(DEFINED PSP)
     target_compile_definitions(woth_options INTERFACE "PSPFW3XX")
     
     include(PspTools) 
-    set(WOTH_PSP_BUILD ON)
 elseif(DEFINED UNIX)
     target_compile_definitions(woth_options INTERFACE "WOTH_PLATFORM_UNIX")
     target_compile_definitions(woth_options INTERFACE "LINUX")
-
-    target_compile_definitions(woth_options INTERFACE "SDL_CONFIG")
 elseif(DEFINED WIN32)
     target_compile_options(woth_options INTERFACE "/wd4005")
 

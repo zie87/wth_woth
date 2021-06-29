@@ -279,6 +279,51 @@ void MTGAllCards::init() {
     initCounters();
 }
 
+void MTGAllCards::loadFolder(const std::string& infolder, const std::string& filename )
+{
+    string folder = infolder;
+
+    // Make sure the base paths finish with a '/' or a '\'
+    if (! folder.empty()) {
+                string::iterator c = folder.end();//userPath.at(userPath.size()-1);
+                c--;
+        if ((*c != '/') && (*c != '\\'))
+            folder += '/';
+    }
+
+    vector<string> files = JFileSystem::GetInstance()->scanfolder(folder);
+
+    if (!files.size())
+    {
+        return;
+    }
+
+    for (size_t i = 0; i < files.size(); ++i)
+    {
+        string afile = folder;
+        afile.append(files[i]);
+
+        if(files[i] == "." || files[i] == "..")
+            continue;
+
+        if(JFileSystem::GetInstance()->DirExists(afile))
+            loadFolder(afile, filename);
+
+        if (!JFileSystem::GetInstance()->FileExists(afile))
+            continue;
+
+        if(filename.size())
+        {
+          if(filename == files[i])
+          {
+            load(afile.c_str(), folder.c_str());
+          }
+        } else {
+          load(afile.c_str());
+        }
+    }
+}
+
 int MTGAllCards::load(const char* config_file, const char* set_name, int autoload) {
     conf_read_mode = 0;
     const int set_id = set_name ? setlist.Add(set_name) : MTGSets::INTERNAL_SET;

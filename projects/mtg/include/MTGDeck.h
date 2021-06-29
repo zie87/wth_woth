@@ -121,6 +121,8 @@ public:
 #endif
 
     MTGCard* getCardByName(std::string  name);
+    void loadFolder(const string& folder, const string& filename="" );
+
     int load(const char* config_file, const char* setName = NULL, int autoload = 1);
     int countByType(const char* _type);
     int countByColor(int color);
@@ -155,6 +157,9 @@ public:
 
     static void loadInstance();
     static void unloadAll();
+
+    
+
     static inline MTGAllCards* getInstance() { return instance; };
 
 private:

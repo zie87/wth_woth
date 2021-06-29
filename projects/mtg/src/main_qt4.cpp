@@ -45,7 +45,6 @@ bool JGEToggleFullscreen() {
     return true;
 }
 
-int JGEGetTime() { return (int)WagicCore::g_startTimer.elapsed(); }
 
 int main(int argc, char* argv[]) {
     QScopedPointer<QApplication> app

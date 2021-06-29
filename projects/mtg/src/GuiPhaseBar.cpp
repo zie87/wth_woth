@@ -112,7 +112,7 @@ void GuiPhaseBar::Render() {
     // print phase name
     WFont* font = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
     string currentP = _("your turn");
-    string interrupt = "";
+    string interrupt;
     if (observer->currentPlayer == observer->players[1]) {
         currentP = _("opponent's turn");
     }

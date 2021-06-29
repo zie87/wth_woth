@@ -31,7 +31,7 @@ using namespace std;
 //////////////////////////////////////////////////////////////////////
 
 filesystem* izfstream::pDefaultFS = nullptr;
-string filesystem::CurrentZipName = "";
+string filesystem::CurrentZipName;
 ifstream filesystem::CurrentZipFile;
 filesystem* filesystem::pCurrentFS = nullptr;
 std::vector<filesystem::pooledBuffer*> filesystem::m_Buffers;

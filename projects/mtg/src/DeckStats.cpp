@@ -110,7 +110,7 @@ void DeckStats::load(const std::string& filename) {
         }
         // check if this player deck has already been profiled for manacolors
         char next = stream.peek();
-        string manaColorIndex = "";
+        string manaColorIndex;
         if (next == 'M') {
             std::getline(stream, s);
             manaColorIndex = s.substr(s.find(":") + 1);
@@ -144,7 +144,7 @@ void DeckStats::save(const std::string& filename) {
         char writer[512];
         map<string, DeckStat*> stats = masterDeckStats[currentDeck];
         map<string, DeckStat*>::iterator it;
-        string manaColorIndex = "";
+        string manaColorIndex;
         int deckId = atoi(filename.substr(filename.find("_deck") + 5, filename.find(".txt")).c_str());
         char buffer[512];
         sprintf(buffer, "deck%i.txt", deckId);
@@ -182,7 +182,7 @@ void DeckStats::saveStats(Player* player, Player* opponent, GameObserver* game) 
     load(currentDeck);
     map<string, DeckStat*>* stats = &masterDeckStats[currentDeck];
     auto it                       = stats->find(opponent->deckFileSmall);
-    string manaColorIndex = "";
+    string manaColorIndex;
     DeckManager* deckManager = DeckManager::GetInstance();
     DeckMetaData* aiDeckMeta = deckManager->getDeckMetaDataByFilename(opponent->deckFile, true);
     StatsWrapper* stw = deckManager->getExtendedDeckStats(aiDeckMeta, MTGAllCards::getInstance(), true);

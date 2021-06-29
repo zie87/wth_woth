@@ -14,7 +14,7 @@
 #include <wge/log.hpp>
 
 Player::Player(GameObserver* observer, string file, string fileSmall, MTGDeck* deck)
-    : Damageable(observer, 20), mAvatarName(""), offerInterruptOnPhase(MTG_PHASE_DRAW) {
+    : Damageable(observer, 20), offerInterruptOnPhase(MTG_PHASE_DRAW) {
     if (deck == nullptr && file != "testsuite" && file != "remote" && file != "")
         deck = NEW MTGDeck(file.c_str(), MTGCollection());
 

@@ -118,7 +118,7 @@ SimpleKey* SimplePad::Add(string display, unsigned char id) {
     return keys[nbitems - 1];
 }
 void SimplePad::pressKey(unsigned char key) {
-    string input = "";
+    string input;
 
     if (isalpha(key)) {
         if (bCapslock)

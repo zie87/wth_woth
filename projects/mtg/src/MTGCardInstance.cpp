@@ -867,7 +867,7 @@ const string& MTGCardInstance::getSample() {
         }
     }
 
-    string type = "";
+    string type;
     if (!types.size()) return sample;
     type = MTGAllCards::findType(types[0]);
     std::transform(type.begin(), type.end(), type.begin(), ::tolower);

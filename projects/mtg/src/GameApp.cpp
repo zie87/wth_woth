@@ -39,8 +39,8 @@
 PlayerType GameApp::players[] = {PLAYER_TYPE_CPU, PLAYER_TYPE_CPU};
 bool GameApp::HasMusic = true;
 JMusic* GameApp::music           = nullptr;
-string GameApp::currentMusicFile = "";
-string GameApp::systemError = "";
+string GameApp::currentMusicFile;
+string GameApp::systemError;
 
 vector<JQuadPtr> manaIcons;
 
@@ -93,7 +93,7 @@ void GameApp::Create() {
     WGE_LOG_TRACE("starting Game");
 
     string systemFolder = "Res/";
-    string foldersRoot = "";
+    string foldersRoot;
 
     // Find the Res folder
     std::ifstream mfile("Res.txt");

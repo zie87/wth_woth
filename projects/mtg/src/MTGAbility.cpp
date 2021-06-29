@@ -341,10 +341,10 @@ int AbilityFactory::countCards(TargetChooser* tc, Player* player, int option) {
 Counter* AbilityFactory::parseCounter(string s, MTGCardInstance* target, Spell* spell) {
     int nb = 1;
     int maxNb = 0;
-    string name = "";
+    string name;
     string nbstr = "1";
     string maxNbstr = "0";
-    string spt = "";
+    string spt;
 
     vector<string> splitCounter = split(s, ',');
     vector<string> splitCounterCheck = split(s, '.');
@@ -836,7 +836,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     // TODO: store string values of "&&" so we can remove the classes added just to add support
     // the current parser finds other abilities inside what should be nested abilities, and converts them into
     // actual abilities, this is a limitation.
-    string unchangedS = "";
+    string unchangedS;
     unchangedS.append(s);
     found = s.find("transforms((");
     if (found != string::npos && storedString.empty()) {
@@ -909,13 +909,13 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     }
 
     int restrictions = parseRestriction(s);
-    string castRestriction = "";
+    string castRestriction;
     if (s.find("restriction{") != string::npos)  // using other/cast restrictions for abilities.
     {
         vector<string> splitRest = parseBetween(s, "restriction{", "}");
         if (splitRest.size()) castRestriction = splitRest[1];
     }
-    string newName = "";
+    string newName;
     vector<string> splitName = parseBetween(s, "name(", ")");
     if (splitName.size()) {
         newName = splitName[1];
@@ -927,7 +927,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
 
     TargetChooser* tc = nullptr;
     string sWithoutTc = s;
-    string tcString = "";
+    string tcString;
     // Target Abilities - We also handle the case "notatarget" here, for things such as copy effects
     bool isTarget = true;
     vector<string> splitTarget = parseBetween(s, "notatarget(", ")");
@@ -962,7 +962,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
             // grabbing the sideffect string and amount before parsing abilities.
             // side effect ei:dragond whelp.
             MTGAbility* sideEffect      = nullptr;
-            string usesBeforeSideEffect = "";
+            string usesBeforeSideEffect;
             size_t limiteffect_str = s1.find("limit^");
             if (limiteffect_str != string::npos) {
                 size_t end = s1.rfind("^");
@@ -979,7 +979,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
                 WGE_LOG_ERROR("Error parsing: {}", sWithoutTc);
                 return nullptr;
             }
-            string limit = "";
+            string limit;
             size_t limit_str = sWithoutTc.find("limit:");
             if (limit_str != string::npos) {
                 limit = sWithoutTc.substr(limit_str + 6);
@@ -1517,7 +1517,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     if (splitToken.size()) {
         WParsedInt* multiplier = nullptr;
         size_t star = s.find("*");
-        string starfound = "";
+        string starfound;
         if (star != string::npos) {
             starfound = s.substr(star + 1);
             size_t starEnd = starfound.find_first_of(" ");
@@ -1638,8 +1638,8 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     // clone
     found = s.find("clone");
     if (found != string::npos) {
-        string with = "";
-        string types = "";
+        string with;
+        string types;
         vector<string> splitWith = parseBetween(s, "with(", ")");
         if (splitWith.size()) {
             with = splitWith[1];
@@ -1714,8 +1714,8 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     for (size_t i = 0; i < sizeof(preventDamageTypes) / sizeof(preventDamageTypes[0]); ++i) {
         found = s.find(preventDamageKeywords[i]);
         if (found != string::npos) {
-            string to = "";
-            string from = "";
+            string to;
+            string from;
 
             vector<string> splitTo = parseBetween(s, "to(", ")");
             if (splitTo.size()) to = splitTo[1];
@@ -1939,7 +1939,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
         string power, toughness;
         vector<string> splitPhaseAlter2 = split(splitPhaseAlter[1], ',');
         if (splitPhaseAlter2.size() < 3) return nullptr;
-        string after = "";
+        string after;
         if (splitPhaseAlter2.size() > 3) {
             vector<string> splitPhaseAlterAfter = parseBetween(splitPhaseAlter2[3], "after<", ">");
             if (splitPhaseAlterAfter.size()) after = splitPhaseAlterAfter[1];
@@ -2030,8 +2030,8 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     if (splitBecomes.size()) {
         vector<string> becomesParameters = split(splitBecomes[1], ',');
         string stypes = becomesParameters[0];
-        string newPower = "";
-        string newToughness = "";
+        string newPower;
+        string newToughness;
         bool ptFound = false;
         if (becomesParameters.size() > 1) {
             vector<string> pt = split(becomesParameters[1], '/');
@@ -2041,7 +2041,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
                 ptFound = true;
             }
         }
-        string sabilities = "";
+        string sabilities;
         unsigned int becomesSize = ptFound ? 2 : 1;
         if (becomesParameters.size() > becomesSize) {
             for (unsigned int i = becomesSize; i < becomesParameters.size(); i++) {
@@ -2083,8 +2083,8 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     // TODO: cleanup this block, it's a rats nest
     found = s.find("transforms((");
     if (found != string::npos) {
-        string extraTransforms = "";
-        string transformsParamsString = "";
+        string extraTransforms;
+        string transformsParamsString;
         transformsParamsString.append(storedString);  // the string between found and real end is removed at start.
 
         found = transformsParamsString.find("transforms((");
@@ -2099,9 +2099,9 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
 
         string sabilities = transformsParamsString.substr(stypes.length());
         bool newpowerfound = false;
-        string newpower = "";
+        string newpower;
         bool newtoughnessfound = false;
-        string newtoughness = "";
+        string newtoughness;
         vector<string> abilities = split(sabilities, ',');
         bool newAbilityFound = false;
         vector<string> newAbilitiesList;
@@ -2143,7 +2143,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     // flip
     vector<string> splitFlipStat = parseBetween(s, "flip(", ")", true);
     if (splitFlipStat.size()) {
-        string flipStats = "";
+        string flipStats;
         if (splitFlipStat[1].size()) {
             /*vector<string>FlipStats = split(splitFlipStat[1],'%');*/
             flipStats = splitFlipStat[1];
@@ -2232,7 +2232,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     vector<string> splitNewAffinity = parseBetween(s, "affinity(", ")");
     if (splitNewAffinity.size()) {
         string tcString = splitNewAffinity[1];
-        string manaString = "";
+        string manaString;
         vector<string> splitNewAffinityMana = parseBetween(splitNewAffinity[2], "reduce(", ")");
         if (splitNewAffinityMana.size()) manaString = splitNewAffinityMana[1];
         if (!manaString.size()) return nullptr;

@@ -766,7 +766,7 @@ void GameObserver::Affinity() {
             if (!card) continue;
 
             int color   = 0;
-            string type = "";
+            string type;
             // only do any of the following if a card with the stated ability is in your hand.
             auto* original = NEW ManaCost();
             original->copy(card->model->data->getManaCost());

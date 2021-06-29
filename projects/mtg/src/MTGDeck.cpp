@@ -173,7 +173,7 @@ int MTGAllCards::processConfLine(string& s, MTGCard* card, CardPrimitive* primit
                 string value = val;
                 std::transform(value.begin(), value.end(), value.begin(), ::tolower);
                 size_t name = value.find("name(");
-                string theName = "";
+                string theName;
                 if (name != string::npos) {
                     size_t endName = value.find(")", name);
                     theName = value.substr(name + 5, endName - name - 5);

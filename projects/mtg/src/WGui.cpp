@@ -1868,8 +1868,7 @@ WGuiKeyBinder::WGuiKeyBinder(string name, GameStateOptions* parent)
       modal(false),
       confirmed(CONFIRM_NEED),
       confirmingKey(LOCAL_KEY_NONE),
-      confirmingButton(JGE_BTN_NONE),
-      confirmationString("") {
+      confirmingButton(JGE_BTN_NONE) {
     JGE* j = JGE::GetInstance();
     auto start = j->KeyBindings_begin(), end = j->KeyBindings_end();
 

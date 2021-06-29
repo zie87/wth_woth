@@ -348,7 +348,7 @@ void CardGui::AlternateRender(MTGCard* card, const Pos& pos) {
     WFont* font = WResourceManager::Instance()->GetWFont(Fonts::MAGIC_FONT);
     float backup_scale = font->GetScale();
     font->SetColor(ARGB((int)pos.actA, 0, 0, 0));
-    string sFormattedData = "";
+    string sFormattedData;
 
     for (size_t i = 0; i < Carditems.size(); i++) {
         ModRulesRenderCardGuiItem* Carditem = Carditems[i];
@@ -495,7 +495,7 @@ void CardGui::AlternateRender(MTGCard* card, const Pos& pos) {
 
                 found = Carditem->mName.find("types");  // types
                 if (found != string::npos) {
-                    string s = "";
+                    string s;
                     for (int i = card->data->types.size() - 1; i > 0; --i) {
                         if (card->data
                                 ->basicAbilities[(int)Constants::CHANGELING]) {  // this avoids drawing the list of
@@ -611,7 +611,7 @@ void CardGui::TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad) {
 
     WFont* font = WResourceManager::Instance()->GetWFont(Fonts::MAGIC_FONT);
     float backup_scale = font->GetScale();
-    string sFormattedData = "";
+    string sFormattedData;
     for (size_t i = 0; i < Carditems.size(); i++) {
         ModRulesRenderCardGuiItem* Carditem = Carditems[i];
         if (Carditem->mFilter.length() == 0 || FilterCard(card, Carditem->mFilter)) {
@@ -758,7 +758,7 @@ void CardGui::TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad) {
 
                 found = Carditem->mName.find("types");  // types
                 if (found != string::npos) {
-                    string s = "";
+                    string s;
                     for (int i = card->data->types.size() - 1; i > 0; --i) {
                         if (card->data
                                 ->basicAbilities[(int)Constants::CHANGELING]) {  // this avoids drawing the list of
@@ -1127,7 +1127,7 @@ void CardGui::RenderCountersBig(MTGCard* mtgcard, const Pos& pos, int drawMode) 
 
         char buf[512];
         bool renderText = true;
-        string gfx = "";
+        string gfx;
         // TODO cache the gfx fetch results?
         if (c->name.size()) {
             if (c->nb < 6)  // we only render a counter's specific quad if there are 5 counters of this type or less.

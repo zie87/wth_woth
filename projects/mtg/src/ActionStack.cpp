@@ -132,7 +132,7 @@ void StackAbility::Render() {
     }
 
     JQuadPtr quad;
-    string alt2 = "";
+    string alt2;
     if (target) {
         quad = target->getIcon();
         if (target->type_as_damageable == DAMAGEABLE_MTGCARDINSTANCE) {
@@ -310,9 +310,9 @@ int Spell::getNbTargets() {
 
 void Spell::Render() {
     string action = source->getName();
-    string alt1 = "";
+    string alt1;
 
-    string alt2 = "";
+    string alt2;
     Damageable* target = getNextDamageableTarget();
     JQuadPtr quad;
     if (target) {
@@ -1025,7 +1025,7 @@ void ActionStack::Render() {
 }
 
 void Interruptible::Dump() {
-    string stype, sstate, sdisplay = "";
+    string stype, sstate, sdisplay;
     switch (type) {
     case ACTION_SPELL:
         stype = "spell";

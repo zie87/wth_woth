@@ -299,7 +299,7 @@ unsigned long hash_djb2(const char* str) {
 }
 
 std::string buildFilePath(const vector<string>& folders, const string& filename) {
-    string result = "";
+    string result;
     for (size_t i = 0; i < folders.size(); ++i) {
         result.append(folders[i]);
         if (result[result.length() - 1] != '/') {

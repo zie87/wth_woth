@@ -334,7 +334,7 @@ void DeckMenu::Add(int id, const char* text, string desc, bool forceFocus, DeckM
                                       (mCount == 0), mAutoTranslate, deckMetaData);
     Translator* t = Translator::GetInstance();
     auto it                = t->deckValues.find(text);
-    string deckDescription = "";
+    string deckDescription;
 
     if (it != t->deckValues.end())  // translate decks desc
         deckDescription = it->second;

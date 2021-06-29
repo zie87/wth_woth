@@ -102,11 +102,10 @@ zbuffer_stored* zbuffer_stored::open(const char* Filename, streamoff Offset, str
 zbuffer_stored* zbuffer_stored::close() {
     if (!m_Opened)
         return nullptr;
-    else {
-        m_Opened = false;
-        m_Used = false;
-        m_ZipFile.close();
-    }
+
+    m_Opened = false;
+    m_Used   = false;
+    m_ZipFile.close();
 
     return this;
 }
@@ -225,14 +224,13 @@ zbuffer_deflated* zbuffer_deflated::open(const char* Filename, streamoff Offset,
 zbuffer_deflated* zbuffer_deflated::close() {
     if (!m_Opened)
         return nullptr;
-    else {
-        m_Opened = false;
-        m_Used = false;
-        m_ZipFile.close();
 
-        // z_stream unitialization.
-        if (inflateEnd(&m_ZStream) != Z_OK) return nullptr;
-    }
+    m_Opened = false;
+    m_Used   = false;
+    m_ZipFile.close();
+
+    // z_stream unitialization.
+    if (inflateEnd(&m_ZStream) != Z_OK) return nullptr;
 
     return this;
 }

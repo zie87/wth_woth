@@ -441,7 +441,8 @@ void GameStateShop::Update(float dt) {
                 if (btn == JGE_BTN_SEC || btn == JGE_BTN_CANCEL || btn == JGE_BTN_PREV) {
                     taskList->End();
                     return;
-                } else if (taskList->getState() == TaskList::TASKS_ACTIVE && btn == JGE_BTN_MENU) {
+                }
+                if (taskList->getState() == TaskList::TASKS_ACTIVE && btn == JGE_BTN_MENU) {
                     if (!menu) {
                         menu =
                             NEW SimpleMenu(JGE::GetInstance(), 11, this, Fonts::MENU_FONT, SCREEN_WIDTH / 2 - 100, 20);
@@ -512,7 +513,8 @@ void GameStateShop::Update(float dt) {
             }
             mStage = STAGE_SHOP_MENU;
             return;
-        } else if (btn == JGE_BTN_CTRL)
+        }
+        if (btn == JGE_BTN_CTRL)
             beginFilters();
         else if (btn == JGE_BTN_NEXT) {
             mStage = STAGE_SHOP_TASKS;
@@ -531,25 +533,22 @@ void GameStateShop::Update(float dt) {
             srcCards->Shuffle();
             load();
             disablePurchase = false;
-            clearInput = true;
+            clearInput      = true;
             return;
 
         } else if (btn == JGE_BTN_CANCEL)
             options[Options::DISABLECARDS].number = !options[Options::DISABLECARDS].number;
         else if (btn == JGE_BTN_SEC) {
-            bListCards = !bListCards;
+            bListCards      = !bListCards;
             disablePurchase = false;
-            clearInput = true;
+            clearInput      = true;
             return;
         } else if (shopMenu) {
-
-            if ((btn == JGE_BTN_OK) && (cycleCardsButton->ButtonPressed() || showCardListButton->ButtonPressed()))
-            {
+            if ((btn == JGE_BTN_OK) && (cycleCardsButton->ButtonPressed() || showCardListButton->ButtonPressed())) {
                 disablePurchase = true;
                 return;
             } else {
-                if (shopMenu->CheckUserInput(btn))
-                srcCards->Touch();
+                if (shopMenu->CheckUserInput(btn)) srcCards->Touch();
             }
         }
         if (shopMenu) shopMenu->Update(dt);
@@ -775,8 +774,7 @@ void ShopBooster::randomize(MTGPacks* packlist) {
 int ShopBooster::basePrice() {
     if (pack)
         return pack->getPrice();
-    else if (altSet)
-        return Constants::PRICE_MIXED_BOOSTER;
+    if (altSet) return Constants::PRICE_MIXED_BOOSTER;
     return Constants::PRICE_BOOSTER;
 }
 void ShopBooster::randomCustom(MTGPacks* packlist) {

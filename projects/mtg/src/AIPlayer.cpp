@@ -50,8 +50,9 @@ int AIAction::Act() {
         if (target && !mAbilityTargets.size()) {
             g->cardClick(target);
             return 1;
-        } else if (playerAbilityTarget && !mAbilityTargets.size()) {
-            g->cardClick(nullptr, (Player*)playerAbilityTarget);
+        }
+        if (playerAbilityTarget && !mAbilityTargets.size()) {
+            g->cardClick(nullptr, dynamic_cast<Player*>(playerAbilityTarget));
             return 1;
         }
         if (mAbilityTargets.size()) {
@@ -73,7 +74,7 @@ int AIAction::clickMultiAct(vector<Targetable*>& actionTargets) {
     if (!tc) return 0;
     auto ite = actionTargets.begin();
     while (ite != actionTargets.end()) {
-        MTGCardInstance* card = ((MTGCardInstance*)(*ite));
+        MTGCardInstance* card = (dynamic_cast<MTGCardInstance*>(*ite));
         if (card == (MTGCardInstance*)tc->source)  // click source first.
         {
             g->cardClick(card);
@@ -129,7 +130,8 @@ int AIPlayer::clickMultiTarget(TargetChooser* tc, vector<Targetable*>& potential
             WGE_LOG_TRACE("Ai clicked source as a target: {}", (card ? card->name : "None"));
             ite = potentialTargets.erase(ite);
             continue;
-        } else if (auto* pTarget = dynamic_cast<Player*>(*ite)) {
+        }
+        if (auto* pTarget = dynamic_cast<Player*>(*ite)) {
             clickstream.push(NEW AIAction(this, pTarget));
             WGE_LOG_TRACE("Ai clicked Player as a target");
             ite = potentialTargets.erase(ite);
@@ -285,14 +287,13 @@ int AIPlayer::countTotalDecks(int lower, int higher, int current) {
         int newlower = current;
         int newcurrent = higher ? (higher + newlower) / 2 : current * 2;
         return countTotalDecks(newlower, higher, newcurrent);
-    } else {
-        if (!lower) return 0;
-        if (lower == current - 1) return lower;
-
-        int newhigher = current;
-        int newcurrent = (lower + newhigher) / 2;
-        return countTotalDecks(lower, newhigher, newcurrent);
     }
+    if (!lower) return 0;
+    if (lower == current - 1) return lower;
+
+    int newhigher  = current;
+    int newcurrent = (lower + newhigher) / 2;
+    return countTotalDecks(lower, newhigher, newcurrent);
 }
 
 void AIPlayer::invalidateTotalAIDecks() { totalAIDecks = -1; }

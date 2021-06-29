@@ -69,7 +69,7 @@ int Damage::resolve() {
 
     //-------------------------------------------------
     if (target->type_as_damageable == DAMAGEABLE_MTGCARDINSTANCE) {
-        auto* _target = (MTGCardInstance*)target;
+        auto* _target = dynamic_cast<MTGCardInstance*>(target);
         if ((_target)->protectedAgainst(source)) damage = 0;
         // rulings = 10/4/2004	The damage prevention ability works even if it has no counters, as long as some effect
         // keeps its toughness above zero. these creature are essentially immune to damage. however 0/-1 effects applied
@@ -113,7 +113,7 @@ int Damage::resolve() {
     if (target->type_as_damageable == DAMAGEABLE_MTGCARDINSTANCE &&
         (source->has(Constants::WITHER) || source->has(Constants::INFECT))) {
         // Damage for WITHER or poison on creatures. This should probably go in replacement effects
-        auto* _target = (MTGCardInstance*)target;
+        auto* _target = dynamic_cast<MTGCardInstance*>(target);
         for (int i = 0; i < damage; i++) {
             _target->counters->addCounter(-1, -1);
         }
@@ -122,7 +122,7 @@ int Damage::resolve() {
     } else if (target->type_as_damageable == DAMAGEABLE_PLAYER &&
                (source->has(Constants::INFECT) || source->has(Constants::POISONDAMAGER))) {
         // Poison on player
-        auto* _target = (Player*)target;
+        auto* _target = dynamic_cast<Player*>(target);
         if (!_target->inPlay()->hasAbility(Constants::POISONSHROUD))
             _target->poisonCount += damage;  // this will be changed to poison counters.
         _target->damageCount += damage;
@@ -130,7 +130,7 @@ int Damage::resolve() {
                (source->has(Constants::POISONTOXIC) || source->has(Constants::POISONTWOTOXIC) ||
                 source->has(Constants::POISONTHREETOXIC))) {
         // Damage + 1, 2, or 3 poison counters on player
-        auto* _target = (Player*)target;
+        auto* _target = dynamic_cast<Player*>(target);
         a = target->dealDamage(damage);
         target->damageCount += damage;
         if (!_target->inPlay()->hasAbility(Constants::POISONSHROUD)) {
@@ -149,7 +149,7 @@ int Damage::resolve() {
         a = target->dealDamage(damage);
         target->damageCount += 1;
         if (target->type_as_damageable == DAMAGEABLE_MTGCARDINSTANCE)
-            ((MTGCardInstance*)target)->wasDealtDamage = true;
+            (dynamic_cast<MTGCardInstance*>(target))->wasDealtDamage = true;
         if (target->type_as_damageable == DAMAGEABLE_PLAYER) {
             if (target == source->controller()) {
                 ((MTGCardInstance*)source)->damageToController = true;
@@ -157,7 +157,7 @@ int Damage::resolve() {
                 ((MTGCardInstance*)source)->damageToOpponent = true;
             }
             target->lifeLostThisTurn += damage;
-            WEvent* lifed = NEW WEventLife((Player*)target, -damage);
+            WEvent* lifed = NEW WEventLife(dynamic_cast<Player*>(target), -damage);
             observer->receiveEvent(lifed);
         }
     }
@@ -187,7 +187,7 @@ void Damage::Render() {
         renderer->RenderQuad(quad.get(), x + 150, y, 0, scale, scale);
     } else {
         if (target->type_as_damageable == DAMAGEABLE_MTGCARDINSTANCE)
-            mFont->DrawString(_(((MTGCardInstance*)target)->getName()).c_str(), x + 120, y);
+            mFont->DrawString(_((dynamic_cast<MTGCardInstance*>(target))->getName()).c_str(), x + 120, y);
     }
 }
 
@@ -210,7 +210,7 @@ DamageStack::DamageStack(GameObserver* observer) : GuiLayer(observer), Interrupt
  */
 int DamageStack::resolve() {
     for (int i = (int)(mObjects.size()) - 1; i >= 0; i--) {
-        auto* damage = (Damage*)mObjects[i];
+        auto* damage = dynamic_cast<Damage*>(mObjects[i]);
         if (damage->state == NOT_RESOLVED) damage->resolve();
     }
     ((Interruptible*)this)->getObserver()->receiveEvent(NEW WEventDamageStackResolved());
@@ -222,7 +222,7 @@ int DamageStack::receiveEvent(WEvent* e) {
     if (!event) return 0;
 
     for (int i = (int)(mObjects.size()) - 1; i >= 0; i--) {
-        auto* damage = (Damage*)mObjects[i];
+        auto* damage = dynamic_cast<Damage*>(mObjects[i]);
         if (damage->state == RESOLVED_OK) damage->target->afterDamage();
     }
     return 1;
@@ -231,7 +231,7 @@ int DamageStack::receiveEvent(WEvent* e) {
 void DamageStack::Render() {
     float currenty = y;
     for (auto& mObject : mObjects) {
-        auto* damage = (Damage*)mObject;
+        auto* damage = dynamic_cast<Damage*>(mObject);
         if (damage->state == NOT_RESOLVED) {
             damage->x = x;
             damage->y = currenty;

@@ -128,7 +128,7 @@ void StackAbility::Render() {
     }
     Damageable* target = nullptr;
     if (_target != ability->source && (dynamic_cast<MTGCardInstance*>(_target) || dynamic_cast<Player*>(_target))) {
-        target = (Damageable*)_target;
+        target = dynamic_cast<Damageable*>(_target);
     }
 
     JQuadPtr quad;
@@ -136,7 +136,7 @@ void StackAbility::Render() {
     if (target) {
         quad = target->getIcon();
         if (target->type_as_damageable == DAMAGEABLE_MTGCARDINSTANCE) {
-            alt2 = ((MTGCardInstance*)target)->name;
+            alt2 = (dynamic_cast<MTGCardInstance*>(target))->name;
         }
     }
 
@@ -318,7 +318,7 @@ void Spell::Render() {
     if (target) {
         quad = target->getIcon();
         if (target->type_as_damageable == DAMAGEABLE_MTGCARDINSTANCE) {
-            alt2 = ((MTGCardInstance*)target)->name;
+            alt2 = (dynamic_cast<MTGCardInstance*>(target))->name;
         }
     }
     Interruptible::Render(source, quad.get(), alt1, alt2, action, true);
@@ -528,7 +528,7 @@ Spell* ActionStack::addSpell(MTGCardInstance* _source, TargetChooser* tc, ManaCo
 Interruptible* ActionStack::getAt(int id) {
     if (id < 0) id = mObjects.size() + id;
     if (id > (int)(mObjects.size()) - 1 || id < 0) return nullptr;
-    return (Interruptible*)mObjects[id];
+    return dynamic_cast<Interruptible*>(mObjects[id]);
 }
 
 ActionStack::ActionStack(GameObserver* game) : GuiLayer(game), currentTutorial(nullptr) {
@@ -551,8 +551,8 @@ ActionStack::ActionStack(GameObserver* game) : GuiLayer(game), currentTutorial(n
 
 int ActionStack::has(MTGAbility* ability) {
     for (auto& mObject : mObjects) {
-        if (((Interruptible*)mObject)->type == ACTION_ABILITY) {
-            StackAbility* action = ((StackAbility*)mObject);
+        if ((dynamic_cast<Interruptible*>(mObject))->type == ACTION_ABILITY) {
+            StackAbility* action = (dynamic_cast<StackAbility*>(mObject));
             if (action->state == NOT_RESOLVED && action->ability == ability) return 1;
         }
     }
@@ -577,7 +577,7 @@ int ActionStack::resolve() {
     } else {
         action->state = RESOLVED_NOK;
     }
-    if (action->type == ACTION_DAMAGE) ((Damage*)action)->target->afterDamage();
+    if (action->type == ACTION_DAMAGE) (dynamic_cast<Damage*>(action))->target->afterDamage();
     if (!getNext(nullptr, NOT_RESOLVED)) {
         for (auto& i : interruptDecision) {
             if (i != 2) i = NOT_DECIDED;
@@ -594,14 +594,14 @@ int ActionStack::resolve() {
 Interruptible* ActionStack::getPrevious(Interruptible* next, int type, int state, int display) {
     int n = getPreviousIndex(next, type, state, display);
     if (n == -1) return nullptr;
-    return ((Interruptible*)mObjects[n]);
+    return (dynamic_cast<Interruptible*>(mObjects[n]));
 }
 
 int ActionStack::getPreviousIndex(Interruptible* next, int type, int state, int display) {
     int found = 0;
     if (!next) found = 1;
     for (int i = (int)(mObjects.size()) - 1; i >= 0; i--) {
-        auto* current = (Interruptible*)mObjects[i];
+        auto* current = dynamic_cast<Interruptible*>(mObjects[i]);
         if (found && (type == 0 || current->type == type) && (state == 0 || current->state == state) &&
             (display == -1 || current->display == display)) {
             return i;
@@ -615,7 +615,7 @@ int ActionStack::getPreviousIndex(Interruptible* next, int type, int state, int 
 int ActionStack::count(int type, int state, int display) {
     int result = 0;
     for (auto& mObject : mObjects) {
-        auto* current = (Interruptible*)mObject;
+        auto* current = dynamic_cast<Interruptible*>(mObject);
         if ((type == 0 || current->type == type) && (state == 0 || current->state == state) &&
             (display == -1 || current->display == display)) {
             result++;
@@ -627,7 +627,7 @@ int ActionStack::count(int type, int state, int display) {
 Interruptible* ActionStack::getActionElementFromCard(MTGCardInstance* card) {
     if (!card) return nullptr;
     for (auto& mObject : mObjects) {
-        auto* current = (Interruptible*)mObject;
+        auto* current = dynamic_cast<Interruptible*>(mObject);
         if (current->source == card) {
             return current;
         }
@@ -638,14 +638,14 @@ Interruptible* ActionStack::getActionElementFromCard(MTGCardInstance* card) {
 Interruptible* ActionStack::getNext(Interruptible* previous, int type, int state, int display) {
     int n = getNextIndex(previous, type, state, display);
     if (n == -1) return nullptr;
-    return ((Interruptible*)mObjects[n]);
+    return (dynamic_cast<Interruptible*>(mObjects[n]));
 }
 
 int ActionStack::getNextIndex(Interruptible* previous, int type, int state, int display) {
     int found = 0;
     if (!previous) found = 1;
     for (size_t i = 0; i < mObjects.size(); i++) {
-        auto* current = (Interruptible*)mObjects[i];
+        auto* current = dynamic_cast<Interruptible*>(mObjects[i]);
         if (found && (type == 0 || current->type == type) && (state == 0 || current->state == state) &&
             (display == -1 || current->display == display)) {
             return i;
@@ -658,7 +658,7 @@ int ActionStack::getNextIndex(Interruptible* previous, int type, int state, int 
 
 Interruptible* ActionStack::getLatest(int state) {
     for (int i = (int)(mObjects.size()) - 1; i >= 0; i--) {
-        Interruptible* action = ((Interruptible*)mObjects[i]);
+        Interruptible* action = (dynamic_cast<Interruptible*>(mObjects[i]));
         if (action->state == state) return action;
     }
     return nullptr;
@@ -667,7 +667,7 @@ Interruptible* ActionStack::getLatest(int state) {
 int ActionStack::receiveEventPlus(WEvent* event) {
     int result = 0;
     for (auto& mObject : mObjects) {
-        auto* current = (Interruptible*)mObject;
+        auto* current = dynamic_cast<Interruptible*>(mObject);
         result += current->receiveEvent(event);
     }
     return result;
@@ -692,7 +692,7 @@ void ActionStack::Update(float dt) {
         checked = 1;
 
         for (size_t i = 0; i < mObjects.size(); i++) {
-            auto* current = (Interruptible*)mObjects[i];
+            auto* current = dynamic_cast<Interruptible*>(mObjects[i]);
             if (tc->canTarget(current)) {
                 if (mCurr < (int)mObjects.size() && mObjects[mCurr]) mObjects[mCurr]->Leaving(JGE_BTN_UP);
                 current->display = 1;
@@ -814,7 +814,8 @@ bool ActionStack::CheckUserInput(JButton inputKey) {
             if (JGE_BTN_SEC == key && gModRules.game.canInterrupt()) {
                 setIsInterrupting(askIfWishesToInterrupt);
                 return true;
-            } else if ((JGE_BTN_OK == key) || (trigger == key)) {
+            }
+            if ((JGE_BTN_OK == key) || (trigger == key)) {
                 cancelInterruptOffer();
                 return true;
             } else if ((JGE_BTN_PRI == key)) {
@@ -822,7 +823,8 @@ bool ActionStack::CheckUserInput(JButton inputKey) {
                 return true;
             }
             return true;
-        } else if (observer->isInterrupting) {
+        }
+        if (observer->isInterrupting) {
             if (JGE_BTN_SEC == key) {
                 endOfInterruption();
                 return true;
@@ -832,7 +834,7 @@ bool ActionStack::CheckUserInput(JButton inputKey) {
         if (modal) {
             if (JGE_BTN_UP == key) {
                 if (mObjects[mCurr]) {
-                    int n = getPreviousIndex(((Interruptible*)mObjects[mCurr]), 0, 0, 1);
+                    int n = getPreviousIndex((dynamic_cast<Interruptible*>(mObjects[mCurr])), 0, 0, 1);
                     if (n != -1 && n != mCurr && mObjects[mCurr]->Leaving(JGE_BTN_UP)) {
                         mCurr = n;
                         mObjects[mCurr]->Entering();
@@ -840,9 +842,10 @@ bool ActionStack::CheckUserInput(JButton inputKey) {
                     }
                 }
                 return true;
-            } else if (JGE_BTN_DOWN == key) {
+            }
+            if (JGE_BTN_DOWN == key) {
                 if (mObjects[mCurr]) {
-                    int n = getNextIndex(((Interruptible*)mObjects[mCurr]), 0, 0, 1);
+                    int n = getNextIndex((dynamic_cast<Interruptible*>(mObjects[mCurr])), 0, 0, 1);
                     if (n != -1 && n != mCurr && mObjects[mCurr]->Leaving(JGE_BTN_DOWN)) {
                         mCurr = n;
                         mObjects[mCurr]->Entering();
@@ -853,7 +856,7 @@ bool ActionStack::CheckUserInput(JButton inputKey) {
             } else if (JGE_BTN_OK == key) {
                 WGE_LOG_TRACE("ACTIONSTACK CLICKED {}", mCurr);
 
-                observer->stackObjectClicked(((Interruptible*)mObjects[mCurr]));
+                observer->stackObjectClicked((dynamic_cast<Interruptible*>(mObjects[mCurr])));
                 return true;
             }
             return true;  // Steal the input to other layers if we're visible
@@ -874,7 +877,7 @@ int ActionStack::garbageCollect() {
     auto iter = mObjects.begin();
 
     while (iter != mObjects.end()) {
-        Interruptible* current = ((Interruptible*)*iter);
+        Interruptible* current = (dynamic_cast<Interruptible*>(*iter));
         if (current->state != NOT_RESOLVED) {
             auto* amp = dynamic_cast<AManaProducer*>(current);
             if (amp) {
@@ -894,7 +897,7 @@ void ActionStack::Fizzle(Interruptible* action) {
         return;
     }
     if (action->type == ACTION_SPELL) {
-        auto* spell = (Spell*)action;
+        auto* spell = dynamic_cast<Spell*>(action);
         spell->source->controller()->game->putInGraveyard(spell->source);
     }
     action->state = RESOLVED_NOK;
@@ -916,7 +919,7 @@ void ActionStack::Render() {
         if (!askIfWishesToInterrupt || !askIfWishesToInterrupt->displayStack()) return;
 
         for (auto& mObject : mObjects) {
-            auto* current = (Interruptible*)mObject;
+            auto* current = dynamic_cast<Interruptible*>(mObject);
             if (current->state == NOT_RESOLVED) height += current->mHeight;
         }
 
@@ -984,7 +987,7 @@ void ActionStack::Render() {
         currenty += kIconVerticalOffset + kSpacer;
 
         for (auto& mObject : mObjects) {
-            auto* current = (Interruptible*)mObject;
+            auto* current = dynamic_cast<Interruptible*>(mObject);
             if (current && current->state == NOT_RESOLVED) {
                 current->x = x0;
                 current->y = currenty;
@@ -995,7 +998,7 @@ void ActionStack::Render() {
         }
     } else if (mode == ACTIONSTACK_TARGET && modal) {
         for (auto& mObject : mObjects) {
-            auto* current = (Interruptible*)mObject;
+            auto* current = dynamic_cast<Interruptible*>(mObject);
             if (current->display) height += current->mHeight;
         }
 
@@ -1008,15 +1011,15 @@ void ActionStack::Render() {
         renderer->DrawRect(x0 - 1, y0 - 1, width + 2, height + 2, ARGB(255, 255, 255, 255));
 
         for (size_t i = 0; i < mObjects.size(); i++) {
-            auto* current = (Interruptible*)mObjects[i];
+            auto* current = dynamic_cast<Interruptible*>(mObjects[i]);
             if (mObjects[i] != nullptr && current->display) {
-                ((Interruptible*)mObjects[i])->x = x0 + 5;
+                (dynamic_cast<Interruptible*>(mObjects[i]))->x = x0 + 5;
                 if (i != mObjects.size() - 1) {
-                    ((Interruptible*)mObjects[i])->y = currenty;
-                    currenty += ((Interruptible*)mObjects[i])->mHeight;
+                    (dynamic_cast<Interruptible*>(mObjects[i]))->y = currenty;
+                    currenty += (dynamic_cast<Interruptible*>(mObjects[i]))->mHeight;
                 } else {
-                    ((Interruptible*)mObjects[i])->y = currenty + 40;
-                    currenty += ((Interruptible*)mObjects[i])->mHeight + 40;
+                    (dynamic_cast<Interruptible*>(mObjects[i]))->y = currenty + 40;
+                    currenty += (dynamic_cast<Interruptible*>(mObjects[i]))->mHeight + 40;
                 }
                 mObjects[i]->Render();
             }
@@ -1074,7 +1077,7 @@ void Interruptible::Dump() {
 void ActionStack::Dump() {
     WGE_LOG_TRACE("===== Dumping Action Stack =====");
     for (auto& mObject : mObjects) {
-        auto* current = (Interruptible*)mObject;
+        auto* current = dynamic_cast<Interruptible*>(mObject);
         current->Dump();
     }
 }

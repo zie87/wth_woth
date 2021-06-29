@@ -99,9 +99,9 @@ AAAlterPoison::AAAlterPoison(GameObserver* observer, int _id, MTGCardInstance* _
     : ActivatedAbilityTP(observer, _id, _source, _target, _cost, who), poison(poison) {}
 
 int AAAlterPoison::resolve() {
-    auto* _target = (Damageable*)getTarget();
+    auto* _target = dynamic_cast<Damageable*>(getTarget());
     if (_target) {
-        auto* pTarget = (Player*)_target;
+        auto* pTarget = dynamic_cast<Player*>(_target);
         if (!pTarget->inPlay()->hasAbility(Constants::POISONSHROUD) || poison < 0) _target->poisonCount += poison;
     }
     return 0;
@@ -121,7 +121,7 @@ AADamagePrevent::AADamagePrevent(GameObserver* observer, int _id, MTGCardInstanc
 }
 
 int AADamagePrevent::resolve() {
-    auto* _target = (Damageable*)getTarget();
+    auto* _target = dynamic_cast<Damageable*>(getTarget());
     if (_target) {
         _target->preventable += preventing;
     }
@@ -143,7 +143,7 @@ AADamager::AADamager(GameObserver* observer, int _id, MTGCardInstance* _source, 
 }
 
 int AADamager::resolve() {
-    auto* _target = (Damageable*)getTarget();
+    auto* _target = dynamic_cast<Damageable*>(getTarget());
     if (_target) {
         WParsedInt damage(d, nullptr, (MTGCardInstance*)source);
         if (_target == game->opponent() && game->opponent()->inPlay()->hasType("planeswalker") && !redirected) {
@@ -153,9 +153,9 @@ int AADamager::resolve() {
             MTGAbility* setPlayer = this->clone();
             this->redirected = false;
             selection.push_back(setPlayer);
-            int checkWalkers = ((Player*)_target)->game->battlefield->cards.size();
+            int checkWalkers = (dynamic_cast<Player*>(_target))->game->battlefield->cards.size();
             for (int i = 0; i < checkWalkers; ++i) {
-                check = ((Player*)_target)->game->battlefield->cards[i];
+                check = (dynamic_cast<Player*>(_target))->game->battlefield->cards[i];
                 if (check->hasType(Subtypes::TYPE_PLANESWALKER)) {
                     this->redirected = true;
                     MTGAbility* setWalker = this->clone();
@@ -236,8 +236,7 @@ const char* AAModTurn::getMenuText() {
     WParsedInt numTurns(nbTurnStr, nullptr, source);
     if (numTurns.getValue() > 0)
         return "Take Extra Turn(s)";
-    else
-        return "Skip A Turn(s)";
+    return "Skip A Turn(s)";
 }
 
 AAModTurn* AAModTurn::clone() const { return NEW AAModTurn(*this); }
@@ -250,7 +249,7 @@ AALibraryBottom::AALibraryBottom(GameObserver* observer, int _id, MTGCardInstanc
 }
 
 int AALibraryBottom::resolve() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     _target = _target->owner->game->putInLibrary(_target);
     if (_target) {
         MTGLibrary* library = _target->owner->game->library;
@@ -278,7 +277,7 @@ AACopier::AACopier(GameObserver* observer, int _id, MTGCardInstance* _source, MT
 }
 
 int AACopier::resolve() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     if (_target) {
         source->copy(_target);
         return 1;
@@ -298,7 +297,7 @@ AAPhaseOut::AAPhaseOut(GameObserver* observer, int _id, MTGCardInstance* _source
 }
 
 int AAPhaseOut::resolve() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     if (_target) {
         _target->isPhased = true;
 
@@ -336,7 +335,7 @@ AACounter::AACounter(GameObserver* observer, int id, MTGCardInstance* source, MT
 
 int AACounter::resolve() {
     if (target) {
-        auto* _target = (MTGCardInstance*)target;
+        auto* _target = dynamic_cast<MTGCardInstance*>(target);
         AbilityFactory af(game);
         if (counterstring.size()) {
             Counter* checkcounter = af.parseCounter(counterstring, source, nullptr);
@@ -423,7 +422,7 @@ ACounterShroud::ACounterShroud(GameObserver* observer, int id, MTGCardInstance* 
 
 int ACounterShroud::addToGame() {
     SAFE_DELETE(re);
-    re = NEW RECountersPrevention(this, source, (MTGCardInstance*)target, csTc, counter);
+    re = NEW RECountersPrevention(this, source, dynamic_cast<MTGCardInstance*>(target), csTc, counter);
     if (re) {
         game->replacementEffects->add(re);
         return MTGAbility::addToGame();
@@ -456,7 +455,7 @@ ACounterTracker::ACounterTracker(GameObserver* observer, int id, MTGCardInstance
 }
 
 int ACounterTracker::addToGame() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     AbilityFactory af(game);
     Counter* counter = af.parseCounter(scounter, _target, nullptr);  //(Spell*)source);
     if (!counter) {
@@ -479,7 +478,7 @@ int ACounterTracker::addToGame() {
 }
 
 int ACounterTracker::destroy() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     AbilityFactory af(game);
     Counter* counter = af.parseCounter(scounter, _target, nullptr);  //(Spell*)source);
     if (!counter) {
@@ -525,7 +524,7 @@ AARemoveAllCounter::AARemoveAllCounter(GameObserver* observer, int id, MTGCardIn
 int AARemoveAllCounter::resolve() {
     if (!target) return 0;
 
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     if (all) {
         for (int amount = 0; amount < _target->counters->mCount; amount++) {
             while (_target->counters->counters[amount]->nb > 0)
@@ -632,8 +631,8 @@ int GenericChooseTypeColor::resolve() {
     vector<MTGAbility*> selection;
     if (chooseColor) {
         for (int i = Constants::MTG_COLOR_GREEN; i <= Constants::MTG_COLOR_WHITE; ++i) {
-            setColor = NEW AASetColorChosen(game, game->mLayers->actionLayer()->getMaxId(), source,
-                                            (MTGCardInstance*)target, i, baseAbility);
+            setColor        = NEW AASetColorChosen(game, game->mLayers->actionLayer()->getMaxId(), source,
+                                            dynamic_cast<MTGCardInstance*>(target), i, baseAbility);
             MTGAbility* set = setColor->clone();
             set->oneShot = true;
             selection.push_back(set);
@@ -644,8 +643,8 @@ int GenericChooseTypeColor::resolve() {
         for (size_t i = 0; i < values.size(); ++i) {
             std::string menu = values[i];
             if (!ANonWall || (menu != "wall" && menu != "Wall")) {
-                setType = NEW AASetTypeChosen(game, game->mLayers->actionLayer()->getMaxId(), source,
-                                              (MTGCardInstance*)target, i, menu, baseAbility);
+                setType         = NEW AASetTypeChosen(game, game->mLayers->actionLayer()->getMaxId(), source,
+                                              dynamic_cast<MTGCardInstance*>(target), i, menu, baseAbility);
                 MTGAbility* set = setType->clone();
                 set->oneShot = true;
                 selection.push_back(set);
@@ -656,7 +655,7 @@ int GenericChooseTypeColor::resolve() {
 
     if (selection.size()) {
         MTGAbility* a1 = NEW MenuAbility(game, this->GetId(), target, source, true, selection);
-        game->mLayers->actionLayer()->currentActionCard = (MTGCardInstance*)target;
+        game->mLayers->actionLayer()->currentActionCard = dynamic_cast<MTGCardInstance*>(target);
         a1->resolve();
     }
     return 1;
@@ -665,8 +664,7 @@ int GenericChooseTypeColor::resolve() {
 const char* GenericChooseTypeColor::getMenuText() {
     if (chooseColor)
         return "Choose a color";
-    else
-        return "Choose a type";
+    return "Choose a type";
 }
 
 GenericChooseTypeColor* GenericChooseTypeColor::clone() const {
@@ -684,7 +682,7 @@ AASetColorChosen::AASetColorChosen(GameObserver* observer, int id, MTGCardInstan
     abilityAltered = nullptr;
 }
 int AASetColorChosen::resolve() {
-    auto* _target         = (MTGCardInstance*)target;
+    auto* _target         = dynamic_cast<MTGCardInstance*>(target);
     _target->chooseacolor = color;
 
     if (abilityToAlter.size()) {
@@ -727,7 +725,7 @@ AASetTypeChosen::AASetTypeChosen(GameObserver* observer, int id, MTGCardInstance
     abilityAltered = nullptr;
 }
 int AASetTypeChosen::resolve() {
-    auto* _target           = (MTGCardInstance*)target;
+    auto* _target           = dynamic_cast<MTGCardInstance*>(target);
     std::string typeChoosen = menutext;
     _target->chooseasubtype = typeChoosen;
 
@@ -775,8 +773,8 @@ int GenericFlipACoin::resolve() {
     if (!target) return 0;
     vector<MTGAbility*> selection;
     for (int i = 0; i < 2; ++i) {
-        setCoin = NEW AASetCoin(game, game->mLayers->actionLayer()->getMaxId(), source, (MTGCardInstance*)target, i,
-                                baseAbility);
+        setCoin         = NEW AASetCoin(game, game->mLayers->actionLayer()->getMaxId(), source,
+                                dynamic_cast<MTGCardInstance*>(target), i, baseAbility);
         MTGAbility* set = setCoin->clone();
         set->oneShot = true;
         selection.push_back(set);
@@ -785,7 +783,7 @@ int GenericFlipACoin::resolve() {
 
     if (selection.size()) {
         MTGAbility* a1 = NEW MenuAbility(game, this->GetId(), target, source, false, selection);
-        game->mLayers->actionLayer()->currentActionCard = (MTGCardInstance*)target;
+        game->mLayers->actionLayer()->currentActionCard = dynamic_cast<MTGCardInstance*>(target);
         a1->resolve();
     }
     return 1;
@@ -809,7 +807,7 @@ AASetCoin::AASetCoin(GameObserver* observer, int id, MTGCardInstance* source, MT
 }
 
 int AASetCoin::resolve() {
-    auto* _target     = (MTGCardInstance*)target;
+    auto* _target     = dynamic_cast<MTGCardInstance*>(target);
     _target->coinSide = side;
 
     int flip = game->getRandomGenerator()->random() % 2;
@@ -877,7 +875,7 @@ AAResetDamage::AAResetDamage(GameObserver* observer, int id, MTGCardInstance* so
     this->target = _target;
 }
 int AAResetDamage::resolve() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     _target->life = _target->toughness;
     return 1;
 }
@@ -903,7 +901,7 @@ int AAFizzler::resolve() {
         // ai targeted using an ability on a card to fizzle.
         target = stack->getActionElementFromCard(cTarget);
     }
-    auto* sTarget          = (Spell*)target;
+    auto* sTarget          = dynamic_cast<Spell*>(target);
     MTGCardInstance* sCard = sTarget->source;
     if (!sCard || !sTarget || sCard->has(Constants::NOFIZZLE)) return 0;
     stack->Fizzle(sTarget);
@@ -923,7 +921,7 @@ AABuryCard::AABuryCard(GameObserver* observer, int _id, MTGCardInstance* _source
 }
 
 int AABuryCard::resolve() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     if (_target) {
         _target->bury();
         while (_target->next) _target = _target->next;
@@ -961,7 +959,7 @@ AADestroyCard::AADestroyCard(GameObserver* observer, int _id, MTGCardInstance* _
 }
 
 int AADestroyCard::resolve() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     if (_target) {
         _target->destroy();
         while (_target->next) _target = _target->next;
@@ -996,7 +994,7 @@ AASacrificeCard::AASacrificeCard(GameObserver* observer, int _id, MTGCardInstanc
 }
 
 int AASacrificeCard::resolve() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     if (_target) {
         Player* p = _target->controller();
         MTGCardInstance* beforeCard = _target;
@@ -1036,7 +1034,7 @@ AADiscardCard::AADiscardCard(GameObserver* observer, int _id, MTGCardInstance* _
 }
 
 int AADiscardCard::resolve() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     if (_target) {
         Player* p = _target->controller();
         WEvent* e = NEW WEventCardDiscard(_target);
@@ -1103,7 +1101,7 @@ AAFrozen::AAFrozen(GameObserver* observer, int id, MTGCardInstance* card, MTGCar
 }
 
 int AAFrozen::resolve() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     if (_target) {
         while (_target->next) _target = _target->next;  // This is for cards such as rampant growth
         _target->frozen += 1;
@@ -1123,10 +1121,10 @@ AANewTarget::AANewTarget(GameObserver* observer, int id, MTGCardInstance* card, 
 }
 
 int AANewTarget::resolve() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     if (retarget) {
         _target = source;
-        source = (MTGCardInstance*)target;
+        source  = dynamic_cast<MTGCardInstance*>(target);
     }
     if (_target) {
         while (_target->next) _target = _target->next;
@@ -1143,11 +1141,11 @@ int AANewTarget::resolve() {
         if (_target->hasSubtype(Subtypes::TYPE_EQUIPMENT)) {
             reUp->resolve();
             for (size_t i = 1; i < game->mLayers->actionLayer()->mObjects.size(); i++) {
-                MTGAbility* a = ((MTGAbility*)game->mLayers->actionLayer()->mObjects[i]);
+                MTGAbility* a = (dynamic_cast<MTGAbility*>(game->mLayers->actionLayer()->mObjects[i]));
                 auto* eq      = dynamic_cast<AEquip*>(a);
                 if (eq && eq->source == reUp->source) {
-                    ((AEquip*)a)->unequip();
-                    ((AEquip*)a)->equip(source);
+                    (dynamic_cast<AEquip*>(a))->unequip();
+                    (dynamic_cast<AEquip*>(a))->equip(source);
                 }
             }
         }
@@ -1176,7 +1174,7 @@ AAMorph::AAMorph(GameObserver* observer, int id, MTGCardInstance* card, MTGCardI
 int AAMorph::resolve() {
     auto* Morpher = (MTGCardInstance*)source;
     if (!Morpher->isMorphed && !Morpher->morphed && Morpher->turningOver) return 0;
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     if (_target) {
         while (_target->next) _target = _target->next;
 
@@ -1211,7 +1209,7 @@ int AAMorph::resolve() {
 }
 
 int AAMorph::testDestroy() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     if (target) {
         if (_target->turningOver && !_target->isMorphed && !_target->morphed) {
             game->removeObserver(this);
@@ -1241,7 +1239,7 @@ int AAFlip::resolve() {
         game->removeObserver(this);
         return 0;
     }
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     if (_target) {
         while (_target->next) _target = _target->next;
 
@@ -1317,7 +1315,7 @@ int AAFlip::resolve() {
 }
 
 int AAFlip::testDestroy() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     if (target) {
         if (_target->isFlipped) {
             this->forceDestroy = 1;
@@ -1361,24 +1359,24 @@ AADynamic::AADynamic(GameObserver* observer, int id, MTGCardInstance* card, Dama
 }
 
 int AADynamic::resolve() {
-    auto* _target               = (Damageable*)target;
+    auto* _target               = dynamic_cast<Damageable*>(target);
     Damageable* secondaryTarget = nullptr;
-    if (amountsource == 2) source = (MTGCardInstance*)_target;
+    if (amountsource == 2) source = dynamic_cast<MTGCardInstance*>(_target);
     switch (who) {
     case DYNAMIC_ABILITY_WHO_EACHOTHER:  // each other, both take the effect
         eachother = true;
         break;
     case DYNAMIC_ABILITY_WHO_ITSELF:
-        source = ((MTGCardInstance*)_target);
+        source  = (dynamic_cast<MTGCardInstance*>(_target));
         _target = _target;
         break;
     case DYNAMIC_ABILITY_WHO_TARGETCONTROLLER:
         _target = _target;
-        secondaryTarget = ((MTGCardInstance*)_target)->controller();
+        secondaryTarget = (dynamic_cast<MTGCardInstance*>(_target))->controller();
         break;
     case DYNAMIC_ABILITY_WHO_TARGETOPPONENT:
         _target = _target;
-        secondaryTarget = ((MTGCardInstance*)_target)->controller()->opponent();
+        secondaryTarget = (dynamic_cast<MTGCardInstance*>(_target))->controller()->opponent();
         break;
     case DYNAMIC_ABILITY_WHO_TOSOURCE:
         tosrc = true;
@@ -1400,8 +1398,8 @@ int AADynamic::resolve() {
     if (amountsource == DYNAMIC_MYFOE_AMOUNT)
         _target = OriginalSrc->controller()->opponent();  // looking at controllers opponent for amount
     if (!_target) return 0;
-    while (dynamic_cast<MTGCardInstance*>(_target) && ((MTGCardInstance*)_target)->next)
-        _target = ((MTGCardInstance*)_target)->next;
+    while (dynamic_cast<MTGCardInstance*>(_target) && (dynamic_cast<MTGCardInstance*>(_target))->next)
+        _target = (dynamic_cast<MTGCardInstance*>(_target))->next;
 
     // find the amount variables that will be used
     sourceamount = 0;
@@ -1410,25 +1408,25 @@ int AADynamic::resolve() {
     switch (type) {
     case DYNAMIC_ABILITY_TYPE_POWER:
         sourceamount = ((MTGCardInstance*)source)->power;
-        targetamount = ((MTGCardInstance*)_target)->power;
+        targetamount = (dynamic_cast<MTGCardInstance*>(_target))->power;
         if (eachother) sourceamount = ((MTGCardInstance*)source)->power;
         break;
     case DYNAMIC_ABILITY_TYPE_TOUGHNESS:
         sourceamount = ((MTGCardInstance*)source)->toughness;
-        targetamount = ((MTGCardInstance*)_target)->toughness;
+        targetamount = (dynamic_cast<MTGCardInstance*>(_target))->toughness;
         if (eachother) sourceamount = ((MTGCardInstance*)source)->toughness;
         break;
     case DYNAMIC_ABILITY_TYPE_MANACOST:
         if (amountsource == 1)
             sourceamount = ((MTGCardInstance*)source)->getManaCost()->getConvertedCost();
         else
-            sourceamount = ((MTGCardInstance*)_target)->getManaCost()->getConvertedCost();
+            sourceamount = (dynamic_cast<MTGCardInstance*>(_target))->getManaCost()->getConvertedCost();
         break;
     case DYNAMIC_ABILITY_TYPE_COLORS:
         for (int i = Constants::MTG_COLOR_GREEN; i <= Constants::MTG_COLOR_WHITE; ++i) {
             if (amountsource == 1 && ((MTGCardInstance*)source)->hasColor(i))
                 ++colored;
-            else if (amountsource == 2 && ((MTGCardInstance*)_target)->hasColor(i))
+            else if (amountsource == 2 && (dynamic_cast<MTGCardInstance*>(_target))->hasColor(i))
                 ++colored;
         }
         sourceamount = colored;
@@ -1436,9 +1434,9 @@ int AADynamic::resolve() {
     case DYNAMIC_ABILITY_TYPE_AGE: {
         Counter* targetCounter = nullptr;
         if (amountsource == 2) {
-            if (((MTGCardInstance*)_target)->counters &&
-                ((MTGCardInstance*)_target)->counters->hasCounter("age", 0, 0)) {
-                targetCounter = ((MTGCardInstance*)_target)->counters->hasCounter("age", 0, 0);
+            if ((dynamic_cast<MTGCardInstance*>(_target))->counters &&
+                (dynamic_cast<MTGCardInstance*>(_target))->counters->hasCounter("age", 0, 0)) {
+                targetCounter = (dynamic_cast<MTGCardInstance*>(_target))->counters->hasCounter("age", 0, 0);
                 sourceamount = targetCounter->nb;
             }
         } else {
@@ -1453,9 +1451,9 @@ int AADynamic::resolve() {
     case DYNAMIC_ABILITY_TYPE_CHARGE: {
         Counter* targetCounter = nullptr;
         if (amountsource == 2) {
-            if (((MTGCardInstance*)_target)->counters &&
-                ((MTGCardInstance*)_target)->counters->hasCounter("charge", 0, 0)) {
-                targetCounter = ((MTGCardInstance*)_target)->counters->hasCounter("charge", 0, 0);
+            if ((dynamic_cast<MTGCardInstance*>(_target))->counters &&
+                (dynamic_cast<MTGCardInstance*>(_target))->counters->hasCounter("charge", 0, 0)) {
+                targetCounter = (dynamic_cast<MTGCardInstance*>(_target))->counters->hasCounter("charge", 0, 0);
                 sourceamount = targetCounter->nb;
             }
         } else {
@@ -1470,8 +1468,9 @@ int AADynamic::resolve() {
     case DYNAMIC_ABILITY_TYPE_ONEONECOUNTERS: {
         Counter* targetCounter = nullptr;
         if (amountsource == 2) {
-            if (((MTGCardInstance*)_target)->counters && ((MTGCardInstance*)_target)->counters->hasCounter(1, 1)) {
-                targetCounter = ((MTGCardInstance*)_target)->counters->hasCounter(1, 1);
+            if ((dynamic_cast<MTGCardInstance*>(_target))->counters &&
+                (dynamic_cast<MTGCardInstance*>(_target))->counters->hasCounter(1, 1)) {
+                targetCounter = (dynamic_cast<MTGCardInstance*>(_target))->counters->hasCounter(1, 1);
                 sourceamount = targetCounter->nb;
             }
         } else {
@@ -1492,8 +1491,8 @@ int AADynamic::resolve() {
 
     if (secondaryTarget != nullptr) _target = secondaryTarget;
     if (_target) {
-        while (dynamic_cast<MTGCardInstance*>(_target) && ((MTGCardInstance*)_target)->next)
-            _target = ((MTGCardInstance*)_target)->next;
+        while (dynamic_cast<MTGCardInstance*>(_target) && (dynamic_cast<MTGCardInstance*>(_target))->next)
+            _target = (dynamic_cast<MTGCardInstance*>(_target))->next;
         if (sourceamount < 0) sourceamount = 0;
         if (targetamount < 0) targetamount = 0;
         std::stringstream out;
@@ -1510,7 +1509,8 @@ int AADynamic::resolve() {
             mainAbility =
                 NEW AADamager(game, this->GetId(), source,
                               tosrc == true ? (Targetable*)OriginalSrc : (Targetable*)_target, sourceamountstring);
-            activateMainAbility(mainAbility, source, tosrc == true ? OriginalSrc : (MTGCardInstance*)_target);
+            activateMainAbility(mainAbility, source,
+                                tosrc == true ? OriginalSrc : dynamic_cast<MTGCardInstance*>(_target));
             if (eachother) {
                 mainAbility = NEW AADamager(game, this->GetId(), source, (Targetable*)OriginalSrc, targetamountstring);
                 activateMainAbility(mainAbility, source, OriginalSrc);
@@ -1532,26 +1532,29 @@ int AADynamic::resolve() {
         }
         case DYNAMIC_ABILITY_EFFECT_PUMPPOWER:  // pump power
         {
-            mainAbility =
-                NEW PTInstant(game, this->GetId(), source, tosrc == true ? OriginalSrc : (MTGCardInstance*)_target,
-                              NEW WParsedPT(sourceamount, 0));
-            return activateMainAbility(mainAbility, source, tosrc == true ? OriginalSrc : (MTGCardInstance*)_target);
+            mainAbility = NEW PTInstant(game, this->GetId(), source,
+                                        tosrc == true ? OriginalSrc : dynamic_cast<MTGCardInstance*>(_target),
+                                        NEW WParsedPT(sourceamount, 0));
+            return activateMainAbility(mainAbility, source,
+                                       tosrc == true ? OriginalSrc : dynamic_cast<MTGCardInstance*>(_target));
             break;
         }
         case DYNAMIC_ABILITY_EFFECT_PUMPTOUGHNESS:  // pump toughness
         {
-            mainAbility =
-                NEW PTInstant(game, this->GetId(), source, tosrc == true ? OriginalSrc : (MTGCardInstance*)_target,
-                              NEW WParsedPT(0, sourceamount));
-            return activateMainAbility(mainAbility, source, tosrc == true ? OriginalSrc : (MTGCardInstance*)_target);
+            mainAbility = NEW PTInstant(game, this->GetId(), source,
+                                        tosrc == true ? OriginalSrc : dynamic_cast<MTGCardInstance*>(_target),
+                                        NEW WParsedPT(0, sourceamount));
+            return activateMainAbility(mainAbility, source,
+                                       tosrc == true ? OriginalSrc : dynamic_cast<MTGCardInstance*>(_target));
             break;
         }
         case DYNAMIC_ABILITY_EFFECT_PUMPBOTH:  // pump both
         {
-            mainAbility =
-                NEW PTInstant(game, this->GetId(), source, tosrc == true ? OriginalSrc : (MTGCardInstance*)_target,
-                              NEW WParsedPT(sourceamount, sourceamount));
-            return activateMainAbility(mainAbility, source, tosrc == true ? OriginalSrc : (MTGCardInstance*)_target);
+            mainAbility = NEW PTInstant(game, this->GetId(), source,
+                                        tosrc == true ? OriginalSrc : dynamic_cast<MTGCardInstance*>(_target),
+                                        NEW WParsedPT(sourceamount, sourceamount));
+            return activateMainAbility(mainAbility, source,
+                                       tosrc == true ? OriginalSrc : dynamic_cast<MTGCardInstance*>(_target));
             break;
         }
         case DYNAMIC_ABILITY_EFFECT_LIFELOSS:  // lose life
@@ -1570,7 +1573,8 @@ int AADynamic::resolve() {
         }
         case DYNAMIC_ABILITY_EFFECT_COUNTERSONEONE: {
             if (!dynamic_cast<MTGCardInstance*>(_target)) _target = OriginalSrc;
-            for (int j = 0; j < sourceamount; j++) ((MTGCardInstance*)_target)->counters->addCounter(1, 1);
+            for (int j = 0; j < sourceamount; j++)
+                (dynamic_cast<MTGCardInstance*>(_target))->counters->addCounter(1, 1);
             break;
         }
         default:
@@ -1691,14 +1695,14 @@ AALifer::AALifer(GameObserver* observer, int _id, MTGCardInstance* card, Targeta
 }
 
 int AALifer::resolve() {
-    auto* _target = (Damageable*)getTarget();
+    auto* _target = dynamic_cast<Damageable*>(getTarget());
     if (!_target) return 0;
 
     WParsedInt life(life_s, nullptr, source);
     if (_target->type_as_damageable == DAMAGEABLE_MTGCARDINSTANCE) {
-        _target = ((MTGCardInstance*)_target)->controller();
+        _target = (dynamic_cast<MTGCardInstance*>(_target))->controller();
     }
-    auto* player = (Player*)_target;
+    auto* player = dynamic_cast<Player*>(_target);
     player->gainOrLoseLife(life.getValue());
 
     return 1;
@@ -1722,7 +1726,7 @@ AASetHand::AASetHand(GameObserver* observer, int _id, MTGCardInstance* _source, 
     : ActivatedAbilityTP(observer, _id, _source, _target, _cost, who), hand(hand) {}
 
 int AASetHand::resolve() {
-    auto* _target = (Damageable*)getTarget();
+    auto* _target = dynamic_cast<Damageable*>(getTarget());
     Player* p = getPlayerFromDamageable(_target);
 
     if (!p) return 0;
@@ -1742,7 +1746,7 @@ AALifeSet::AALifeSet(GameObserver* observer, int _id, MTGCardInstance* _source, 
     : ActivatedAbilityTP(observer, _id, _source, _target, _cost, who), life(life) {}
 
 int AALifeSet::resolve() {
-    auto* _target = (Damageable*)getTarget();
+    auto* _target = dynamic_cast<Damageable*>(getTarget());
     Player* p = getPlayerFromDamageable(_target);
 
     if (!p) return 0;
@@ -1781,7 +1785,7 @@ AACloner::AACloner(GameObserver* observer, int _id, MTGCardInstance* _source, MT
 }
 
 int AACloner::resolve() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     if (!_target) return 0;
 
     MTGCard* clone = (_target->isToken ? _target : MTGCollection()->getCardByName(_target->name));
@@ -1909,7 +1913,7 @@ AInstantCastRestrictionUEOT::AInstantCastRestrictionUEOT(GameObserver* observer,
 
 int AInstantCastRestrictionUEOT::resolve() {
     ACastRestriction* a = ability->clone();
-    auto* wrapper       = NEW GenericInstantAbility(game, 1, source, (Damageable*)(this->target), a);
+    auto* wrapper       = NEW GenericInstantAbility(game, 1, source, dynamic_cast<Damageable*>(this->target), a);
     wrapper->addToGame();
     return 1;
 }
@@ -1932,12 +1936,12 @@ AAMover::AAMover(GameObserver* observer, int _id, MTGCardInstance* _source, MTGC
 }
 
 MTGGameZone* AAMover::destinationZone(Targetable* target) {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     return MTGGameZone::stringToZone(game, destination, source, _target);
 }
 
 int AAMover::resolve() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     if (target) {
         Player* p = _target->controller();
         if (p) {
@@ -2046,12 +2050,12 @@ AARandomMover::AARandomMover(GameObserver* observer, int _id, MTGCardInstance* _
 }
 
 MTGGameZone* AARandomMover::destinationZone(Targetable* target, std::string zone) {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     return MTGGameZone::stringToZone(game, zone, source, _target);
 }
 
 int AARandomMover::resolve() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     if (target) {
         Player* p = _target->controller();
         if (p) {
@@ -2198,7 +2202,7 @@ AATapper::AATapper(GameObserver* observer, int id, MTGCardInstance* card, MTGCar
 }
 
 int AATapper::resolve() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     if (_target) {
         while (_target->next) _target = _target->next;  // This is for cards such as rampant growth
         _target->tap();
@@ -2219,7 +2223,7 @@ AAUntapper::AAUntapper(GameObserver* observer, int id, MTGCardInstance* card, MT
 }
 
 int AAUntapper::resolve() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     if (_target) {
         while (_target->next) _target = _target->next;  // This is for cards such as rampant growth
         _target->untap();
@@ -2251,7 +2255,7 @@ AAWinGame::AAWinGame(GameObserver* observer, int _id, MTGCardInstance* card, Tar
     : ActivatedAbilityTP(observer, _id, card, _target, _cost, who) {}
 
 int AAWinGame::resolve() {
-    Player* p = getPlayerFromDamageable((Damageable*)getTarget());
+    Player* p = getPlayerFromDamageable(dynamic_cast<Damageable*>(getTarget()));
     if (!p) return 0;
 
     bool canwin = true;
@@ -2343,16 +2347,15 @@ int IfThenAbility::resolve() {
     }
     if (!a1)
         return 0;
-    else {
-        if (a1->target && !dynamic_cast<Player*>(a1->target)) a1->target = aTarget;
+    if (a1->target && !dynamic_cast<Player*>(a1->target)) a1->target = aTarget;
 
-        if (a1->oneShot) {
-            a1->resolve();
-            SAFE_DELETE(a1);
-        } else
-            a1->addToGame();
-        return 1;
-    }
+    if (a1->oneShot) {
+        a1->resolve();
+        SAFE_DELETE(a1);
+    } else
+        a1->addToGame();
+    return 1;
+
     return 0;
 }
 
@@ -2453,7 +2456,7 @@ void MenuAbility::Update(float dt) {
     ActionLayer* object = game->mLayers->actionLayer();
     if (!triggered && !object->menuObject) {
         triggered = 1;
-        object->currentActionCard = (MTGCardInstance*)this->target;
+        object->currentActionCard = dynamic_cast<MTGCardInstance*>(this->target);
         if (auto* ta = dynamic_cast<TargetAbility*>(ability)) {
             if (!ta->getActionTc()->validTargetsExist()) return;
         }
@@ -2491,7 +2494,7 @@ int MenuAbility::isReactingToTargetClick(Targetable* card) { return MayAbility::
 int MenuAbility::reactToTargetClick(Targetable* object) { return 1; }
 
 int MenuAbility::reactToChoiceClick(Targetable* object, int choice, int control) {
-    auto* currentAction = (ActionElement*)game->mLayers->actionLayer()->mObjects[control];
+    auto* currentAction = dynamic_cast<ActionElement*>(game->mLayers->actionLayer()->mObjects[control]);
     if (currentAction != (ActionElement*)this) return 0;
     if (!abilities.size() || !triggered) return 0;
     for (int i = 0; i < int(abilities.size()); i++) {
@@ -2657,7 +2660,8 @@ int GenericTargetAbility::resolve() {
             if (sa->oneShot) {
                 sa->fireAbility();
             } else {
-                auto* wrapper = NEW GenericInstantAbility(game, 1, source, (Damageable*)(this->target), sa);
+                auto* wrapper =
+                    NEW GenericInstantAbility(game, 1, source, dynamic_cast<Damageable*>(this->target), sa);
                 wrapper->addToGame();
             }
         }
@@ -2715,7 +2719,7 @@ AAlterCost::AAlterCost(GameObserver* observer, int id, MTGCardInstance* source, 
 }
 
 int AAlterCost::addToGame() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     if (!_target || _target->hasType("land")) {
         this->forceDestroy = 1;
         return MTGAbility::addToGame();
@@ -2739,7 +2743,7 @@ int AAlterCost::addToGame() {
 }
 
 int AAlterCost::testDestroy() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     if (!this->manaReducer->isInPlay(game)) {
         if (amount > 0) {
             _target->getIncreasedManaCost()->remove(type, amount);
@@ -2839,15 +2843,15 @@ ATransformer::ATransformer(GameObserver* observer, int id, MTGCardInstance* sour
 
 int ATransformer::addToGame() {
     MTGCardInstance* _target = nullptr;
-    auto* action             = (Interruptible*)target;
+    auto* action             = dynamic_cast<Interruptible*>(target);
     if (action && action->type == ACTION_SPELL && action->state == NOT_RESOLVED) {
-        auto* spell = (Spell*)action;
+        auto* spell = dynamic_cast<Spell*>(action);
         _target = spell->source;
         aForever = true;
         // when targeting the stack, set the effect to forever, incase the person does not use it
         // otherwise we will end up with a null pointer on the destroy.
     } else {
-        _target = (MTGCardInstance*)target;
+        _target = dynamic_cast<MTGCardInstance*>(target);
     }
 
     if (!_target) {
@@ -2905,18 +2909,18 @@ int ATransformer::addToGame() {
             if (!aNew) continue;
             auto* gta = dynamic_cast<GenericTargetAbility*>(aNew);
             if (gta) {
-                ((GenericTargetAbility*)aNew)->source = _target;
-                ((GenericTargetAbility*)aNew)->ability->source = _target;
+                (dynamic_cast<GenericTargetAbility*>(aNew))->source          = _target;
+                (dynamic_cast<GenericTargetAbility*>(aNew))->ability->source = _target;
             }
             auto* gaa = dynamic_cast<GenericActivatedAbility*>(aNew);
             if (gaa) {
-                ((GenericActivatedAbility*)aNew)->source = _target;
-                ((GenericActivatedAbility*)aNew)->ability->source = _target;
+                (dynamic_cast<GenericActivatedAbility*>(aNew))->source          = _target;
+                (dynamic_cast<GenericActivatedAbility*>(aNew))->ability->source = _target;
             }
             auto* abi = dynamic_cast<MultiAbility*>(aNew);
             if (abi) {
-                ((MultiAbility*)aNew)->source = _target;
-                ((MultiAbility*)aNew)->abilities[0]->source = _target;
+                (dynamic_cast<MultiAbility*>(aNew))->source               = _target;
+                (dynamic_cast<MultiAbility*>(aNew))->abilities[0]->source = _target;
             }
 
             aNew->target = _target;
@@ -2970,7 +2974,7 @@ int ATransformer::reapplyCountersBonus(MTGCardInstance* rtarget, bool powerappli
 }
 int ATransformer::destroy() {
     if (aForever) return 0;
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     if (_target) {
         while (_target->next) _target = _target->next;
         std::list<int>::iterator it;
@@ -3064,7 +3068,7 @@ ATransformerInstant::ATransformerInstant(GameObserver* observer, int id, MTGCard
 
 int ATransformerInstant::resolve() {
     ATransformer* a = ability->clone();
-    auto* wrapper   = NEW GenericInstantAbility(game, 1, source, (Damageable*)(this->target), a);
+    auto* wrapper   = NEW GenericInstantAbility(game, 1, source, dynamic_cast<Damageable*>(this->target), a);
     wrapper->addToGame();
     return 1;
 }
@@ -3088,7 +3092,7 @@ PTInstant::PTInstant(GameObserver* observer, int id, MTGCardInstance* source, MT
 
 int PTInstant::resolve() {
     APowerToughnessModifier* a = ability->clone();
-    auto* wrapper              = NEW GenericInstantAbility(game, 1, source, (Damageable*)(this->target), a);
+    auto* wrapper = NEW GenericInstantAbility(game, 1, source, dynamic_cast<Damageable*>(this->target), a);
     wrapper->addToGame();
     return 1;
 }
@@ -3109,7 +3113,7 @@ ASwapPTUEOT::ASwapPTUEOT(GameObserver* observer, int id, MTGCardInstance* source
 
 int ASwapPTUEOT::resolve() {
     ASwapPT* a = ability->clone();
-    auto* wrapper = NEW GenericInstantAbility(game, 1, source, (Damageable*)(this->target), a);
+    auto* wrapper = NEW GenericInstantAbility(game, 1, source, dynamic_cast<Damageable*>(this->target), a);
     wrapper->addToGame();
     return 1;
 }
@@ -3130,7 +3134,7 @@ AAExchangeLife::AAExchangeLife(GameObserver* observer, int _id, MTGCardInstance*
     : ActivatedAbilityTP(observer, _id, _source, _target, _cost, who) {}
 
 int AAExchangeLife::resolve() {
-    auto* _target = (Damageable*)getTarget();
+    auto* _target = dynamic_cast<Damageable*>(getTarget());
     if (_target) {
         Player* player = source->controller();
         int oldlife = player->getLife();
@@ -3138,7 +3142,7 @@ int AAExchangeLife::resolve() {
         int modifier = oldlife > targetOldLife ? oldlife - targetOldLife : targetOldLife - oldlife;
         if (_target->type_as_damageable == DAMAGEABLE_MTGCARDINSTANCE) {
             int increaser = 0;
-            MTGCardInstance* card = ((MTGCardInstance*)_target);
+            MTGCardInstance* card = (dynamic_cast<MTGCardInstance*>(_target));
             int toughMod = 0;
             targetOldLife <= card->origtoughness ? toughMod = card->origtoughness - targetOldLife
                                                  : toughMod = targetOldLife - card->origtoughness;
@@ -3154,7 +3158,7 @@ int AAExchangeLife::resolve() {
 
             return 1;
         }
-        auto* opponent = (Player*)_target;
+        auto* opponent = dynamic_cast<Player*>(_target);
         if (oldlife > targetOldLife) {
             player->gainOrLoseLife(modifier * -1);
             opponent->gainOrLoseLife(modifier);
@@ -3182,7 +3186,7 @@ int ALoseAbilities::addToGame() {
         WGE_LOG_ERROR("storedAbilities shouldn't be already set inALoseAbilitie");
         return 0;
     }
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
 
     ActionLayer* al = game->mLayers->actionLayer();
 
@@ -3191,7 +3195,7 @@ int ALoseAbilities::addToGame() {
     for (int i = (int)(al->mObjects.size()) - 1; i > 0; i--)  // 0 is not a mtgability...hackish
     {
         if (al->mObjects[i]) {
-            auto* currentAction = (MTGAbility*)al->mObjects[i];
+            auto* currentAction = dynamic_cast<MTGAbility*>(al->mObjects[i]);
             auto* l             = dynamic_cast<ALord*>(currentAction);
             if (l) lordsInGame.push_back(l);
         }
@@ -3200,7 +3204,7 @@ int ALoseAbilities::addToGame() {
     for (int i = (int)(al->mObjects.size()) - 1; i > 0; i--)  // 0 is not a mtgability...hackish
     {
         if (al->mObjects[i]) {
-            auto* currentAction = (MTGAbility*)al->mObjects[i];
+            auto* currentAction = dynamic_cast<MTGAbility*>(al->mObjects[i]);
             auto* la            = dynamic_cast<ALoseAbilities*>(currentAction);
             if (la) continue;
             if (currentAction->source == _target) {
@@ -3267,7 +3271,7 @@ int ALoseSubtypes::addToGame() {
         WGE_LOG_ERROR("storedSubtypes shouldn't be already set inALoseSubtypes");
         return 0;
     }
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
 
     for (int i = ((int)_target->types.size()) - 1; i >= 0; --i) {
         int subtype = _target->types[i];
@@ -3281,7 +3285,7 @@ int ALoseSubtypes::addToGame() {
 }
 
 int ALoseSubtypes::destroy() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     for (int storedSubtype : storedSubtypes) _target->addType(storedSubtype);
     storedSubtypes.clear();
     return 1;
@@ -3340,7 +3344,7 @@ APreventDamageTypesUEOT::APreventDamageTypesUEOT(GameObserver* observer, int id,
 
 int APreventDamageTypesUEOT::resolve() {
     APreventDamageTypes* a = ability->clone();
-    auto* wrapper          = NEW GenericInstantAbility(game, 1, source, (Damageable*)(this->target), a);
+    auto* wrapper          = NEW GenericInstantAbility(game, 1, source, dynamic_cast<Damageable*>(this->target), a);
     wrapper->addToGame();
     return 1;
 }
@@ -3540,9 +3544,8 @@ void APhaseAction::Update(float dt) {
                 if (!sAbility.size() || (!target || isTargetable)) {
                     this->forceDestroy = 1;
                     return;
-                } else {
-                    while (_target && _target->next) _target = _target->next;
                 }
+                while (_target && _target->next) _target = _target->next;
 
                 AbilityFactory af(game);
                 MTGAbility* ability = af.parseMagicLine(sAbility, abilityId, nullptr, _target);
@@ -3567,8 +3570,7 @@ int APhaseAction::resolve() { return 0; }
 const char* APhaseAction::getMenuText() {
     if (psMenuText.size())
         return psMenuText.c_str();
-    else
-        return "Phase Based Action";
+    return "Phase Based Action";
 }
 
 APhaseAction* APhaseAction::clone() const {
@@ -3691,13 +3693,13 @@ void ABlink::Update(float dt) {
 }
 
 void ABlink::resolveBlink() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     if (_target) {
         if (blinkhand && !_target->controller()->game->isInZone(_target, _target->controller()->game->hand)) {
             this->forceDestroy = 1;
             return;
-        } else if (!blinkhand &&
-                   !_target->controller()->game->isInZone(_target, _target->controller()->game->battlefield)) {
+        }
+        if (!blinkhand && !_target->controller()->game->isInZone(_target, _target->controller()->game->battlefield)) {
             this->forceDestroy = 1;
             return;
         }
@@ -3810,7 +3812,7 @@ AABlock::AABlock(GameObserver* observer, int id, MTGCardInstance* card, MTGCardI
 }
 
 int AABlock::resolve() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     source = (MTGCardInstance*)source;
     if (_target && source->canBlock(_target)) {
         source->toggleDefenser(_target);
@@ -3828,7 +3830,7 @@ AAConnect::AAConnect(GameObserver* observer, int id, MTGCardInstance* card, MTGC
 }
 
 int AAConnect::resolve() {
-    auto* _target = (MTGCardInstance*)target;
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     if (_target) {
         while (_target->next) _target = _target->next;
         _target->childrenCards.push_back(source);
@@ -3836,11 +3838,11 @@ int AAConnect::resolve() {
         // weapon
         if (source->hasSubtype(Subtypes::TYPE_EQUIPMENT)) {
             for (size_t i = 1; i < game->mLayers->actionLayer()->mObjects.size(); i++) {
-                MTGAbility* a = ((MTGAbility*)game->mLayers->actionLayer()->mObjects[i]);
+                MTGAbility* a = (dynamic_cast<MTGAbility*>(game->mLayers->actionLayer()->mObjects[i]));
                 auto* eq      = dynamic_cast<AEquip*>(a);
                 if (eq && eq->source == source) {
-                    ((AEquip*)a)->unequip();
-                    ((AEquip*)a)->equip(_target);
+                    (dynamic_cast<AEquip*>(a))->unequip();
+                    (dynamic_cast<AEquip*>(a))->equip(_target);
                 }
             }
         } else {

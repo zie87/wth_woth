@@ -23,10 +23,9 @@ int TargetsList::addTarget(Targetable* target) {
             targets.push_back(target);
             return 1;
 
-        } else {
-            targets.push_back(target);
-            return 1;
         }
+        targets.push_back(target);
+        return 1;
     }
     return 0;
 }
@@ -51,9 +50,8 @@ int TargetsList::removeTarget(Targetable* target) {
 int TargetsList::toggleTarget(Targetable* target) {
     if (alreadyHasTarget(target)) {
         return removeTarget(target);
-    } else {
-        return addTarget(target);
     }
+    return addTarget(target);
 }
 
 size_t TargetsList::iterateTarget(Targetable* previous) {
@@ -121,7 +119,8 @@ Damageable* TargetsList::getNextDamageableTarget(Damageable* previous) {
     for (size_t i = nextIndex; i < targets.size(); i++) {
         if (auto* pTarget = dynamic_cast<Player*>(targets[i])) {
             return pTarget;
-        } else if (auto* cTarget = dynamic_cast<MTGCardInstance*>(targets[i])) {
+        }
+        if (auto* cTarget = dynamic_cast<MTGCardInstance*>(targets[i])) {
             return cTarget;
         }
     }

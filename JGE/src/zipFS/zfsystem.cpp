@@ -424,31 +424,30 @@ bool filesystem::PreloadZip(const char* Filename, map<string, limited_file_info>
 
         File.close();
         return (target.size() ? true : false);
-    } else {
-        if (!File.seekg(CentralDir(File))) {
-            File.close();
-            return false;
-        }
-
-        // Check every headers within the zip file
-        file_header FileHdr;
-
-        while ((NextHeader(File) == FILE) && (FileHdr.ReadHeader(File))) {
-            // Include files into Files map
-            const char* Name = &(*FileHdr.m_Filename.begin());
-            if (FileHdr.m_FilenameSize != 0) {
-                // The zip in zip method only supports stored Zips because of JFileSystem limitations
-                if ((FileHdr.m_UncompSize != FileHdr.m_CompSize) || FileHdr.m_CompMethod != STORED) continue;
-
-                target[Name] = limited_file_info(FileHdr.m_RelOffset,  // "Local File" header offset position
-                                                 FileHdr.m_UncompSize  // File Size
-                );
-            }
-        }
-
-        File.close();
-        return (target.size() ? true : false);
     }
+    if (!File.seekg(CentralDir(File))) {
+        File.close();
+        return false;
+    }
+
+    // Check every headers within the zip file
+    file_header FileHdr;
+
+    while ((NextHeader(File) == FILE) && (FileHdr.ReadHeader(File))) {
+        // Include files into Files map
+        const char* Name = &(*FileHdr.m_Filename.begin());
+        if (FileHdr.m_FilenameSize != 0) {
+            // The zip in zip method only supports stored Zips because of JFileSystem limitations
+            if ((FileHdr.m_UncompSize != FileHdr.m_CompSize) || FileHdr.m_CompMethod != STORED) continue;
+
+            target[Name] = limited_file_info(FileHdr.m_RelOffset,  // "Local File" header offset position
+                                             FileHdr.m_UncompSize  // File Size
+            );
+        }
+    }
+
+    File.close();
+    return (target.size() ? true : false);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -503,8 +502,7 @@ bool filesystem::lt_path::operator()(const string& s1, const string& s2) const {
             // This line puts uppercases first
             if ((A[i] == '\0') || (A[i] < B[i]))
                 return true;
-            else
-                return false;
+            return false;
         }
     }
 }

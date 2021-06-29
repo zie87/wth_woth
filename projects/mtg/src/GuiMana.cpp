@@ -276,8 +276,8 @@ int GuiMana::receiveEventPlus(WEvent* e) {
         else
             manas.push_back(NEW ManaIcon(event->color, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, x, y));
         return 1;
-    } else
-        return 0;
+    }
+    return 0;
 }
 
 int GuiMana::receiveEventMinus(WEvent* e) {
@@ -289,7 +289,8 @@ int GuiMana::receiveEventMinus(WEvent* e) {
                 return 1;
             }
         return 1;
-    } else if (auto* event2 = dynamic_cast<WEventEmptyManaPool*>(e)) {
+    }
+    if (auto* event2 = dynamic_cast<WEventEmptyManaPool*>(e)) {
         if (event2->source != owner->getManaPool()) return 0;
         for (auto& mana : manas) mana->Drop();
         return 1;

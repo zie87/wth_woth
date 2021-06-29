@@ -379,7 +379,7 @@ void GuiCombat::Render() {
         if (activeAtk->card->has(Constants::TRAMPLE)) {
             if (activeAtk->card->isAttacking && activeAtk->card->isAttacking != observer->opponent()) {
                 JQuadPtr enemy = WResourceManager::Instance()->RetrieveCard(
-                    (MTGCardInstance*)activeAtk->card->isAttacking, CACHE_THUMB);
+                    dynamic_cast<MTGCardInstance*>(activeAtk->card->isAttacking), CACHE_THUMB);
                 float oldH = enemy->mHeight;
                 float oldW = enemy->mWidth;
                 enemy->mHeight = setH;
@@ -420,18 +420,19 @@ int GuiCombat::resolve()  // Returns the number of damage objects dealt this tur
     for (auto& it : attackers) {
         MTGCardInstance* attacker = it->card;
         signed dmg = attacker->stepPower(step);
-        for (auto q = it->blockers.begin(); q != it->blockers.end(); ++q) {
-            for (auto& damage : (*q)->damages) stack->Add(NEW Damage(damage));
-            dmg -= (*q)->sumDamages();
+        for (auto& blocker : it->blockers) {
+            for (auto& damage : blocker->damages) stack->Add(NEW Damage(damage));
+            dmg -= blocker->sumDamages();
         }
 
         if (dmg > 0 && ((!attacker->isBlocked()) || attacker->has(Constants::TRAMPLE)))
-            stack->Add(NEW Damage(
-                observer, it->card,
-                (Damageable*)attacker->isAttacking ? (Damageable*)attacker->isAttacking : observer->opponent(), dmg,
-                DAMAGE_COMBAT));
+            stack->Add(NEW Damage(observer, it->card,
+                                  dynamic_cast<Damageable*>(attacker->isAttacking)
+                                      ? dynamic_cast<Damageable*>(attacker->isAttacking)
+                                      : observer->opponent(),
+                                  dmg, DAMAGE_COMBAT));
 
-        for (auto d = it->damages.begin(); d != it->damages.end(); ++d) stack->Add(NEW Damage(*d));
+        for (auto& damage : it->damages) stack->Add(NEW Damage(damage));
     }
     int v = stack->mObjects.size();
     if (v > 0) {
@@ -452,7 +453,8 @@ int GuiCombat::receiveEventPlus(WEvent* e) {
         auto* t = NEW AttackerDamaged(event->card, pos, true, nullptr);
         attackers.push_back(t);
         return 1;
-    } else if (auto* event = dynamic_cast<WEventCreatureBlocker*>(e)) {
+    }
+    if (auto* event = dynamic_cast<WEventCreatureBlocker*>(e)) {
         for (auto& attacker : attackers)
             if (attacker->card == event->after) {
                 Pos pos(0, 0, 0, 0, 255);
@@ -476,7 +478,7 @@ int GuiCombat::receiveEventPlus(WEvent* e) {
                 for (it2 = attacker->blockers.begin(); it2 != attacker->blockers.end(); ++it2)
                     if ((*it2)->card == event->exchangeWith) break;
                 if (attacker->blockers.end() == it2) return 1;
-                float x = (*it1)->x;
+                float x   = (*it1)->x;
                 (*it1)->x = (*it2)->x;
                 (*it2)->x = x;
                 std::iter_swap(it1, it2);
@@ -516,7 +518,8 @@ int GuiCombat::receiveEventMinus(WEvent* e) {
                 return 1;
             }
         return 0;
-    } else if (auto* event = dynamic_cast<WEventCreatureBlocker*>(e)) {
+    }
+    if (auto* event = dynamic_cast<WEventCreatureBlocker*>(e)) {
         for (auto& attacker : attackers)
             if (attacker->card == event->before)
                 for (auto q = attacker->blockers.begin(); q != attacker->blockers.end(); ++q)
@@ -562,10 +565,10 @@ int GuiCombat::receiveEventMinus(WEvent* e) {
             repos<AttackerDamaged>(attackers.begin(), attackers.end(), 0);
             if (active) {
                 active->zoom = kZoom_level3;
-                activeAtk = static_cast<AttackerDamaged*>(active);
+                activeAtk    = static_cast<AttackerDamaged*>(active);
                 remaskBlkViews(nullptr, static_cast<AttackerDamaged*>(active));
                 cursor_pos = ATK;
-                step = ORDER;
+                step       = ORDER;
             } else
                 observer->userRequestNextGamePhase(false, false);
             return 1;
@@ -588,7 +591,7 @@ int GuiCombat::receiveEventMinus(WEvent* e) {
         DAMAGE:
             step = event->step;
             if (!observer->currentPlayer->displayStack()) {
-                ((AIPlayer*)observer->currentPlayer)->affectCombatDamages(step);
+                (dynamic_cast<AIPlayer*>(observer->currentPlayer))->affectCombatDamages(step);
                 observer->userRequestNextGamePhase(false, false);
                 return 1;
             }
@@ -607,7 +610,7 @@ int GuiCombat::receiveEventMinus(WEvent* e) {
                 }
             if (active) {
                 active->zoom = kZoom_level3;
-                activeAtk = static_cast<AttackerDamaged*>(active);
+                activeAtk    = static_cast<AttackerDamaged*>(active);
                 remaskBlkViews(nullptr, static_cast<AttackerDamaged*>(active));
                 cursor_pos = ATK;
             } else

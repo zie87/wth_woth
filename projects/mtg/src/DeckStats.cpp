@@ -45,9 +45,8 @@ DeckStat* DeckStats::getDeckStat(string opponentsFile) {
     auto it                      = stats.find(opponentsFile);
     if (it == stats.end()) {
         return nullptr;
-    } else {
-        return it->second;
     }
+    return it->second;
 }
 
 int DeckStats::nbGames() {
@@ -66,9 +65,8 @@ int DeckStats::percentVictories(string opponentsFile) {
     auto it                      = stats.find(opponentsFile);
     if (it == stats.end()) {
         return 50;
-    } else {
-        return (it->second->percentVictories());
     }
+    return (it->second->percentVictories());
 }
 
 int DeckStats::percentVictories() {

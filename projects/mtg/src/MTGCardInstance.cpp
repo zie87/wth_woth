@@ -614,12 +614,11 @@ int MTGCardInstance::toggleAttacker() {
         // if (!basicAbilities[Constants::VIGILANCE]) tap();
         setAttacker(1);
         return 1;
-    } else {
-        // untap();
-        setAttacker(0);
-        isAttacking = nullptr;
-        return 1;
-    }
+    }  // untap();
+    setAttacker(0);
+    isAttacking = nullptr;
+    return 1;
+
     return 0;
 }
 

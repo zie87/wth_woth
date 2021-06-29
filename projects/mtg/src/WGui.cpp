@@ -25,8 +25,7 @@ PIXEL_TYPE WGuiBase::getColor(int type) {
         if (type < WGuiColor::BACK) {
             if (hasFocus())
                 return ARGB(255, 255, 255, 0);
-            else
-                return ARGB(255, 255, 255, 255);
+            return ARGB(255, 255, 255, 255);
         } else if (hasFocus())
             return ARGB(150, 200, 200, 200);
         else
@@ -130,19 +129,18 @@ void WDecoStyled::subBack(WGuiBase* item) {
     JRenderer* renderer = JRenderer::GetInstance();
     if (mStyle & DS_STYLE_BACKLESS) return;
     // TODO: if(mStyle & DS_STYLE_EDGED) Draw the edged box ala SimpleMenu
-    else {  // Draw standard style
-        auto* split = dynamic_cast<WGuiSplit*>(item);
-        if (split && split->left->Visible() && split->right->Visible()) {
-            if (split->left)
-                renderer->FillRoundRect(split->left->getX() - 2, split->getY() - 2, split->left->getWidth() - 6,
-                                        split->getHeight(), 2, split->left->getColor(WGuiColor::BACK));
-            if (split->right)
-                renderer->FillRoundRect(split->right->getX() - 2, split->getY() - 2, split->right->getWidth(),
-                                        split->getHeight(), 2, split->right->getColor(WGuiColor::BACK));
-        } else {
-            renderer->FillRoundRect(item->getX() - 2, item->getY() - 2, item->getWidth(), item->getHeight(), 2,
-                                    getColor(WGuiColor::BACK));
-        }
+    // Draw standard style
+    auto* split = dynamic_cast<WGuiSplit*>(item);
+    if (split && split->left->Visible() && split->right->Visible()) {
+        if (split->left)
+            renderer->FillRoundRect(split->left->getX() - 2, split->getY() - 2, split->left->getWidth() - 6,
+                                    split->getHeight(), 2, split->left->getColor(WGuiColor::BACK));
+        if (split->right)
+            renderer->FillRoundRect(split->right->getX() - 2, split->getY() - 2, split->right->getWidth(),
+                                    split->getHeight(), 2, split->right->getColor(WGuiColor::BACK));
+    } else {
+        renderer->FillRoundRect(item->getX() - 2, item->getY() - 2, item->getWidth(), item->getHeight(), 2,
+                                getColor(WGuiColor::BACK));
     }
 }
 
@@ -180,8 +178,7 @@ bool WGuiMenu::Leaving(JButton key) {
     int nbitems = (int)items.size();
     if (key == buttonNext && currentItem < nbitems - 1)
         return false;
-    else if (key == buttonPrev && currentItem > 0)
-        return false;
+    if (key == buttonPrev && currentItem > 0) return false;
 
     if (currentItem >= 0 && currentItem < nbitems)
         if (!items[currentItem]->Leaving(key)) return false;
@@ -888,18 +885,17 @@ bool WGuiMenu::isButtonDir(JButton key, int dir) {
         default:;  // Nothing
         }
         return (key == buttonPrev);
-    } else {
-        switch (buttonNext) {
-        case JGE_BTN_RIGHT:
-            if (key == JGE_BTN_DOWN) return true;
-            break;
-        case JGE_BTN_DOWN:
-            if (key == JGE_BTN_RIGHT) return true;
-            break;
-        default:;  // Nothing
-        }
-        return (key == buttonNext);
     }
+    switch (buttonNext) {
+    case JGE_BTN_RIGHT:
+        if (key == JGE_BTN_DOWN) return true;
+        break;
+    case JGE_BTN_DOWN:
+        if (key == JGE_BTN_RIGHT) return true;
+        break;
+    default:;  // Nothing
+    }
+    return (key == buttonNext);
 }
 void WGuiMenu::Update(float dt) {
     int nbitems = (int)items.size();
@@ -1444,9 +1440,8 @@ void WGuiFilters::ButtonPressed(int controllerId, int controlId) {
             buildList();
         }
         return;
-    } else {
-        if (list != nullptr) list->ButtonPressed(controllerId, controlId);
     }
+    if (list != nullptr) list->ButtonPressed(controllerId, controlId);
 }
 
 void WGuiFilters::buildList() {

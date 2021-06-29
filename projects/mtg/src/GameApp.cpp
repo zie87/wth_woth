@@ -331,7 +331,7 @@ void GameApp::Update() {
     if (mCurrentState) {
         mCurrentState->Update(dt);
         if (mGameStates[GAME_STATE_TRANSITION] == mCurrentState)
-            mTrans = (TransitionBase*)mGameStates[GAME_STATE_TRANSITION];
+            mTrans = dynamic_cast<TransitionBase*>(mGameStates[GAME_STATE_TRANSITION]);
     }
     // Check for finished transitions.
     if (mTrans && mTrans->Finished()) {
@@ -429,7 +429,7 @@ void GameApp::DoTransition(int trans, int tostate, float dur, bool animonly) {
     if (tostate > GAME_STATE_NONE && tostate < GAME_STATE_MAX) toState = mGameStates[tostate];
 
     if (mGameStates[GAME_STATE_TRANSITION]) {
-        tb = (TransitionBase*)mGameStates[GAME_STATE_TRANSITION];
+        tb = dynamic_cast<TransitionBase*>(mGameStates[GAME_STATE_TRANSITION]);
         if (toState) tb->to = toState;  // Additional calls to transition merely update the destination.
         return;
     }

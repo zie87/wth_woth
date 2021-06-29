@@ -13,7 +13,7 @@
 #include <wge/log.hpp>
 
 Player* OrderedAIAction::getPlayerTarget() {
-    if (playerAbilityTarget) return (Player*)playerAbilityTarget;
+    if (playerAbilityTarget) return dynamic_cast<Player*>(playerAbilityTarget);
 
     return nullptr;
 }
@@ -76,7 +76,7 @@ int OrderedAIAction::getEfficiency() {
         return 0;
     }
 
-    if (!((AIPlayerBaka*)owner)->canHandleCost(ability)) {
+    if (!(dynamic_cast<AIPlayerBaka*>(owner))->canHandleCost(ability)) {
         SAFE_DELETE(transAbility);
         return 0;
     }
@@ -90,7 +90,7 @@ int OrderedAIAction::getEfficiency() {
 
     switch (a->aType) {
     case MTGAbility::DAMAGER: {
-        efficiency = getEfficiency((AADamager*)a);
+        efficiency = getEfficiency(dynamic_cast<AADamager*>(a));
         break;
     }
     case MTGAbility::STANDARD_REGENERATE: {
@@ -353,7 +353,7 @@ int OrderedAIAction::getEfficiency() {
 
     case MTGAbility::LIFER: {
         // use life abilities whenever possible.
-        auto* alife    = (AALifer*)a;
+        auto* alife    = dynamic_cast<AALifer*>(a);
         Targetable* _t = alife->getTarget();
 
         efficiency = 100;
@@ -371,7 +371,7 @@ int OrderedAIAction::getEfficiency() {
         break;
     }
     case MTGAbility::STANDARD_DRAW: {
-        auto* drawer = (AADrawer*)a;
+        auto* drawer = dynamic_cast<AADrawer*>(a);
         // adding this case since i played a few games where Ai litterally decided to mill himself to death. fastest
         // and easiest win ever. this should help a little, tho ultimately it will be decided later what the best
         // course of action is. eff of drawing ability is calculated by base 20 + the amount of cards in library minus
@@ -498,7 +498,7 @@ int OrderedAIAction::getEfficiency() {
 
     auto* may = dynamic_cast<MayAbility*>(ability);
     if (!efficiency && may) {
-        auto* chk = (AIPlayer*)p;
+        auto* chk = dynamic_cast<AIPlayer*>(p);
         if (may->ability->getActionTc() && chk->chooseTarget(may->ability->getActionTc(), nullptr, nullptr, true))
             efficiency = 50 + (owner->getRandomGenerator()->random() % 50);
     }
@@ -512,8 +512,7 @@ int OrderedAIAction::getEfficiency() {
                 ExtraCost* tapper = dynamic_cast<TapCost*>(cost);
                 if (tapper)
                     continue;
-                else
-                    efficiency = efficiency / 2;
+                efficiency = efficiency / 2;
             }
             // Decrease chance of using ability if there is an extra cost to use the ability, ignore tap
         }
@@ -645,7 +644,7 @@ bool AIPlayerBaka::payTheManaCost(ManaCost* cost, MTGCardInstance* target, vecto
     for (size_t i = 1; i < observer->mLayers->actionLayer()->mObjects.size(); ++i) {  // 0 is not a
                                                                                       // mtgability...hackish
         // Make sure we can use the ability
-        MTGAbility* a = ((MTGAbility*)observer->mLayers->actionLayer()->mObjects[i]);
+        MTGAbility* a = (dynamic_cast<MTGAbility*>(observer->mLayers->actionLayer()->mObjects[i]));
         auto* amp     = dynamic_cast<AManaProducer*>(a);
         if (amp && canHandleCost(amp)) {
             MTGCardInstance* card = amp->source;
@@ -678,7 +677,7 @@ ManaCost* AIPlayerBaka::getPotentialMana(MTGCardInstance* target) {
     map<MTGCardInstance*, bool> used;
     for (auto& manaObject : observer->mLayers->actionLayer()->manaObjects) {
         // Make sure we can use the ability
-        MTGAbility* a = ((MTGAbility*)manaObject);
+        MTGAbility* a = (dynamic_cast<MTGAbility*>(manaObject));
         auto* amp     = dynamic_cast<AManaProducer*>(a);
         auto* gmp     = dynamic_cast<GenericActivatedAbility*>(a);
         if (gmp && canHandleCost(gmp)) {
@@ -726,7 +725,7 @@ vector<MTGAbility*> AIPlayerBaka::canPayMana(MTGCardInstance* target, ManaCost* 
     int needColorConverted = cost->getConvertedCost() - int(cost->getCost(0) + cost->getCost(7));
     int fullColor = 0;
     for (auto& manaObject : observer->mLayers->actionLayer()->manaObjects) {
-        MTGAbility* a = ((MTGAbility*)manaObject);
+        MTGAbility* a = (dynamic_cast<MTGAbility*>(manaObject));
         auto* amp     = dynamic_cast<AManaProducer*>(a);
         if (amp && (amp->getCost() && amp->getCost()->extraCosts && !amp->getCost()->extraCosts->canPay())) continue;
         if (fullColor == needColorConverted && result->getConvertedCost() < cost->getConvertedCost()) {
@@ -810,7 +809,7 @@ vector<MTGAbility*> AIPlayerBaka::canPayMana(MTGCardInstance* target, ManaCost* 
             bool foundColor1 = false;
             bool foundColor2 = false;
             for (auto& manaObject : observer->mLayers->actionLayer()->manaObjects) {
-                MTGAbility* a = ((MTGAbility*)manaObject);
+                MTGAbility* a = (dynamic_cast<MTGAbility*>(manaObject));
                 auto* amp     = dynamic_cast<AManaProducer*>(a);
                 if (amp && canHandleCost(amp)) {
                     foundColor1 = amp->output->hasColor(hybridCost->color1) ? true : false;
@@ -884,7 +883,7 @@ vector<MTGAbility*> AIPlayerBaka::canPayMana(MTGCardInstance* target, ManaCost* 
         // if we decided to play an "x" ability/card, lets go all out, these effects tend to be game winners.
         // add the rest of the mana.
         for (auto& manaObject : observer->mLayers->actionLayer()->manaObjects) {
-            MTGAbility* a = ((MTGAbility*)manaObject);
+            MTGAbility* a = (dynamic_cast<MTGAbility*>(manaObject));
             auto* amp     = dynamic_cast<AManaProducer*>(a);
             if (amp && canHandleCost(amp)) {
                 if (!used[amp->source] && amp->isReactingToClick(amp->source) &&
@@ -915,7 +914,7 @@ vector<MTGAbility*> AIPlayerBaka::canPaySunBurst(ManaCost* cost) {
         if (fullColor == needColorConverted || fullColor == cost->getConvertedCost()) {
             break;
         }
-        MTGAbility* a = ((MTGAbility*)manaObject);
+        MTGAbility* a = (dynamic_cast<MTGAbility*>(manaObject));
         auto* amp     = dynamic_cast<AManaProducer*>(a);
         if (amp && amp->getCost() && amp->getCost()->extraCosts && !amp->getCost()->extraCosts->canPay())
             continue;  // pentid prism, has no cost but contains a counter cost, without this check ai will think it
@@ -946,7 +945,7 @@ vector<MTGAbility*> AIPlayerBaka::canPaySunBurst(ManaCost* cost) {
 
     for (int i = fullColor; i < cost->getConvertedCost(); i++) {
         for (auto& manaObject : observer->mLayers->actionLayer()->manaObjects) {
-            MTGAbility* a = ((MTGAbility*)manaObject);
+            MTGAbility* a = (dynamic_cast<MTGAbility*>(manaObject));
             auto* amp     = dynamic_cast<AManaProducer*>(a);
             if (amp && canHandleCost(amp)) {
                 MTGCardInstance* card = amp->source;
@@ -1095,7 +1094,7 @@ int AIPlayerBaka::selectAbility() {
     totalPotentialMana->add(this->getManaPool());
     for (size_t i = 1; i < observer->mLayers->actionLayer()->mObjects.size(); i++) {  // 0 is not a
                                                                                       // mtgability...hackish
-        MTGAbility* a = ((MTGAbility*)observer->mLayers->actionLayer()->mObjects[i]);
+        MTGAbility* a = (dynamic_cast<MTGAbility*>(observer->mLayers->actionLayer()->mObjects[i]));
         // Skip mana abilities for performance
         if (dynamic_cast<AManaProducer*>(a)) continue;
         // Make sure we can use the ability
@@ -1317,7 +1316,7 @@ int AIPlayerBaka::selectMenuOption() {
             for (size_t m = object->mObjects.size() - 1; m > 0; m--) {
                 auto* ability = dynamic_cast<MenuAbility*>(object->mObjects[m]);
                 if (ability && ability->triggered) {
-                    currentMenu = (MenuAbility*)object->mObjects[m];
+                    currentMenu = dynamic_cast<MenuAbility*>(object->mObjects[m]);
                     break;
                 }
             }
@@ -1333,7 +1332,8 @@ int AIPlayerBaka::selectMenuOption() {
             for (unsigned int k = 0; k < object->abilitiesMenu->mObjects.size(); k++) {
                 if (object->abilitiesMenu->mObjects[k]->GetId() <= 0) continue;
 
-                auto* checkEff = (MTGAbility*)object->mObjects[object->abilitiesMenu->mObjects[k]->GetId()];
+                auto* checkEff =
+                    dynamic_cast<MTGAbility*>(object->mObjects[object->abilitiesMenu->mObjects[k]->GetId()]);
                 int checked = getEfficiency(checkEff);
                 if (checked > 60 && checked > checkedLast) {
                     doThis = k;
@@ -1564,7 +1564,8 @@ int AIPlayerBaka::computeActions() {
         findingCard = false;
 #endif  // AI_CHANGE_TESTING
         return 1;
-    } else if (observer->mLayers->stackLayer()->count(0, NOT_RESOLVED) == 0) {  // standard actions
+    }
+    if (observer->mLayers->stackLayer()->count(0, NOT_RESOLVED) == 0) {  // standard actions
         switch (observer->getCurrentGamePhase()) {
         case MTG_PHASE_UPKEEP:
             selectAbility();
@@ -1590,7 +1591,7 @@ int AIPlayerBaka::computeActions() {
                 }
             } else {
                 const char* types[] = {"planeswalker", "creature", "enchantment", "artifact", "sorcery", "instant"};
-                int count = 0;
+                int count           = 0;
                 while (!nextCardToPlay && count < 6) {
                     if (clickstream.size())  // don't find cards while we have clicking to do.
                     {

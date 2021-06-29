@@ -191,7 +191,8 @@ bool Player::parseLine(const string& s) {
             manaPool = new ManaPool(this);
             ManaCost::parseManaCost(s.substr(limiter + 1), manaPool);
             return true;
-        } else if (areaS.compare("avatar") == 0) {
+        }
+        if (areaS.compare("avatar") == 0) {
             mAvatarName = s.substr(limiter + 1);
             loadAvatar(mAvatarName, "bakaAvatar");
             return true;
@@ -217,7 +218,7 @@ bool Player::parseLine(const string& s) {
                 SAFE_DELETE(mDeck);
                 SAFE_DELETE(game);
                 mDeck = NEW MTGDeck(deckFile.c_str(), MTGCollection(), 0, deckSetting);
-                game = NEW MTGPlayerCards(mDeck);
+                game  = NEW MTGPlayerCards(mDeck);
                 // This automatically sets the observer pointer on all the deck cards
                 game->setOwner(this);
                 deckName = mDeck->meta_name;

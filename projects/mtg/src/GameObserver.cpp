@@ -24,8 +24,7 @@
 WResourceManager* GameObserver::getResourceManager() {
     if (this)
         return mResourceManager;
-    else
-        return nullptr;
+    return nullptr;
 };
 
 void GameObserver::cleanup() {
@@ -987,7 +986,7 @@ int GameObserver::cardClick(MTGCardInstance* card, Targetable* object, bool log)
     MTGCardInstance* backup = nullptr;
 
     if (!card) {
-        clickedPlayer = ((Player*)object);
+        clickedPlayer = (dynamic_cast<Player*>(object));
     } else {
         backup = card;
         zone   = card->currentZone;
@@ -1087,11 +1086,11 @@ int GameObserver::cardClick(MTGCardInstance* card, Targetable* object, bool log)
             if (reaction == 1) {
                 toReturn = mLayers->actionLayer()->reactToClick(card);
                 return cardClickLog(log, clickedPlayer, zone, backup, index, toReturn);
-            } else {
-                mLayers->actionLayer()->setMenuObject(object);
-                toReturn = 1;
-                return cardClickLog(log, clickedPlayer, zone, backup, index, toReturn);
             }
+            mLayers->actionLayer()->setMenuObject(object);
+            toReturn = 1;
+            return cardClickLog(log, clickedPlayer, zone, backup, index, toReturn);
+
         } else if (card->isTapped() && card->controller() == currentPlayer) {
             toReturn = untap(card);
             return cardClickLog(log, clickedPlayer, zone, backup, index, toReturn);
@@ -1182,8 +1181,8 @@ int GameObserver::targetListIsSet(MTGCardInstance* card) {
     if (targetChooser && targetChooser->validTargetsExist()) {
         cardWaitingForTargets = card;
         return (targetChooser->targetListSet());
-    } else
-        SAFE_DELETE(targetChooser);
+    }
+    SAFE_DELETE(targetChooser);
     return 0;
 }
 
@@ -1197,12 +1196,11 @@ std::ostream& operator<<(std::ostream& out, const GameObserver& g) {
         out << "[player2]" << std::endl;
         out << *(g.players[1]) << std::endl;
         return out;
-    } else {
-        out << "rvalues:";
-        g.randomGenerator.saveUsedRandValues(out);
-        out << std::endl;
-        out << g.startupGameSerialized;
     }
+    out << "rvalues:";
+    g.randomGenerator.saveUsedRandValues(out);
+    out << std::endl;
+    out << g.startupGameSerialized;
 
     out << "[do]" << std::endl;
 
@@ -1223,7 +1221,8 @@ bool GameObserver::parseLine(const string& s) {
         if (areaS.compare("player") == 0) {
             currentPlayerId = atoi(s.substr(limiter + 1).c_str()) - 1;
             return true;
-        } else if (areaS.compare("phase") == 0) {
+        }
+        if (areaS.compare("phase") == 0) {
             currentGamePhase = PhaseRing::phaseStrToInt(s.substr(limiter + 1).c_str());
             return true;
         }
@@ -1399,7 +1398,7 @@ bool GameObserver::processActions(bool undo
             size_t begin = s.find("[") + 1;
             size_t size  = s.find("]") - begin;
             size_t index = atoi(s.substr(begin, size).c_str());
-            stackObjectClicked((Interruptible*)mLayers->stackLayer()->getByIndex(index));
+            stackObjectClicked(dynamic_cast<Interruptible*>(mLayers->stackLayer()->getByIndex(index)));
         } else if (s.find("yes") != string::npos) {
             mLayers->stackLayer()->setIsInterrupting(p);
         } else if (s.find("no") != string::npos) {
@@ -1584,6 +1583,6 @@ void GameObserver::loadPlayer(int playerId, PlayerType playerType, int decknb, b
             loadPlayer(playerId, playerCreator.createAIPlayer(this, MTGCollection(), opponent));
         }
 
-        if (playerType == PLAYER_TYPE_CPU_TEST) ((AIPlayer*)players[playerId])->setFastTimerMode();
+        if (playerType == PLAYER_TYPE_CPU_TEST) (dynamic_cast<AIPlayer*>(players[playerId]))->setFastTimerMode();
     }
 }

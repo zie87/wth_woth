@@ -120,8 +120,8 @@ void JParticleEmitter::Update(float dt) {
             if (mRepeatCounter > 0) {
                 ReStart();
                 return;
-            } else
-                mActive = false;
+            }
+            mActive = false;
         }
     }
 

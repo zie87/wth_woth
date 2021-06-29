@@ -111,8 +111,8 @@ bool JTTFont::SetSize(int size) {
         for (unsigned short& i : mCachedCode) i = 0;
 
         return true;
-    } else
-        return false;
+    }
+    return false;
 }
 
 FT_Library JTTFont::GetFontLibrary() { return mLibrary; }
@@ -164,8 +164,7 @@ bool JTTFont::Load(const char* filename, int size, int mode) {
 
                 if (mode == MODE_PRECACHE_ASCII)
                     return PreCacheASCII();
-                else if (mode == MODE_PRECACHE_ASCII_EX)
-                    return PreCacheExtendedASCII();
+                if (mode == MODE_PRECACHE_ASCII_EX) return PreCacheExtendedASCII();
 
                 return true;
             }

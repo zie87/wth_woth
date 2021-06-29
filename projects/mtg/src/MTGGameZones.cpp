@@ -1032,7 +1032,8 @@ bool MTGPlayerCards::parseLine(const string& s) {
         if (areaS.compare("graveyard") == 0) {
             graveyard->parseLine(s.substr(limiter + 1));
             return true;
-        } else if (areaS.compare("library") == 0) {
+        }
+        if (areaS.compare("library") == 0) {
             library->parseLine(s.substr(limiter + 1));
             return true;
         } else if (areaS.compare("hand") == 0) {

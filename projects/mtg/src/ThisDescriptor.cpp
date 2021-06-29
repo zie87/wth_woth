@@ -340,25 +340,24 @@ int ThisCounter::match(MTGCardInstance* card) {
     Counter* targetCounter = card->counters->hasCounter(counter->name.c_str(), counter->power, counter->toughness);
     if (targetCounter) {
         return matchValue(targetCounter->nb);
-    } else {
-        switch (comparisonMode) {
-        case COMPARISON_LESS:
-            return comparisonCriterion;
-        case COMPARISON_AT_MOST:
-            return comparisonCriterion + 1;
-        case COMPARISON_UNEQUAL:
-            if (comparisonCriterion)
-                return 1;
-            else
-                return 0;
-        case COMPARISON_EQUAL:
-            if (comparisonCriterion)
-                return 0;
-            else
-                return 1;
-        default:
+    }
+    switch (comparisonMode) {
+    case COMPARISON_LESS:
+        return comparisonCriterion;
+    case COMPARISON_AT_MOST:
+        return comparisonCriterion + 1;
+    case COMPARISON_UNEQUAL:
+        if (comparisonCriterion)
+            return 1;
+        else
             return 0;
-        }
+    case COMPARISON_EQUAL:
+        if (comparisonCriterion)
+            return 0;
+        else
+            return 1;
+    default:
+        return 0;
     }
 }
 

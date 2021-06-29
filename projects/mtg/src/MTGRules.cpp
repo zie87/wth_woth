@@ -1195,8 +1195,8 @@ int MTGBlockRule::reactToClick(MTGCardInstance* card) {
             blockAbility->forceDestroy = 1;
             blockAbility->canBeInterrupted = false;
             return blockAbility->reactToTargetClick(card);
-        } else
-            card->toggleDefenser(nullptr);
+        }
+        card->toggleDefenser(nullptr);
     } else
         while (!result) {
             currentOpponent = game->currentPlayer->game->inPlay->getNextAttacker(currentOpponent);

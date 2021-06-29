@@ -44,7 +44,7 @@ void AIStats::updateStatsCard(MTGCardInstance* cardInstance, Damage* damage, flo
     if (damage->target == player) {
         stat->value += static_cast<int>(multiplier * STATS_PLAYER_MULTIPLIER * damage->damage);
     } else if (damage->target->type_as_damageable == DAMAGEABLE_MTGCARDINSTANCE) {
-        auto* target = (MTGCardInstance*)damage->target;
+        auto* target = dynamic_cast<MTGCardInstance*>(damage->target);
         if (target->controller() == player && !target->isInPlay(player->getObserver())) {
             // One of my creatures got lethal damage...
             stat->value += static_cast<int>(multiplier * STATS_CREATURE_MULTIPLIER * damage->damage);
@@ -73,7 +73,7 @@ int AIStats::receiveEvent(WEvent* event) {
     // Lords
     map<MTGCardInstance*, int> lords;
     for (size_t i = 1; i < g->mLayers->actionLayer()->mObjects.size(); i++) {  // 0 is not a mtgability...hackish
-        MTGAbility* a = ((MTGAbility*)g->mLayers->actionLayer()->mObjects[i]);
+        MTGAbility* a = (dynamic_cast<MTGAbility*>(g->mLayers->actionLayer()->mObjects[i]));
         if (auto* al = dynamic_cast<ALord*>(a)) {
             if (al->cards.find(card) != al->cards.end() && opponentZone->hasCard(al->source)) {
                 lords[al->source] = 1;

@@ -80,8 +80,7 @@ void GuiPlay::VertStack::Render(CardView* card, iterator begin, iterator end) {
 inline float GuiPlay::VertStack::nextX() {
     if (0 == count)
         return x + CARD_WIDTH;
-    else
-        return x;
+    return x;
 }
 
 GuiPlay::BattleField::BattleField() : attackers(0), blockers(0), height(0.0), red(0), colorFlow(0) {}

@@ -382,9 +382,9 @@ void WFBFont::DrawString(const char* s, float x, float y, int align, float leftO
     while (*src != 0) {
         if (yy > SCREEN_HEIGHT_F)  // don't render or count outside the buttom of viewport
             return;
-        else if (yy + mFontSize < 0.0f) {  // don't render when outside the top of viewport, but counted
-            if (*src < 0x20) {             // control characters
-                if (*src == 0x0a) {        // NEWLINE
+        if (yy + mFontSize < 0.0f) {  // don't render when outside the top of viewport, but counted
+            if (*src < 0x20) {        // control characters
+                if (*src == 0x0a) {   // NEWLINE
                     xx = x;
                     yy += (mFontSize * mScale);
                 }
@@ -405,17 +405,17 @@ void WFBFont::DrawString(const char* s, float x, float y, int align, float leftO
                 }
                 src += 1;
             } else {
-                int mana = this->GetMana(src);
+                int mana     = this->GetMana(src);
                 bool doubleW = doubleWidthChar(src);
-                index = PreCacheChar(src);
+                index        = PreCacheChar(src);
                 src += charWidth(*src);
 
                 // fix for leftoffset and width's setting
                 float xPos, yPos, charW, charHeight;
                 mSprites[index]->GetTextureRect(&xPos, &yPos, &charW, &charHeight);
-                float xPos0 = xPos;
+                float xPos0  = xPos;
                 float charW0 = charW;
-                float delta = doubleW ? (charW * mScale) : (charW * mScale / 2);
+                float delta  = doubleW ? (charW * mScale) : (charW * mScale / 2);
                 if (leftOffset) {
                     if (leftOffset < 0) {
                         xx -= leftOffset;
@@ -427,7 +427,7 @@ void WFBFont::DrawString(const char* s, float x, float y, int align, float leftO
                         xPos += leftOffset / mScale;
                         delta -= leftOffset;
                         leftOffset = 0;
-                        charW = delta / mScale;
+                        charW      = delta / mScale;
                     }
                 }
                 if (width) {
@@ -444,7 +444,7 @@ void WFBFont::DrawString(const char* s, float x, float y, int align, float leftO
                         src += 1 + charWidth(*src);
                         unsigned char t = (JGE::GetInstance()->GetTime() / 3) & 0xFF;
                         unsigned char v = t + 127;
-                        float scale = 0.05f * cosf(2 * M_PI * ((float)t) / 256.0f);
+                        float scale     = 0.05f * cosf(2 * M_PI * ((float)t) / 256.0f);
                         if (scale < 0) {
                             mRenderer->RenderQuad(manaIcons[mana].get(), xx + 3 * sinf(2 * M_PI * ((float)t) / 256.0f),
                                                   yy + 3 * cosf(2 * M_PI * ((float)(t - 35)) / 256.0f), 0,
@@ -505,11 +505,10 @@ float WFBFont::GetStringWidth(const char* s) const {
             src += charWidth(*src);
         }
         return width * mFontSize * mScale / 2;
-    } else {
-        WFont* mFont = WResourceManager::Instance()->GetWFont(mFontID + Fonts::kSingleByteFontOffset);
-        mFont->SetScale(GetScale());
-        return mFont->GetStringWidth(s);
     }
+    WFont* mFont = WResourceManager::Instance()->GetWFont(mFontID + Fonts::kSingleByteFontOffset);
+    mFont->SetScale(GetScale());
+    return mFont->GetStringWidth(s);
 }
 
 void WFBFont::SetScale(float scale) { mScale = scale; }
@@ -726,9 +725,9 @@ void WGBKFont::DrawString(const char* s, float x, float y, int align, float left
     while (*src != 0) {
         if (yy > SCREEN_HEIGHT_F)  // don't render or count outside the buttom of viewport
             return;
-        else if (yy + mFontSize < 0.0f) {  // don't render when outside the top of viewport, but counted
-            if (*src < 0x20) {             // control characters
-                if (*src == 0x0a) {        // NEWLINE
+        if (yy + mFontSize < 0.0f) {  // don't render when outside the top of viewport, but counted
+            if (*src < 0x20) {        // control characters
+                if (*src == 0x0a) {   // NEWLINE
                     xx = x;
                     yy += (mFontSize * mScale);
                 }
@@ -756,7 +755,7 @@ void WGBKFont::DrawString(const char* s, float x, float y, int align, float left
             } else {
                 int mana = -1;
                 if (*src > 0x80) {  // 2-bytes char
-                    mana = this->GetMana(src);
+                    mana  = this->GetMana(src);
                     index = PreCacheChar(src);
                     src += 2;
                     dualByteFont = true;
@@ -769,9 +768,9 @@ void WGBKFont::DrawString(const char* s, float x, float y, int align, float left
                 // fix for leftoffset and witdth's setting
                 float xPos, yPos, charW, charHeight;
                 mSprites[index]->GetTextureRect(&xPos, &yPos, &charW, &charHeight);
-                float xPos0 = xPos;
+                float xPos0  = xPos;
                 float charW0 = charW;
-                float delta = (dualByteFont) ? (charW * mScale) : (charW * mScale / 2);
+                float delta  = (dualByteFont) ? (charW * mScale) : (charW * mScale / 2);
                 if (leftOffset) {
                     if (leftOffset < 0) {
                         xx -= leftOffset;
@@ -783,7 +782,7 @@ void WGBKFont::DrawString(const char* s, float x, float y, int align, float left
                         xPos += leftOffset / mScale;
                         delta -= leftOffset;
                         leftOffset = 0;
-                        charW = delta / mScale;
+                        charW      = delta / mScale;
                     }
                 }
                 if (width) {
@@ -800,7 +799,7 @@ void WGBKFont::DrawString(const char* s, float x, float y, int align, float left
                         src += 3;
                         unsigned char t = (JGE::GetInstance()->GetTime() / 3) & 0xFF;
                         unsigned char v = t + 127;
-                        float scale = 0.05f * cosf(2 * M_PI * ((float)t) / 256.0f);
+                        float scale     = 0.05f * cosf(2 * M_PI * ((float)t) / 256.0f);
                         if (scale < 0) {
                             mRenderer->RenderQuad(manaIcons[mana].get(), xx + 3 * sinf(2 * M_PI * ((float)t) / 256.0f),
                                                   yy + 3 * cosf(2 * M_PI * ((float)(t - 35)) / 256.0f), 0,
@@ -862,11 +861,10 @@ float WGBKFont::GetStringWidth(const char* s) const {
                 xx += (mFontSize * mScale) / 2;
         }
         return xx;
-    } else {
-        WFont* mFont = WResourceManager::Instance()->GetWFont(mFontID + Fonts::kSingleByteFontOffset);
-        mFont->SetScale(GetScale());
-        return mFont->GetStringWidth(s);
     }
+    WFont* mFont = WResourceManager::Instance()->GetWFont(mFontID + Fonts::kSingleByteFontOffset);
+    mFont->SetScale(GetScale());
+    return mFont->GetStringWidth(s);
 }
 
 int WGBKFont::GetCode(const u8* ch, int* charLength) const {

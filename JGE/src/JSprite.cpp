@@ -280,8 +280,7 @@ void JSprite::SetCurrentFrameIndex(int frame) {
 JQuad* JSprite::GetCurrentFrame() {
     if (mCurrentFrame < (signed int)mFrames.size())
         return mFrames[mCurrentFrame];
-    else
-        return nullptr;
+    return nullptr;
 }
 
 int JSprite::GetFrameCount() { return (int)mFrames.size(); }
@@ -289,8 +288,7 @@ int JSprite::GetFrameCount() { return (int)mFrames.size(); }
 JQuad* JSprite::GetFrame(int index) {
     if (index < (signed int)mFrames.size())
         return mFrames[index];
-    else
-        return nullptr;
+    return nullptr;
 }
 
 float JSprite::GetX() { return mX; }

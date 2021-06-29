@@ -84,21 +84,22 @@ int AIMomirPlayer::computeActions() {
     if (observer->isInterrupting == this) {  // interrupting
         selectAbility();
         return 1;
-    } else if (p == this && observer->mLayers->stackLayer()->count(0, NOT_RESOLVED) == 0) {  // standard actions
+    }
+    if (p == this && observer->mLayers->stackLayer()->count(0, NOT_RESOLVED) == 0) {  // standard actions
         CardDescriptor cd;
         MTGCardInstance* card = nullptr;
 
         switch (currentGamePhase) {
         case MTG_PHASE_FIRSTMAIN: {
             ManaCost* potentialMana = getPotentialMana();
-            int converted = potentialMana->getConvertedCost();
+            int converted           = potentialMana->getConvertedCost();
             SAFE_DELETE(potentialMana);
 
             if (converted < 8 || game->hand->nb_cards > 1) {
                 // Attempt to put land into play
                 cd.init();
                 cd.setColor(Constants::MTG_COLOR_LAND);
-                card = cd.match(game->hand);
+                card                    = cd.match(game->hand);
                 int canPutLandsIntoPlay = game->playRestrictions->canPutIntoZone(card, game->inPlay);
                 if (card && (canPutLandsIntoPlay == PlayRestriction::CAN_PLAY)) {
                     MTGAbility* putIntoPlay = observer->mLayers->actionLayer()->getAbility(MTGAbility::PUT_INTO_PLAY);

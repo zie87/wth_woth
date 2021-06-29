@@ -505,7 +505,8 @@ TargetChooser* TargetChooserFactory::createTargetChooser(string s, MTGCardInstan
             if (!tc) {
                 if (typeName.compare("*") == 0) {
                     return NEW TargetZoneChooser(observer, zones, nbzones, card, maxtargets, other, targetMin);
-                } else if (typeName.compare("this") == 0) {
+                }
+                if (typeName.compare("this") == 0) {
                     return NEW CardTargetChooser(observer, card, card, zones, nbzones);
                 } else if (typeName.compare("mystored") == 0) {
                     return NEW CardTargetChooser(observer, card->storedSourceCard, card, zones, nbzones);
@@ -609,7 +610,7 @@ bool TargetChooser::canTarget(Targetable* target, bool withoutProtections) {
         }
         // this is kinda cheating but by default we let auras and equipments always continue to target a phased
         // creature.
-        else if (card && card->isPhased) {
+        if (card && card->isPhased) {
             return false;
         }
 
@@ -620,8 +621,8 @@ bool TargetChooser::canTarget(Targetable* target, bool withoutProtections) {
             if ((targetter->controller() != card->controller()) && card->has(Constants::OPPONENTSHROUD)) return false;
         }
         return true;
-    } else if (dynamic_cast<Interruptible*>(target))
-        return true;
+    }
+    if (dynamic_cast<Interruptible*>(target)) return true;
 
     return false;
 }
@@ -798,7 +799,8 @@ bool TypeTargetChooser::canTarget(Targetable* target, bool withoutProtections) {
             }
         }
         return false;
-    } else if (auto* action = dynamic_cast<Interruptible*>(target)) {
+    }
+    if (auto* action = dynamic_cast<Interruptible*>(target)) {
         if (action->type == ACTION_SPELL && action->state == NOT_RESOLVED) {
             auto* spell           = (Spell*)action;
             MTGCardInstance* card = spell->source;
@@ -1220,7 +1222,8 @@ bool ProliferateChooser::canTarget(Targetable* target, bool withoutProtections) 
     if (auto* card = dynamic_cast<MTGCardInstance*>(target)) {
         if (card->counters && card->counters->counters.empty()) return false;
         return true;
-    } else if (auto* p = dynamic_cast<Player*>(target)) {
+    }
+    if (auto* p = dynamic_cast<Player*>(target)) {
         if (!p->poisonCount) return false;
         return true;
     }

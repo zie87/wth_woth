@@ -50,7 +50,7 @@ bool Unlockable::tryToUnlock(GameObserver* game) {
     string id = getValue("id");
     assert(id.size() > 0);
 
-    GameOptionAward* goa = (GameOptionAward*)&options[id];
+    GameOptionAward* goa = dynamic_cast<GameOptionAward*>(&options[id]);
     goa->giveAward();
     return true;
 }
@@ -196,7 +196,7 @@ void Credits::compute(GameObserver* g, GameApp* _app) {
             unlocked = isDifficultyUnlocked(stats);
             if (unlocked) {
                 unlockedTextureName = "unlocked.png";
-                goa = (GameOptionAward*)&options[Options::DIFFICULTY_MODE_UNLOCKED];
+                goa                 = dynamic_cast<GameOptionAward*>(&options[Options::DIFFICULTY_MODE_UNLOCKED]);
                 goa->giveAward();
             } else {
                 for (auto& unlockable : Unlockable::unlockables) {
@@ -213,11 +213,11 @@ void Credits::compute(GameObserver* g, GameApp* _app) {
             if (!unlocked) {
                 if ((unlocked = isEvilTwinUnlocked())) {
                     unlockedTextureName = "eviltwin_unlocked.png";
-                    goa = (GameOptionAward*)&options[Options::EVILTWIN_MODE_UNLOCKED];
+                    goa                 = dynamic_cast<GameOptionAward*>(&options[Options::EVILTWIN_MODE_UNLOCKED]);
                     goa->giveAward();
                 } else if ((unlocked = isRandomDeckUnlocked())) {
                     unlockedTextureName = "randomdeck_unlocked.png";
-                    goa = (GameOptionAward*)&options[Options::RANDOMDECK_MODE_UNLOCKED];
+                    goa                 = dynamic_cast<GameOptionAward*>(&options[Options::RANDOMDECK_MODE_UNLOCKED]);
                     goa->giveAward();
                 } else if ((unlocked = unlockRandomSet())) {
                     unlockedTextureName = "set_unlocked.png";
@@ -398,7 +398,7 @@ int Credits::unlockSetByName(string name) {
     int setId = setlist.findSet(name);
     if (setId < 0) return 0;
 
-    auto* goa = (GameOptionAward*)&options[Options::optionSet(setId)];
+    auto* goa = dynamic_cast<GameOptionAward*>(&options[Options::optionSet(setId)]);
     goa->giveAward();
     options.save();
     return setId + 1;  // We add 1 here to show success/failure. Be sure to subtract later.
@@ -422,7 +422,7 @@ int Credits::unlockRandomSet(bool force) {
 
     if (1 == options[Options::optionSet(setId)].number) return 0;
 
-    auto* goa = (GameOptionAward*)&options[Options::optionSet(setId)];
+    auto* goa = dynamic_cast<GameOptionAward*>(&options[Options::optionSet(setId)]);
     goa->giveAward();
     options.save();
     return setId + 1;  // We add 1 here to show success/failure. Be sure to subtract later.

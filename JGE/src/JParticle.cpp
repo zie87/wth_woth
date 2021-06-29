@@ -78,8 +78,7 @@ JRenderer* JParticle::mRenderer = nullptr;
 JParticleData* JParticle::GetField(int index) {
     if (index < FIELD_COUNT)
         return &mData[index];
-    else
-        return nullptr;
+    return nullptr;
 }
 
 JParticleData* JParticle::GetDataPtr() { return mData; }

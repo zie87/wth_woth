@@ -401,31 +401,30 @@ JTexture* ResourceManagerImpl::RetrieveTexture(const string& filename, int style
         return t;
     }
 #ifdef DEBUG_CACHE
-    else {
-        switch (textureWCache.mError) {
-        case CACHE_ERROR_NONE:
-            debugMessage = "Not in cache: ";
-            break;
-        case CACHE_ERROR_404:
-            debugMessage = "File not found: ";
-            break;
-        case CACHE_ERROR_BAD_ALLOC:
-            debugMessage = "Out of memory: ";
-            break;
-        case CACHE_ERROR_BAD:
-            debugMessage = "Cache bad: ";
-            break;
-        case CACHE_ERROR_NOT_MANAGED:
-            debugMessage = "Resource not managed: ";
-            break;
-        case CACHE_ERROR_LOST:
-            debugMessage = "Resource went bad, potential memory leak: ";
-            break;
-        default:
-            debugMessage = "Unspecified error: ";
-        }
-        debugMessage += filename;
+    switch (textureWCache.mError) {
+    case CACHE_ERROR_NONE:
+        debugMessage = "Not in cache: ";
+        break;
+    case CACHE_ERROR_404:
+        debugMessage = "File not found: ";
+        break;
+    case CACHE_ERROR_BAD_ALLOC:
+        debugMessage = "Out of memory: ";
+        break;
+    case CACHE_ERROR_BAD:
+        debugMessage = "Cache bad: ";
+        break;
+    case CACHE_ERROR_NOT_MANAGED:
+        debugMessage = "Resource not managed: ";
+        break;
+    case CACHE_ERROR_LOST:
+        debugMessage = "Resource went bad, potential memory leak: ";
+        break;
+    default:
+        debugMessage = "Unspecified error: ";
     }
+    debugMessage += filename;
+
 #endif
 
     return nullptr;
@@ -908,12 +907,10 @@ cacheItem* WCache<cacheItem, cacheActual>::AttemptNew(const string& filename, in
             //WGE_LOG_ERROR("AttemptNew failed to load. Deleting cache item {0:#x}", fmt::ptr(item));
             SAFE_DELETE(item);
             return nullptr;
-        } else {
-            //WGE_LOG_ERROR("failed to load (not a 404 error). Deleting cache item {0:#x}", fmt::ptr(item));
-            SAFE_DELETE(item);
-            mError = CACHE_ERROR_BAD;
-            return nullptr;
-        }
+        }  // WGE_LOG_ERROR("failed to load (not a 404 error). Deleting cache item {0:#x}", fmt::ptr(item));
+        SAFE_DELETE(item);
+        mError = CACHE_ERROR_BAD;
+        return nullptr;
     }
 
     // Success! Enforce cache limits, then return.

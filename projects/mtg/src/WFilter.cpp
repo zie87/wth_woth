@@ -42,25 +42,23 @@ WCardFilter* WCFilterFactory::Construct(string src) {
                 if (endp < (srcLength - 1)) {
                     if (src[endp + 1] == '|')
                         return NEW WCFilterOR(g, Construct(src.substr(endp + 2)));
-                    else if (src[endp + 1] == '&')
-                        return NEW WCFilterAND(g, Construct(src.substr(endp + 2)));
+                    if (src[endp + 1] == '&') return NEW WCFilterAND(g, Construct(src.substr(endp + 2)));
                 }
                 return g;
-            } else
-                return NEW WCFilterNULL();
-        } else if (c == '{') {  // Negation
+            }
+            return NEW WCFilterNULL();
+        }
+        if (c == '{') {  // Negation
             size_t endp = findNext(src, i, '{', '}');
             if (endp != string::npos) {
                 auto* g = NEW WCFilterNOT(Construct(src.substr(i + 1, endp - 1)));
                 if (endp < (srcLength - 1)) {
-                    if (src[endp + 1] == '|')
-                        return NEW WCFilterOR(g, Construct(src.substr(endp + 2)));
-                    else if (src[endp + 1] == '&')
-                        return NEW WCFilterAND(g, Construct(src.substr(endp + 2)));
+                    if (src[endp + 1] == '|') return NEW WCFilterOR(g, Construct(src.substr(endp + 2)));
+                    if (src[endp + 1] == '&') return NEW WCFilterAND(g, Construct(src.substr(endp + 2)));
                 }
                 return g;
-            } else
-                return NEW WCFilterNULL();
+            }
+            return NEW WCFilterNULL();
         } else if (c == '&') {  // And
             return NEW WCFilterAND(Construct(src.substr(0, i)), Construct(src.substr(i + 1)));
         } else if (c == '|') {  // Or
@@ -113,9 +111,9 @@ WCardFilter* WCFilterFactory::Terminal(string src, string arg) {
 
     if (type == "r" || type == "rarity")
         return NEW WCFilterRarity(arg);
-    else if (type == "c" || type == "color")
+    if (type == "c" || type == "color")
         return NEW WCFilterColor(arg);
-    else if (type == "xc" || type == "xcolor")
+    if (type == "xc" || type == "xcolor")
         return NEW WCFilterOnlyColor(arg);
     else if (type == "s" || type == "set")
         return NEW WCFilterSet(arg);

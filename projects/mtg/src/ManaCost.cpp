@@ -33,9 +33,9 @@ ManaCost* ManaCost::parseManaCost(string s, ManaCost* _manaCost, MTGCardInstance
             start = s.find_first_of("{");
             if (start == string::npos) {
                 return manaCost;
-            } else {
-                state = 1;
             }
+            state = 1;
+
             break;
         case 1:
             end = s.find_first_of("}");
@@ -668,10 +668,9 @@ ManaCost* ManaCost::Diff(ManaCost* _cost) {
                     diff[i * 2 + 1] += diff[colorless_idx];
                     diff[colorless_idx] = 0;
                     break;
-                } else {
-                    diff[colorless_idx] += diff[i * 2 + 1];
-                    diff[i * 2 + 1] = 0;
                 }
+                diff[colorless_idx] += diff[i * 2 + 1];
+                diff[i * 2 + 1] = 0;
             }
         }
     }

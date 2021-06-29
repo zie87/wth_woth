@@ -203,10 +203,9 @@ int WSrcCards::addToDeck(MTGDeck* i, int num) {
                 }
                 setOffset(0);
                 continue;
-            } else {
-                i->add(c);
-                added++;
             }
+            i->add(c);
+            added++;
         }
     setOffset(oldpos);
     return 0;
@@ -570,8 +569,8 @@ bool WCSortCollector::operator()(const MTGCard* l, const MTGCard* r) {
                 return (lc < rc);
             }
             return (isArt < 0);
-        } else
-            return (isBasic < 0);
+        }
+        return (isBasic < 0);
     }
     return (isLand < 0);
 }

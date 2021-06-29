@@ -19,8 +19,7 @@ const float GuiHand::ClosedY = SCREEN_HEIGHT;
 bool HandLimitor::select(Target* t) {
     if (auto* c = dynamic_cast<CardView*>(t))
         return hand->isInHand(c);
-    else
-        return false;
+    return false;
 }
 bool HandLimitor::greyout(Target* t) { return true; }
 HandLimitor::HandLimitor(GuiHand* hand) : hand(hand) {}

@@ -173,8 +173,8 @@ int DeckManager::getDifficultyRating(Player* statsPlayer, Player* player) {
     if (player->deckFile != "") {
         DeckMetaData* meta = getDeckMetaDataByFilename(player->deckFile, (player->isAI() == 1));
         return meta->getDifficulty();
-    } else
-        return EASY;
+    }
+    return EASY;
 }
 
 DeckManager::~DeckManager() {

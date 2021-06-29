@@ -207,8 +207,8 @@ PIXEL_TYPE GameOption::asColor(PIXEL_TYPE fallback) {
             temp = "";
             subpixel++;
             continue;
-        } else if (!isdigit(i))
-            return fallback;
+        }
+        if (!isdigit(i)) return fallback;
         if (subpixel > 3) return fallback;
         temp += i;
     }
@@ -547,7 +547,7 @@ GameOption& GameSettings::operator[](string optionName) {
 GameOption* GameSettings::get(int optionID) {
     if (optionID < 0)
         return &invalid_option;
-    else if (globalOptions && optionID <= Options::LAST_GLOBAL)
+    if (globalOptions && optionID <= Options::LAST_GLOBAL)
         return globalOptions->get(optionID);
     else if (profileOptions)
         return profileOptions->get(optionID);
@@ -878,7 +878,7 @@ bool GameOptionAward::read(string input) {
     size_t inlen = input.size();
     if (!inlen)
         return true;                     // Default reader doesn't care about invalid formatting.
-    else if (inlen < 8 || input != "0")  // Regardless of what garbage this is fed, a non-zero value is "Awarded"
+    if (inlen < 8 || input != "0")       // Regardless of what garbage this is fed, a non-zero value is "Awarded"
         number = 1;
 
     size_t w = input.find("V");
@@ -952,8 +952,7 @@ bool GameOptionAward::isViewed() {
 string GameOptionAward::menuStr() {
     if (!number)
         return _("Not unlocked.");
-    else if (achieved == 1)
-        return _("Unlocked.");
+    if (achieved == 1) return _("Unlocked.");
 
     char buf[256];
 
@@ -966,8 +965,7 @@ string GameOptionAward::menuStr() {
 static JButton u32_to_button(u32 b) {
     if (b < JGE_BTN_MAX)
         return static_cast<JButton>(b);
-    else
-        return JGE_BTN_NONE;
+    return JGE_BTN_NONE;
 }
 
 // MARK:  -

@@ -192,15 +192,13 @@ void hgeDistortionMesh::SetDisplacement(int col, int row, float dx, float dy, in
 float hgeDistortionMesh::GetZ(int col, int row) const {
     if (row < nRows && col < nCols)
         return disp_array[row * nCols + col].z;
-    else
-        return 0.0f;
+    return 0.0f;
 }
 
 PIXEL_TYPE hgeDistortionMesh::GetColor(int col, int row) const {
     if (row < nRows && col < nCols)
         return disp_array[row * nCols + col].color;
-    else
-        return 0;
+    return 0;
 }
 
 void hgeDistortionMesh::GetDisplacement(int col, int row, float* dx, float* dy, int ref) const {

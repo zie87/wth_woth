@@ -457,8 +457,7 @@ int TestSuite::loadNext() {
     cleanup();
     if (!load())
         return loadNext();
-    else
-        WGE_LOG_INFO("Starting test : {}", files[currentfile - 1]);
+    WGE_LOG_INFO("Starting test : {}", files[currentfile - 1]);
     return currentfile;
 }
 
@@ -721,8 +720,8 @@ MTGPlayerCards* TestSuiteGame::buildDeck(Player* player, int playerId) {
             initState.players[playerId]->game->hand, initState.players[playerId]->game->inPlay};
 
         for (auto& loadedPlayerZone : loadedPlayerZones) {
-            for (size_t k = 0; k < loadedPlayerZone->cards.size(); k++) {
-                int cardid    = loadedPlayerZone->cards[k]->getId();
+            for (auto& card : loadedPlayerZone->cards) {
+                int cardid    = card->getId();
                 list[nbcards] = cardid;
                 nbcards++;
             }

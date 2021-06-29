@@ -2162,9 +2162,8 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
             return NEW APowerToughnessModifier(observer, id, card, target, wppt, s, nonstatic);
         }
         return NEW PTInstant(observer, id, card, target, wppt, s, nonstatic);
-    } else {
-        delete wppt;
     }
+    delete wppt;
 
     // Mana Producer
     found = s.find("add");
@@ -3758,21 +3757,20 @@ int TargetAbility::reactToClick(MTGCardInstance* card) {
             waitingForAnswer = 0;
             game->mLayers->actionLayer()->setCurrentWaitingAction(nullptr);
             return ActivatedAbility::reactToClick(source);
-        } else {
-            if (tc->toggleTarget(card) == TARGET_OK_FULL) {
-                int result = ActivatedAbility::reactToClick(source);
-                if (result) {
-                    waitingForAnswer = 0;
-                    game->mLayers->actionLayer()->setCurrentWaitingAction(nullptr);
-                    if (tc->targetter) {
-                        WEvent* e = NEW WEventTarget(card, source);
-                        game->receiveEvent(e);
-                    }
-                }
-                return result;
-            }
-            return 1;
         }
+        if (tc->toggleTarget(card) == TARGET_OK_FULL) {
+            int result = ActivatedAbility::reactToClick(source);
+            if (result) {
+                waitingForAnswer = 0;
+                game->mLayers->actionLayer()->setCurrentWaitingAction(nullptr);
+                if (tc->targetter) {
+                    WEvent* e = NEW WEventTarget(card, source);
+                    game->receiveEvent(e);
+                }
+            }
+            return result;
+        }
+        return 1;
     }
     return 0;
 }
@@ -3806,16 +3804,15 @@ int TargetAbility::resolve() {
             }
             tc->initTargets();
             return 1;
-        } else {
-            while (t) {
-                MTGAbility* a = ability->clone();
-                a->addToGame();
-                t = tc->getNextTarget(t);
-                ability->target = t;
-            }
-            tc->initTargets();
-            return 1;
         }
+        while (t) {
+            MTGAbility* a = ability->clone();
+            a->addToGame();
+            t               = tc->getNextTarget(t);
+            ability->target = t;
+        }
+        tc->initTargets();
+        return 1;
     }
     return 0;
 }

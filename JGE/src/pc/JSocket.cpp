@@ -226,8 +226,8 @@ int JSocket::Read(char* buff, int size) {
             if (readbytes < 0) {
                 WGE_LOG_ERROR("Error reading from socket");
                 return -1;
-            } else
-                return readbytes;
+            }
+            return readbytes;
         } else if (result < 0) {
             return -1;
         }

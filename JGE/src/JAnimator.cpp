@@ -248,12 +248,10 @@ bool JAnimatorFrame::Update(float dt) {
     mTimer += dt;
     if (mTimer >= mFrameTime)
         return true;
-    else {
-        int size = mObjects.size();
-        for (int i = 0; i < size; i++) mObjects[i]->Update(dt);
+    int size = mObjects.size();
+    for (int i = 0; i < size; i++) mObjects[i]->Update(dt);
 
-        return false;
-    }
+    return false;
 }
 
 void JAnimatorFrame::Render(float x, float y) {

@@ -122,7 +122,7 @@ vector<MTGAbility*> AIHints::findAbilities(AIHint* hint) {
 
     for (size_t i = 1; i < al->mObjects.size(); i++)  // 0 is not a mtgability...hackish
     {
-        MTGAbility* a = ((MTGAbility*)al->mObjects[i]);
+        MTGAbility* a = (dynamic_cast<MTGAbility*>(al->mObjects[i]));
         if (abilityMatches(a, hint)) elems.push_back(a);
     }
     return elems;

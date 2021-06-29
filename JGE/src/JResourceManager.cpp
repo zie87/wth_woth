@@ -169,8 +169,8 @@ int JResourceManager::CreateTexture(const std::string& textureName) {
         mTextureMap[textureName] = id;
 
         return id;
-    } else
-        return itr->second;
+    }
+    return itr->second;
 }
 
 JTexture* JResourceManager::GetTexture(const std::string& textureName) {
@@ -178,15 +178,13 @@ JTexture* JResourceManager::GetTexture(const std::string& textureName) {
 
     if (itr == mTextureMap.end())
         return nullptr;
-    else
-        return mTextureList[itr->second];
+    return mTextureList[itr->second];
 }
 
 JTexture* JResourceManager::GetTexture(int id) {
     if (id >= 0 && id < (int)mTextureList.size())
         return mTextureList[id];
-    else
-        return nullptr;
+    return nullptr;
 }
 
 int JResourceManager::CreateQuad(const std::string& quadName, const std::string& textureName, float x, float y,
@@ -212,8 +210,8 @@ int JResourceManager::CreateQuad(const std::string& quadName, const std::string&
 
         return id;
 
-    } else
-        return itr->second;
+    }
+    return itr->second;
 }
 
 JQuad* JResourceManager::GetQuad(const std::string& quadName) {
@@ -221,15 +219,13 @@ JQuad* JResourceManager::GetQuad(const std::string& quadName) {
 
     if (itr == mQuadMap.end())
         return nullptr;
-    else
-        return mQuadList[itr->second];
+    return mQuadList[itr->second];
 }
 
 JQuad* JResourceManager::GetQuad(int id) {
     if (id >= 0 && id < (int)mQuadList.size())
         return mQuadList[id];
-    else
-        return nullptr;
+    return nullptr;
 }
 
 JLBFont* JResourceManager::LoadJLBFont(const std::string& fontName, int height) {
@@ -253,15 +249,13 @@ JLBFont* JResourceManager::GetJLBFont(const std::string& fontName) {
 
     if (itr == mFontMap.end())
         return nullptr;
-    else
-        return mFontList[itr->second];
+    return mFontList[itr->second];
 }
 
 JLBFont* JResourceManager::GetJLBFont(int id) {
     if (id >= 0 && id < (int)mFontList.size())
         return mFontList[id];
-    else
-        return nullptr;
+    return nullptr;
 }
 
 //

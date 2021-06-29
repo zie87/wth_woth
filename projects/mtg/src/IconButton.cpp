@@ -14,7 +14,7 @@ IconButtonsController::IconButtonsController(JGE* jge, float x, float y)
 
 void IconButtonsController::SetColor(PIXEL_TYPE color) {
     for (int i = 0; i < mCount; ++i)
-        if (mObjects[i]) ((IconButton*)mObjects[i])->SetColor(color);
+        if (mObjects[i]) (dynamic_cast<IconButton*>(mObjects[i]))->SetColor(color);
 }
 
 IconButton::IconButton(int id, IconButtonsController* parent, string texture, float x, float y, float scale,

@@ -97,9 +97,9 @@ void RulesState::parsePlayerState(int playerId, string s) {
         if (areaS.compare("auto") == 0) {
             playerData[playerId].extraRules.push_back(s.substr(limiter + 1));
             return;
-        } else {
-            return;  // ERROR
         }
+        return;  // ERROR
+
     } else {
         // ERROR
     }
@@ -274,8 +274,8 @@ MTGDeck* Rules::buildDeck(int playerId) {
         initState.playerData[playerId].player->game->hand, initState.playerData[playerId].player->game->inPlay};
 
     for (auto& loadedPlayerZone : loadedPlayerZones) {
-        for (size_t k = 0; k < loadedPlayerZone->cards.size(); k++) {
-            int cardid = loadedPlayerZone->cards[k]->getId();
+        for (auto& card : loadedPlayerZone->cards) {
+            int cardid = card->getId();
             deck->add(cardid);
             nbcards++;
         }

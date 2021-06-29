@@ -499,10 +499,9 @@ void CardGui::AlternateRender(MTGCard* card, const Pos& pos) {
                                                                                  // subtypes on changeling cards.
                             s += _("Shapeshifter - ");
                             break;
-                        } else {
-                            s += _(MTGAllCards::findType(card->data->types[i]));
-                            s += _(" - ");
                         }
+                        s += _(MTGAllCards::findType(card->data->types[i]));
+                        s += _(" - ");
                     }
                     if (card->data->types.size())
                         s += _(MTGAllCards::findType(card->data->types[0]));
@@ -761,10 +760,9 @@ void CardGui::TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad) {
                                                                                  // subtypes on changeling cards.
                             s += _("Shapeshifter - ");
                             break;
-                        } else {
-                            s += _(MTGAllCards::findType(card->data->types[i]));
-                            s += _(" - ");
                         }
+                        s += _(MTGAllCards::findType(card->data->types[i]));
+                        s += _(" - ");
                     }
                     if (card->data->types.size())
                         s += _(MTGAllCards::findType(card->data->types[0]));
@@ -864,14 +862,13 @@ string CardGui::FormattedData(string data, string replace, string value) {
         size_t len = replace.length();
         string teste = data.replace(found, len, value);
         return teste;
-    } else {
-        return value;
     }
+    return value;
 }
 
 bool CardGui::FilterCard(MTGCard* _card, string filter) {
     CardDescriptor cd;
-    auto* card = (MTGCardInstance*)_card->data;
+    auto* card = dynamic_cast<MTGCardInstance*>(_card->data);
     cd.init();
     cd.mode = CD_OR;
     while (filter.size()) {

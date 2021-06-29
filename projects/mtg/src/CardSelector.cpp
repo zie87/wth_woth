@@ -80,8 +80,7 @@ CardSelector::Target* CardSelector::fetchMemory(SelectorMemory& memory) {
         if (card == memory.object) {
             if ((nullptr == limitor) || (limitor->select(memory.object)))
                 return memory.object;
-            else
-                break;
+            break;
         }
     // We come here if the card is not in the selector any more, or if
     // it is there but it is now refused by the limitor.

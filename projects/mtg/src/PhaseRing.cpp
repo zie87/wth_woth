@@ -297,9 +297,8 @@ int PhaseRing::removePhase(int id) {
             if (current == it) current++;  // Avoid our cursor to get invalidated
             turn.erase(it);
             return 1;
-        } else {
-            it++;
         }
+        it++;
     }
     return 0;
 }

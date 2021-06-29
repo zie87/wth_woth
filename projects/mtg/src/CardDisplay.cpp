@@ -49,7 +49,7 @@ void CardDisplay::init(MTGGameZone* zone) {
 void CardDisplay::rotateLeft() {
     if (start_item == 0) return;
     for (auto& mObject : mObjects) {
-        auto* cardg = (CardGui*)mObject;
+        auto* cardg = dynamic_cast<CardGui*>(mObject);
         cardg->x += 30;
     }
     start_item--;
@@ -58,7 +58,7 @@ void CardDisplay::rotateLeft() {
 void CardDisplay::rotateRight() {
     if (start_item == (int)(mObjects.size()) - 1) return;
     for (auto& mObject : mObjects) {
-        auto* cardg = (CardGui*)mObject;
+        auto* cardg = dynamic_cast<CardGui*>(mObject);
         cardg->x -= 30;
     }
     start_item++;
@@ -74,7 +74,7 @@ void CardDisplay::Update(float dt) {
                 update = true;
                 break;
             }
-            auto* cardg = (CardGui*)mObjects[i];
+            auto* cardg = dynamic_cast<CardGui*>(mObjects[i]);
             if (cardg->card != zone->cards[i]) update = true;
         }
     }
@@ -93,14 +93,13 @@ bool CardDisplay::CheckUserInput(JButton key) {
 
     if (mActionButton == key) {
         if (mObjects[mCurr] && mObjects[mCurr]->ButtonPressed()) {
-            auto* cardg = (CardGui*)mObjects[mCurr];
+            auto* cardg = dynamic_cast<CardGui*>(mObjects[mCurr]);
             if (tc) {
                 tc->toggleTarget(cardg->card);
                 return true;
-            } else {
-                if (observer) observer->ButtonPressed(cardg);
-                return true;
             }
+            if (observer) observer->ButtonPressed(cardg);
+            return true;
         }
         return true;
     }
@@ -196,7 +195,7 @@ void CardDisplay::Render() {
         if (mObjects[i]) {
             mObjects[i]->Render();
             if (tc) {
-                auto* cardg = (CardGui*)mObjects[i];
+                auto* cardg = dynamic_cast<CardGui*>(mObjects[i]);
                 if (tc->alreadyHasTarget(cardg->card)) {
                     r->DrawCircle(cardg->x + 5, cardg->y + 5, 5, ARGB(255, 255, 0, 0));
                 } else if (!tc->canTarget(cardg->card)) {
@@ -209,7 +208,7 @@ void CardDisplay::Render() {
     // TODO: CardSelector should handle the graveyard and the library in the future...
     if (mObjects.size() && mObjects[mCurr] != nullptr) {
         mObjects[mCurr]->Render();
-        CardGui* cardg = ((CardGui*)mObjects[mCurr]);
+        CardGui* cardg = (dynamic_cast<CardGui*>(mObjects[mCurr]));
         Pos pos = Pos(CardGui::BigWidth / 2, CardGui::BigHeight / 2 - 10, 1.0, 0.0, 220);
         int drawMode = DrawMode::kNormal;
         if (observer) {

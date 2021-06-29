@@ -30,15 +30,15 @@ windows:INCLUDEPATH += ../../JGE/Dependencies/include
 windows:INCLUDEPATH += extra
 unix:!symbian:INCLUDEPATH += /usr/include/GL
 macx:INCLUDEPATH += /opt/include
-INCLUDEPATH += ../../wge/extern/fmt/include
 INCLUDEPATH += ../../wge/include
 INCLUDEPATH += ../../JGE/include/qt
 INCLUDEPATH += ../../JGE/include
 INCLUDEPATH += ../../JGE/src/zipFS
+INCLUDEPATH += ../../build_sdl/include/generated
 INCLUDEPATH += include
 #!symbian:DESTDIR = bin
 
-unix:!symbian:LIBS += -lz
+unix:!symbian:LIBS += -lz -lfmt
 PRECOMPILED_HEADER = include/PrecompiledHeader.h
 
 #DEFINES += TESTSUITE
@@ -276,6 +276,9 @@ HEADERS  += \
         include/InteractiveButton.h\
         include/ObjectAnalytics.h
 
+SOURCES += \
+        ../../wge/src/wge/debug/log_core.cpp\
+
 # JGE, could probably be moved outside
 SOURCES += \
         ../../JGE/src/qt/filedownloader.cpp\
@@ -316,19 +319,10 @@ SOURCES += \
         ../../JGE/src/pc/JSfx.cpp\
         ../../JGE/src/pc/JGfx.cpp
 
-SOURCES += \
-        ../../wge/extern/fmt/src/format.cc\
-        ../../wge/extern/fmt/src/os.cc\
-        ../../wge/src/wge/debug/log_core.cpp
-
-HEADERS += \
-        ../../wge/extern/fmt/include/fmt/format.h
-
 HEADERS += \
         ../../JGE/include/qt/filedownloader.h\
         ../../JGE/include/qt/corewrapper.h\
         ../../JGE/include/decoder_prx.h\
-        ../../JGE/include/DebugRoutines.h\
         ../../JGE/include/Encoding.h\
         ../../JGE/include/JAnimator.h\
         ../../JGE/include/JApp.h\
@@ -358,15 +352,12 @@ HEADERS += \
         ../../JGE/include/JTypes.h\
         ../../JGE/include/Vector2D.h\
         ../../JGE/include/Vector3D.h\
-        ../../JGE/include/vram.h\
         ../../JGE/include/hge/hgecolor.h\
         ../../JGE/include/hge/hgedistort.h\
         ../../JGE/include/hge/hgefont.h\
         ../../JGE/include/hge/hgeparticle.h\
         ../../JGE/include/hge/hgerect.h\
         ../../JGE/include/hge/hgevector.h\
-        ../../JGE/src/unzip/unzip.h\
-        ../../JGE/src/unzip/ioapi.h\
         ../../JGE/src/zipFS/zstream_zlib.h\
         ../../JGE/src/zipFS/zfsystem.h\
         ../../JGE/src/zipFS/zstream.h\
@@ -375,7 +366,6 @@ HEADERS += \
         ../../JGE/src/zipFS/fileio.h\
         ../../JGE/src/tinyxml/tinystr.h\
         ../../JGE/src/tinyxml/tinyxml.h\
-        ../../JGE/include/vram.h
 
 # Please do not modify the following two lines. Required for deployment.
 !maemo5:include(qml/qmlapplicationviewer/qmlapplicationviewer.pri)

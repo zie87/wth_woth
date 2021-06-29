@@ -25,6 +25,7 @@ jobs:
       run: |
         sudo apt update && sudo apt install git lcov libsdl2-dev libpng-dev libjpeg-dev libz-dev
         cmake -E make_directory ${{runner.workspace}}/build
+        ln -sf ./projects/mtg/Res ${{runner.workspace}}/build
 
     - name: Configure
       working-directory: ${{runner.workspace}}/build
@@ -49,9 +50,8 @@ jobs:
       run: ctest ${{matrix.build_type}}
 
     - name: Start Testsuite
+      working-directory: ${{runner.workspace}}/build
       run : |
-        cd build
-        ln -sf ../projects/mtg/bin/Res .
         ./projects/mtg/wth_woth
 
     - name: lcov creation

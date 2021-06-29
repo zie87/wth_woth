@@ -1,7 +1,7 @@
 ---
-Checks:             '-*,modernize-use-nullptr'
+Checks:             '-*,modernize-use-nullptr,modernize-use-auto,modernize-loop-convert,cppcoreguidelines-slicing,llvm-namespace-comment,readability-else-after-return)
 WarningsAsErrors:   ''
-HeaderFilterRegex:  '^((?!/build/|/extern/|/JGE/src/tinyxml/)).)*$'
+HeaderFilterRegex:  '^((?!/build/|/extern/|/tinyxml/)).)*$'
 FormatStyle:        file
 
 

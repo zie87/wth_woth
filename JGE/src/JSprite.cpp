@@ -133,7 +133,7 @@ void JSprite::AddFrame(float x, float y, float width, float height, bool flipped
     // mFlipped[mFrameCount] = flipped;
     // mFrames[mFrameCount++] = new JQuad(mTex, x, y, width, height);
 
-    JQuad* quad = new JQuad(mTex, x, y, width, height);
+    auto* quad = new JQuad(mTex, x, y, width, height);
     if (quad != nullptr) {
         quad->SetHFlip(flipped);
         mFrames.push_back(quad);

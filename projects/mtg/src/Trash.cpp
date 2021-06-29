@@ -8,7 +8,7 @@
 
 template <class T>
 void TrashBin<T>::put_out() {
-    for (typename std::vector<T>::iterator it = bin.begin(); it != bin.end(); ++it) SAFE_DELETE(*it);
+    for (auto it = bin.begin(); it != bin.end(); ++it) SAFE_DELETE(*it);
     bin.clear();
 }
 

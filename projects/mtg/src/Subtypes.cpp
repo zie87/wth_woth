@@ -29,7 +29,7 @@ int Subtypes::find(string value, bool forceAdd) {
 
     if (value[0] >= 97 && value[0] <= 122)
         value[0] -= 32;  // Poor man's camelcase. We assume strings we get are either Camelcased or lowercase
-    map<string, int>::iterator it = values.find(value);
+    auto it = values.find(value);
     if (it != values.end()) return it->second;
     if (!forceAdd) return 0;
     int id = (int)(valuesById.size() + 1);

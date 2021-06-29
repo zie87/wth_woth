@@ -79,7 +79,7 @@ JQuadPtr WCachedTexture::GetQuad(float offX, float offY, float width, float heig
         if (resname != kGenericCardID && resname != kGenericCardThumbnailID) resource = kPlaceholderID;
     }
 
-    std::map<string, JQuadPtr>::iterator iter = mTrackedQuads.find(resource);
+    auto iter = mTrackedQuads.find(resource);
     if (iter != mTrackedQuads.end()) return iter->second;
 
     JQuadPtr quad(NEW JQuad(texture, offX, offY, width, height));
@@ -92,7 +92,7 @@ JQuadPtr WCachedTexture::GetQuad(float offX, float offY, float width, float heig
 
 JQuadPtr WCachedTexture::GetQuad(const string& resname) {
     JQuadPtr result;
-    std::map<string, JQuadPtr>::iterator iter = mTrackedQuads.find(resname);
+    auto iter = mTrackedQuads.find(resname);
     if (iter != mTrackedQuads.end()) result = iter->second;
 
     return result;
@@ -131,7 +131,7 @@ void WCachedTexture::Refresh() {
 
     JRenderer::GetInstance()->TransferTextureToGLContext(*texture);
 
-    for (map<string, JQuadPtr>::iterator it = mTrackedQuads.begin(); it != mTrackedQuads.end(); ++it) {
+    for (auto it = mTrackedQuads.begin(); it != mTrackedQuads.end(); ++it) {
         if (it->second.get()) it->second->mTex = texture;
     }
 }

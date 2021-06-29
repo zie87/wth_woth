@@ -1,5 +1,5 @@
 ---
-Checks:             '-*,modernize-use-nullptr'
+Checks:             '-*,modernize-use-nullptr,modernize-use-auto'
 WarningsAsErrors:   ''
 HeaderFilterRegex:  '^((?!/build/|/extern/|/tinyxml/)).)*$'
 FormatStyle:        file

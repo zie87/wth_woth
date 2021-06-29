@@ -585,7 +585,7 @@ int ManaCost::setExtraCostsAction(MTGAbility* action, MTGCardInstance* card) {
 
 int ManaCost::pay(ManaCost* _cost) {
     int result = MANA_PAID;
-    ManaCost* toPay = NEW ManaCost();
+    auto* toPay = NEW ManaCost();
     toPay->copy(_cost);
     ManaCost* diff = Diff(toPay);
     for (int i = 0; i < Constants::NB_Colors; i++) {
@@ -696,7 +696,7 @@ ManaCost* ManaCost::Diff(ManaCost* _cost) {
         }
     }
 
-    ManaCost* result = NEW ManaCost(diff, Constants::NB_Colors + 1);
+    auto* result = NEW ManaCost(diff, Constants::NB_Colors + 1);
     return result;
 }
 

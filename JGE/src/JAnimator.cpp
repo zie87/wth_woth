@@ -76,7 +76,7 @@ bool JAnimator::Load(const char* scriptFile) {
         defaultTime = 1 / fps;
 
         for (frame = script->FirstChild("frame"); frame; frame = frame->NextSibling()) {
-            JAnimatorFrame* aniFrame = new JAnimatorFrame(this);
+            auto* aniFrame = new JAnimatorFrame(this);
 
             float duration;
             element = frame->ToElement();
@@ -118,7 +118,7 @@ bool JAnimator::Load(const char* scriptFile) {
 
                             if (element->QueryIntAttribute("flip", &value) == TIXML_SUCCESS) flipped = (value == 1);
 
-                            JAnimatorObject* object = new JAnimatorObject();
+                            auto* object = new JAnimatorObject();
                             object->SetQuad(quad);
                             object->SetPosition(x, y);
                             object->SetHScale(hsize);

@@ -1577,7 +1577,7 @@ void JRenderer::TransferTextureToGLContext(JTexture& inTexture) {
 
 JTexture* JRenderer::CreateTexture(int width, int height, int mode __attribute__((unused))) {
     checkGlError();
-    JTexture* tex = new JTexture();
+    auto* tex = new JTexture();
 
     if (tex) {
         int size     = width * height * sizeof(PIXEL_TYPE);  // RGBA
@@ -1754,7 +1754,7 @@ void JRenderer::RenderTriangles(JTexture* texture, Vertex3D* vertices, int start
 
     int index = start * 3;
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
-    GLubyte* colorCoords = new GLubyte[count * 3 * 4];
+    auto* colorCoords = new GLubyte[count * 3 * 4];
     memset(colorCoords, 255, count * 3 * 4);
 
     // Use the program object
@@ -1839,8 +1839,8 @@ void JRenderer::FillPolygon(float* x, float* y, int count, PIXEL_TYPE color) {
     int i;
 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
-    GLubyte* colors    = new GLubyte[count * 4];
-    GLfloat* vVertices = new GLfloat[count * 3];
+    auto* colors    = new GLubyte[count * 4];
+    auto* vVertices = new GLfloat[count * 3];
 
     for (i = 0; i < count; i++) {
         colors[4 * i + 0] = col.r;
@@ -1932,8 +1932,8 @@ void JRenderer::DrawPolygon(float* x, float* y, int count, PIXEL_TYPE color) {
 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
     int number         = count + 1;
-    GLfloat* vVertices = new GLfloat[3 * number];
-    GLubyte* colors    = new GLubyte[4 * number];
+    auto* vVertices    = new GLfloat[3 * number];
+    auto* colors       = new GLubyte[4 * number];
 
     for (i = 0; i < number; i++) {
         colors[4 * i + 0] = col.r;
@@ -2036,7 +2036,7 @@ void JRenderer::DrawLine(float x1, float y1, float x2, float y2, float lineWidth
     float dx = x2 - x1;
     if (dy == 0 && dx == 0) return;
 
-    float l = (float)hypot(dx, dy);
+    auto l = (float)hypot(dx, dy);
 
     float x[4];
     float y[4];
@@ -2282,8 +2282,8 @@ void JRenderer::DrawPolygon(float x, float y, float size, int count, float start
     int i;
 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
-    GLfloat* vVertices = new GLfloat[3 * count];
-    GLubyte* colors    = new GLubyte[4 * count];
+    auto* vVertices = new GLfloat[3 * count];
+    auto* colors    = new GLubyte[4 * count];
 
     for (i = 0; i < count; i++) {
         colors[4 * i + 0] = col.r;
@@ -2386,8 +2386,8 @@ void JRenderer::FillPolygon(float x, float y, float size, int count, float start
     int i;
 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
-    GLfloat* vVertices = new GLfloat[3 * (count + 2)];
-    GLubyte* colors    = new GLubyte[4 * (count + 2)];
+    auto* vVertices = new GLfloat[3 * (count + 2)];
+    auto* colors    = new GLubyte[4 * (count + 2)];
 
     for (i = 0; i < count + 2; i++) {
         colors[4 * i + 0] = col.r;
@@ -2511,8 +2511,8 @@ void JRenderer::DrawRoundRect(float x, float y, float w, float h, float radius, 
 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
     int number         = 360;
-    GLfloat* vVertices = new GLfloat[3 * number];
-    GLubyte* colors    = new GLubyte[4 * number];
+    auto* vVertices    = new GLfloat[3 * number];
+    auto* colors       = new GLubyte[4 * number];
 
     for (i = 0; i < number; i++) {
         colors[4 * i + 0] = col.r;
@@ -2666,8 +2666,8 @@ void JRenderer::FillRoundRect(float x, float y, float w, float h, float radius, 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
     int i, offset;
     int number         = 2 + 360;
-    GLfloat* vVertices = new GLfloat[3 * number];
-    GLubyte* colors    = new GLubyte[4 * number];
+    auto* vVertices    = new GLfloat[3 * number];
+    auto* colors       = new GLubyte[4 * number];
 
     for (i = 0; i < number; i++) {
         colors[4 * i + 0] = col.r;

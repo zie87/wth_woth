@@ -27,7 +27,7 @@ void TransitionBase::Update(float dt) {
 
 void TransitionBase::ButtonPressed(int controllerId, int controlId) {
     if (!from) return;
-    JGuiListener* jgl = dynamic_cast<JGuiListener*>(from);
+    auto* jgl = dynamic_cast<JGuiListener*>(from);
     if (jgl) jgl->ButtonPressed(controllerId, controlId);
 }
 

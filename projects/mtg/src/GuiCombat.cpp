@@ -54,16 +54,16 @@ GuiCombat::~GuiCombat() {
         ok_tex = nullptr;
     }
 
-    for (inner_iterator it = attackers.begin(); it != attackers.end(); ++it) delete (*it);
+    for (auto it = attackers.begin(); it != attackers.end(); ++it) delete (*it);
 }
 
 template <typename T>
 static inline void repos(typename vector<T*>::iterator begin, typename vector<T*>::iterator end, signed size = -1) {
-    for (typename vector<T*>::iterator it = begin; it != end; ++it)
+    for (auto it = begin; it != end; ++it)
         if ((*it)->show) ++size;
     float space = (SCREEN_WIDTH - 2 * MARGIN) / size;
     float pos = MARGIN;
-    for (typename vector<T*>::iterator it = begin; it != end; ++it)
+    for (auto it = begin; it != end; ++it)
         if ((*it)->show) {
             (*it)->x = pos;
             pos += space;
@@ -71,17 +71,16 @@ static inline void repos(typename vector<T*>::iterator begin, typename vector<T*
 }
 
 void GuiCombat::Update(float dt) {
-    for (inner_iterator it = attackers.begin(); it != attackers.end(); ++it) (*it)->Update(dt);
+    for (auto it = attackers.begin(); it != attackers.end(); ++it) (*it)->Update(dt);
     if (activeAtk)
-        for (vector<DefenserDamaged*>::iterator q = activeAtk->blockers.begin(); q != activeAtk->blockers.end(); ++q)
-            (*q)->Update(dt);
+        for (auto q = activeAtk->blockers.begin(); q != activeAtk->blockers.end(); ++q) (*q)->Update(dt);
     ok.Update(dt);
     enemy_avatar.Update(dt);
 }
 
 void GuiCombat::remaskBlkViews(AttackerDamaged* before, AttackerDamaged* after) {
     if (after) {
-        for (vector<DefenserDamaged*>::iterator q = after->blockers.begin(); q != after->blockers.end(); ++q) {
+        for (auto q = after->blockers.begin(); q != after->blockers.end(); ++q) {
             (*q)->actX = MARGIN;
             (*q)->y = TOP_LINE;
             (*q)->zoom = kZoom_level2;
@@ -111,7 +110,7 @@ void GuiCombat::validateDamage() {
 void GuiCombat::autoaffectDamage(AttackerDamaged* attacker, CombatStep step) {
     attacker->clearDamage();
     unsigned damage = attacker->card->stepPower(step);
-    for (vector<DefenserDamaged*>::iterator it = attacker->blockers.begin(); it != attacker->blockers.end(); ++it) {
+    for (auto it = attacker->blockers.begin(); it != attacker->blockers.end(); ++it) {
         (*it)->clearDamage();
         unsigned actual_damage = MIN(damage, (unsigned)MAX((*it)->card->toughness, 0));
         if (attacker->card->has(Constants::DEATHTOUCH) && actual_damage > 1) actual_damage = 1;
@@ -126,7 +125,7 @@ void GuiCombat::autoaffectDamage(AttackerDamaged* attacker, CombatStep step) {
 void GuiCombat::addOne(DefenserDamaged* blocker, CombatStep step) {
     blocker->addDamage(1, activeAtk);
     signed damage = activeAtk->card->stepPower(step);
-    for (vector<DamagerDamaged*>::iterator it = activeAtk->blockers.begin(); it != activeAtk->blockers.end(); ++it) {
+    for (auto it = activeAtk->blockers.begin(); it != activeAtk->blockers.end(); ++it) {
         damage -= (*it)->sumDamages();
         if (0 > damage) {
             (*it)->addDamage(-1, activeAtk);
@@ -136,7 +135,7 @@ void GuiCombat::addOne(DefenserDamaged* blocker, CombatStep step) {
 }
 void GuiCombat::removeOne(DefenserDamaged* blocker, CombatStep step) {
     blocker->addDamage(-1, activeAtk);
-    for (vector<DamagerDamaged*>::iterator it = activeAtk->blockers.begin(); it != activeAtk->blockers.end(); ++it)
+    for (auto it = activeAtk->blockers.begin(); it != activeAtk->blockers.end(); ++it)
         if (activeAtk->card->has(Constants::DEATHTOUCH) ? ((*it)->sumDamages() < 1) : (!(*it)->hasLethalDamage())) {
             (*it)->addDamage(1, activeAtk);
             return;
@@ -178,7 +177,7 @@ void GuiCombat::shiftLeft() {
     case NONE:
         break;
     case OK:
-        for (vector<AttackerDamaged*>::reverse_iterator it = attackers.rbegin(); it != attackers.rend(); ++it)
+        for (auto it = attackers.rbegin(); it != attackers.rend(); ++it)
             if ((*it)->show) {
                 active = *it;
                 break;
@@ -264,8 +263,7 @@ bool GuiCombat::CheckUserInput(JButton key) {
             // find the index into the vector where the current selected card is.
             int c1 = 0, c2 = 0;
             int i = 0;
-            for (vector<DamagerDamaged*>::iterator it = activeAtk->blockers.begin(); it != activeAtk->blockers.end();
-                 ++it) {
+            for (auto it = activeAtk->blockers.begin(); it != activeAtk->blockers.end(); ++it) {
                 if (*it == selectedCard)
                     c2 = i;
                 else if (*it == active)
@@ -289,8 +287,7 @@ bool GuiCombat::CheckUserInput(JButton key) {
                 observer->cardClick(active->card);  //  { activeAtk->card->raiseBlockerRankOrder(active->card); }
             else {
                 signed damage = activeAtk->card->stepPower(step);
-                for (vector<DamagerDamaged*>::iterator it = activeAtk->blockers.begin(); *it != active; ++it)
-                    damage -= (*it)->sumDamages();
+                for (auto it = activeAtk->blockers.begin(); *it != active; ++it) damage -= (*it)->sumDamages();
                 signed now = active->sumDamages();
                 damage -= now;
                 if (damage > 0)
@@ -365,13 +362,13 @@ void GuiCombat::Render() {
     JRenderer* renderer = JRenderer::GetInstance();
     renderer->FillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, ARGB(200, 0, 0, 0));
 
-    for (inner_iterator it = attackers.begin(); it != attackers.end(); ++it)
+    for (auto it = attackers.begin(); it != attackers.end(); ++it)
         if ((*it)->show) (*it)->Render(step);
     if (activeAtk) {
         float setH = 0;
         float setW = 0;
         signed damage = activeAtk->card->stepPower(step);
-        for (vector<DefenserDamaged*>::iterator q = activeAtk->blockers.begin(); q != activeAtk->blockers.end(); ++q) {
+        for (auto q = activeAtk->blockers.begin(); q != activeAtk->blockers.end(); ++q) {
             (*q)->Render(step);
             damage -= (*q)->sumDamages();
             setH = (*q)->Height;
@@ -418,13 +415,12 @@ void GuiCombat::Render() {
 
 int GuiCombat::resolve()  // Returns the number of damage objects dealt this turn.
 {
-    DamageStack* stack = NEW DamageStack(observer);
-    for (inner_iterator it = attackers.begin(); it != attackers.end(); ++it) {
+    auto* stack = NEW DamageStack(observer);
+    for (auto it = attackers.begin(); it != attackers.end(); ++it) {
         MTGCardInstance* attacker = (*it)->card;
         signed dmg = attacker->stepPower(step);
-        for (vector<DefenserDamaged*>::iterator q = (*it)->blockers.begin(); q != (*it)->blockers.end(); ++q) {
-            for (vector<Damage>::iterator d = (*q)->damages.begin(); d != (*q)->damages.end(); ++d)
-                stack->Add(NEW Damage(*d));
+        for (auto q = (*it)->blockers.begin(); q != (*it)->blockers.end(); ++q) {
+            for (auto d = (*q)->damages.begin(); d != (*q)->damages.end(); ++d) stack->Add(NEW Damage(*d));
             dmg -= (*q)->sumDamages();
         }
 
@@ -434,8 +430,7 @@ int GuiCombat::resolve()  // Returns the number of damage objects dealt this tur
                 (Damageable*)attacker->isAttacking ? (Damageable*)attacker->isAttacking : observer->opponent(), dmg,
                 DAMAGE_COMBAT));
 
-        for (vector<Damage>::iterator d = (*it)->damages.begin(); d != (*it)->damages.end(); ++d)
-            stack->Add(NEW Damage(*d));
+        for (auto d = (*it)->damages.begin(); d != (*it)->damages.end(); ++d) stack->Add(NEW Damage(*d));
     }
     int v = stack->mObjects.size();
     if (v > 0) {
@@ -448,21 +443,21 @@ int GuiCombat::resolve()  // Returns the number of damage objects dealt this tur
 }
 
 int GuiCombat::receiveEventPlus(WEvent* e) {
-    if (WEventCreatureAttacker* event = dynamic_cast<WEventCreatureAttacker*>(e)) {
+    if (auto* event = dynamic_cast<WEventCreatureAttacker*>(e)) {
         if (nullptr == event->after) return 0;
         Pos pos(0, 0, 0, 0, 255);
         if (event->card->view != nullptr) pos = *event->card->view;
 
-        AttackerDamaged* t = NEW AttackerDamaged(event->card, pos, true, nullptr);
+        auto* t = NEW AttackerDamaged(event->card, pos, true, nullptr);
         attackers.push_back(t);
         return 1;
-    } else if (WEventCreatureBlocker* event = dynamic_cast<WEventCreatureBlocker*>(e)) {
-        for (inner_iterator it = attackers.begin(); it != attackers.end(); ++it)
+    } else if (auto* event = dynamic_cast<WEventCreatureBlocker*>(e)) {
+        for (auto it = attackers.begin(); it != attackers.end(); ++it)
             if ((*it)->card == event->after) {
                 Pos pos(0, 0, 0, 0, 255);
                 if (event->card->view != nullptr) pos = *event->card->view;
 
-                DefenserDamaged* t = NEW DefenserDamaged(event->card, pos, true, nullptr);
+                auto* t = NEW DefenserDamaged(event->card, pos, true, nullptr);
                 t->y = t->actY = TOP_LINE;
                 t->actT = t->t = 0;
                 t->actZ = t->zoom = kZoom_level2;
@@ -470,8 +465,8 @@ int GuiCombat::receiveEventPlus(WEvent* e) {
                 return 1;
             }
         return 0;
-    } else if (WEventCreatureBlockerRank* event = dynamic_cast<WEventCreatureBlockerRank*>(e)) {
-        for (inner_iterator it = attackers.begin(); it != attackers.end(); ++it)
+    } else if (auto* event = dynamic_cast<WEventCreatureBlockerRank*>(e)) {
+        for (auto it = attackers.begin(); it != attackers.end(); ++it)
             if ((*it)->card == event->attacker) {
                 vector<DefenserDamaged*>::iterator it1, it2;
                 for (it1 = (*it)->blockers.begin(); it1 != (*it)->blockers.end(); ++it1)
@@ -491,9 +486,9 @@ int GuiCombat::receiveEventPlus(WEvent* e) {
     return 0;
 }
 int GuiCombat::receiveEventMinus(WEvent* e) {
-    if (WEventZoneChange* event = dynamic_cast<WEventZoneChange*>(e))
+    if (auto* event = dynamic_cast<WEventZoneChange*>(e))
         if (observer->players[0]->game->inPlay == event->from || observer->players[1]->game->inPlay == event->from) {
-            for (inner_iterator it = attackers.begin(); it != attackers.end(); ++it)
+            for (auto it = attackers.begin(); it != attackers.end(); ++it)
                 if ((*it)->card == event->card->previous || (*it)->card == event->card) {
                     AttackerDamaged* d = *it;
                     if (activeAtk == *it) activeAtk = nullptr;
@@ -501,8 +496,7 @@ int GuiCombat::receiveEventMinus(WEvent* e) {
                     observer->mTrash->trash(d);
                     return 1;
                 } else
-                    for (vector<DefenserDamaged*>::iterator q = (*it)->blockers.begin(); q != (*it)->blockers.end();
-                         ++q)
+                    for (auto q = (*it)->blockers.begin(); q != (*it)->blockers.end(); ++q)
                         if ((*q)->card == event->card->previous || (*q)->card == event->card) {
                             DefenserDamaged* d = *q;
                             (*it)->blockers.erase(q);
@@ -511,9 +505,9 @@ int GuiCombat::receiveEventMinus(WEvent* e) {
                         }
             return 0;
         }
-    if (WEventCreatureAttacker* event = dynamic_cast<WEventCreatureAttacker*>(e)) {
+    if (auto* event = dynamic_cast<WEventCreatureAttacker*>(e)) {
         if (nullptr == event->before) return 0;
-        for (inner_iterator it = attackers.begin(); it != attackers.end(); ++it)
+        for (auto it = attackers.begin(); it != attackers.end(); ++it)
             if ((*it)->card == event->card) {
                 AttackerDamaged* d = *it;
                 attackers.erase(it);
@@ -521,10 +515,10 @@ int GuiCombat::receiveEventMinus(WEvent* e) {
                 return 1;
             }
         return 0;
-    } else if (WEventCreatureBlocker* event = dynamic_cast<WEventCreatureBlocker*>(e)) {
-        for (inner_iterator it = attackers.begin(); it != attackers.end(); ++it)
+    } else if (auto* event = dynamic_cast<WEventCreatureBlocker*>(e)) {
+        for (auto it = attackers.begin(); it != attackers.end(); ++it)
             if ((*it)->card == event->before)
-                for (vector<DefenserDamaged*>::iterator q = (*it)->blockers.begin(); q != (*it)->blockers.end(); ++q)
+                for (auto q = (*it)->blockers.begin(); q != (*it)->blockers.end(); ++q)
                     if ((*q)->card == event->card) {
                         DefenserDamaged* d = *q;
                         (*it)->blockers.erase(q);
@@ -532,12 +526,12 @@ int GuiCombat::receiveEventMinus(WEvent* e) {
                         return 1;
                     }
         return 0;
-    } else if (WEventPhaseChange* event = dynamic_cast<WEventPhaseChange*>(e)) {
+    } else if (auto* event = dynamic_cast<WEventPhaseChange*>(e)) {
         if (MTG_PHASE_COMBATDAMAGE == event->to->id)
             step = BLOCKERS;
         else
             cursor_pos = NONE;
-    } else if (WEventCombatStepChange* event = dynamic_cast<WEventCombatStepChange*>(e))
+    } else if (auto* event = dynamic_cast<WEventCombatStepChange*>(e))
         switch (event->step) {
         case BLOCKERS:
             break;
@@ -552,12 +546,12 @@ int GuiCombat::receiveEventMinus(WEvent* e) {
                 observer->nextCombatStep();
                 return 1;
             }
-            for (inner_iterator it = attackers.begin(); it != attackers.end(); ++it) {
+            for (auto it = attackers.begin(); it != attackers.end(); ++it) {
                 (*it)->show = (1 < (*it)->blockers.size());
                 autoaffectDamage(*it, DAMAGE);
             }
             active = activeAtk = nullptr;
-            for (inner_iterator it = attackers.begin(); it != attackers.end(); ++it)
+            for (auto it = attackers.begin(); it != attackers.end(); ++it)
                 if ((*it)->show) {
                     (*it)->y = 210;
                     (*it)->zoom = kZoom_level2;
@@ -577,14 +571,14 @@ int GuiCombat::receiveEventMinus(WEvent* e) {
         }
         case FIRST_STRIKE:
             step = FIRST_STRIKE;
-            for (inner_iterator attacker = attackers.begin(); attacker != attackers.end(); ++attacker)
+            for (auto attacker = attackers.begin(); attacker != attackers.end(); ++attacker)
                 if ((*attacker)->card->has(Constants::FIRSTSTRIKE) || (*attacker)->card->has(Constants::DOUBLESTRIKE))
                     goto DAMAGE;
             observer->nextCombatStep();
             break;
         case END_FIRST_STRIKE:
             step = END_FIRST_STRIKE;
-            for (inner_iterator attacker = attackers.begin(); attacker != attackers.end(); ++attacker)
+            for (auto attacker = attackers.begin(); attacker != attackers.end(); ++attacker)
                 autoaffectDamage(*attacker, FIRST_STRIKE);
             if (0 == resolve()) observer->nextCombatStep();
             // else go->mLayers->stackLayer()->AddNextGamePhase(); //uncomment to add "interrupt" offer after first
@@ -598,16 +592,16 @@ int GuiCombat::receiveEventMinus(WEvent* e) {
                 observer->userRequestNextGamePhase(false, false);
                 return 1;
             }
-            for (inner_iterator attacker = attackers.begin(); attacker != attackers.end(); ++attacker)
+            for (auto attacker = attackers.begin(); attacker != attackers.end(); ++attacker)
                 autoaffectDamage(*attacker, step);
-            for (inner_iterator it = attackers.begin(); it != attackers.end(); ++it)
+            for (auto it = attackers.begin(); it != attackers.end(); ++it)
                 (*it)->show =
                     ((*it)->card->has(Constants::DOUBLESTRIKE) ||
                      ((*it)->card->has(Constants::FIRSTSTRIKE) ^ (DAMAGE == step))) &&
                     (((*it)->card->has(Constants::TRAMPLE) ? (size_t)0 : (size_t)1) < (*it)->blockers.size());
             repos<AttackerDamaged>(attackers.begin(), attackers.end(), 0);
             active = activeAtk = nullptr;
-            for (inner_iterator it = attackers.begin(); it != attackers.end(); ++it)
+            for (auto it = attackers.begin(); it != attackers.end(); ++it)
                 if ((*it)->show) {
                     active = *it;
                     break;

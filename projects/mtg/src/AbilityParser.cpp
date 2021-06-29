@@ -80,7 +80,7 @@ string AutoLineMacro::process(const string& s) {
 }
 
 bool AutoLineMacro::AddMacro(const string& s) {
-    AutoLineMacro* alm = NEW AutoLineMacro(s);
+    auto* alm = NEW AutoLineMacro(s);
     if (gAutoLineMacrosIndex[alm->mName]) {
         WGE_LOG_WARN("Macro already exists: {}", alm->mName);
         delete alm;

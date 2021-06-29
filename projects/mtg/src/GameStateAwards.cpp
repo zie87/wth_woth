@@ -53,15 +53,14 @@ void GameStateAwards::Start() {
     WGuiAward* aw;
     WGuiButton* btn;
 
-    WGuiHeader* wgh = NEW WGuiHeader("Achievements");
+    auto* wgh = NEW WGuiHeader("Achievements");
     listview->Add(wgh);
 
     aw = NEW WGuiAward(Options::DIFFICULTY_MODE_UNLOCKED, "Difficulty Modes", "Achieved a 66% victory ratio.");
     btn = NEW WGuiButton(aw, GUI_AWARD_BUTTON, Options::DIFFICULTY_MODE_UNLOCKED, this);
     listview->Add(btn);
 
-    for (map<string, Unlockable*>::iterator it = Unlockable::unlockables.begin(); it != Unlockable::unlockables.end();
-         ++it) {
+    for (auto it = Unlockable::unlockables.begin(); it != Unlockable::unlockables.end(); ++it) {
         Unlockable* award = it->second;
         aw = NEW WGuiAward(award->getValue("id"), award->getValue("name"), award->getValue("trophyroom_text"));
         btn = NEW WGuiButton(aw, GUI_AWARD_BUTTON, 0, this);
@@ -203,7 +202,7 @@ bool GameStateAwards::enterSet(int setid) {
 
     detailview = NEW WGuiMenu(JGE_BTN_DOWN, JGE_BTN_UP);
 
-    WGuiList* spoiler = NEW WGuiList("Spoiler", setSrc);
+    auto* spoiler = NEW WGuiList("Spoiler", setSrc);
     spoiler->setX(210);
     spoiler->setWidth(SCREEN_WIDTH - 220);
     for (int t = 0; t < setSrc->Size(); t++) {
@@ -212,7 +211,7 @@ bool GameStateAwards::enterSet(int setid) {
     }
     setSrc->setOffset(0);
     spoiler->Entering(JGE_BTN_NONE);
-    WGuiCardImage* wi = NEW WGuiCardImage(setSrc);
+    auto* wi = NEW WGuiCardImage(setSrc);
     wi->setX(105);
     wi->setY(137);
     detailview->Add(wi);
@@ -222,8 +221,7 @@ bool GameStateAwards::enterSet(int setid) {
 }
 bool GameStateAwards::enterStats(int option) {
     if (option != Options::AWARD_COLLECTOR) return false;
-    DeckDataWrapper* ddw =
-        NEW DeckDataWrapper(NEW MTGDeck(options.profileFile(PLAYER_COLLECTION).c_str(), MTGCollection()));
+    auto* ddw = NEW DeckDataWrapper(NEW MTGDeck(options.profileFile(PLAYER_COLLECTION).c_str(), MTGCollection()));
     if (!ddw) return false;
 
     SAFE_DELETE(detailview);

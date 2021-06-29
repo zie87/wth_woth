@@ -1495,7 +1495,7 @@ void GameStateDeckViewer::ButtonPressed(int controllerId, int controlId) {
             playerdata->collection->complete();          // Add the cards
             playerdata->collection->save();              // Save the new collection
             for (int i = 0; i < setlist.size(); i++) {   // Update unlocked sets
-                GameOptionAward* goa = dynamic_cast<GameOptionAward*>(&options[Options::optionSet(i)]);
+                auto* goa = dynamic_cast<GameOptionAward*>(&options[Options::optionSet(i)]);
                 if (goa) goa->giveAward();
             }
             options.save();

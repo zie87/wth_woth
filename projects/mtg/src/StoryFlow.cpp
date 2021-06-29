@@ -328,12 +328,12 @@ StoryDialog::StoryDialog(TiXmlElement* root, StoryFlow* mParent)
         TiXmlElement* element = node->ToElement();
         if (element) {
             string sX = safeAttribute(element, "x");
-            float x = static_cast<float>(atof(sX.c_str()));
+            auto x    = static_cast<float>(atof(sX.c_str()));
             if (x > 0 && x < 1) {
                 x = SCREEN_WIDTH_F * x;
             }
             string sY = safeAttribute(element, "y");
-            float y = static_cast<float>(atof(sY.c_str()));
+            auto y    = static_cast<float>(atof(sY.c_str()));
             if (y > 0 && y < 1) {
                 y = SCREEN_HEIGHT_F * y;
             }
@@ -358,7 +358,7 @@ StoryDialog::StoryDialog(TiXmlElement* root, StoryFlow* mParent)
                 string id = element->Attribute("goto");
                 if (!align.size()) align = "center";
                 int i = mObjects.size();
-                StoryChoice* sc = NEW StoryChoice(id, text, i, x, y, align, font, (i == 0));
+                auto* sc = NEW StoryChoice(id, text, i, x, y, align, font, (i == 0));
                 graphics.push_back(sc);
                 Add(sc);
             } else if (strcmp(element->Value(), "reward") == 0) {
@@ -401,7 +401,7 @@ void StoryDialog::Render() {
     currentY = 2;
     previousY = currentY;
     for (size_t i = 0; i < graphics.size(); ++i) {
-        StoryDialogElement* elmt = (StoryDialogElement*)(graphics[i]);
+        auto* elmt = (StoryDialogElement*)(graphics[i]);
         if (mCount && elmt == mObjects[0]) currentY += SPACE_BEFORE_CHOICES;
         RenderElement(elmt);
     }
@@ -497,8 +497,8 @@ bool StoryFlow::parse(string path) {
     }
 
     // autoLoad
-    PlayerData* pd = NEW PlayerData();
-    map<string, string>::iterator it = pd->storySaves.find(folder);
+    auto* pd = NEW PlayerData();
+    auto it  = pd->storySaves.find(folder);
     if (it != pd->storySaves.end()) {
         if (it->second.compare("End") != 0) loadPageId(it->second);
     }
@@ -512,13 +512,13 @@ void StoryFlow::Update(float dt) { pages[currentPageId]->Update(dt); }
 void StoryFlow::Render() { pages[currentPageId]->Render(); }
 
 StoryFlow::~StoryFlow() {
-    for (map<string, StoryPage*>::iterator i = pages.begin(); i != pages.end(); ++i) {
+    for (auto i = pages.begin(); i != pages.end(); ++i) {
         SAFE_DELETE(i->second);
     }
     pages.clear();
 
     // autoSave progress
-    PlayerData* pd = NEW PlayerData();
+    auto* pd               = NEW PlayerData();
     pd->storySaves[folder] = currentPageId;
     pd->save();
     SAFE_DELETE(pd);

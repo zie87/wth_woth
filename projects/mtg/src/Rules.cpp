@@ -31,7 +31,7 @@ Rules* Rules::getRulesByFilename(string _filename) {
 int Rules::loadAllRules() {
     vector<string> rulesFiles = JFileSystem::GetInstance()->scanfolder("rules");
     for (size_t i = 0; i < rulesFiles.size(); ++i) {
-        Rules* rules = NEW Rules();
+        auto* rules = NEW Rules();
         if (rules->load(rulesFiles[i])) {
             RulesList.push_back(rules);
         } else {
@@ -189,7 +189,7 @@ Player* Rules::loadPlayerMomir(GameObserver* observer, int isAI) {
     string deckFileSmall = "momir";
     char empty[] = "";
 
-    MTGDeck* tempDeck =
+    auto* tempDeck =
         NEW MTGDeck(MTGCollection());  // Autogenerate a momir deck. Leave the "momir.txt" bits below for stats.
     tempDeck->addRandomCards(12, nullptr, 0, Constants::RARITY_L, "Forest");
     tempDeck->addRandomCards(12, nullptr, 0, Constants::RARITY_L, "Plains");
@@ -218,7 +218,7 @@ Player* Rules::loadPlayerRandom(GameObserver* observer, int isAI, int mode) {
 
     string lands[] = {"forest", "forest", "island", "mountain", "swamp", "plains", "forest"};
 
-    MTGDeck* tempDeck = NEW MTGDeck(MTGCollection());
+    auto* tempDeck = NEW MTGDeck(MTGCollection());
     tempDeck->addRandomCards(9, nullptr, 0, -1, lands[color1].c_str());
     tempDeck->addRandomCards(9, nullptr, 0, -1, lands[color2].c_str());
     tempDeck->addRandomCards(1, nullptr, 0, 'U', "land");
@@ -268,7 +268,7 @@ Player* Rules::initPlayer(GameObserver* g, int playerId) {
 
 MTGDeck* Rules::buildDeck(int playerId) {
     int nbcards = 0;
-    MTGDeck* deck = NEW MTGDeck(MTGCollection());
+    auto* deck  = NEW MTGDeck(MTGCollection());
 
     MTGGameZone* loadedPlayerZones[] = {
         initState.playerData[playerId].player->game->graveyard, initState.playerData[playerId].player->game->library,
@@ -339,7 +339,7 @@ void Rules::initGame(GameObserver* g) {
                 if (card && zone != p->game->library) {
                     if (zone == p->game->inPlay) {
                         MTGCardInstance* copy = p->game->putInZone(card, p->game->library, p->game->stack);
-                        Spell* spell = NEW Spell(g, copy);
+                        auto* spell           = NEW Spell(g, copy);
                         spell->resolve();
                         delete spell;
                     } else {

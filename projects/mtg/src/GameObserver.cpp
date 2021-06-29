@@ -378,7 +378,7 @@ void GameObserver::startGame(GameType gtype, Rules* rules) {
                 }
                 if (card) {
                     MTGCardInstance* copy = p->game->putInZone(card, p->game->library, p->game->stack);
-                    Spell* spell          = NEW Spell(this, copy);
+                    auto* spell           = NEW Spell(this, copy);
                     spell->resolve();
                     delete spell;
                 }
@@ -768,7 +768,7 @@ void GameObserver::Affinity() {
             int color   = 0;
             string type = "";
             // only do any of the following if a card with the stated ability is in your hand.
-            ManaCost* original = NEW ManaCost();
+            auto* original = NEW ManaCost();
             original->copy(card->model->data->getManaCost());
             // have to run alter cost before affinity or the 2 cancel each other out.
             if (card->getIncreasedManaCost()->getConvertedCost() || card->getReducedManaCost()->getConvertedCost()) {
@@ -784,7 +784,7 @@ void GameObserver::Affinity() {
             int reducem    = 0;
             bool resetCost = false;
             for (unsigned int na = 0; na < card->cardsAbilities.size(); na++) {
-                ANewAffinity* newAff = dynamic_cast<ANewAffinity*>(card->cardsAbilities[na]);
+                auto* newAff = dynamic_cast<ANewAffinity*>(card->cardsAbilities[na]);
                 if (newAff) {
                     if (!resetCost) {
                         resetCost = true;
@@ -871,10 +871,10 @@ void GameObserver::Render() {
 
 void GameObserver::ButtonPressed(PlayGuiObject* target) {
     WGE_LOG_TRACE("GAMEOBSERVER Click");
-    if (CardView* cardview = dynamic_cast<CardView*>(target)) {
+    if (auto* cardview = dynamic_cast<CardView*>(target)) {
         MTGCardInstance* card = cardview->getCard();
         cardClick(card, card);
-    } else if (GuiLibrary* library = dynamic_cast<GuiLibrary*>(target)) {
+    } else if (auto* library = dynamic_cast<GuiLibrary*>(target)) {
         if (library->showCards) {
             library->toggleDisplay();
             forceShuffleLibraries();
@@ -885,10 +885,10 @@ void GameObserver::ButtonPressed(PlayGuiObject* target) {
                 library->zone->needShuffle = true;
             }
         }
-    } else if (GuiGraveyard* graveyard = dynamic_cast<GuiGraveyard*>(target))
+    } else if (auto* graveyard = dynamic_cast<GuiGraveyard*>(target))
         graveyard->toggleDisplay();
     // opponenthand
-    else if (GuiOpponentHand* opponentHand = dynamic_cast<GuiOpponentHand*>(target))
+    else if (auto* opponentHand = dynamic_cast<GuiOpponentHand*>(target))
         if (opponentHand->showCards) {
             opponentHand->toggleDisplay();
         } else {
@@ -898,7 +898,7 @@ void GameObserver::ButtonPressed(PlayGuiObject* target) {
             }
         }
     // end opponenthand
-    else if (GuiAvatar* avatar = dynamic_cast<GuiAvatar*>(target)) {
+    else if (auto* avatar = dynamic_cast<GuiAvatar*>(target)) {
         cardClick(nullptr, avatar->player);
     } else if (dynamic_cast<GuiPhaseBar*>(target)) {
         mLayers->getPhaseHandler()->NextGamePhase();
@@ -1491,7 +1491,7 @@ void GameObserver::createPlayer(const string& playerMode
                                 TestSuiteGame* testgame
 #endif  // TESTSUITE
 ) {
-    Player::Mode aMode = (Player::Mode)atoi(playerMode.c_str());
+    auto aMode = (Player::Mode)atoi(playerMode.c_str());
     switch (aMode) {
     case Player::MODE_AI:
         AIPlayerFactory playerCreator;

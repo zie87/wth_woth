@@ -51,7 +51,7 @@ void JFileSystem::preloadZip(const std::string& filename) {
         clearZipCache();
     }
 
-    JZipCache* cache = new JZipCache();
+    auto* cache         = new JZipCache();
     mZipCache[filename] = cache;
 
     if (!mZipAvailable || !mZipFile) {
@@ -279,7 +279,7 @@ bool JFileSystem::OpenFile(const std::string& filename) {
         return openForRead(mFile, filename);
     }
     JZipCache* zc = it->second;
-    std::map<std::string, zfs::filesystem::limited_file_info>::iterator it2 = zc->dir.find(filename);
+    auto it2      = zc->dir.find(filename);
     if (it2 == zc->dir.end()) {
         /*DetachZipFile();
         return OpenFile(filename); */

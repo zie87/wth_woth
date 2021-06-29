@@ -33,7 +33,7 @@ const float ICONSCALE = 1.5;
 const float CENTER = SCREEN_HEIGHT_F / 2 + 10;
 
 void DrawGlyph(JQuad* inQuad, int inGlyph, float inY, float inAngle, unsigned int inP, float inScale) {
-    float xPos = static_cast<float>((inP + inGlyph * (int)(kWidth + 1)) % (kPhases * (int)(kWidth + 1)));
+    auto xPos = static_cast<float>((inP + inGlyph * (int)(kWidth + 1)) % (kPhases * (int)(kWidth + 1)));
     inQuad->SetTextureRect(xPos, 0, kWidth, kHeight);
     JRenderer::GetInstance()->RenderQuad(inQuad, 0, inY, 0.0, inScale, inScale);
 }
@@ -104,7 +104,7 @@ void GuiPhaseBar::Render() {
     if (angle > 0) {
         scale = zoomFactor * sinf(angle) / 2;
         yPos -= kWidth * scale;
-        float xPos = static_cast<float>(p % (kPhases * (int)(kWidth + 1)));
+        auto xPos = static_cast<float>(p % (kPhases * (int)(kWidth + 1)));
         quad->SetTextureRect(xPos, kHeight, kWidth, kHeight);
         JRenderer::GetInstance()->RenderQuad(quad.get(), 0, yPos, 0.0, scale, scale);
     }
@@ -135,7 +135,7 @@ void GuiPhaseBar::Render() {
 }
 
 int GuiPhaseBar::receiveEventMinus(WEvent* e) {
-    WEventPhaseChange* event = dynamic_cast<WEventPhaseChange*>(e);
+    auto* event = dynamic_cast<WEventPhaseChange*>(e);
     if (event) {
         angle = M_PI / 6;
         phase = event->to;

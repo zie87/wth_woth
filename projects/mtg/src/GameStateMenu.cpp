@@ -141,7 +141,7 @@ void GameStateMenu::Start() {
 
 void GameStateMenu::genNbCardsStr() {
     // How many cards total ?
-    PlayerData* playerdata = NEW PlayerData(MTGCollection());
+    auto* playerdata   = NEW PlayerData(MTGCollection());
     size_t totalUnique = MTGCollection()->primitives.size();
     size_t totalPrints = MTGCollection()->totalCards();
 
@@ -170,8 +170,7 @@ void GameStateMenu::fillScroller() {
     if (!options[Options::DIFFICULTY_MODE_UNLOCKED].number)
         scroller->Add(_("Unlock the difficult mode for more challenging duels!"));
 
-    for (map<string, Unlockable*>::iterator it = Unlockable::unlockables.begin(); it != Unlockable::unlockables.end();
-         ++it) {
+    for (auto it = Unlockable::unlockables.begin(); it != Unlockable::unlockables.end(); ++it) {
         Unlockable* award = it->second;
         if (!award->isUnlocked()) {
             if (award->getValue("teaser").size()) scroller->Add(_(award->getValue("teaser")));
@@ -206,8 +205,7 @@ int GameStateMenu::gamePercentComplete() {
     total++;
     if (options[Options::DIFFICULTY_MODE_UNLOCKED].number) done++;
 
-    for (map<string, Unlockable*>::iterator it = Unlockable::unlockables.begin(); it != Unlockable::unlockables.end();
-         ++it) {
+    for (auto it = Unlockable::unlockables.begin(); it != Unlockable::unlockables.end(); ++it) {
         total++;
         if (it->second->isUnlocked()) total++;
     }

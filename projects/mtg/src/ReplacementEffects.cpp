@@ -17,7 +17,7 @@ REDamagePrevention::REDamagePrevention(MTGAbility* source, TargetChooser* tcSour
 WEvent* REDamagePrevention::replace(WEvent* event) {
     if (!event) return event;
     if (!damage) return event;
-    WEventDamage* e = dynamic_cast<WEventDamage*>(event);
+    auto* e = dynamic_cast<WEventDamage*>(event);
     if (!e) return event;
     Damage* d = e->damage;
     if (d->typeOfDamage != typeOfDamage && typeOfDamage != DAMAGE_ALL_TYPES) return event;
@@ -37,7 +37,7 @@ WEvent* REDamagePrevention::replace(WEvent* event) {
         d->damage -= damage;
         damage = 0;
         delete event;
-        WEventDamage* newEvent = NEW WEventDamage(d);
+        auto* newEvent = NEW WEventDamage(d);
         return newEvent;
     }
     return event;
@@ -53,7 +53,7 @@ RECountersPrevention::RECountersPrevention(MTGAbility* source, MTGCardInstance* 
 
 WEvent* RECountersPrevention::replace(WEvent* event) {
     if (!event) return event;
-    WEventCounters* e = dynamic_cast<WEventCounters*>(event);
+    auto* e = dynamic_cast<WEventCounters*>(event);
     if (!e) return event;
     if ((MTGCardInstance*)e->targetCard) {
         if ((MTGCardInstance*)e->targetCard == cardSource && counter) {

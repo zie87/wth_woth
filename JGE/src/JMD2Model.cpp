@@ -134,8 +134,8 @@ bool JMD2Model::Load(char* filename, char* textureName) {
         return false;
     }
 
-    float texWidth = (float)tex->mWidth;
-    float texHeight = (float)tex->mHeight;
+    auto texWidth  = (float)tex->mWidth;
+    auto texHeight = (float)tex->mHeight;
 
     // allocate memory for the model texture coordinates
     mModel->st = (texCoord_t*)malloc(sizeof(texCoord_t) * modelHeader->numST);

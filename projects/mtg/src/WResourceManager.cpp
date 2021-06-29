@@ -273,7 +273,7 @@ int ResourceManagerImpl::CreateQuad(const string& quadName, const string& textur
 
 JQuadPtr ResourceManagerImpl::GetQuad(const string& quadName) {
     JQuadPtr result;
-    ManagedQuadMap::const_iterator found = mManagedQuads.find(quadName);
+    auto found = mManagedQuads.find(quadName);
     if (found != mManagedQuads.end()) {
         result = found->second.texture->GetQuad(quadName);
     }
@@ -285,7 +285,7 @@ JQuadPtr ResourceManagerImpl::GetQuad(int id) {
     JQuadPtr result;
     if (id < 0 || id >= (int)mManagedQuads.size()) return result;
 
-    IDLookupMap::const_iterator key = mIDLookupMap.find(id);
+    auto key = mIDLookupMap.find(id);
     if (key != mIDLookupMap.end()) {
         WCachedTexture* jtex = mManagedQuads[key->second].texture;
         if (jtex) {
@@ -785,7 +785,7 @@ WFont* ResourceManagerImpl::LoadWFont(const string& inFontname, int inFontHeight
 
 WFont* ResourceManagerImpl::GetWFont(int id) {
     WFont* font            = nullptr;
-    FontMap::iterator iter = mWFontMap.find(id);
+    auto iter              = mWFontMap.find(id);
     if (iter != mWFontMap.end()) {
         font = iter->second;
     }
@@ -793,7 +793,7 @@ WFont* ResourceManagerImpl::GetWFont(int id) {
 }
 
 void ResourceManagerImpl::RemoveWFonts() {
-    for (FontMap::iterator font = mWFontMap.begin(); font != mWFontMap.end(); ++font) {
+    for (auto font = mWFontMap.begin(); font != mWFontMap.end(); ++font) {
         delete font->second;
     }
     mWFontMap.clear();
@@ -846,9 +846,9 @@ void ResourceManagerImpl::Refresh() {
 // WCache
 template <class cacheItem, class cacheActual>
 bool WCache<cacheItem, cacheActual>::RemoveOldest() {
-    typename map<int, cacheItem*>::iterator oldest = cache.end();
+    auto oldest = cache.end();
 
-    for (typename map<int, cacheItem*>::iterator it = cache.begin(); it != cache.end(); ++it) {
+    for (auto it = cache.begin(); it != cache.end(); ++it) {
         if (it->second && !it->second->isLocked() &&
             (oldest == cache.end() || it->second->lastTime < oldest->second->lastTime))
             oldest = it;
@@ -894,7 +894,7 @@ void WCache<cacheItem, cacheActual>::Resize(unsigned long size, int items) {
 
 template <class cacheItem, class cacheActual>
 cacheItem* WCache<cacheItem, cacheActual>::AttemptNew(const string& filename, int submode) {
-    cacheItem* item = NEW cacheItem;
+    auto* item = NEW cacheItem;
     if (!item) {
         mError = CACHE_ERROR_BAD_ALLOC;
         return nullptr;
@@ -1168,14 +1168,14 @@ unsigned int WCache<cacheItem, cacheActual>::Flatten() {
 
     if (!cache.size()) return 0;
 
-    for (typename map<int, cacheItem*>::iterator it = cache.begin(); it != cache.end(); ++it) {
+    for (auto it = cache.begin(); it != cache.end(); ++it) {
         if (!it->second) continue;
         items.push_back(it->second);
     }
 
     sort(items.begin(), items.end(), WCacheSort());
 
-    for (typename vector<cacheItem*>::iterator it = items.begin(); it != items.end(); ++it) {
+    for (auto it = items.begin(); it != items.end(); ++it) {
         assert((*it) && (*it)->lastTime > lastSet);
         lastSet = (*it)->lastTime;
         (*it)->lastTime = ++oldest;
@@ -1220,7 +1220,7 @@ bool WCache<cacheItem, cacheActual>::RemoveItem(cacheItem* item, bool force) {
 
 template <class cacheItem, class cacheActual>
 bool WCache<cacheItem, cacheActual>::UnlinkCache(cacheItem* item) {
-    typename map<int, cacheItem*>::iterator it = cache.end();
+    auto it = cache.end();
 
     if (item == nullptr) return false;  // Use RemoveMiss to remove cache misses, not this.
 

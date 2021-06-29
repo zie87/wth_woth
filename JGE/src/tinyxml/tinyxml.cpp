@@ -46,30 +46,24 @@ void TiXmlBase::PutString( const TIXML_STRING& str, TIXML_STRING* outString )
 
 	while( i<(int)str.length() )
 	{
-		unsigned char c = (unsigned char) str[i];
+            auto c = (unsigned char)str[i];
 
-		if (    c == '&' 
-		     && i < ( (int)str.length() - 2 )
-			 && str[i+1] == '#'
-			 && str[i+2] == 'x' )
-		{
-			// Hexadecimal character reference.
-			// Pass through unchanged.
-			// &#xA9;	-- copyright symbol, for example.
-			//
-			// The -1 is a bug fix from Rob Laveaux. It keeps
-			// an overflow from happening if there is no ';'.
-			// There are actually 2 ways to exit this loop -
-			// while fails (error case) and break (semicolon found).
-			// However, there is no mechanism (currently) for
-			// this function to return an error.
-			while ( i<(int)str.length()-1 )
-			{
-				outString->append( str.c_str() + i, 1 );
-				++i;
-				if ( str[i] == ';' )
-					break;
-			}
+            if (c == '&' && i < ((int)str.length() - 2) && str[i + 1] == '#' && str[i + 2] == 'x') {
+                // Hexadecimal character reference.
+                // Pass through unchanged.
+                // &#xA9;	-- copyright symbol, for example.
+                //
+                // The -1 is a bug fix from Rob Laveaux. It keeps
+                // an overflow from happening if there is no ';'.
+                // There are actually 2 ways to exit this loop -
+                // while fails (error case) and break (semicolon found).
+                // However, there is no mechanism (currently) for
+                // this function to return an error.
+                while (i < (int)str.length() - 1) {
+                    outString->append(str.c_str() + i, 1);
+                    ++i;
+                    if (str[i] == ';') break;
+                }
 		}
 		else if ( c == '&' )
 		{
@@ -763,8 +757,8 @@ void TiXmlElement::SetAttribute( const char * cname, const char * cvalue )
 		return;
 	}
 
-	TiXmlAttribute* attrib = new TiXmlAttribute( cname, cvalue );
-	if ( attrib )
+        auto* attrib = new TiXmlAttribute(cname, cvalue);
+        if ( attrib )
 	{
 		attributeSet.Add( attrib );
 	}
@@ -907,11 +901,11 @@ void TiXmlElement::CopyTo( TiXmlElement* target ) const
 
 TiXmlNode* TiXmlElement::Clone() const
 {
-	TiXmlElement* clone = new TiXmlElement( Value() );
-        if (!clone) return nullptr;
+    auto* clone = new TiXmlElement(Value());
+    if (!clone) return nullptr;
 
-        CopyTo( clone );
-	return clone;
+    CopyTo(clone);
+    return clone;
 }
 
 
@@ -1181,11 +1175,11 @@ void TiXmlDocument::CopyTo( TiXmlDocument* target ) const
 
 TiXmlNode* TiXmlDocument::Clone() const
 {
-	TiXmlDocument* clone = new TiXmlDocument();
-        if (!clone) return nullptr;
+    auto* clone = new TiXmlDocument();
+    if (!clone) return nullptr;
 
-        CopyTo( clone );
-	return clone;
+    CopyTo(clone);
+    return clone;
 }
 
 
@@ -1365,12 +1359,12 @@ void TiXmlComment::CopyTo( TiXmlComment* target ) const
 
 TiXmlNode* TiXmlComment::Clone() const
 {
-	TiXmlComment* clone = new TiXmlComment();
+    auto* clone = new TiXmlComment();
 
-        if (!clone) return nullptr;
+    if (!clone) return nullptr;
 
-        CopyTo( clone );
-	return clone;
+    CopyTo(clone);
+    return clone;
 }
 
 
@@ -1516,13 +1510,13 @@ void TiXmlDeclaration::CopyTo( TiXmlDeclaration* target ) const
 
 
 TiXmlNode* TiXmlDeclaration::Clone() const
-{	
-	TiXmlDeclaration* clone = new TiXmlDeclaration();
+{
+    auto* clone = new TiXmlDeclaration();
 
-        if (!clone) return nullptr;
+    if (!clone) return nullptr;
 
-        CopyTo( clone );
-	return clone;
+    CopyTo(clone);
+    return clone;
 }
 
 
@@ -1548,12 +1542,12 @@ void TiXmlUnknown::CopyTo( TiXmlUnknown* target ) const
 
 TiXmlNode* TiXmlUnknown::Clone() const
 {
-	TiXmlUnknown* clone = new TiXmlUnknown();
+    auto* clone = new TiXmlUnknown();
 
-        if (!clone) return nullptr;
+    if (!clone) return nullptr;
 
-        CopyTo( clone );
-	return clone;
+    CopyTo(clone);
+    return clone;
 }
 
 

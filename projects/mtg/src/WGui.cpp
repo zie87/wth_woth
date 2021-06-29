@@ -41,7 +41,7 @@ PIXEL_TYPE WGuiBase::getColor(int type) {
 */
 void WGuiBase::renderBack(WGuiBase* it) {
     if (!it) return;
-    WDecoStyled* styled = dynamic_cast<WDecoStyled*>(it);
+    auto* styled = dynamic_cast<WDecoStyled*>(it);
     if (styled)
         styled->renderBack(styled->getDecorated());
     else
@@ -49,7 +49,7 @@ void WGuiBase::renderBack(WGuiBase* it) {
 }
 
 WGuiBase::CONFIRM_TYPE WGuiBase::needsConfirm() {
-    for (vector<WGuiBase*>::iterator it = items.begin(); it != items.end(); ++it) {
+    for (auto it = items.begin(); it != items.end(); ++it) {
         switch ((*it)->needsConfirm()) {
         case CONFIRM_NEED:
             return CONFIRM_NEED;
@@ -62,7 +62,7 @@ WGuiBase::CONFIRM_TYPE WGuiBase::needsConfirm() {
     return CONFIRM_OK;
 }
 bool WGuiBase::yieldFocus() {
-    for (vector<WGuiBase*>::iterator it = items.begin(); it != items.end(); ++it)
+    for (auto it = items.begin(); it != items.end(); ++it)
         if ((*it)->yieldFocus()) {
             return true;
         }
@@ -131,7 +131,7 @@ void WDecoStyled::subBack(WGuiBase* item) {
     if (mStyle & DS_STYLE_BACKLESS) return;
     // TODO: if(mStyle & DS_STYLE_EDGED) Draw the edged box ala SimpleMenu
     else {  // Draw standard style
-        WGuiSplit* split = dynamic_cast<WGuiSplit*>(item);
+        auto* split = dynamic_cast<WGuiSplit*>(item);
         if (split && split->left->Visible() && split->right->Visible()) {
             if (split->left)
                 renderer->FillRoundRect(split->left->getX() - 2, split->getY() - 2, split->left->getWidth() - 6,
@@ -210,7 +210,7 @@ void WGuiMenu::subBack(WGuiBase* item) {
     if (!item) return;
     JRenderer* renderer = JRenderer::GetInstance();
 
-    WGuiSplit* split = dynamic_cast<WGuiSplit*>(item);
+    auto* split = dynamic_cast<WGuiSplit*>(item);
     if (split && split->left->Visible() && split->right->Visible()) {
         if (split->left)
             subBack(
@@ -233,7 +233,7 @@ void WGuiMenu::setSelected(int newItem) {
     }
 }
 bool WGuiMenu::yieldFocus() {
-    for (vector<WGuiBase*>::iterator it = items.begin(); it != items.end(); ++it)
+    for (auto it = items.begin(); it != items.end(); ++it)
         if ((*it)->yieldFocus()) {
             setSelected(it);
             return true;
@@ -352,9 +352,9 @@ void WGuiList::Render() {
 
         // Draw scrollbar
         if (listHeight > SCREEN_HEIGHT && listSelectable > 1) {
-            float barPosition =
+            auto barPosition =
                 static_cast<float>(y - 5 + ((float)adjustedCurrent / listSelectable) * (SCREEN_HEIGHT - y));
-            float barLength = static_cast<float>((SCREEN_HEIGHT - y) / listSelectable);
+            auto barLength = static_cast<float>((SCREEN_HEIGHT - y) / listSelectable);
             if (barLength < 4) barLength = 4;
             renderer->FillRect(x + width - 2, y - 1, 2, SCREEN_HEIGHT - y, getColor(WGuiColor::SCROLLBAR));
             renderer->FillRoundRect(x + width - 5, barPosition, 5, barLength, 2, getColor(WGuiColor::SCROLLBUTTON));
@@ -417,7 +417,7 @@ string WDecoEnum::lookupVal(int value) {
     if (edef == nullptr) {
         int id = getId();
         if (id != INVALID_ID) {
-            GameOptionEnum* goEnum = dynamic_cast<GameOptionEnum*>(options.get(getId()));
+            auto* goEnum = dynamic_cast<GameOptionEnum*>(options.get(getId()));
             if (goEnum) edef = goEnum->def;
         }
     }
@@ -437,7 +437,7 @@ void WDecoEnum::Render() {
     mFont->SetColor(getColor(WGuiColor::TEXT));
     mFont->DrawString(_(getDisplay()).c_str(), getX() + 2, getY() + 3);
 
-    OptionInteger* opt = dynamic_cast<OptionInteger*>(it);
+    auto* opt = dynamic_cast<OptionInteger*>(it);
     if (opt) mFont->DrawString(_(lookupVal(opt->value)).c_str(), getWidth() - 5, getY() + 3, JGETEXT_RIGHT);
 }
 
@@ -778,21 +778,21 @@ WGuiMenu::WGuiMenu(JButton next, JButton prev, bool dPad, WSyncable* syncme) : W
     held = JGE_BTN_NONE;
 }
 WGuiMenu::~WGuiMenu() {
-    for (vector<WGuiBase*>::iterator it = items.begin(); it != items.end(); it++) SAFE_DELETE(*it);
+    for (auto it = items.begin(); it != items.end(); it++) SAFE_DELETE(*it);
 }
 void WGuiMenu::setData() {
-    for (vector<WGuiBase*>::iterator it = items.begin(); it != items.end(); it++) (*it)->setData();
+    for (auto it = items.begin(); it != items.end(); it++) (*it)->setData();
 };
 
 void WGuiMenu::Reload() {
-    for (vector<WGuiBase*>::iterator it = items.begin(); it != items.end(); it++) (*it)->Reload();
+    for (auto it = items.begin(); it != items.end(); it++) (*it)->Reload();
 };
 
 void WGuiMenu::Render() {
-    for (vector<WGuiBase*>::iterator it = items.begin(); it != items.end(); it++) (*it)->Render();
+    for (auto it = items.begin(); it != items.end(); it++) (*it)->Render();
 }
 void WGuiMenu::confirmChange(bool confirmed) {
-    for (vector<WGuiBase*>::iterator it = items.begin(); it != items.end(); it++) (*it)->confirmChange(confirmed);
+    for (auto it = items.begin(); it != items.end(); it++) (*it)->confirmChange(confirmed);
 }
 
 void WGuiMenu::ButtonPressed(int controllerId, int controlId) {
@@ -992,7 +992,7 @@ void WGuiTabMenu::Render() {
 
     float offset = x;
     mFont->SetScale(0.8f);
-    for (vector<WGuiBase*>::iterator it = items.begin(); it != items.end(); it++) {
+    for (auto it = items.begin(); it != items.end(); it++) {
         float w = mFont->GetStringWidth(_((*it)->getDisplay()).c_str());
         mFont->SetColor((*it)->getColor(WGuiColor::TEXT_TAB));
         renderer->FillRoundRect(offset + 5, 5, w + 5, 25, 2, (*it)->getColor(WGuiColor::BACK_TAB));
@@ -1020,7 +1020,7 @@ bool WGuiTabMenu::CheckUserInput(JButton key) {
             float offset = x;
             WFont* mFont = WResourceManager::Instance()->GetWFont(Fonts::OPTION_FONT);
             mFont->SetScale(0.8f);
-            for (vector<WGuiBase*>::iterator it = items.begin(); it != items.end(); it++) {
+            for (auto it = items.begin(); it != items.end(); it++) {
                 float w = mFont->GetStringWidth(_((*it)->getDisplay()).c_str());
 
                 if (i >= offset + 5 && i <= offset + w + 10 + 2) {
@@ -1162,7 +1162,7 @@ WGuiAward::WGuiAward(string _id, string name, string _text, string _details) : W
 }
 
 WGuiAward::~WGuiAward() {
-    GameOptionAward* goa = dynamic_cast<GameOptionAward*>(&options[id]);
+    auto* goa = dynamic_cast<GameOptionAward*>(&options[id]);
     if (goa) goa->setViewed(true);
 }
 bool WGuiAward::Visible() {
@@ -1433,7 +1433,7 @@ bool WGuiFilters::Finish(bool emptyset) {
 void WGuiFilters::ButtonPressed(int controllerId, int controlId) {
     if (controllerId == -102) {
         if (controlId == -10) {
-            WGuiListRow* wgl = NEW WGuiListRow("");
+            auto* wgl = NEW WGuiListRow("");
             wgl->Add(NEW WGuiFilterItem(this));
             list->Add(wgl);
         } else if (controlId == -11) {
@@ -1451,11 +1451,11 @@ void WGuiFilters::ButtonPressed(int controllerId, int controlId) {
 
 void WGuiFilters::buildList() {
     list = NEW WGuiList("");
-    WGuiButton* l = NEW WGuiButton(NEW WGuiItem("Add Filter"), -102, -10, this);
-    WGuiButton* r = NEW WGuiButton(NEW WGuiItem("Done"), -102, -11, this);
-    WGuiButton* mid = NEW WGuiButton(NEW WGuiItem("Clear"), -102, -66, this);
-    WGuiSplit* sub = NEW WGuiSplit(mid, r);
-    WGuiSplit* wgs = NEW WGuiSplit(l, sub);
+    auto* l         = NEW WGuiButton(NEW WGuiItem("Add Filter"), -102, -10, this);
+    auto* r         = NEW WGuiButton(NEW WGuiItem("Done"), -102, -11, this);
+    auto* mid       = NEW WGuiButton(NEW WGuiItem("Clear"), -102, -66, this);
+    auto* sub       = NEW WGuiSplit(mid, r);
+    auto* wgs       = NEW WGuiSplit(l, sub);
     subMenu         = nullptr;
     list->Add(NEW WGuiHeader(displayValue));
     list->Add(wgs);
@@ -1476,14 +1476,14 @@ string WGuiFilters::getCode() {
     string res;
     vector<WGuiBase*>::iterator row, col;
     for (row = list->items.begin(); row != list->items.end(); row++) {
-        WGuiList* wgl = dynamic_cast<WGuiList*>(*row);
+        auto* wgl = dynamic_cast<WGuiList*>(*row);
         if (wgl) {
             if (res.size())
                 res += "|(";
             else
                 res += "(";
             for (col = wgl->items.begin(); col != wgl->items.end(); col++) {
-                WGuiFilterItem* fi = dynamic_cast<WGuiFilterItem*>(*col);
+                auto* fi = dynamic_cast<WGuiFilterItem*>(*col);
                 if (fi) {
                     string gc = fi->getCode();
                     if (res.size() && gc.size() && res[res.size() - 1] != '(') res += "&";
@@ -1502,12 +1502,12 @@ void WGuiFilters::Update(float dt) {
     if (subMenu && !subMenu->isClosed()) subMenu->Update(dt);
     if (list) {
         list->Update(dt);
-        WGuiList* wgl = dynamic_cast<WGuiList*>(list->Current());
+        auto* wgl = dynamic_cast<WGuiList*>(list->Current());
         if (!wgl) return;
         vector<WGuiBase*>::iterator it;
         bool bDeleted = false;
         for (it = wgl->items.begin(); it != wgl->items.end(); it++) {
-            WGuiFilterItem* wgfi = dynamic_cast<WGuiFilterItem*>(*it);
+            auto* wgfi = dynamic_cast<WGuiFilterItem*>(*it);
             if (!wgfi || wgfi->mState != WGuiFilterItem::STATE_REMOVE) continue;
             SAFE_DELETE(*it);
             it = wgl->items.erase(it);
@@ -1556,7 +1556,7 @@ WGuiFilters::~WGuiFilters() {
 
 void WGuiFilters::addColumn() {
     if (!list) return;
-    WGuiList* wgl = dynamic_cast<WGuiList*>(list->Current());
+    auto* wgl = dynamic_cast<WGuiList*>(list->Current());
     if (wgl) {
         wgl->currentItem = wgl->items.size() - 1;
         wgl->Add(NEW WGuiFilterItem(this));
@@ -1565,11 +1565,11 @@ void WGuiFilters::addColumn() {
 
 bool WGuiFilters::isAvailableCode(string code) {
     if (!list) return false;
-    WGuiList* wgl = dynamic_cast<WGuiList*>(list->Current());
+    auto* wgl = dynamic_cast<WGuiList*>(list->Current());
     if (wgl) {
         vector<WGuiBase*>::iterator it;
         for (it = wgl->items.begin(); it != wgl->items.end(); it++) {
-            WGuiFilterItem* wgfi = dynamic_cast<WGuiFilterItem*>(*it);
+            auto* wgfi = dynamic_cast<WGuiFilterItem*>(*it);
             if (!wgfi || wgfi->mState != WGuiFilterItem::STATE_FINISHED) continue;
             if (!wgfi->mCode.size()) continue;
             if (wgfi->mCode == code) return false;
@@ -1582,11 +1582,11 @@ bool WGuiFilters::isAvailableCode(string code) {
 bool WGuiFilters::isAvailable(int type) {
     if (!list) return false;
     int colors = 0, ma = 0;
-    WGuiList* wgl = dynamic_cast<WGuiList*>(list->Current());
+    auto* wgl = dynamic_cast<WGuiList*>(list->Current());
     if (wgl) {
         vector<WGuiBase*>::iterator it;
         for (it = wgl->items.begin(); it != wgl->items.end(); it++) {
-            WGuiFilterItem* wgfi = dynamic_cast<WGuiFilterItem*>(*it);
+            auto* wgfi = dynamic_cast<WGuiFilterItem*>(*it);
             if (!wgfi || wgfi->mState != WGuiFilterItem::STATE_FINISHED) continue;
             switch (type) {
             case WGuiFilterItem::FILTER_SUBTYPE:
@@ -1871,25 +1871,25 @@ WGuiKeyBinder::WGuiKeyBinder(string name, GameStateOptions* parent)
       confirmingButton(JGE_BTN_NONE),
       confirmationString("") {
     JGE* j = JGE::GetInstance();
-    JGE::keybindings_it start = j->KeyBindings_begin(), end = j->KeyBindings_end();
+    auto start = j->KeyBindings_begin(), end = j->KeyBindings_end();
 
     Add(NEW OptionKey(parent, LOCAL_KEY_NONE, JGE_BTN_NONE));
-    for (JGE::keybindings_it it = start; it != end; ++it) Add(NEW OptionKey(parent, it->first, it->second));
+    for (auto it = start; it != end; ++it) Add(NEW OptionKey(parent, it->first, it->second));
 }
 
 void WGuiKeyBinder::Update(float dt) {
-    OptionKey* o = dynamic_cast<OptionKey*>(items[0]);
+    auto* o = dynamic_cast<OptionKey*>(items[0]);
     if (!o) return;
     if (LOCAL_KEY_NONE != o->from) {
         items.insert(items.begin(), NEW OptionKey(parent, LOCAL_KEY_NONE, JGE_BTN_NONE));
         if (0 == currentItem) ++currentItem;
     }
-    for (vector<WGuiBase*>::iterator it = items.begin(); it != items.end(); ++it) (*it)->Update(dt);
+    for (auto it = items.begin(); it != items.end(); ++it) (*it)->Update(dt);
     if (confirmMenu) confirmMenu->Update(dt);
 }
 
 bool WGuiKeyBinder::isModal() {
-    for (vector<WGuiBase*>::iterator it = items.begin(); it != items.end(); ++it)
+    for (auto it = items.begin(); it != items.end(); ++it)
         if ((*it)->isModal()) return true;
     return modal;
 }
@@ -1904,8 +1904,8 @@ bool WGuiKeyBinder::CheckUserInput(JButton key) {
 void WGuiKeyBinder::setData() {
     JGE* j = JGE::GetInstance();
     j->ClearBindings();
-    for (vector<WGuiBase*>::iterator it = items.begin(); it != items.end(); ++it) {
-        OptionKey* o = static_cast<OptionKey*>(*it);
+    for (auto it = items.begin(); it != items.end(); ++it) {
+        auto* o = static_cast<OptionKey*>(*it);
         if (o && LOCAL_KEY_NONE != o->from && JGE_BTN_NONE != o->to) j->BindKey(o->from, o->to);
     }
     j->ResetInput();
@@ -1927,11 +1927,11 @@ WGuiBase::CONFIRM_TYPE WGuiKeyBinder::needsConfirm() {
 
     // Check whether any key is bound to two functions.
     confirmingKey = LOCAL_KEY_NONE;
-    for (vector<WGuiBase*>::iterator it = items.begin(); it != items.end(); ++it) {
+    for (auto it = items.begin(); it != items.end(); ++it) {
         if (!(*it)->Visible()) continue;
 
         vector<JButton> boundFunctionsList;
-        for (vector<WGuiBase*>::iterator jt = it + 1; jt != items.end(); ++jt) {
+        for (auto jt = it + 1; jt != items.end(); ++jt) {
             if (!(*jt)->Visible()) continue;
             if (C(*it)->from == C(*jt)->from)
                 if (confirmedKeys.end() == find(confirmedKeys.begin(), confirmedKeys.end(), C(*it)->from)) {
@@ -1948,7 +1948,7 @@ WGuiBase::CONFIRM_TYPE WGuiKeyBinder::needsConfirm() {
                      translateKey(confirmingKey).first.c_str(), boundFunctionsList.size());
             std::stringstream ss;
             ss << s << "\n";
-            vector<JButton>::iterator jt = boundFunctionsList.begin();
+            auto jt = boundFunctionsList.begin();
             ss << translateKey(*jt).first.c_str();
             for (++jt; jt != boundFunctionsList.end(); ++jt) ss << ", " << translateKey(*jt).first.c_str();
             confirmationString = ss.str();
@@ -1966,7 +1966,7 @@ WGuiBase::CONFIRM_TYPE WGuiKeyBinder::needsConfirm() {
     for (signed int i = (sizeof(btnToCheck) / sizeof(btnToCheck[0])) - 1; i >= 0; --i) {
         if (confirmedButtons.end() != find(confirmedButtons.begin(), confirmedButtons.end(), btnToCheck[i])) continue;
         bool found = false;
-        for (vector<WGuiBase*>::iterator it = items.begin(); it != items.end(); ++it)
+        for (auto it = items.begin(); it != items.end(); ++it)
             if (btnToCheck[i] == C(*it)->to) {
                 found = true;
                 break;

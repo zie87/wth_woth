@@ -51,7 +51,7 @@ CardSelector::CardSelector(GameObserver* observer, DuelLayers* duel)
 void CardSelector::Add(CardSelector::Target* target) {
     if (nullptr == active)
         if (nullptr == limitor || limitor->select(active)) active = target;
-    CardView* c = dynamic_cast<CardView*>(target);
+    auto* c = dynamic_cast<CardView*>(target);
     if (c) c->zoom = 1.0f;
     c = dynamic_cast<CardView*>(active);
     if (c) c->zoom = 1.4f;
@@ -59,10 +59,10 @@ void CardSelector::Add(CardSelector::Target* target) {
 }
 
 void CardSelector::Remove(CardSelector::Target* card) {
-    for (vector<Target*>::iterator it = cards.begin(); it != cards.end(); ++it)
+    for (auto it = cards.begin(); it != cards.end(); ++it)
         if (card == *it) {
             if (active == *it) {
-                CardView* c = dynamic_cast<CardView*>(active);
+                auto* c = dynamic_cast<CardView*>(active);
                 if (c) c->zoom = 1.0f;
                 active = closest<Diff>(cards, limitor, active);
                 c = dynamic_cast<CardView*>(active);
@@ -76,7 +76,7 @@ void CardSelector::Remove(CardSelector::Target* card) {
 
 CardSelector::Target* CardSelector::fetchMemory(SelectorMemory& memory) {
     if (nullptr == memory.object) return nullptr;
-    for (vector<Target*>::iterator it = cards.begin(); it != cards.end(); ++it)
+    for (auto it = cards.begin(); it != cards.end(); ++it)
         if (*it == memory.object) {
             if ((nullptr == limitor) || (limitor->select(memory.object)))
                 return memory.object;
@@ -96,7 +96,7 @@ void CardSelector::Pop() {
         active = fetchMemory(memoryStack.top());
         memoryStack.pop();
         CardView::SelectorZone oldowner;
-        if (CardView* q = dynamic_cast<CardView*>(oldactive))
+        if (auto* q = dynamic_cast<CardView*>(oldactive))
             oldowner = q->owner;
         else
             oldowner = CardView::nullZone;
@@ -104,11 +104,11 @@ void CardSelector::Pop() {
     }
     if (active != oldactive) {
         {
-            CardView* c = dynamic_cast<CardView*>(oldactive);
+            auto* c = dynamic_cast<CardView*>(oldactive);
             if (c) c->zoom = 1.0f;
         }  // Is this needed, I think it is one in Leaving(0) ?
         {
-            CardView* c = dynamic_cast<CardView*>(active);
+            auto* c = dynamic_cast<CardView*>(active);
             if (c) c->zoom = 1.4f;
         }  // Is this needed, I think it is one in Entering() ?
         if (oldactive) oldactive->Leaving(JGE_BTN_NONE);
@@ -118,7 +118,7 @@ void CardSelector::Pop() {
 
 bool CardSelector::CheckUserInput(JButton key) {
     if (!active) {
-        for (vector<Target*>::iterator it = cards.begin(); it != cards.end(); ++it)
+        for (auto it = cards.begin(); it != cards.end(); ++it)
             if ((nullptr == limitor) || (limitor->select(*it))) {
                 active = *it;
                 active->Entering();
@@ -172,11 +172,11 @@ bool CardSelector::CheckUserInput(JButton key) {
     if (key != JGE_BTN_NONE) {
         if (active != oldactive) {
             CardView::SelectorZone oldowner, owner;
-            if (CardView* q = dynamic_cast<CardView*>(oldactive))
+            if (auto* q = dynamic_cast<CardView*>(oldactive))
                 oldowner = q->owner;
             else
                 oldowner = CardView::nullZone;
-            if (CardView* q = dynamic_cast<CardView*>(active))
+            if (auto* q = dynamic_cast<CardView*>(active))
                 owner = q->owner;
             else
                 owner = CardView::nullZone;
@@ -205,7 +205,7 @@ bool CardSelector::CheckUserInput(JButton key) {
         } else {
             // active card hasn't changed - that means we're probably at an edge of the battlefield.
             // check if we're not already a selected avatar - if not, select one depending whether we're going up/down.
-            GuiAvatar* avatar = dynamic_cast<GuiAvatar*>(active);
+            auto* avatar = dynamic_cast<GuiAvatar*>(active);
             if (!avatar) {
                 if (key == JGE_BTN_DOWN) {
                     active = duel->GetAvatars()->GetSelf();
@@ -219,11 +219,11 @@ bool CardSelector::CheckUserInput(JButton key) {
 switch_active:
     if (active != oldactive) {
         {
-            PlayGuiObject* c = dynamic_cast<PlayGuiObject*>(oldactive);
+            auto* c = dynamic_cast<PlayGuiObject*>(oldactive);
             if (c) c->zoom = 1.0f;
         }
         {
-            PlayGuiObject* c = dynamic_cast<PlayGuiObject*>(active);
+            auto* c = dynamic_cast<PlayGuiObject*>(active);
             if (c) c->zoom = 1.4f;
         }
         if (oldactive) oldactive->Leaving(JGE_BTN_NONE);
@@ -235,7 +235,7 @@ switch_active:
 void CardSelector::Update(float dt) {
     float boundary = duel->RightBoundary();
     float position = boundary - CardGui::BigWidth / 2;
-    if (CardView* c = dynamic_cast<CardView*>(active))
+    if (auto* c = dynamic_cast<CardView*>(active))
         if ((c->x + CardGui::Width / 2 > position - CardGui::BigWidth / 2) &&
             (c->x - CardGui::Width / 2 < position + CardGui::BigWidth / 2))
             position = CardGui::BigWidth / 2 - 10;
@@ -247,7 +247,7 @@ void CardSelector::Update(float dt) {
 void CardSelector::Render() {
     if (active) {
         active->Render();
-        if (CardView* card = dynamic_cast<CardView*>(active)) {
+        if (auto* card = dynamic_cast<CardView*>(active)) {
             card->DrawCard(bigpos, mDrawMode);
         }
     }
@@ -258,7 +258,7 @@ void CardSelector::Limit(LimitorFunctor<PlayGuiObject>* limitor, CardView::Selec
     if (limitor && !limitor->select(active)) {
         PlayGuiObject* oldactive = active;
         CardView::SelectorZone oldowner;
-        if (CardView* q = dynamic_cast<CardView*>(oldactive))
+        if (auto* q = dynamic_cast<CardView*>(oldactive))
             oldowner = q->owner;
         else
             oldowner = CardView::nullZone;
@@ -270,7 +270,7 @@ void CardSelector::Limit(LimitorFunctor<PlayGuiObject>* limitor, CardView::Selec
 
         if (limitor && !limitor->select(active)) {
             active = nullptr;
-            for (vector<PlayGuiObject*>::iterator it = cards.begin(); it != cards.end(); ++it)
+            for (auto it = cards.begin(); it != cards.end(); ++it)
                 if (limitor->select(*it)) {
                     active = *it;
                     break;
@@ -279,11 +279,11 @@ void CardSelector::Limit(LimitorFunctor<PlayGuiObject>* limitor, CardView::Selec
 
         if (active != oldactive) {
             {
-                CardView* c = dynamic_cast<CardView*>(oldactive);
+                auto* c = dynamic_cast<CardView*>(oldactive);
                 if (c) c->zoom = 1.0f;
             }
             {
-                CardView* c = dynamic_cast<CardView*>(active);
+                auto* c = dynamic_cast<CardView*>(active);
                 if (c) c->zoom = 1.4f;
             }
             if (oldactive) oldactive->Leaving(JGE_BTN_NONE);
@@ -295,7 +295,7 @@ void CardSelector::Limit(LimitorFunctor<PlayGuiObject>* limitor, CardView::Selec
 void CardSelector::PushLimitor() {
     if (nullptr == limitor) return;
     CardView::SelectorZone owner;
-    if (CardView* q = dynamic_cast<CardView*>(active))
+    if (auto* q = dynamic_cast<CardView*>(active))
         owner = q->owner;
     else
         owner = CardView::nullZone;

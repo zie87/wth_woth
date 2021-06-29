@@ -61,14 +61,14 @@ void GameStateOptions::Start() {
 
     optionsList = NEW WGuiList("User");
     optionsList->Add(NEW WGuiHeader("User Options"));
-    WDecoConfirm* cPrf = NEW WDecoConfirm(this, NEW OptionProfile(mParent, this));
+    auto* cPrf          = NEW WDecoConfirm(this, NEW OptionProfile(mParent, this));
     cPrf->confirm = "Use this Profile";
-    OptionThemeStyle* ots = NEW OptionThemeStyle("Theme Style");
+    auto* ots           = NEW OptionThemeStyle("Theme Style");
     OptionDirectory* od = NEW OptionTheme(ots);
-    WDecoConfirm* cThm = NEW WDecoConfirm(this, od);
+    auto* cThm          = NEW WDecoConfirm(this, od);
     cThm->confirm = "Use this Theme";
 
-    WDecoConfirm* cStyle = NEW WDecoConfirm(this, ots);
+    auto* cStyle    = NEW WDecoConfirm(this, ots);
     cStyle->confirm = "Use this Style";
 
     optionsList->Add(NEW WGuiSplit(cPrf, cThm));
@@ -83,29 +83,26 @@ void GameStateOptions::Start() {
 
     optionsList = NEW WGuiList("Advanced");
     optionsList->Add(NEW WGuiHeader("Advanced Options"));
-    WDecoStyled* wAdv = NEW WDecoStyled(NEW WGuiHeader("The following options require a restart."));
+    auto* wAdv   = NEW WDecoStyled(NEW WGuiHeader("The following options require a restart."));
     wAdv->mStyle = WDecoStyled::DS_STYLE_ALERT;
     optionsList->Add(wAdv);
-    WDecoConfirm* cLang = NEW WDecoConfirm(this, NEW OptionLanguage("Language"));
+    auto* cLang    = NEW WDecoConfirm(this, NEW OptionLanguage("Language"));
     cLang->confirm = "Use this Language";
     optionsList->Add(cLang);
-    WDecoEnum* oGra =
-        NEW WDecoEnum(NEW OptionInteger(Options::MAX_GRADE, "Minimum Card Grade", Constants::GRADE_DANGEROUS, 1,
-                                        Constants::GRADE_BORDERLINE, "", Constants::GRADE_SUPPORTED));
+    auto* oGra = NEW WDecoEnum(NEW OptionInteger(Options::MAX_GRADE, "Minimum Card Grade", Constants::GRADE_DANGEROUS,
+                                                 1, Constants::GRADE_BORDERLINE, "", Constants::GRADE_SUPPORTED));
     optionsList->Add(oGra);
-    WDecoEnum* oASPhases =
-        NEW WDecoEnum(NEW OptionInteger(Options::ASPHASES, "Phase Skip Automation", Constants::ASKIP_FULL, 1,
-                                        Constants::ASKIP_NONE, "", Constants::ASKIP_NONE));
+    auto* oASPhases = NEW WDecoEnum(NEW OptionInteger(Options::ASPHASES, "Phase Skip Automation", Constants::ASKIP_FULL,
+                                                      1, Constants::ASKIP_NONE, "", Constants::ASKIP_NONE));
     optionsList->Add(oASPhases);
     optionsTabs->Add(optionsList);
 
-    WDecoEnum* oFirstPlayer = NEW WDecoEnum(NEW OptionInteger(
-        Options::FIRSTPLAYER, "First Turn Player", Constants::WHO_R, 1, Constants::WHO_P, "", Constants::WHO_P));
+    auto* oFirstPlayer = NEW WDecoEnum(NEW OptionInteger(Options::FIRSTPLAYER, "First Turn Player", Constants::WHO_R, 1,
+                                                         Constants::WHO_P, "", Constants::WHO_P));
     optionsList->Add(oFirstPlayer);
 
-    WDecoEnum* oKickerPay =
-        NEW WDecoEnum(NEW OptionInteger(Options::KICKERPAYMENT, "Kicker Cost", Constants::KICKER_CHOICE, 1,
-                                        Constants::KICKER_ALWAYS, "", Constants::KICKER_ALWAYS));
+    auto* oKickerPay = NEW WDecoEnum(NEW OptionInteger(Options::KICKERPAYMENT, "Kicker Cost", Constants::KICKER_CHOICE,
+                                                       1, Constants::KICKER_ALWAYS, "", Constants::KICKER_ALWAYS));
     optionsList->Add(oKickerPay);
     optionsList = NEW WGuiKeyBinder("Key Bindings", this);
     optionsTabs->Add(optionsList);

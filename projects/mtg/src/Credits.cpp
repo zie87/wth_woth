@@ -95,7 +95,7 @@ void Unlockable::load() {
 }
 
 void Unlockable::Destroy() {
-    for (map<string, Unlockable*>::iterator it = unlockables.begin(); it != unlockables.end(); ++it) {
+    for (auto it = unlockables.begin(); it != unlockables.end(); ++it) {
         SAFE_DELETE(it->second);
     }
     unlockables.clear();
@@ -136,19 +136,19 @@ void Credits::compute(GameObserver* g, GameApp* _app) {
     // no credits when the AI plays :)
     if (p1->isAI()) return;
 
-    PlayerData* playerdata = NEW PlayerData(MTGCollection());
+    auto* playerdata = NEW PlayerData(MTGCollection());
     if (p2->isAI() && g->didWin(p1)) {
         gameLength = time(nullptr) - g->startedAt;
         value = 400;
         if (app->gameType != GAME_TYPE_CLASSIC) value = 200;
         int difficulty = options[Options::DIFFICULTY].number;
         if (options[Options::DIFFICULTY_MODE_UNLOCKED].number && difficulty) {
-            CreditBonus* b = NEW CreditBonus(100 * difficulty, _("Difficulty Bonus"));
+            auto* b = NEW CreditBonus(100 * difficulty, _("Difficulty Bonus"));
             bonus.push_back(b);
         }
 
         if (p1->life == 1) {
-            CreditBonus* b = NEW CreditBonus(111, _("'Live dangerously and you live right' Bonus"));
+            auto* b = NEW CreditBonus(111, _("'Live dangerously and you live right' Bonus"));
             bonus.push_back(b);
         }
 
@@ -156,22 +156,22 @@ void Credits::compute(GameObserver* g, GameApp* _app) {
         if (diff < 0) diff = 0;
         if (diff > 500) diff = 500;
         if (diff) {
-            CreditBonus* b = NEW CreditBonus(diff, _("Life Delta Bonus"));
+            auto* b = NEW CreditBonus(diff, _("Life Delta Bonus"));
             bonus.push_back(b);
         }
 
         if (p1->game->library->nb_cards == 0) {
-            CreditBonus* b = NEW CreditBonus(391, _("'Decree of Theophilus' Bonus"));
+            auto* b = NEW CreditBonus(391, _("'Decree of Theophilus' Bonus"));
             bonus.push_back(b);
         }
 
         if ((p2->game->library->nb_cards == 0) && p1->game->library->nb_cards) {
-            CreditBonus* b = NEW CreditBonus(p1->game->library->nb_cards * 3, _("Miller Bonus"));
+            auto* b = NEW CreditBonus(p1->game->library->nb_cards * 3, _("Miller Bonus"));
             bonus.push_back(b);
         }
 
         if (g->turn < 15) {
-            CreditBonus* b = NEW CreditBonus((20 - g->turn) * 17, _("'Fast and Furious' Bonus"));
+            auto* b = NEW CreditBonus((20 - g->turn) * 17, _("'Fast and Furious' Bonus"));
             bonus.push_back(b);
         }
 
@@ -182,9 +182,9 @@ void Credits::compute(GameObserver* g, GameApp* _app) {
 
         char buffer[512];
 
-        for (vector<Task*>::iterator it = finishedTasks.begin(); it != finishedTasks.end(); it++) {
+        for (auto it = finishedTasks.begin(); it != finishedTasks.end(); it++) {
             sprintf(buffer, _("Task: %s").c_str(), (*it)->getShortDesc().c_str());
-            CreditBonus* b = NEW CreditBonus((*it)->getReward(), buffer);
+            auto* b = NEW CreditBonus((*it)->getReward(), buffer);
             bonus.push_back(b);
             playerdata->taskList->removeTask(*it);
         }
@@ -199,8 +199,7 @@ void Credits::compute(GameObserver* g, GameApp* _app) {
                 goa = (GameOptionAward*)&options[Options::DIFFICULTY_MODE_UNLOCKED];
                 goa->giveAward();
             } else {
-                for (map<string, Unlockable*>::iterator it = Unlockable::unlockables.begin();
-                     it != Unlockable::unlockables.end(); ++it) {
+                for (auto it = Unlockable::unlockables.begin(); it != Unlockable::unlockables.end(); ++it) {
                     Unlockable* award = it->second;
                     if (award->tryToUnlock(g)) {
                         unlocked = 1;
@@ -238,7 +237,7 @@ void Credits::compute(GameObserver* g, GameApp* _app) {
 
         vector<CreditBonus*>::iterator it;
         if (bonus.size()) {
-            CreditBonus* b = NEW CreditBonus(value, _("Victory"));
+            auto* b = NEW CreditBonus(value, _("Victory"));
             bonus.insert(bonus.begin(), b);
             for (it = bonus.begin() + 1; it < bonus.end(); ++it) value += (*it)->value;
         }
@@ -371,7 +370,7 @@ int Credits::isRandomDeckUnlocked() {
 }
 
 int Credits::addCreditBonus(int value) {
-    PlayerData* playerdata = NEW PlayerData();
+    auto* playerdata = NEW PlayerData();
     playerdata->credits += value;
     playerdata->save();
     SAFE_DELETE(playerdata);
@@ -389,7 +388,7 @@ int Credits::addCardToCollection(int cardId, MTGDeck* collection) { return colle
  * prefer to call the above function if you want to add several cards, since saving is expensive
  */
 int Credits::addCardToCollection(int cardId) {
-    PlayerData* playerdata = NEW PlayerData(MTGCollection());
+    auto* playerdata = NEW PlayerData(MTGCollection());
     int result = addCardToCollection(cardId, playerdata->collection);
     playerdata->collection->save();
     return result;
@@ -399,7 +398,7 @@ int Credits::unlockSetByName(string name) {
     int setId = setlist.findSet(name);
     if (setId < 0) return 0;
 
-    GameOptionAward* goa = (GameOptionAward*)&options[Options::optionSet(setId)];
+    auto* goa = (GameOptionAward*)&options[Options::optionSet(setId)];
     goa->giveAward();
     options.save();
     return setId + 1;  // We add 1 here to show success/failure. Be sure to subtract later.
@@ -423,7 +422,7 @@ int Credits::unlockRandomSet(bool force) {
 
     if (1 == options[Options::optionSet(setId)].number) return 0;
 
-    GameOptionAward* goa = (GameOptionAward*)&options[Options::optionSet(setId)];
+    auto* goa = (GameOptionAward*)&options[Options::optionSet(setId)];
     goa->giveAward();
     options.save();
     return setId + 1;  // We add 1 here to show success/failure. Be sure to subtract later.

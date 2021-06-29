@@ -128,7 +128,7 @@ void hgeParticleSystem::Update(float fDeltaTime) {
 
     if (bUpdateBoundingBox) rectBoundingBox.Clear();
 
-    ParticleBuffer::iterator particle = mParticleBuffer.begin();
+    auto particle = mParticleBuffer.begin();
     while (particle != mParticleBuffer.end()) {
         particle->fAge += fDeltaTime;
         if (particle->fAge >= particle->fTerminalAge) {
@@ -236,7 +236,7 @@ void hgeParticleSystem::MoveTo(float x, float y, bool bMoveParticles) {
         dx = x - vecLocation.x;
         dy = y - vecLocation.y;
 
-        ParticleBuffer::iterator particle = mParticleBuffer.begin();
+        auto particle = mParticleBuffer.begin();
         for (; particle != mParticleBuffer.end(); ++particle) {
             particle->vecLocation.x += dx;
             particle->vecLocation.y += dy;
@@ -283,7 +283,7 @@ void hgeParticleSystem::Stop(bool bKillParticles) {
 }
 
 void hgeParticleSystem::Render() {
-    ParticleBuffer::iterator particle = mParticleBuffer.begin();
+    auto particle = mParticleBuffer.begin();
     for (; particle != mParticleBuffer.end(); ++particle) {
         info.sprite->SetColor(particle->colColor.GetHWColor());
         JRenderer::GetInstance()->RenderQuad(info.sprite, particle->vecLocation.x + fTx, particle->vecLocation.y + fTy,

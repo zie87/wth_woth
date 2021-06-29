@@ -427,7 +427,7 @@ Navigator::Navigator(GameObserver* observer, DuelLayers* inDuelLayers)
  **
  */
 Navigator::~Navigator() {
-    std::map<int, CardZone*>::iterator iter = mCardZones.begin();
+    auto iter = mCardZones.begin();
     for (; iter != mCardZones.end(); ++iter) {
         SAFE_DELETE(iter->second);
     }
@@ -503,7 +503,7 @@ void Navigator::Render() {
     if (GetCurrentCard() != nullptr) {
         GetCurrentCard()->Render();
 
-        CardView* card = dynamic_cast<CardView*>(GetCurrentCard());
+        auto* card = dynamic_cast<CardView*>(GetCurrentCard());
         if (card) {
             card->DrawCard(mDrawPosition, mDrawMode);
         }
@@ -565,7 +565,7 @@ void Navigator::Limit(LimitorFunctor<PlayGuiObject>* inLimitor, CardView::Select
  */
 int Navigator::CardToCardZone(PlayGuiObject* inCard) {
     int result = kCardZone_Unknown;
-    GuiAvatar* avatar = dynamic_cast<GuiAvatar*>(inCard);
+    auto* avatar = dynamic_cast<GuiAvatar*>(inCard);
     if (avatar) {
         if (avatar->player->isAI()) {
             result = kCardZone_AIAvatar;
@@ -574,7 +574,7 @@ int Navigator::CardToCardZone(PlayGuiObject* inCard) {
         }
     }
 
-    GuiGraveyard* graveyard = dynamic_cast<GuiGraveyard*>(inCard);
+    auto* graveyard = dynamic_cast<GuiGraveyard*>(inCard);
     if (graveyard) {
         if (graveyard->player->isAI()) {
             result = kCardZone_AIGraveyard;
@@ -583,7 +583,7 @@ int Navigator::CardToCardZone(PlayGuiObject* inCard) {
         }
     }
 
-    GuiLibrary* library = dynamic_cast<GuiLibrary*>(inCard);
+    auto* library = dynamic_cast<GuiLibrary*>(inCard);
     if (library) {
         if (library->player->isAI()) {
             result = kCardZone_AILibrary;
@@ -592,12 +592,12 @@ int Navigator::CardToCardZone(PlayGuiObject* inCard) {
         }
     }
 
-    GuiOpponentHand* opponentHand = dynamic_cast<GuiOpponentHand*>(inCard);
+    auto* opponentHand = dynamic_cast<GuiOpponentHand*>(inCard);
     if (opponentHand) {
         result = kCardZone_AIHand;
     }
 
-    CardView* card = dynamic_cast<CardView*>(inCard);
+    auto* card = dynamic_cast<CardView*>(inCard);
     {
         if (card) {
             if (card->owner == CardView::handZone) {

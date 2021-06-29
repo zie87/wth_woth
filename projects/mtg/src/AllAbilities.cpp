@@ -86,7 +86,7 @@ int GenericActivatedAbility::testDestroy() {
 }
 
 GenericActivatedAbility* GenericActivatedAbility::clone() const {
-    GenericActivatedAbility* a = NEW GenericActivatedAbility(*this);
+    auto* a    = NEW GenericActivatedAbility(*this);
     a->ability = ability->clone();
     return a;
 }
@@ -99,9 +99,9 @@ AAAlterPoison::AAAlterPoison(GameObserver* observer, int _id, MTGCardInstance* _
     : ActivatedAbilityTP(observer, _id, _source, _target, _cost, who), poison(poison) {}
 
 int AAAlterPoison::resolve() {
-    Damageable* _target = (Damageable*)getTarget();
+    auto* _target = (Damageable*)getTarget();
     if (_target) {
-        Player* pTarget = (Player*)_target;
+        auto* pTarget = (Player*)_target;
         if (!pTarget->inPlay()->hasAbility(Constants::POISONSHROUD) || poison < 0) _target->poisonCount += poison;
     }
     return 0;
@@ -121,7 +121,7 @@ AADamagePrevent::AADamagePrevent(GameObserver* observer, int _id, MTGCardInstanc
 }
 
 int AADamagePrevent::resolve() {
-    Damageable* _target = (Damageable*)getTarget();
+    auto* _target = (Damageable*)getTarget();
     if (_target) {
         _target->preventable += preventing;
     }
@@ -143,7 +143,7 @@ AADamager::AADamager(GameObserver* observer, int _id, MTGCardInstance* _source, 
 }
 
 int AADamager::resolve() {
-    Damageable* _target = (Damageable*)getTarget();
+    auto* _target = (Damageable*)getTarget();
     if (_target) {
         WParsedInt damage(d, nullptr, (MTGCardInstance*)source);
         if (_target == game->opponent() && game->opponent()->inPlay()->hasType("planeswalker") && !redirected) {
@@ -185,7 +185,7 @@ int AADamager::getDamage() {
 }
 
 const char* AADamager::getMenuText() {
-    MTGCardInstance* _target = dynamic_cast<MTGCardInstance*>(target);
+    auto* _target = dynamic_cast<MTGCardInstance*>(target);
     if (_target && _target->hasType(Subtypes::TYPE_PLANESWALKER)) return _target->name.c_str();
     if (redirected) return "Damage Player";
     return "Damage";
@@ -250,7 +250,7 @@ AALibraryBottom::AALibraryBottom(GameObserver* observer, int _id, MTGCardInstanc
 }
 
 int AALibraryBottom::resolve() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     _target = _target->owner->game->putInLibrary(_target);
     if (_target) {
         MTGLibrary* library = _target->owner->game->library;
@@ -279,7 +279,7 @@ AACopier::AACopier(GameObserver* observer, int _id, MTGCardInstance* _source, MT
 }
 
 int AACopier::resolve() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (_target) {
         source->copy(_target);
         return 1;
@@ -299,7 +299,7 @@ AAPhaseOut::AAPhaseOut(GameObserver* observer, int _id, MTGCardInstance* _source
 }
 
 int AAPhaseOut::resolve() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (_target) {
         _target->isPhased = true;
 
@@ -337,7 +337,7 @@ AACounter::AACounter(GameObserver* observer, int id, MTGCardInstance* source, MT
 
 int AACounter::resolve() {
     if (target) {
-        MTGCardInstance* _target = (MTGCardInstance*)target;
+        auto* _target = (MTGCardInstance*)target;
         AbilityFactory af(game);
         if (counterstring.size()) {
             Counter* checkcounter = af.parseCounter(counterstring, source, nullptr);
@@ -439,7 +439,7 @@ int ACounterShroud::destroy() {
 }
 
 ACounterShroud* ACounterShroud::clone() const {
-    ACounterShroud* a = NEW ACounterShroud(*this);
+    auto* a           = NEW ACounterShroud(*this);
     a->re             = nullptr;
     return a;
 }
@@ -457,7 +457,7 @@ ACounterTracker::ACounterTracker(GameObserver* observer, int id, MTGCardInstance
 }
 
 int ACounterTracker::addToGame() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     AbilityFactory af(game);
     Counter* counter = af.parseCounter(scounter, _target, nullptr);  //(Spell*)source);
     if (!counter) {
@@ -480,7 +480,7 @@ int ACounterTracker::addToGame() {
 }
 
 int ACounterTracker::destroy() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     AbilityFactory af(game);
     Counter* counter = af.parseCounter(scounter, _target, nullptr);  //(Spell*)source);
     if (!counter) {
@@ -503,7 +503,7 @@ int ACounterTracker::testDestroy() {
 }
 
 ACounterTracker* ACounterTracker::clone() const {
-    ACounterTracker* a = NEW ACounterTracker(*this);
+    auto* a = NEW ACounterTracker(*this);
     return a;
 }
 
@@ -526,7 +526,7 @@ AARemoveAllCounter::AARemoveAllCounter(GameObserver* observer, int id, MTGCardIn
 int AARemoveAllCounter::resolve() {
     if (!target) return 0;
 
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (all) {
         for (int amount = 0; amount < _target->counters->mCount; amount++) {
             while (_target->counters->counters[amount]->nb > 0)
@@ -588,8 +588,8 @@ int AAProliferate::resolve() {
 
     vector<MTGAbility*> pcounters;
 
-    Player* pTarget = dynamic_cast<Player*>(target);
-    MTGCardInstance* cTarget = dynamic_cast<MTGCardInstance*>(target);
+    auto* pTarget = dynamic_cast<Player*>(target);
+    auto* cTarget = dynamic_cast<MTGCardInstance*>(target);
 
     if (pTarget && pTarget->poisonCount && pTarget != source->controller()) {
         MTGAbility* a = NEW AAAlterPoison(game, game->mLayers->actionLayer()->getMaxId(), source, target, 1, nullptr);
@@ -672,7 +672,7 @@ const char* GenericChooseTypeColor::getMenuText() {
 }
 
 GenericChooseTypeColor* GenericChooseTypeColor::clone() const {
-    GenericChooseTypeColor* a = NEW GenericChooseTypeColor(*this);
+    auto* a = NEW GenericChooseTypeColor(*this);
     return a;
 }
 
@@ -686,7 +686,7 @@ AASetColorChosen::AASetColorChosen(GameObserver* observer, int id, MTGCardInstan
     abilityAltered = nullptr;
 }
 int AASetColorChosen::resolve() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target         = (MTGCardInstance*)target;
     _target->chooseacolor = color;
 
     if (abilityToAlter.size()) {
@@ -699,7 +699,7 @@ int AASetColorChosen::resolve() {
             SAFE_DELETE(abilityAltered);
         } else {
             abilityAltered->target = _target;
-            MayAbility* dontAdd = dynamic_cast<MayAbility*>(abilityAltered);
+            auto* dontAdd          = dynamic_cast<MayAbility*>(abilityAltered);
             if (!dontAdd) {
                 _target->cardsAbilities.push_back(abilityAltered);
                 for (unsigned int j = 0; j < _target->cardsAbilities.size(); ++j) {
@@ -729,7 +729,7 @@ AASetTypeChosen::AASetTypeChosen(GameObserver* observer, int id, MTGCardInstance
     abilityAltered = nullptr;
 }
 int AASetTypeChosen::resolve() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target           = (MTGCardInstance*)target;
     std::string typeChoosen = menutext;
     _target->chooseasubtype = typeChoosen;
 
@@ -741,7 +741,7 @@ int AASetTypeChosen::resolve() {
             SAFE_DELETE(abilityAltered);
         } else {
             abilityAltered->target = _target;
-            MayAbility* dontAdd = dynamic_cast<MayAbility*>(abilityAltered);
+            auto* dontAdd          = dynamic_cast<MayAbility*>(abilityAltered);
             if (!dontAdd) {
                 _target->cardsAbilities.push_back(abilityAltered);
                 for (unsigned int j = 0; j < _target->cardsAbilities.size(); ++j) {
@@ -796,7 +796,7 @@ int GenericFlipACoin::resolve() {
 const char* GenericFlipACoin::getMenuText() { return "Flip A Coin"; }
 
 GenericFlipACoin* GenericFlipACoin::clone() const {
-    GenericFlipACoin* a = NEW GenericFlipACoin(*this);
+    auto* a = NEW GenericFlipACoin(*this);
     return a;
 }
 
@@ -811,7 +811,7 @@ AASetCoin::AASetCoin(GameObserver* observer, int id, MTGCardInstance* source, MT
 }
 
 int AASetCoin::resolve() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target     = (MTGCardInstance*)target;
     _target->coinSide = side;
 
     int flip = game->getRandomGenerator()->random() % 2;
@@ -879,7 +879,7 @@ AAResetDamage::AAResetDamage(GameObserver* observer, int id, MTGCardInstance* so
     this->target = _target;
 }
 int AAResetDamage::resolve() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     _target->life = _target->toughness;
     return 1;
 }
@@ -901,11 +901,11 @@ int AAFizzler::resolve() {
     if (!target && source->target) {
         // ai is casting a spell from its hand to fizzle.
         target = stack->getActionElementFromCard(source->target);
-    } else if (MTGCardInstance* cTarget = dynamic_cast<MTGCardInstance*>(target)) {
+    } else if (auto* cTarget = dynamic_cast<MTGCardInstance*>(target)) {
         // ai targeted using an ability on a card to fizzle.
         target = stack->getActionElementFromCard(cTarget);
     }
-    Spell* sTarget = (Spell*)target;
+    auto* sTarget          = (Spell*)target;
     MTGCardInstance* sCard = sTarget->source;
     if (!sCard || !sTarget || sCard->has(Constants::NOFIZZLE)) return 0;
     stack->Fizzle(sTarget);
@@ -925,7 +925,7 @@ AABuryCard::AABuryCard(GameObserver* observer, int _id, MTGCardInstance* _source
 }
 
 int AABuryCard::resolve() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (_target) {
         _target->bury();
         while (_target->next) _target = _target->next;
@@ -947,7 +947,7 @@ int AABuryCard::resolve() {
 const char* AABuryCard::getMenuText() { return "Bury"; }
 
 AABuryCard* AABuryCard::clone() const {
-    AABuryCard* a = NEW AABuryCard(*this);
+    auto* a = NEW AABuryCard(*this);
     if (andAbility) a->andAbility = andAbility->clone();
     return a;
 }
@@ -963,7 +963,7 @@ AADestroyCard::AADestroyCard(GameObserver* observer, int _id, MTGCardInstance* _
 }
 
 int AADestroyCard::resolve() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (_target) {
         _target->destroy();
         while (_target->next) _target = _target->next;
@@ -985,7 +985,7 @@ int AADestroyCard::resolve() {
 const char* AADestroyCard::getMenuText() { return "Destroy"; }
 
 AADestroyCard* AADestroyCard::clone() const {
-    AADestroyCard* a = NEW AADestroyCard(*this);
+    auto* a = NEW AADestroyCard(*this);
     if (andAbility) a->andAbility = andAbility->clone();
     return a;
 }
@@ -998,7 +998,7 @@ AASacrificeCard::AASacrificeCard(GameObserver* observer, int _id, MTGCardInstanc
 }
 
 int AASacrificeCard::resolve() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (_target) {
         Player* p = _target->controller();
         MTGCardInstance* beforeCard = _target;
@@ -1024,7 +1024,7 @@ int AASacrificeCard::resolve() {
 const char* AASacrificeCard::getMenuText() { return "Sacrifice"; }
 
 AASacrificeCard* AASacrificeCard::clone() const {
-    AASacrificeCard* a = NEW AASacrificeCard(*this);
+    auto* a = NEW AASacrificeCard(*this);
     if (andAbility) a->andAbility = andAbility->clone();
     return a;
 }
@@ -1038,7 +1038,7 @@ AADiscardCard::AADiscardCard(GameObserver* observer, int _id, MTGCardInstance* _
 }
 
 int AADiscardCard::resolve() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (_target) {
         Player* p = _target->controller();
         WEvent* e = NEW WEventCardDiscard(_target);
@@ -1063,7 +1063,7 @@ int AADiscardCard::resolve() {
 const char* AADiscardCard::getMenuText() { return "Discard"; }
 
 AADiscardCard* AADiscardCard::clone() const {
-    AADiscardCard* a = NEW AADiscardCard(*this);
+    auto* a = NEW AADiscardCard(*this);
     if (andAbility) a->andAbility = andAbility->clone();
     return a;
 }
@@ -1105,7 +1105,7 @@ AAFrozen::AAFrozen(GameObserver* observer, int id, MTGCardInstance* card, MTGCar
 }
 
 int AAFrozen::resolve() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (_target) {
         while (_target->next) _target = _target->next;  // This is for cards such as rampant growth
         _target->frozen += 1;
@@ -1125,7 +1125,7 @@ AANewTarget::AANewTarget(GameObserver* observer, int id, MTGCardInstance* card, 
 }
 
 int AANewTarget::resolve() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (retarget) {
         _target = source;
         source = (MTGCardInstance*)target;
@@ -1137,7 +1137,7 @@ int AANewTarget::resolve() {
 
         MTGCardInstance* refreshed = source->controller()->game->putInZone(_target, _target->currentZone,
                                                                            source->controller()->game->battlefield);
-        Spell* reUp = NEW Spell(game, refreshed);
+        auto* reUp                 = NEW Spell(game, refreshed);
         if (reUp->source->hasSubtype(Subtypes::TYPE_AURA)) {
             reUp->source->target = source;
             reUp->resolve();
@@ -1146,7 +1146,7 @@ int AANewTarget::resolve() {
             reUp->resolve();
             for (size_t i = 1; i < game->mLayers->actionLayer()->mObjects.size(); i++) {
                 MTGAbility* a = ((MTGAbility*)game->mLayers->actionLayer()->mObjects[i]);
-                AEquip* eq = dynamic_cast<AEquip*>(a);
+                auto* eq      = dynamic_cast<AEquip*>(a);
                 if (eq && eq->source == reUp->source) {
                     ((AEquip*)a)->unequip();
                     ((AEquip*)a)->equip(source);
@@ -1165,7 +1165,7 @@ int AANewTarget::resolve() {
 const char* AANewTarget::getMenuText() { return "New Target"; }
 
 AANewTarget* AANewTarget::clone() const {
-    AANewTarget* a = NEW AANewTarget(*this);
+    auto* a    = NEW AANewTarget(*this);
     a->oneShot = 1;
     return a;
 }
@@ -1176,9 +1176,9 @@ AAMorph::AAMorph(GameObserver* observer, int id, MTGCardInstance* card, MTGCardI
 }
 
 int AAMorph::resolve() {
-    MTGCardInstance* Morpher = (MTGCardInstance*)source;
+    auto* Morpher = (MTGCardInstance*)source;
     if (!Morpher->isMorphed && !Morpher->morphed && Morpher->turningOver) return 0;
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (_target) {
         while (_target->next) _target = _target->next;
 
@@ -1200,7 +1200,7 @@ int AAMorph::resolve() {
                     delete (a);
                 } else {
                     a->addToGame();
-                    MayAbility* dontAdd = dynamic_cast<MayAbility*>(a);
+                    auto* dontAdd = dynamic_cast<MayAbility*>(a);
                     if (!dontAdd) {
                         _target->cardsAbilities.push_back(a);
                     }
@@ -1214,7 +1214,7 @@ int AAMorph::resolve() {
 }
 
 int AAMorph::testDestroy() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (target) {
         if (_target->turningOver && !_target->isMorphed && !_target->morphed) {
             game->removeObserver(this);
@@ -1227,7 +1227,7 @@ int AAMorph::testDestroy() {
 const char* AAMorph::getMenuText() { return "Morph"; }
 
 AAMorph* AAMorph::clone() const {
-    AAMorph* a = NEW AAMorph(*this);
+    auto* a         = NEW AAMorph(*this);
     a->forceDestroy = 1;
     return a;
 }
@@ -1238,13 +1238,13 @@ AAFlip::AAFlip(GameObserver* observer, int id, MTGCardInstance* card, MTGCardIns
 }
 
 int AAFlip::resolve() {
-    MTGCardInstance* Flipper = (MTGCardInstance*)source;
+    auto* Flipper = (MTGCardInstance*)source;
     this->oneShot = true;
     if (Flipper->isFlipped) {
         game->removeObserver(this);
         return 0;
     }
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (_target) {
         while (_target->next) _target = _target->next;
 
@@ -1254,7 +1254,7 @@ int AAFlip::resolve() {
         if (flipStats.size()) {
             MTGCard* fcard = MTGCollection()->getCardByName(flipStats);
             if (!fcard) return 0;
-            MTGCardInstance* myFlip = NEW MTGCardInstance(fcard, _target->controller()->game);
+            auto* myFlip  = NEW MTGCardInstance(fcard, _target->controller()->game);
             _target->name = myFlip->name;
             _target->setName(myFlip->name);
             _target->colors = myFlip->colors;
@@ -1264,7 +1264,7 @@ int AAFlip::resolve() {
             _target->basicAbilities = myFlip->basicAbilities;
 
             for (unsigned int i = 0; i < _target->cardsAbilities.size(); i++) {
-                MTGAbility* a = dynamic_cast<MTGAbility*>(_target->cardsAbilities[i]);
+                auto* a = dynamic_cast<MTGAbility*>(_target->cardsAbilities[i]);
 
                 if (a) game->removeObserver(a);
             }
@@ -1280,7 +1280,7 @@ int AAFlip::resolve() {
                         delete (a);
                     } else {
                         a->addToGame();
-                        MayAbility* dontAdd = dynamic_cast<MayAbility*>(a);
+                        auto* dontAdd = dynamic_cast<MayAbility*>(a);
                         if (!dontAdd) {
                             _target->cardsAbilities.push_back(a);
                         }
@@ -1321,7 +1321,7 @@ int AAFlip::resolve() {
 }
 
 int AAFlip::testDestroy() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (target) {
         if (_target->isFlipped) {
             this->forceDestroy = 1;
@@ -1340,7 +1340,7 @@ const char* AAFlip::getMenuText() {
 }
 
 AAFlip* AAFlip::clone() const {
-    AAFlip* a = NEW AAFlip(*this);
+    auto* a         = NEW AAFlip(*this);
     a->forceDestroy = 1;
     return a;
 }
@@ -1365,7 +1365,7 @@ AADynamic::AADynamic(GameObserver* observer, int id, MTGCardInstance* card, Dama
 }
 
 int AADynamic::resolve() {
-    Damageable* _target = (Damageable*)target;
+    auto* _target               = (Damageable*)target;
     Damageable* secondaryTarget = nullptr;
     if (amountsource == 2) source = (MTGCardInstance*)_target;
     switch (who) {
@@ -1587,7 +1587,7 @@ int AADynamic::resolve() {
 int AADynamic::activateMainAbility(MTGAbility* toActivate, MTGCardInstance* source, Damageable* target) {
     if (storedAbility) activateStored();
     if (!toActivate) return 0;
-    if (PTInstant* a = dynamic_cast<PTInstant*>(toActivate)) {
+    if (auto* a = dynamic_cast<PTInstant*>(toActivate)) {
         a->addToGame();
         return 1;
     }
@@ -1680,7 +1680,7 @@ const char* AADynamic::getMenuText() {
 }
 
 AADynamic* AADynamic::clone() const {
-    AADynamic* a = NEW AADynamic(*this);
+    auto* a          = NEW AADynamic(*this);
     a->storedAbility = storedAbility ? storedAbility->clone() : nullptr;
     return a;
 }
@@ -1695,14 +1695,14 @@ AALifer::AALifer(GameObserver* observer, int _id, MTGCardInstance* card, Targeta
 }
 
 int AALifer::resolve() {
-    Damageable* _target = (Damageable*)getTarget();
+    auto* _target = (Damageable*)getTarget();
     if (!_target) return 0;
 
     WParsedInt life(life_s, nullptr, source);
     if (_target->type_as_damageable == DAMAGEABLE_MTGCARDINSTANCE) {
         _target = ((MTGCardInstance*)_target)->controller();
     }
-    Player* player = (Player*)_target;
+    auto* player = (Player*)_target;
     player->gainOrLoseLife(life.getValue());
 
     return 1;
@@ -1726,7 +1726,7 @@ AASetHand::AASetHand(GameObserver* observer, int _id, MTGCardInstance* _source, 
     : ActivatedAbilityTP(observer, _id, _source, _target, _cost, who), hand(hand) {}
 
 int AASetHand::resolve() {
-    Damageable* _target = (Damageable*)getTarget();
+    auto* _target = (Damageable*)getTarget();
     Player* p = getPlayerFromDamageable(_target);
 
     if (!p) return 0;
@@ -1746,7 +1746,7 @@ AALifeSet::AALifeSet(GameObserver* observer, int _id, MTGCardInstance* _source, 
     : ActivatedAbilityTP(observer, _id, _source, _target, _cost, who), life(life) {}
 
 int AALifeSet::resolve() {
-    Damageable* _target = (Damageable*)getTarget();
+    auto* _target = (Damageable*)getTarget();
     Player* p = getPlayerFromDamageable(_target);
 
     if (!p) return 0;
@@ -1760,7 +1760,7 @@ int AALifeSet::resolve() {
 const char* AALifeSet::getMenuText() { return "Set Life"; }
 
 AALifeSet* AALifeSet::clone() const {
-    AALifeSet* a = NEW AALifeSet(*this);
+    auto* a = NEW AALifeSet(*this);
     a->life = NEW WParsedInt(*(a->life));
     return a;
 }
@@ -1785,17 +1785,17 @@ AACloner::AACloner(GameObserver* observer, int _id, MTGCardInstance* _source, MT
 }
 
 int AACloner::resolve() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (!_target) return 0;
 
     MTGCard* clone = (_target->isToken ? _target : MTGCollection()->getCardByName(_target->name));
 
     Player* targetPlayer = who == 1 ? source->controller()->opponent() : source->controller();
 
-    MTGCardInstance* myClone = NEW MTGCardInstance(clone, targetPlayer->game);
+    auto* myClone = NEW MTGCardInstance(clone, targetPlayer->game);
     targetPlayer->game->temp->addCard(myClone);
 
-    Spell* spell = NEW Spell(game, myClone);
+    auto* spell = NEW Spell(game, myClone);
     spell->resolve();
     spell->source->isToken = 1;
     spell->source->fresh = 1;
@@ -1891,7 +1891,7 @@ const char* ACastRestriction::getMenuText() {
 }
 
 ACastRestriction* ACastRestriction::clone() const {
-    ACastRestriction* a = NEW ACastRestriction(*this);
+    auto* a              = NEW ACastRestriction(*this);
     a->value = NEW WParsedInt(*(a->value));
     a->restrictionsScope = restrictionsScope->clone();
     return a;
@@ -1913,14 +1913,14 @@ AInstantCastRestrictionUEOT::AInstantCastRestrictionUEOT(GameObserver* observer,
 
 int AInstantCastRestrictionUEOT::resolve() {
     ACastRestriction* a = ability->clone();
-    GenericInstantAbility* wrapper = NEW GenericInstantAbility(game, 1, source, (Damageable*)(this->target), a);
+    auto* wrapper       = NEW GenericInstantAbility(game, 1, source, (Damageable*)(this->target), a);
     wrapper->addToGame();
     return 1;
 }
 const char* AInstantCastRestrictionUEOT::getMenuText() { return ability->getMenuText(); }
 
 AInstantCastRestrictionUEOT* AInstantCastRestrictionUEOT::clone() const {
-    AInstantCastRestrictionUEOT* a = NEW AInstantCastRestrictionUEOT(*this);
+    auto* a    = NEW AInstantCastRestrictionUEOT(*this);
     a->ability = this->ability->clone();
     return a;
 }
@@ -1936,12 +1936,12 @@ AAMover::AAMover(GameObserver* observer, int _id, MTGCardInstance* _source, MTGC
 }
 
 MTGGameZone* AAMover::destinationZone(Targetable* target) {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     return MTGGameZone::stringToZone(game, destination, source, _target);
 }
 
 int AAMover::resolve() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (target) {
         Player* p = _target->controller();
         if (p) {
@@ -1954,7 +1954,7 @@ int AAMover::resolve() {
                     fromZone != game->players[i]->opponent()->game->inPlay) {
                     MTGCardInstance* copy =
                         game->players[i]->game->putInZone(_target, fromZone, game->players[i]->game->temp);
-                    Spell* spell = NEW Spell(game, copy);
+                    auto* spell = NEW Spell(game, copy);
                     spell->resolve();
                     if (andAbility) {
                         MTGAbility* andAbilityClone = andAbility->clone();
@@ -2035,7 +2035,7 @@ const char* AAMover::getMenuText(TargetChooser* tc) {
 }
 
 AAMover* AAMover::clone() const {
-    AAMover* a = NEW AAMover(*this);
+    auto* a = NEW AAMover(*this);
     if (andAbility) a->andAbility = andAbility->clone();
     return a;
 }
@@ -2050,12 +2050,12 @@ AARandomMover::AARandomMover(GameObserver* observer, int _id, MTGCardInstance* _
 }
 
 MTGGameZone* AARandomMover::destinationZone(Targetable* target, std::string zone) {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     return MTGGameZone::stringToZone(game, zone, source, _target);
 }
 
 int AARandomMover::resolve() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (target) {
         Player* p = _target->controller();
         if (p) {
@@ -2083,7 +2083,7 @@ int AARandomMover::resolve() {
                     fromDest != game->players[i]->opponent()->game->inPlay) {
                     MTGCardInstance* copy =
                         game->players[i]->game->putInZone(toMove, fromDest, game->players[i]->game->temp);
-                    Spell* spell = NEW Spell(game, copy);
+                    auto* spell = NEW Spell(game, copy);
                     spell->resolve();
                     delete spell;
                     return 1;
@@ -2099,7 +2099,7 @@ int AARandomMover::resolve() {
 const char* AARandomMover::getMenuText() { return "Dig"; }
 
 AARandomMover* AARandomMover::clone() const {
-    AARandomMover* a = NEW AARandomMover(*this);
+    auto* a = NEW AARandomMover(*this);
     return a;
 }
 
@@ -2187,7 +2187,7 @@ const char* AARemoveMana::getMenuText() {
 }
 
 AARemoveMana* AARemoveMana::clone() const {
-    AARemoveMana* a = NEW AARemoveMana(*this);
+    auto* a         = NEW AARemoveMana(*this);
     a->mManaDesc    = mManaDesc ? NEW ManaCost(mManaDesc) : nullptr;
     return a;
 }
@@ -2202,7 +2202,7 @@ AATapper::AATapper(GameObserver* observer, int id, MTGCardInstance* card, MTGCar
 }
 
 int AATapper::resolve() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (_target) {
         while (_target->next) _target = _target->next;  // This is for cards such as rampant growth
         _target->tap();
@@ -2223,7 +2223,7 @@ AAUntapper::AAUntapper(GameObserver* observer, int id, MTGCardInstance* card, MT
 }
 
 int AAUntapper::resolve() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (_target) {
         while (_target->next) _target = _target->next;  // This is for cards such as rampant growth
         _target->untap();
@@ -2324,9 +2324,9 @@ IfThenAbility::IfThenAbility(GameObserver* observer, int _id, MTGAbility* delaye
 }
 
 int IfThenAbility::resolve() {
-    MTGCardInstance* card = (MTGCardInstance*)source;
+    auto* card = (MTGCardInstance*)source;
     AbilityFactory af(game);
-    Targetable* aTarget = (Targetable*)target;
+    auto* aTarget = (Targetable*)target;
     int checkCond = af.parseCastRestrictions(card, card->controller(), Cond);
     if (Cond.find("cantargetcard(") != string::npos) {
         TargetChooser* condTc                = nullptr;
@@ -2363,7 +2363,7 @@ int IfThenAbility::resolve() {
 const char* IfThenAbility::getMenuText() { return ""; }
 
 IfThenAbility* IfThenAbility::clone() const {
-    IfThenAbility* a = NEW IfThenAbility(*this);
+    auto* a           = NEW IfThenAbility(*this);
     a->delayedAbility = delayedAbility->clone();
     return a;
 }
@@ -2387,7 +2387,7 @@ void MayAbility::Update(float dt) {
     if (!triggered && !game->getCurrentTargetChooser()) {
         triggered = 1;
         if (optionalCost && !source->controller()->getManaPool()->canAfford(optionalCost)) return;
-        if (TargetAbility* ta = dynamic_cast<TargetAbility*>(ability)) {
+        if (auto* ta = dynamic_cast<TargetAbility*>(ability)) {
             if (!ta->getActionTc()->validTargetsExist()) return;
         }
         game->mLayers->actionLayer()->setMenuObject(source, must);
@@ -2430,7 +2430,7 @@ int MayAbility::reactToTargetClick(Targetable* object) {
 }
 
 MayAbility* MayAbility::clone() const {
-    MayAbility* a = NEW MayAbility(*this);
+    auto* a         = NEW MayAbility(*this);
     a->ability = ability->clone();
     a->optionalCost = this->optionalCost;
     return a;
@@ -2458,7 +2458,7 @@ void MenuAbility::Update(float dt) {
     if (!triggered && !object->menuObject) {
         triggered = 1;
         object->currentActionCard = (MTGCardInstance*)this->target;
-        if (TargetAbility* ta = dynamic_cast<TargetAbility*>(ability)) {
+        if (auto* ta = dynamic_cast<TargetAbility*>(ability)) {
             if (!ta->getActionTc()->validTargetsExist()) return;
         }
     }
@@ -2495,7 +2495,7 @@ int MenuAbility::isReactingToTargetClick(Targetable* card) { return MayAbility::
 int MenuAbility::reactToTargetClick(Targetable* object) { return 1; }
 
 int MenuAbility::reactToChoiceClick(Targetable* object, int choice, int control) {
-    ActionElement* currentAction = (ActionElement*)game->mLayers->actionLayer()->mObjects[control];
+    auto* currentAction = (ActionElement*)game->mLayers->actionLayer()->mObjects[control];
     if (currentAction != (ActionElement*)this) return 0;
     if (!abilities.size() || !triggered) return 0;
     for (int i = 0; i < int(abilities.size()); i++) {
@@ -2521,7 +2521,7 @@ int MenuAbility::reactToChoiceClick(Targetable* object, int choice, int control)
 }
 
 MenuAbility* MenuAbility::clone() const {
-    MenuAbility* a = NEW MenuAbility(*this);
+    auto* a             = NEW MenuAbility(*this);
     a->canBeInterrupted = false;
     if (abilities.size()) {
         for (int i = 0; i < int(abilities.size()); i++) {
@@ -2536,7 +2536,7 @@ MenuAbility* MenuAbility::clone() const {
 MenuAbility::~MenuAbility() {
     if (abilities.size()) {
         for (int i = 0; i < int(abilities.size()); i++) {
-            AASetColorChosen* chooseA = dynamic_cast<AASetColorChosen*>(abilities[i]);
+            auto* chooseA = dynamic_cast<AASetColorChosen*>(abilities[i]);
             if (chooseA && chooseA->abilityAltered) SAFE_DELETE(chooseA->abilityAltered);
             SAFE_DELETE(abilities[i]);
         }
@@ -2603,7 +2603,7 @@ const char* MultiAbility::getMenuText() {
 }
 
 MultiAbility* MultiAbility::clone() const {
-    MultiAbility* a = NEW MultiAbility(*this);
+    auto* a = NEW MultiAbility(*this);
     a->abilities.clear();
     for (size_t i = 0; i < abilities.size(); ++i) {
         a->abilities.push_back(abilities[i]->clone());
@@ -2644,7 +2644,7 @@ const char* GenericTargetAbility::getMenuText() {
 
     // Special case for move
     MTGAbility* core = AbilityFactory::getCoreAbility(ability);
-    if (AAMover* move = dynamic_cast<AAMover*>(core)) return (move->getMenuText(tc));
+    if (auto* move = dynamic_cast<AAMover*>(core)) return (move->getMenuText(tc));
     return ability->getMenuText();
 }
 
@@ -2652,7 +2652,7 @@ int GenericTargetAbility::resolve() {
     counters++;
     tc->done = false;
     if (sideEffects && usesBeforeSideEffects.size()) {
-        WParsedInt* use = NEW WParsedInt(usesBeforeSideEffects.c_str(), nullptr, source);
+        auto* use = NEW WParsedInt(usesBeforeSideEffects.c_str(), nullptr, source);
         uses = use->getValue();
         delete use;
         if (counters == uses) {
@@ -2662,8 +2662,7 @@ int GenericTargetAbility::resolve() {
             if (sa->oneShot) {
                 sa->fireAbility();
             } else {
-                GenericInstantAbility* wrapper =
-                    NEW GenericInstantAbility(game, 1, source, (Damageable*)(this->target), sa);
+                auto* wrapper = NEW GenericInstantAbility(game, 1, source, (Damageable*)(this->target), sa);
                 wrapper->addToGame();
             }
         }
@@ -2703,7 +2702,7 @@ int GenericTargetAbility::testDestroy() {
 }
 
 GenericTargetAbility* GenericTargetAbility::clone() const {
-    GenericTargetAbility* a = NEW GenericTargetAbility(*this);
+    auto* a    = NEW GenericTargetAbility(*this);
     a->ability = ability->clone();
     return a;
 }
@@ -2721,21 +2720,21 @@ AAlterCost::AAlterCost(GameObserver* observer, int id, MTGCardInstance* source, 
 }
 
 int AAlterCost::addToGame() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (!_target || _target->hasType("land")) {
         this->forceDestroy = 1;
         return MTGAbility::addToGame();
     }
     if (amount > 0) {
         if (!_target->getIncreasedManaCost()->getConvertedCost()) {
-            ManaCost* increased = NEW ManaCost();
+            auto* increased = NEW ManaCost();
             _target->getIncreasedManaCost()->copy(increased);
             delete increased;
         }
         _target->getIncreasedManaCost()->add(type, amount);
     } else {
         if (!_target->getReducedManaCost()->getConvertedCost()) {
-            ManaCost* reduced = NEW ManaCost();
+            auto* reduced = NEW ManaCost();
             _target->getReducedManaCost()->copy(reduced);
             delete reduced;
         }
@@ -2745,7 +2744,7 @@ int AAlterCost::addToGame() {
 }
 
 int AAlterCost::testDestroy() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (!this->manaReducer->isInPlay(game)) {
         if (amount > 0) {
             _target->getIncreasedManaCost()->remove(type, amount);
@@ -2759,7 +2758,7 @@ int AAlterCost::testDestroy() {
     return 0;
 }
 void AAlterCost::refreshCost(MTGCardInstance* card) {
-    ManaCost* original = NEW ManaCost();
+    auto* original = NEW ManaCost();
     original->copy(card->model->data->getManaCost());
     original->add(card->getIncreasedManaCost());
     original->remove(card->getReducedManaCost());
@@ -2845,9 +2844,9 @@ ATransformer::ATransformer(GameObserver* observer, int id, MTGCardInstance* sour
 
 int ATransformer::addToGame() {
     MTGCardInstance* _target = nullptr;
-    Interruptible* action = (Interruptible*)target;
+    auto* action             = (Interruptible*)target;
     if (action && action->type == ACTION_SPELL && action->state == NOT_RESOLVED) {
-        Spell* spell = (Spell*)action;
+        auto* spell = (Spell*)action;
         _target = spell->source;
         aForever = true;
         // when targeting the stack, set the effect to forever, incase the person does not use it
@@ -2909,17 +2908,17 @@ int ATransformer::addToGame() {
             AbilityFactory af(game);
             MTGAbility* aNew = af.parseMagicLine(newAbilitiesList[k], 0, nullptr, _target);
             if (!aNew) continue;
-            GenericTargetAbility* gta = dynamic_cast<GenericTargetAbility*>(aNew);
+            auto* gta = dynamic_cast<GenericTargetAbility*>(aNew);
             if (gta) {
                 ((GenericTargetAbility*)aNew)->source = _target;
                 ((GenericTargetAbility*)aNew)->ability->source = _target;
             }
-            GenericActivatedAbility* gaa = dynamic_cast<GenericActivatedAbility*>(aNew);
+            auto* gaa = dynamic_cast<GenericActivatedAbility*>(aNew);
             if (gaa) {
                 ((GenericActivatedAbility*)aNew)->source = _target;
                 ((GenericActivatedAbility*)aNew)->ability->source = _target;
             }
-            MultiAbility* abi = dynamic_cast<MultiAbility*>(aNew);
+            auto* abi = dynamic_cast<MultiAbility*>(aNew);
             if (abi) {
                 ((MultiAbility*)aNew)->source = _target;
                 ((MultiAbility*)aNew)->abilities[0]->source = _target;
@@ -2937,7 +2936,7 @@ int ATransformer::addToGame() {
         }
     }
     if (newpowerfound) {
-        WParsedInt* val = NEW WParsedInt(newpower, nullptr, source);
+        auto* val = NEW WParsedInt(newpower, nullptr, source);
         oldpower = _target->power;
         _target->power += val->getValue();
         _target->power -= oldpower;
@@ -2945,7 +2944,7 @@ int ATransformer::addToGame() {
         delete val;
     }
     if (newtoughnessfound) {
-        WParsedInt* val = NEW WParsedInt(newtoughness, nullptr, source);
+        auto* val    = NEW WParsedInt(newtoughness, nullptr, source);
         oldtoughness = _target->toughness;
         _target->addToToughness(val->getValue());
         _target->addToToughness(-oldtoughness);
@@ -2976,7 +2975,7 @@ int ATransformer::reapplyCountersBonus(MTGCardInstance* rtarget, bool powerappli
 }
 int ATransformer::destroy() {
     if (aForever) return 0;
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (_target) {
         while (_target->next) _target = _target->next;
         std::list<int>::iterator it;
@@ -3070,14 +3069,14 @@ ATransformerInstant::ATransformerInstant(GameObserver* observer, int id, MTGCard
 
 int ATransformerInstant::resolve() {
     ATransformer* a = ability->clone();
-    GenericInstantAbility* wrapper = NEW GenericInstantAbility(game, 1, source, (Damageable*)(this->target), a);
+    auto* wrapper   = NEW GenericInstantAbility(game, 1, source, (Damageable*)(this->target), a);
     wrapper->addToGame();
     return 1;
 }
 const char* ATransformerInstant::getMenuText() { return ability->getMenuText(); }
 
 ATransformerInstant* ATransformerInstant::clone() const {
-    ATransformerInstant* a = NEW ATransformerInstant(*this);
+    auto* a    = NEW ATransformerInstant(*this);
     a->ability = this->ability->clone();
     return a;
 }
@@ -3094,14 +3093,14 @@ PTInstant::PTInstant(GameObserver* observer, int id, MTGCardInstance* source, MT
 
 int PTInstant::resolve() {
     APowerToughnessModifier* a = ability->clone();
-    GenericInstantAbility* wrapper = NEW GenericInstantAbility(game, 1, source, (Damageable*)(this->target), a);
+    auto* wrapper              = NEW GenericInstantAbility(game, 1, source, (Damageable*)(this->target), a);
     wrapper->addToGame();
     return 1;
 }
 const char* PTInstant::getMenuText() { return ability->getMenuText(); }
 
 PTInstant* PTInstant::clone() const {
-    PTInstant* a = NEW PTInstant(*this);
+    auto* a    = NEW PTInstant(*this);
     a->ability = this->ability->clone();
     return a;
 }
@@ -3115,7 +3114,7 @@ ASwapPTUEOT::ASwapPTUEOT(GameObserver* observer, int id, MTGCardInstance* source
 
 int ASwapPTUEOT::resolve() {
     ASwapPT* a = ability->clone();
-    GenericInstantAbility* wrapper = NEW GenericInstantAbility(game, 1, source, (Damageable*)(this->target), a);
+    auto* wrapper = NEW GenericInstantAbility(game, 1, source, (Damageable*)(this->target), a);
     wrapper->addToGame();
     return 1;
 }
@@ -3123,7 +3122,7 @@ int ASwapPTUEOT::resolve() {
 const char* ASwapPTUEOT::getMenuText() { return ability->getMenuText(); }
 
 ASwapPTUEOT* ASwapPTUEOT::clone() const {
-    ASwapPTUEOT* a = NEW ASwapPTUEOT(*this);
+    auto* a    = NEW ASwapPTUEOT(*this);
     a->ability = this->ability->clone();
     return a;
 }
@@ -3136,7 +3135,7 @@ AAExchangeLife::AAExchangeLife(GameObserver* observer, int _id, MTGCardInstance*
     : ActivatedAbilityTP(observer, _id, _source, _target, _cost, who) {}
 
 int AAExchangeLife::resolve() {
-    Damageable* _target = (Damageable*)getTarget();
+    auto* _target = (Damageable*)getTarget();
     if (_target) {
         Player* player = source->controller();
         int oldlife = player->getLife();
@@ -3160,7 +3159,7 @@ int AAExchangeLife::resolve() {
 
             return 1;
         }
-        Player* opponent = (Player*)_target;
+        auto* opponent = (Player*)_target;
         if (oldlife > targetOldLife) {
             player->gainOrLoseLife(modifier * -1);
             opponent->gainOrLoseLife(modifier);
@@ -3188,7 +3187,7 @@ int ALoseAbilities::addToGame() {
         WGE_LOG_ERROR("storedAbilities shouldn't be already set inALoseAbilitie");
         return 0;
     }
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
 
     ActionLayer* al = game->mLayers->actionLayer();
 
@@ -3197,8 +3196,8 @@ int ALoseAbilities::addToGame() {
     for (int i = (int)(al->mObjects.size()) - 1; i > 0; i--)  // 0 is not a mtgability...hackish
     {
         if (al->mObjects[i]) {
-            MTGAbility* currentAction = (MTGAbility*)al->mObjects[i];
-            ALord* l = dynamic_cast<ALord*>(currentAction);
+            auto* currentAction = (MTGAbility*)al->mObjects[i];
+            auto* l             = dynamic_cast<ALord*>(currentAction);
             if (l) lordsInGame.push_back(l);
         }
     }
@@ -3206,8 +3205,8 @@ int ALoseAbilities::addToGame() {
     for (int i = (int)(al->mObjects.size()) - 1; i > 0; i--)  // 0 is not a mtgability...hackish
     {
         if (al->mObjects[i]) {
-            MTGAbility* currentAction = (MTGAbility*)al->mObjects[i];
-            ALoseAbilities* la = dynamic_cast<ALoseAbilities*>(currentAction);
+            auto* currentAction = (MTGAbility*)al->mObjects[i];
+            auto* la            = dynamic_cast<ALoseAbilities*>(currentAction);
             if (la) continue;
             if (currentAction->source == _target) {
                 bool canRemove = true;
@@ -3274,7 +3273,7 @@ int ALoseSubtypes::addToGame() {
         WGE_LOG_ERROR("storedSubtypes shouldn't be already set inALoseSubtypes");
         return 0;
     }
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
 
     for (int i = ((int)_target->types.size()) - 1; i >= 0; --i) {
         int subtype = _target->types[i];
@@ -3288,7 +3287,7 @@ int ALoseSubtypes::addToGame() {
 }
 
 int ALoseSubtypes::destroy() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     for (size_t i = 0; i < storedSubtypes.size(); ++i) _target->addType(storedSubtypes[i]);
     storedSubtypes.clear();
     return 1;
@@ -3331,7 +3330,7 @@ int APreventDamageTypes::destroy() {
 }
 
 APreventDamageTypes* APreventDamageTypes::clone() const {
-    APreventDamageTypes* a = NEW APreventDamageTypes(*this);
+    auto* a                = NEW APreventDamageTypes(*this);
     a->re                  = nullptr;
     return a;
 }
@@ -3347,7 +3346,7 @@ APreventDamageTypesUEOT::APreventDamageTypesUEOT(GameObserver* observer, int id,
 
 int APreventDamageTypesUEOT::resolve() {
     APreventDamageTypes* a = ability->clone();
-    GenericInstantAbility* wrapper = NEW GenericInstantAbility(game, 1, source, (Damageable*)(this->target), a);
+    auto* wrapper          = NEW GenericInstantAbility(game, 1, source, (Damageable*)(this->target), a);
     wrapper->addToGame();
     return 1;
 }
@@ -3363,7 +3362,7 @@ int APreventDamageTypesUEOT::destroy() {
 const char* APreventDamageTypesUEOT::getMenuText() { return ability->getMenuText(); }
 
 APreventDamageTypesUEOT* APreventDamageTypesUEOT::clone() const {
-    APreventDamageTypesUEOT* a = NEW APreventDamageTypesUEOT(*this);
+    auto* a    = NEW APreventDamageTypesUEOT(*this);
     a->ability = this->ability->clone();
     return a;
 }
@@ -3438,7 +3437,7 @@ AUpkeep::AUpkeep(GameObserver* observer, int _id, MTGCardInstance* card, MTGAbil
 }
 
 int AUpkeep::receiveEvent(WEvent* event) {
-    if (WEventPhaseChange* pe = dynamic_cast<WEventPhaseChange*>(event)) {
+    if (auto* pe = dynamic_cast<WEventPhaseChange*>(event)) {
         if (MTG_PHASE_DRAW == pe->to->id) {
             if (source->controller() == game->currentPlayer && once < 2 && paidThisTurn < 1) {
                 ability->resolve();
@@ -3494,7 +3493,7 @@ std::ostream& AUpkeep::toString(std::ostream& out) const {
 }
 
 AUpkeep* AUpkeep::clone() const {
-    AUpkeep* a = NEW AUpkeep(*this);
+    auto* a    = NEW AUpkeep(*this);
     a->ability = ability->clone();
     return a;
 }
@@ -3579,7 +3578,7 @@ const char* APhaseAction::getMenuText() {
 }
 
 APhaseAction* APhaseAction::clone() const {
-    APhaseAction* a = NEW APhaseAction(*this);
+    auto* a = NEW APhaseAction(*this);
     if (forcedestroy == false) a->forceDestroy = -1;  // we want this ability to stay alive until it resolves.
     return a;
 }
@@ -3606,7 +3605,7 @@ int APhaseActionGeneric::resolve() {
 const char* APhaseActionGeneric::getMenuText() { return ability->getMenuText(); }
 
 APhaseActionGeneric* APhaseActionGeneric::clone() const {
-    APhaseActionGeneric* a = NEW APhaseActionGeneric(*this);
+    auto* a    = NEW APhaseActionGeneric(*this);
     a->ability = this->ability->clone();
     a->oneShot = 1;
     return a;
@@ -3644,7 +3643,7 @@ void ABlink::Update(float dt) {
             _target->controller()->game->putInZone(_target, _target->currentZone, _target->owner->game->hand);
             return;
         }
-        Spell* spell = NEW Spell(game, Blinker);
+        auto* spell = NEW Spell(game, Blinker);
         spell->source->counters->init();
         if (spell->source->hasSubtype(Subtypes::TYPE_AURA) && !blinkhand) {
             TargetChooserFactory tcf(game);
@@ -3698,7 +3697,7 @@ void ABlink::Update(float dt) {
 }
 
 void ABlink::resolveBlink() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (_target) {
         if (blinkhand && !_target->controller()->game->isInZone(_target, _target->controller()->game->hand)) {
             this->forceDestroy = 1;
@@ -3725,7 +3724,7 @@ void ABlink::resolveBlink() {
                 _target->controller()->game->putInZone(_target, _target->currentZone, _target->owner->game->hand);
                 return;
             }
-            Spell* spell = NEW Spell(game, Blinker);
+            auto* spell = NEW Spell(game, Blinker);
             spell->source->counters->init();
             if (spell->source->hasSubtype(Subtypes::TYPE_AURA) && !blinkhand) {
                 TargetChooserFactory tcf(game);
@@ -3779,7 +3778,7 @@ int ABlink::resolve() { return 0; }
 const char* ABlink::getMenuText() { return "Blink"; }
 
 ABlink* ABlink::clone() const {
-    ABlink* a = NEW ABlink(*this);
+    auto* a         = NEW ABlink(*this);
     a->stored       = stored ? stored->clone() : nullptr;
     a->forceDestroy = -1;
     return a;
@@ -3802,7 +3801,7 @@ int ABlinkGeneric::resolve() {
 const char* ABlinkGeneric::getMenuText() { return "Blink"; }
 
 ABlinkGeneric* ABlinkGeneric::clone() const {
-    ABlinkGeneric* a = NEW ABlinkGeneric(*this);
+    auto* a    = NEW ABlinkGeneric(*this);
     a->ability = this->ability->clone();
     a->oneShot = 1;
     return a;
@@ -3817,7 +3816,7 @@ AABlock::AABlock(GameObserver* observer, int id, MTGCardInstance* card, MTGCardI
 }
 
 int AABlock::resolve() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     source = (MTGCardInstance*)source;
     if (_target && source->canBlock(_target)) {
         source->toggleDefenser(_target);
@@ -3835,7 +3834,7 @@ AAConnect::AAConnect(GameObserver* observer, int id, MTGCardInstance* card, MTGC
 }
 
 int AAConnect::resolve() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (_target) {
         while (_target->next) _target = _target->next;
         _target->childrenCards.push_back(source);
@@ -3844,7 +3843,7 @@ int AAConnect::resolve() {
         if (source->hasSubtype(Subtypes::TYPE_EQUIPMENT)) {
             for (size_t i = 1; i < game->mLayers->actionLayer()->mObjects.size(); i++) {
                 MTGAbility* a = ((MTGAbility*)game->mLayers->actionLayer()->mObjects[i]);
-                AEquip* eq = dynamic_cast<AEquip*>(a);
+                auto* eq      = dynamic_cast<AEquip*>(a);
                 if (eq && eq->source == source) {
                     ((AEquip*)a)->unequip();
                     ((AEquip*)a)->equip(_target);
@@ -3979,8 +3978,8 @@ void ATutorialMessage::Render() {
                 JQuadPtr quad = game->getResourceManager()->RetrieveQuad("iconspsp.png", 4 * 32, 0, 32, 32, "iconpsp4",
                                                                          RETRIEVE_MANAGE);
                 quad->SetHotSpot(16, 16);
-                IconButton* iconButton = NEW IconButton(1, this, quad.get(), 0, mBg[0]->mHeight / 2, 0.7f,
-                                                        Fonts::MAGIC_FONT, _("continue"), 0, 16, true);
+                auto* iconButton = NEW IconButton(1, this, quad.get(), 0, mBg[0]->mHeight / 2, 0.7f, Fonts::MAGIC_FONT,
+                                                  _("continue"), 0, 16, true);
                 Add(iconButton);
             }
 
@@ -3990,8 +3989,8 @@ void ATutorialMessage::Render() {
         } else {
             mBgTex = game->getResourceManager()->RetrieveTexture("taskboard.png", RETRIEVE_LOCK);
 
-            float unitH = static_cast<float>(mBgTex->mHeight / 4);
-            float unitW = static_cast<float>(mBgTex->mWidth / 4);
+            auto unitH = static_cast<float>(mBgTex->mHeight / 4);
+            auto unitW = static_cast<float>(mBgTex->mWidth / 4);
             if (unitH == 0 || unitW == 0) return;
 
             if (mBgTex) {
@@ -4010,8 +4009,8 @@ void ATutorialMessage::Render() {
             JQuadPtr quad = game->getResourceManager()->RetrieveQuad("iconspsp.png", 4 * 32, 0, 32, 32, "iconpsp4",
                                                                      RETRIEVE_MANAGE);
             quad->SetHotSpot(16, 16);
-            IconButton* iconButton = NEW IconButton(1, this, quad.get(), SCREEN_WIDTH_F / 2, SCREEN_HEIGHT_F - 60,
-                                                    0.7f, Fonts::MAGIC_FONT, _("continue"), 0, 16, true);
+            auto* iconButton = NEW IconButton(1, this, quad.get(), SCREEN_WIDTH_F / 2, SCREEN_HEIGHT_F - 60, 0.7f,
+                                              Fonts::MAGIC_FONT, _("continue"), 0, 16, true);
             Add(iconButton);
 
             mSH = 64 / unitH;
@@ -4084,7 +4083,7 @@ void ATutorialMessage::Render() {
 }
 
 ATutorialMessage* ATutorialMessage::clone() const {
-    ATutorialMessage* copy = NEW ATutorialMessage(*this);
+    auto* copy              = NEW ATutorialMessage(*this);
     copy->mUserCloseRequest = (copy->alreadyShown() > 0);
     return copy;
 }

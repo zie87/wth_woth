@@ -198,7 +198,7 @@ void ManaIcon::Drop() {
 GuiMana::GuiMana(float x, float y, Player* p) : GuiLayer(p->getObserver()), x(x), y(y), owner(p) {}
 
 GuiMana::~GuiMana() {
-    for (vector<ManaIcon*>::iterator it = manas.begin(); it != manas.end(); ++it) {
+    for (auto it = manas.begin(); it != manas.end(); ++it) {
         delete (*it);
     }
 }
@@ -210,7 +210,7 @@ void GuiMana::RenderStatic() {
     WFont* mFont = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
     JRenderer* r = JRenderer::GetInstance();
     for (int i = 0; i < Constants::NB_Colors; ++i) values[i] = 0;
-    for (vector<ManaIcon*>::iterator it = manas.begin(); it != manas.end(); ++it)
+    for (auto it = manas.begin(); it != manas.end(); ++it)
         if (ManaIcon::ALIVE == (*it)->mode) {
             values[(*it)->color]++;
             if (values[(*it)->color] == 1) totalColors++;
@@ -244,7 +244,7 @@ void GuiMana::RenderStatic() {
 }
 
 void GuiMana::Render() {
-    for (vector<ManaIcon*>::iterator it = manas.begin(); it != manas.end(); ++it) (*it)->Render();
+    for (auto it = manas.begin(); it != manas.end(); ++it) (*it)->Render();
 
     if (OptionManaDisplay::DYNAMIC != options[Options::MANADISPLAY].number &&
         OptionManaDisplay::NOSTARSDYNAMIC != options[Options::MANADISPLAY].number)
@@ -256,20 +256,20 @@ bool remove_dead(ManaIcon* m) { return ManaIcon::DEAD != m->mode; }
 void GuiMana::Update(float dt) {
     if (observer->getResourceManager()) {
         float shift = 0;
-        for (vector<ManaIcon*>::iterator it = manas.begin(); it != manas.end(); ++it) {
+        for (auto it = manas.begin(); it != manas.end(); ++it) {
             (*it)->Update(dt, shift);
             shift += 15;
         }
     }
-    vector<ManaIcon*>::iterator it = partition(manas.begin(), manas.end(), &remove_dead);
+    auto it = partition(manas.begin(), manas.end(), &remove_dead);
     if (it != manas.end()) {
-        for (vector<ManaIcon*>::iterator q = it; q != manas.end(); ++q) SAFE_DELETE(*q);
+        for (auto q = it; q != manas.end(); ++q) SAFE_DELETE(*q);
         manas.erase(it, manas.end());
     }
 }
 
 int GuiMana::receiveEventPlus(WEvent* e) {
-    if (WEventEngageMana* event = dynamic_cast<WEventEngageMana*>(e)) {
+    if (auto* event = dynamic_cast<WEventEngageMana*>(e)) {
         if (event->destination != owner->getManaPool()) return 0;
         if (event->card && event->card->view)
             manas.push_back(NEW ManaIcon(event->color, event->card->view->actX, event->card->view->actY, x, y));
@@ -281,17 +281,17 @@ int GuiMana::receiveEventPlus(WEvent* e) {
 }
 
 int GuiMana::receiveEventMinus(WEvent* e) {
-    if (WEventConsumeMana* event = dynamic_cast<WEventConsumeMana*>(e)) {
+    if (auto* event = dynamic_cast<WEventConsumeMana*>(e)) {
         if (event->source != owner->getManaPool()) return 0;
-        for (vector<ManaIcon*>::iterator it = manas.begin(); it != manas.end(); ++it)
+        for (auto it = manas.begin(); it != manas.end(); ++it)
             if ((event->color == (*it)->color) && (ManaIcon::ALIVE == (*it)->mode)) {
                 (*it)->Wither();
                 return 1;
             }
         return 1;
-    } else if (WEventEmptyManaPool* event2 = dynamic_cast<WEventEmptyManaPool*>(e)) {
+    } else if (auto* event2 = dynamic_cast<WEventEmptyManaPool*>(e)) {
         if (event2->source != owner->getManaPool()) return 0;
-        for (vector<ManaIcon*>::iterator it = manas.begin(); it != manas.end(); ++it) (*it)->Drop();
+        for (auto it = manas.begin(); it != manas.end(); ++it) (*it)->Drop();
         return 1;
     }
     return 0;

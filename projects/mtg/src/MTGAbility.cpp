@@ -157,12 +157,12 @@ int AbilityFactory::parseCastRestrictions(MTGCardInstance* card, Player* player,
                         rtc = comparasion[i].substr(foundComp + 8, end - foundComp - 8).c_str();
                         mod = atoi(comparasion[i].substr(end + 1).c_str());
                         if (i == 2) {
-                            WParsedInt* newAmount = NEW WParsedInt(rtc, card);
+                            auto* newAmount = NEW WParsedInt(rtc, card);
                             secondAmount = newAmount->getValue();
                             secondAmount += mod;
                             SAFE_DELETE(newAmount);
                         } else {
-                            WParsedInt* newAmount = NEW WParsedInt(rtc, card);
+                            auto* newAmount = NEW WParsedInt(rtc, card);
                             firstAmount = newAmount->getValue();
                             firstAmount += mod;
                             SAFE_DELETE(newAmount);
@@ -199,7 +199,7 @@ int AbilityFactory::parseCastRestrictions(MTGCardInstance* card, Player* player,
                         SAFE_DELETE(stc);
                     }
                 } else if (i == 2) {
-                    WParsedInt* secondA = NEW WParsedInt(comparasion[2].c_str(), nullptr, card);
+                    auto* secondA = NEW WParsedInt(comparasion[2].c_str(), nullptr, card);
                     secondAmount = secondA->getValue();
                     SAFE_DELETE(secondA);
                 }
@@ -389,7 +389,7 @@ Counter* AbilityFactory::parseCounter(string s, MTGCardInstance* target, Spell* 
 
     int power, toughness;
     if (parsePowerToughness(spt, &power, &toughness)) {
-        Counter* counter = NEW Counter(target, name.c_str(), power, toughness);
+        auto* counter  = NEW Counter(target, name.c_str(), power, toughness);
         counter->nb = nb;
         counter->maxNb = maxNb;
         return counter;
@@ -656,24 +656,24 @@ TriggeredAbility* AbilityFactory::parseTrigger(string s, string magicText, int i
 // When abilities encapsulate each other, gets the deepest one (it is the one likely to have the most relevant
 // information)
 MTGAbility* AbilityFactory::getCoreAbility(MTGAbility* a) {
-    if (AForeach* fea = dynamic_cast<AForeach*>(a)) return getCoreAbility(fea->ability);
+    if (auto* fea = dynamic_cast<AForeach*>(a)) return getCoreAbility(fea->ability);
 
-    if (AAsLongAs* aea = dynamic_cast<AAsLongAs*>(a)) return getCoreAbility(aea->ability);
+    if (auto* aea = dynamic_cast<AAsLongAs*>(a)) return getCoreAbility(aea->ability);
 
-    if (GenericTargetAbility* gta = dynamic_cast<GenericTargetAbility*>(a)) return getCoreAbility(gta->ability);
+    if (auto* gta = dynamic_cast<GenericTargetAbility*>(a)) return getCoreAbility(gta->ability);
 
-    if (GenericActivatedAbility* gaa = dynamic_cast<GenericActivatedAbility*>(a)) return getCoreAbility(gaa->ability);
+    if (auto* gaa = dynamic_cast<GenericActivatedAbility*>(a)) return getCoreAbility(gaa->ability);
 
-    if (MultiAbility* abi = dynamic_cast<MultiAbility*>(a)) return getCoreAbility(abi->abilities[0]);
+    if (auto* abi = dynamic_cast<MultiAbility*>(a)) return getCoreAbility(abi->abilities[0]);
 
-    if (NestedAbility* na = dynamic_cast<NestedAbility*>(a)) {
+    if (auto* na = dynamic_cast<NestedAbility*>(a)) {
         if (na->ability)
             // only atempt to return a nestedability if it contains a valid ability. example where this causes a bug
             // otherwise. AEquip is considered nested, but contains no ability.
             return getCoreAbility(na->ability);
     }
 
-    if (MenuAbility* ma = dynamic_cast<MenuAbility*>(a)) return getCoreAbility(ma->abilities[0]);
+    if (auto* ma = dynamic_cast<MenuAbility*>(a)) return getCoreAbility(ma->abilities[0]);
 
     return a;
 }
@@ -828,7 +828,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
         strncmp(s.c_str(), "chooseatype ", strlen("chooseatype ")) == 0) {
         MTGAbility* choose = parseChooseActionAbility(s, card, spell, target, 0, id);
         choose                  = NEW GenericActivatedAbility(observer, "", "", id, card, choose, nullptr);
-        MayAbility* mainAbility = NEW MayAbility(observer, id, choose, card, true);
+        auto* mainAbility       = NEW MayAbility(observer, id, choose, card, true);
         return mainAbility;
     }
 
@@ -985,7 +985,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
                 limit = sWithoutTc.substr(limit_str + 6);
             }
             ////A stupid Special case for ManaProducers, becuase Ai only understands manaabilities that are not nested.
-            AManaProducer* amp = dynamic_cast<AManaProducer*>(a);
+            auto* amp = dynamic_cast<AManaProducer*>(a);
             if (amp) {
                 amp->setCost(cost);
                 if (cost) cost->setExtraCostsAction(a, card);
@@ -999,7 +999,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
                 return amp;
             }
 
-            AEquip* ae = dynamic_cast<AEquip*>(a);
+            auto* ae = dynamic_cast<AEquip*>(a);
             if (ae) {
                 ae->setCost(cost);
                 if (!tc) {
@@ -1085,7 +1085,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
                 a1 = NEW GenericTargetAbility(observer, newName, castRestriction, id, card, tc, a1);
             else
                 a1 = NEW GenericActivatedAbility(observer, newName, castRestriction, id, card, a1, nullptr);
-            MayAbility* mainAbility = NEW MayAbility(observer, id, a1, card, mayMust[i]);
+            auto* mainAbility = NEW MayAbility(observer, id, a1, card, mayMust[i]);
             if (mayCost) mainAbility->optionalCost = mayCost;
             return mainAbility;
         }
@@ -1231,7 +1231,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     if (found != string::npos) {
         SAFE_DELETE(tc);
         vector<string> multiEffects = split(s, '&');
-        MultiAbility* multi         = NEW MultiAbility(observer, id, card, target, nullptr);
+        auto* multi                 = NEW MultiAbility(observer, id, card, target, nullptr);
         for (unsigned int i = 0; i < multiEffects.size(); i++) {
             if (!multiEffects[i].empty()) {
                 MTGAbility* addAbility = parseMagicLine(multiEffects[i], id, spell, card, activated);
@@ -1502,7 +1502,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     // ability creator the target has to do the ability.
     if (s.find("ability$") != string::npos) {
         if (storedAbilityString.size()) {
-            ATargetedAbilityCreator* abl =
+            auto* abl =
                 NEW ATargetedAbilityCreator(observer, id, card, target, nullptr, newName, storedAbilityString, who);
             abl->oneShot = 1;
             storedString.clear();
@@ -1532,8 +1532,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
                 return NEW ATokenCreator(observer, id, card, target, nullptr, "ID NOT FOUND", "ERROR ID", 0, 0, "", "",
                                          nullptr, 0);
 
-            ATokenCreator* tok =
-                NEW ATokenCreator(observer, id, card, target, nullptr, tokenId, starfound, multiplier, who);
+            auto* tok    = NEW ATokenCreator(observer, id, card, target, nullptr, tokenId, starfound, multiplier, who);
             tok->oneShot = 1;
             return tok;
         }
@@ -1565,9 +1564,8 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
         int power, toughness;
         parsePowerToughness(spt, &power, &toughness);
 
-        ATokenCreator* tok =
-            NEW ATokenCreator(observer, id, card, target, nullptr, sname, stypes, power + value, toughness + value,
-                              sabilities, starfound, multiplier, who, aLivingWeapon, spt);
+        auto* tok    = NEW ATokenCreator(observer, id, card, target, nullptr, sname, stypes, power + value,
+                                      toughness + value, sabilities, starfound, multiplier, who, aLivingWeapon, spt);
         tok->oneShot = 1;
         if (aLivingWeapon) tok->forceDestroy = 1;
         return tok;
@@ -1787,7 +1785,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     // set life total
     vector<string> splitLifeset = parseBetween(s, "lifeset:", " ", false);
     if (splitLifeset.size()) {
-        WParsedInt* life = NEW WParsedInt(splitLifeset[1], spell, card);
+        auto* life       = NEW WParsedInt(splitLifeset[1], spell, card);
         Damageable* t    = spell ? spell->getNextDamageableTarget() : nullptr;
         MTGAbility* a    = NEW AALifeSet(observer, id, card, t, life, nullptr, who);
         a->oneShot = 1;
@@ -1880,7 +1878,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
             string valueStr = splitValue[1];
             bool modifyExisting = (valueStr.find("+") != string::npos || valueStr.find("-") != string::npos);
 
-            WParsedInt* value = NEW WParsedInt(valueStr, spell, card);
+            auto* value       = NEW WParsedInt(valueStr, spell, card);
             Targetable* t     = spell ? spell->getNextTarget() : nullptr;
             if (card->hasType(Subtypes::TYPE_INSTANT) || card->hasType(Subtypes::TYPE_SORCERY) || forceUEOT) {
                 return NEW AInstantCastRestrictionUEOT(observer, id, card, t, castTargets, value, modifyExisting,
@@ -2156,7 +2154,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     }
 
     // Change Power/Toughness
-    WParsedPT* wppt = NEW WParsedPT(s, spell, card);
+    auto* wppt     = NEW WParsedPT(s, spell, card);
     bool nonstatic = false;
     if (wppt->ok) {
         if (s.find("nonstatic") != string::npos) nonstatic = true;
@@ -2500,17 +2498,17 @@ MTGAbility* AbilityFactory::parseChooseActionAbility(string s, MTGCardInstance* 
 int AbilityFactory::abilityEfficiency(MTGAbility* a, Player* p, int mode, TargetChooser* tc, Targetable* target) {
     if (!a) return BAKA_EFFECT_DONTKNOW;
 
-    if (GenericTargetAbility* abi = dynamic_cast<GenericTargetAbility*>(a)) {
+    if (auto* abi = dynamic_cast<GenericTargetAbility*>(a)) {
         if (mode == MODE_PUTINTOPLAY) return BAKA_EFFECT_GOOD;
         return abilityEfficiency(abi->ability, p, mode, abi->getActionTc());
     }
-    if (GenericActivatedAbility* abi = dynamic_cast<GenericActivatedAbility*>(a)) {
+    if (auto* abi = dynamic_cast<GenericActivatedAbility*>(a)) {
         if (mode == MODE_PUTINTOPLAY) return BAKA_EFFECT_GOOD;
         return abilityEfficiency(abi->ability, p, mode, tc);
     }
-    if (MultiAbility* abi = dynamic_cast<MultiAbility*>(a)) return abilityEfficiency(abi->abilities[0], p, mode, tc);
-    if (MayAbility* abi = dynamic_cast<MayAbility*>(a)) return abilityEfficiency(abi->ability, p, mode, tc);
-    if (ALord* abi = dynamic_cast<ALord*>(a)) {
+    if (auto* abi = dynamic_cast<MultiAbility*>(a)) return abilityEfficiency(abi->abilities[0], p, mode, tc);
+    if (auto* abi = dynamic_cast<MayAbility*>(a)) return abilityEfficiency(abi->ability, p, mode, tc);
+    if (auto* abi = dynamic_cast<ALord*>(a)) {
         int myCards = countCards(abi->getActionTc(), p);
         int theirCards = countCards(abi->getActionTc(), p->opponent());
         int efficiency = abilityEfficiency(abi->ability, p, mode, tc);
@@ -2526,10 +2524,10 @@ int AbilityFactory::abilityEfficiency(MTGAbility* a, Player* p, int mode, Target
         return efficiency;
         return -efficiency; */
     }
-    if (AAsLongAs* abi = dynamic_cast<AAsLongAs*>(a)) return abilityEfficiency(abi->ability, p, mode, tc);
-    if (AForeach* abi = dynamic_cast<AForeach*>(a)) return abilityEfficiency(abi->ability, p, mode, tc);
-    if (ATeach* abi = dynamic_cast<ATeach*>(a)) return abilityEfficiency(abi->ability, p, mode, tc);
-    if (ATargetedAbilityCreator* atac = dynamic_cast<ATargetedAbilityCreator*>(a)) {
+    if (auto* abi = dynamic_cast<AAsLongAs*>(a)) return abilityEfficiency(abi->ability, p, mode, tc);
+    if (auto* abi = dynamic_cast<AForeach*>(a)) return abilityEfficiency(abi->ability, p, mode, tc);
+    if (auto* abi = dynamic_cast<ATeach*>(a)) return abilityEfficiency(abi->ability, p, mode, tc);
+    if (auto* atac = dynamic_cast<ATargetedAbilityCreator*>(a)) {
         Player* targetedPlyr;
         switch (atac->who) {
         case TargetChooser::CONTROLLER:
@@ -2553,7 +2551,7 @@ int AbilityFactory::abilityEfficiency(MTGAbility* a, Player* p, int mode, Target
         }
         int result = 0;
         if (targetedPlyr) {
-            MTGCardInstance* testDummy = NEW MTGCardInstance();
+            auto* testDummy = NEW MTGCardInstance();
             testDummy->setObserver(targetedPlyr->getObserver());
             testDummy->owner = targetedPlyr;
             testDummy->storedSourceCard = atac->source;
@@ -2587,7 +2585,7 @@ int AbilityFactory::abilityEfficiency(MTGAbility* a, Player* p, int mode, Target
     // our own lands, so we return a "positive" value
     if (dynamic_cast<ACounterTracker*>(a)) return BAKA_EFFECT_GOOD;
 
-    if (AACounter* ac = dynamic_cast<AACounter*>(a)) {
+    if (auto* ac = dynamic_cast<AACounter*>(a)) {
         bool negative_effect = ac->power < 0 || ac->toughness < 0;
         if ((ac->nb > 0 && negative_effect) || (ac->nb < 0 && !negative_effect)) return BAKA_EFFECT_BAD;
         return BAKA_EFFECT_GOOD;
@@ -2595,7 +2593,7 @@ int AbilityFactory::abilityEfficiency(MTGAbility* a, Player* p, int mode, Target
 
     if (dynamic_cast<ATokenCreator*>(a)) return BAKA_EFFECT_GOOD;
 
-    if (AAMover* aam = dynamic_cast<AAMover*>(a)) {
+    if (auto* aam = dynamic_cast<AAMover*>(a)) {
         MTGGameZone* z = aam->destinationZone(target);
         if (tc && tc->targetsZone(p->game->library)) {
             if (z == p->game->hand || z == p->game->inPlay) return BAKA_EFFECT_GOOD;
@@ -2607,21 +2605,20 @@ int AbilityFactory::abilityEfficiency(MTGAbility* a, Player* p, int mode, Target
     if (dynamic_cast<AABuryCard*>(a)) return BAKA_EFFECT_BAD;
     if (dynamic_cast<AADestroyCard*>(a)) return BAKA_EFFECT_BAD;
     if (dynamic_cast<AStandardRegenerate*>(a)) return BAKA_EFFECT_GOOD;
-    if (AALifer* abi = dynamic_cast<AALifer*>(a)) return abi->getLife() > 0 ? BAKA_EFFECT_GOOD : BAKA_EFFECT_BAD;
-    if (AAAlterPoison* abi = dynamic_cast<AAAlterPoison*>(a))
-        return abi->poison > 0 ? BAKA_EFFECT_GOOD : BAKA_EFFECT_BAD;
+    if (auto* abi = dynamic_cast<AALifer*>(a)) return abi->getLife() > 0 ? BAKA_EFFECT_GOOD : BAKA_EFFECT_BAD;
+    if (auto* abi = dynamic_cast<AAAlterPoison*>(a)) return abi->poison > 0 ? BAKA_EFFECT_GOOD : BAKA_EFFECT_BAD;
     if (dynamic_cast<AADepleter*>(a)) return BAKA_EFFECT_BAD;
     if (dynamic_cast<AADrawer*>(a)) return BAKA_EFFECT_GOOD;
     if (dynamic_cast<AARandomDiscarder*>(a)) return BAKA_EFFECT_BAD;
     if (dynamic_cast<ARampageAbility*>(a)) return BAKA_EFFECT_GOOD;
     if (dynamic_cast<ABushidoAbility*>(a)) return BAKA_EFFECT_GOOD;
-    if (PTInstant* abi = dynamic_cast<PTInstant*>(a))
+    if (auto* abi = dynamic_cast<PTInstant*>(a))
         return (abi->wppt->power.getValue() >= 0 && abi->wppt->toughness.getValue() >= 0) ? BAKA_EFFECT_GOOD
                                                                                           : BAKA_EFFECT_BAD;
-    if (APowerToughnessModifier* abi = dynamic_cast<APowerToughnessModifier*>(a))
+    if (auto* abi = dynamic_cast<APowerToughnessModifier*>(a))
         return (abi->wppt->power.getValue() >= 0 && abi->wppt->toughness.getValue() >= 0) ? BAKA_EFFECT_GOOD
                                                                                           : BAKA_EFFECT_BAD;
-    if (PTInstant* abi = dynamic_cast<PTInstant*>(a)) return abilityEfficiency(abi->ability, p, mode, tc);
+    if (auto* abi = dynamic_cast<PTInstant*>(a)) return abilityEfficiency(abi->ability, p, mode, tc);
 
     if (dynamic_cast<ACantBeBlockedBy*>(a)) return BAKA_EFFECT_GOOD;
     if (dynamic_cast<AProtectionFrom*>(a)) return BAKA_EFFECT_GOOD;
@@ -2641,15 +2638,15 @@ int AbilityFactory::abilityEfficiency(MTGAbility* a, Player* p, int mode, Target
     badAbilities[(int)Constants::EXILEDEATH] = true;
     badAbilities[(int)Constants::WEAK] = true;
 
-    if (AInstantBasicAbilityModifierUntilEOT* abi = dynamic_cast<AInstantBasicAbilityModifierUntilEOT*>(a)) {
+    if (auto* abi = dynamic_cast<AInstantBasicAbilityModifierUntilEOT*>(a)) {
         int result = badAbilities[abi->ability] ? BAKA_EFFECT_BAD : BAKA_EFFECT_GOOD;
         return (abi->value > 0) ? result : -result;
     }
-    if (ABasicAbilityModifier* abi = dynamic_cast<ABasicAbilityModifier*>(a)) {
+    if (auto* abi = dynamic_cast<ABasicAbilityModifier*>(a)) {
         int result = (badAbilities[abi->ability]) ? BAKA_EFFECT_BAD : BAKA_EFFECT_GOOD;
         return (abi->modifier > 0) ? result : -result;
     }
-    if (ABasicAbilityAuraModifierUntilEOT* abi = dynamic_cast<ABasicAbilityAuraModifierUntilEOT*>(a))
+    if (auto* abi = dynamic_cast<ABasicAbilityAuraModifierUntilEOT*>(a))
         return abilityEfficiency(abi->ability, p, mode);
     if (dynamic_cast<AManaProducer*>(a)) return BAKA_EFFECT_GOOD;
     return BAKA_EFFECT_DONTKNOW;
@@ -2812,7 +2809,7 @@ int AbilityFactory::magicText(int id, Spell* spell, MTGCardInstance* card, int m
         if (moreThanOneTarget) a->target = spell->getNextTarget();
 
         if (a->target && moreThanOneTarget) {
-            MayAbility* aMay = dynamic_cast<MayAbility*>(a);
+            auto* aMay = dynamic_cast<MayAbility*>(a);
             while (a->target) {
                 if (a->oneShot) {
                     a->resolve();
@@ -2831,7 +2828,7 @@ int AbilityFactory::magicText(int id, Spell* spell, MTGCardInstance* card, int m
                 delete (a);
             } else {
                 a->addToGame();
-                MayAbility* dontAdd = dynamic_cast<MayAbility*>(a);
+                auto* dontAdd = dynamic_cast<MayAbility*>(a);
                 if (!dontAdd) {
                     if (a->source)
                         a->source->cardsAbilities.push_back(a);
@@ -2868,13 +2865,13 @@ void AbilityFactory::addAbilities(int _id, Spell* spell) {
     switch (id) {
     case 1092:  // Aladdin's lamp
     {
-        AAladdinsLamp* ability = NEW AAladdinsLamp(observer, _id, card);
+        auto* ability = NEW AAladdinsLamp(observer, _id, card);
         observer->addObserver(ability);
         break;
     }
     case 1095:  // Armageddon clock
     {
-        AArmageddonClock* ability = NEW AArmageddonClock(observer, _id, card);
+        auto* ability = NEW AArmageddonClock(observer, _id, card);
         observer->addObserver(ability);
         break;
     }
@@ -2935,8 +2932,7 @@ void AbilityFactory::addAbilities(int _id, Spell* spell) {
         std::vector<int8_t> cost;
         cost.push_back(Constants::MTG_COLOR_ARTIFACT);
         cost.push_back(1);
-        ASpellCastLife* ability =
-            NEW ASpellCastLife(observer, _id, card, Constants::MTG_COLOR_BLUE, NEW ManaCost(cost, 1), 1);
+        auto* ability = NEW ASpellCastLife(observer, _id, card, Constants::MTG_COLOR_BLUE, NEW ManaCost(cost, 1), 1);
         observer->addObserver(ability);
         break;
     }
@@ -2967,8 +2963,7 @@ void AbilityFactory::addAbilities(int _id, Spell* spell) {
         std::vector<int8_t> cost;
         cost.push_back(Constants::MTG_COLOR_ARTIFACT);
         cost.push_back(1);
-        ASpellCastLife* ability =
-            NEW ASpellCastLife(observer, _id, card, Constants::MTG_COLOR_RED, NEW ManaCost(cost, 1), 1);
+        auto* ability = NEW ASpellCastLife(observer, _id, card, Constants::MTG_COLOR_RED, NEW ManaCost(cost, 1), 1);
         observer->addObserver(ability);
         break;
     }
@@ -2982,8 +2977,7 @@ void AbilityFactory::addAbilities(int _id, Spell* spell) {
         std::vector<int8_t> cost;
         cost.push_back(Constants::MTG_COLOR_ARTIFACT);
         cost.push_back(1);
-        ASpellCastLife* ability =
-            NEW ASpellCastLife(observer, _id, card, Constants::MTG_COLOR_WHITE, NEW ManaCost(cost, 1), 1);
+        auto* ability = NEW ASpellCastLife(observer, _id, card, Constants::MTG_COLOR_WHITE, NEW ManaCost(cost, 1), 1);
         observer->addObserver(ability);
         break;
     }
@@ -3049,8 +3043,7 @@ void AbilityFactory::addAbilities(int _id, Spell* spell) {
         std::vector<int8_t> cost;
         cost.push_back(Constants::MTG_COLOR_ARTIFACT);
         cost.push_back(1);
-        ASpellCastLife* ability =
-            NEW ASpellCastLife(observer, _id, card, Constants::MTG_COLOR_BLACK, NEW ManaCost(cost, 1), 1);
+        auto* ability = NEW ASpellCastLife(observer, _id, card, Constants::MTG_COLOR_BLACK, NEW ManaCost(cost, 1), 1);
         observer->addObserver(ability);
         break;
     }
@@ -3060,14 +3053,13 @@ void AbilityFactory::addAbilities(int _id, Spell* spell) {
         std::vector<int8_t> cost;
         cost.push_back(Constants::MTG_COLOR_ARTIFACT);
         cost.push_back(1);
-        ASpellCastLife* ability =
-            NEW ASpellCastLife(observer, _id, card, Constants::MTG_COLOR_GREEN, NEW ManaCost(cost, 1), 1);
+        auto* ability = NEW ASpellCastLife(observer, _id, card, Constants::MTG_COLOR_GREEN, NEW ManaCost(cost, 1), 1);
         observer->addObserver(ability);
         break;
     }
     case 1143:  // Animate Dead
     {
-        AAnimateDead* a = NEW AAnimateDead(observer, _id, card, card->target);
+        auto* a = NEW AAnimateDead(observer, _id, card, card->target);
         observer->addObserver(a);
         card->target = ((MTGCardInstance*)a->target);
         break;
@@ -3084,7 +3076,7 @@ void AbilityFactory::addAbilities(int _id, Spell* spell) {
     }
     case 1159:  // Erg Raiders
     {
-        AErgRaiders* ability = NEW AErgRaiders(observer, _id, card);
+        auto* ability = NEW AErgRaiders(observer, _id, card);
         observer->addObserver(ability);
         break;
     }
@@ -3127,7 +3119,7 @@ void AbilityFactory::addAbilities(int _id, Spell* spell) {
     }
     case 1176:  // Sacrifice
     {
-        ASacrifice* ability = NEW ASacrifice(observer, _id, card, card->target);
+        auto* ability = NEW ASacrifice(observer, _id, card, card->target);
         observer->addObserver(ability);
         break;
     }
@@ -3486,9 +3478,9 @@ std::ostream& MTGAbility::toString(std::ostream& out) const {
 Player* MTGAbility::getPlayerFromTarget(Targetable* target) {
     if (!target) return nullptr;
 
-    if (MTGCardInstance* cTarget = dynamic_cast<MTGCardInstance*>(target)) return cTarget->controller();
+    if (auto* cTarget = dynamic_cast<MTGCardInstance*>(target)) return cTarget->controller();
 
-    if (Player* cPlayer = dynamic_cast<Player*>(target)) return cPlayer;
+    if (auto* cPlayer = dynamic_cast<Player*>(target)) return cPlayer;
 
     return ((Interruptible*)target)->source->controller();
 }
@@ -3554,7 +3546,7 @@ int ActivatedAbility::isReactingToClick(MTGCardInstance* card, ManaCost* mana) {
     }
     limitPerTurn = 0;
     if (limit.size()) {
-        WParsedInt* value = NEW WParsedInt(limit.c_str(), nullptr, source);
+        auto* value  = NEW WParsedInt(limit.c_str(), nullptr, source);
         limitPerTurn = value->getValue();
         delete value;
         // only run this check if we have a valid limit string.
@@ -3576,7 +3568,7 @@ int ActivatedAbility::isReactingToClick(MTGCardInstance* card, ManaCost* mana) {
         if (!cost) return 1;
         if (card->hasType(Subtypes::TYPE_PLANESWALKER)) {
             for (unsigned int k = 0; k < card->cardsAbilities.size(); ++k) {
-                ActivatedAbility* check = dynamic_cast<ActivatedAbility*>(card->cardsAbilities[k]);
+                auto* check = dynamic_cast<ActivatedAbility*>(card->cardsAbilities[k]);
                 if (check && check->counters) return 0;
             }
             if (player != game->currentPlayer) return 0;
@@ -3586,8 +3578,8 @@ int ActivatedAbility::isReactingToClick(MTGCardInstance* card, ManaCost* mana) {
         AbilityFactory af(game);
         MTGAbility* fmp     = nullptr;
         fmp = af.getCoreAbility(this);
-        AManaProducer* amp = dynamic_cast<AManaProducer*>(this);
-        AManaProducer* femp = dynamic_cast<AManaProducer*>(fmp);
+        auto* amp           = dynamic_cast<AManaProducer*>(this);
+        auto* femp          = dynamic_cast<AManaProducer*>(fmp);
         if (source->has(Constants::NOMANA) && (amp || femp)) return 0;
         if (source->has(Constants::ONLYMANA) && !(amp || femp)) return 0;
         cost->setExtraCostsAction(this, card);
@@ -3617,7 +3609,7 @@ int ActivatedAbility::reactToClick(MTGCardInstance* card) {
             game->mExtraPayment = cost->extraCosts;
             return 0;
         }
-        ManaCost* previousManaPool = NEW ManaCost(player->getManaPool());
+        auto* previousManaPool = NEW ManaCost(player->getManaPool());
         game->currentlyActing()->getManaPool()->pay(cost);
         cost->doPayExtra();
         SAFE_DELETE(abilityCost);
@@ -3632,13 +3624,12 @@ int ActivatedAbility::reactToTargetClick(Targetable* object) {
     Player* player = game->currentlyActing();
     ManaCost* cost = getCost();
     if (cost) {
-        if (MTGCardInstance* cObject = dynamic_cast<MTGCardInstance*>(object))
-            cost->setExtraCostsAction(this, cObject);
+        if (auto* cObject = dynamic_cast<MTGCardInstance*>(object)) cost->setExtraCostsAction(this, cObject);
         if (!cost->isExtraPaymentSet()) {
             game->mExtraPayment = cost->extraCosts;
             return 0;
         }
-        ManaCost* previousManaPool = NEW ManaCost(player->getManaPool());
+        auto* previousManaPool = NEW ManaCost(player->getManaPool());
         game->currentlyActing()->getManaPool()->pay(cost);
         cost->doPayExtra();
         SAFE_DELETE(abilityCost);
@@ -3654,8 +3645,8 @@ int ActivatedAbility::activateAbility() {
     // taking foreach manaproducers off the stack and sending tapped for mana events.
     AbilityFactory af(game);
     fmp = af.getCoreAbility(this);
-    AManaProducer* amp = dynamic_cast<AManaProducer*>(this);
-    AManaProducer* femp = dynamic_cast<AManaProducer*>(fmp);
+    auto* amp      = dynamic_cast<AManaProducer*>(this);
+    auto* femp     = dynamic_cast<AManaProducer*>(fmp);
     ManaCost* cost = getCost();
     if ((amp || femp) && cost && cost->extraCosts) {
         for (unsigned int i = 0; i < cost->extraCosts->costs.size(); i++) {
@@ -3692,7 +3683,7 @@ int ActivatedAbility::activateAbility() {
 }
 
 void ActivatedAbility::activateSideEffect() {
-    WParsedInt* use = NEW WParsedInt(usesBeforeSideEffects.c_str(), nullptr, source);
+    auto* use = NEW WParsedInt(usesBeforeSideEffects.c_str(), nullptr, source);
     uses = use->getValue();
     delete use;
     if (counters == uses) {
@@ -3702,8 +3693,7 @@ void ActivatedAbility::activateSideEffect() {
         if (sa->oneShot) {
             sa->fireAbility();
         } else {
-            GenericInstantAbility* wrapper =
-                NEW GenericInstantAbility(game, 1, source, (Damageable*)(this->target), sa);
+            auto* wrapper = NEW GenericInstantAbility(game, 1, source, (Damageable*)(this->target), sa);
             wrapper->addToGame();
         }
     }
@@ -3738,7 +3728,7 @@ TargetAbility::TargetAbility(GameObserver* observer, int id, MTGCardInstance* ca
 }
 
 int TargetAbility::reactToTargetClick(Targetable* object) {
-    if (MTGCardInstance* cObject = dynamic_cast<MTGCardInstance*>(object)) return reactToClick(cObject);
+    if (auto* cObject = dynamic_cast<MTGCardInstance*>(object)) return reactToClick(cObject);
 
     if (waitingForAnswer) {
         if (tc->toggleTarget(object) == TARGET_OK_FULL) {
@@ -3807,7 +3797,7 @@ int TargetAbility::resolve() {
         ability->target = t;
         // do nothing if the target controller responded by phasing out the target.
         if (dynamic_cast<MTGCardInstance*>(t) && ((MTGCardInstance*)t)->isPhased) return 0;
-        Player* targetedPlyr = dynamic_cast<Player*>(t);
+        auto* targetedPlyr = dynamic_cast<Player*>(t);
         if (targetedPlyr) {
             source->playerTarget = targetedPlyr;
         }
@@ -3944,14 +3934,14 @@ bool ListMaintainerAbility::canTarget(MTGGameZone* zone) {
 void ListMaintainerAbility::updateTargets() {
     // remove invalid ones
     map<MTGCardInstance*, bool> temp;
-    for (map<MTGCardInstance*, bool>::iterator it = cards.begin(); it != cards.end(); ++it) {
+    for (auto it = cards.begin(); it != cards.end(); ++it) {
         MTGCardInstance* card = (*it).first;
         if (!canBeInList(card) || card->mPropertiesChangedSinceLastUpdate) {
             temp[card] = true;
         }
     }
 
-    for (map<MTGCardInstance*, bool>::iterator it = temp.begin(); it != temp.end(); ++it) {
+    for (auto it = temp.begin(); it != temp.end(); ++it) {
         MTGCardInstance* card = (*it).first;
         cards.erase(card);
         removed(card);
@@ -3976,7 +3966,7 @@ void ListMaintainerAbility::updateTargets() {
         }
     }
 
-    for (map<MTGCardInstance*, bool>::iterator it = temp.begin(); it != temp.end(); ++it) {
+    for (auto it = temp.begin(); it != temp.end(); ++it) {
         MTGCardInstance* card = (*it).first;
         cards[card] = true;
         added(card);
@@ -3999,14 +3989,14 @@ void ListMaintainerAbility::updateTargets() {
 void ListMaintainerAbility::checkTargets() {
     // remove invalid ones
     map<MTGCardInstance*, bool> tempCheck;
-    for (map<MTGCardInstance*, bool>::iterator it = checkCards.begin(); it != checkCards.end(); ++it) {
+    for (auto it = checkCards.begin(); it != checkCards.end(); ++it) {
         MTGCardInstance* card = (*it).first;
         if (!canBeInList(card) || card->mPropertiesChangedSinceLastUpdate) {
             tempCheck[card] = true;
         }
     }
 
-    for (map<MTGCardInstance*, bool>::iterator it = tempCheck.begin(); it != tempCheck.end(); ++it) {
+    for (auto it = tempCheck.begin(); it != tempCheck.end(); ++it) {
         MTGCardInstance* card = (*it).first;
         checkCards.erase(card);
     }
@@ -4031,7 +4021,7 @@ void ListMaintainerAbility::checkTargets() {
             }
         }
     }
-    for (map<MTGCardInstance*, bool>::iterator it = tempCheck.begin(); it != tempCheck.end(); ++it) {
+    for (auto it = tempCheck.begin(); it != tempCheck.end(); ++it) {
         MTGCardInstance* card = (*it).first;
         checkCards[card] = true;
     }
@@ -4041,7 +4031,7 @@ void ListMaintainerAbility::Update(float dt) { updateTargets(); }
 
 // Destroy the spell -> remove all targets
 int ListMaintainerAbility::destroy() {
-    map<MTGCardInstance*, bool>::iterator it = cards.begin();
+    auto it = cards.begin();
 
     while (it != cards.end()) {
         MTGCardInstance* card = (*it).first;
@@ -4173,13 +4163,13 @@ int GenericTriggeredAbility::triggerOnEvent(WEvent* e) {
 }
 
 Targetable* GenericTriggeredAbility::getTriggerTarget(WEvent* e, MTGAbility* a) {
-    TriggerTargetChooser* ttc = dynamic_cast<TriggerTargetChooser*>(a->getActionTc());
+    auto* ttc = dynamic_cast<TriggerTargetChooser*>(a->getActionTc());
     if (ttc) return e->getTarget(ttc->triggerTarget);
 
-    NestedAbility* na = dynamic_cast<NestedAbility*>(a);
+    auto* na = dynamic_cast<NestedAbility*>(a);
     if (na) return getTriggerTarget(e, na->ability);
 
-    MultiAbility* ma = dynamic_cast<MultiAbility*>(a);
+    auto* ma = dynamic_cast<MultiAbility*>(a);
     if (ma) {
         for (size_t i = 0; i < ma->abilities.size(); i++) {
             return getTriggerTarget(e, ma->abilities[i]);
@@ -4190,16 +4180,16 @@ Targetable* GenericTriggeredAbility::getTriggerTarget(WEvent* e, MTGAbility* a) 
 }
 
 void GenericTriggeredAbility::setTriggerTargets(Targetable* ta, MTGAbility* a) {
-    TriggerTargetChooser* ttc = dynamic_cast<TriggerTargetChooser*>(a->getActionTc());
+    auto* ttc = dynamic_cast<TriggerTargetChooser*>(a->getActionTc());
     if (ttc) {
         a->target = ta;
         ttc->target = ta;
     }
 
-    NestedAbility* na = dynamic_cast<NestedAbility*>(a);
+    auto* na = dynamic_cast<NestedAbility*>(a);
     if (na) setTriggerTargets(ta, na->ability);
 
-    MultiAbility* ma = dynamic_cast<MultiAbility*>(a);
+    auto* ma = dynamic_cast<MultiAbility*>(a);
     if (ma) {
         for (size_t i = 0; i < ma->abilities.size(); i++) {
             setTriggerTargets(ta, ma->abilities[i]);
@@ -4241,7 +4231,7 @@ GenericTriggeredAbility::~GenericTriggeredAbility() {
 const char* GenericTriggeredAbility::getMenuText() { return ability->getMenuText(); }
 
 GenericTriggeredAbility* GenericTriggeredAbility::clone() const {
-    GenericTriggeredAbility* a = NEW GenericTriggeredAbility(*this);
+    auto* a             = NEW GenericTriggeredAbility(*this);
     a->t = t->clone();
     a->ability = ability->clone();
     a->destroyCondition = destroyCondition->clone();
@@ -4335,7 +4325,7 @@ const char* AManaProducer::getMenuText() {
 AManaProducer::~AManaProducer() { SAFE_DELETE(output); }
 
 AManaProducer* AManaProducer::clone() const {
-    AManaProducer* a = NEW AManaProducer(*this);
+    auto* a   = NEW AManaProducer(*this);
     a->output = NEW ManaCost();
     a->output->copy(output);
     return a;

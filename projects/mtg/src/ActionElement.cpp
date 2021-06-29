@@ -28,11 +28,11 @@ ActionElement::~ActionElement() { SAFE_DELETE(tc); }
 int ActionElement::getActivity() { return activeState; }
 
 int ActionElement::isReactingToTargetClick(Targetable* object) {
-    if (MTGCardInstance* cObject = dynamic_cast<MTGCardInstance*>(object)) return isReactingToClick(cObject);
+    if (auto* cObject = dynamic_cast<MTGCardInstance*>(object)) return isReactingToClick(cObject);
     return 0;
 }
 
 int ActionElement::reactToTargetClick(Targetable* object) {
-    if (MTGCardInstance* cObject = dynamic_cast<MTGCardInstance*>(object)) return reactToClick(cObject);
+    if (auto* cObject = dynamic_cast<MTGCardInstance*>(object)) return reactToClick(cObject);
     return 0;
 }

@@ -93,7 +93,7 @@ vector<DeckMetaData*> GameState::BuildDeckList(const string& path, const string&
 // build a menu with the given deck list and return a vector of the deck ids created.
 void GameState::renderDeckMenu(SimpleMenu* _menu, const vector<DeckMetaData*>& deckMetaDataList) {
     int deckNumber = 1;
-    for (vector<DeckMetaData*>::const_iterator i = deckMetaDataList.begin(); i != deckMetaDataList.end(); i++) {
+    for (auto i = deckMetaDataList.begin(); i != deckMetaDataList.end(); i++) {
         DeckMetaData* deckMetaData = *i;
         string deckName = deckMetaData->getName();
         string deckDescription = deckMetaData->getDescription();
@@ -104,7 +104,7 @@ void GameState::renderDeckMenu(SimpleMenu* _menu, const vector<DeckMetaData*>& d
 // build a menu with the given deck list and return a vector of the deck ids created.
 void GameState::renderDeckMenu(DeckMenu* _menu, const vector<DeckMetaData*>& deckMetaDataList) {
     int deckNumber = 1;
-    for (vector<DeckMetaData*>::const_iterator i = deckMetaDataList.begin(); i != deckMetaDataList.end(); i++) {
+    for (auto i = deckMetaDataList.begin(); i != deckMetaDataList.end(); i++) {
         DeckMetaData* deckMetaData = *i;
         string deckName = deckMetaData->getName();
         string deckDescription = deckMetaData->getDescription();

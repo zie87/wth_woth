@@ -209,7 +209,7 @@ std::vector<std::string>& split(const std::string& s, char delim, std::vector<st
 
 std::string join(vector<string>& v, string delim) {
     std::string retVal;
-    for (vector<string>::iterator it = v.begin(); it != v.end(); ++it) {
+    for (auto it = v.begin(); it != v.end(); ++it) {
         retVal.append(*it);
         retVal.append(delim);
     }

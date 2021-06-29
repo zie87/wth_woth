@@ -179,8 +179,8 @@ void SimplePad::Update(float dt) {
     unsigned int minDistance = -1;
     if (mEngine->GetLeftClickCoordinates(x, y)) {
         for (int i = 0; i < nbitems; i++) {
-            unsigned int distance = static_cast<unsigned int>((keys[i]->mY - (float)y) * (keys[i]->mY - (float)y) +
-                                                              (keys[i]->mX - (float)x) * (keys[i]->mX - (float)x));
+            auto distance = static_cast<unsigned int>((keys[i]->mY - (float)y) * (keys[i]->mY - (float)y) +
+                                                      (keys[i]->mX - (float)x) * (keys[i]->mX - (float)x));
             if (distance < minDistance) {
                 minDistance = distance;
                 n = i;

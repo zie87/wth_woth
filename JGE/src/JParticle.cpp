@@ -105,7 +105,7 @@ JParticle::~JParticle() {
 }
 
 bool JParticle::Update(float dt) {
-    for (int i = 0; i < FIELD_COUNT; i++) mData[i].Update(dt);
+    for (auto& i : mData) i.Update(dt);
 
     // the radial and tangential acceleration code was taken from HGE's particle source
     Vector2D vecAccel = mPos - mOrigin;  // par->vecLocation-vecLocation;
@@ -155,9 +155,9 @@ void JParticle::Render() {
 void JParticle::Init(float lifeTime) {
     mLifetime = lifeTime;
 
-    for (int i = 0; i < FIELD_COUNT; i++) {
-        mData[i].SetScale(lifeTime);
-        mData[i].Init();
+    for (auto& i : mData) {
+        i.SetScale(lifeTime);
+        i.Init();
     }
 
     mActive = true;

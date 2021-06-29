@@ -184,8 +184,8 @@ JFileSystem::~JFileSystem() {
 void JFileSystem::clearZipCache() {
     DetachZipFile();
 
-    for (auto it = mZipCache.begin(); it != mZipCache.end(); ++it) {
-        delete (it->second);
+    for (auto& it : mZipCache) {
+        delete (it.second);
     }
     mZipCache.clear();
     mZipCachedElementsCount = 0;
@@ -352,7 +352,7 @@ std::vector<std::string>& JFileSystem::scanfolder(const std::string& _folderName
         std::vector<std::string> userZips;
         mUserFS->scanfolder(folderName, userZips);
 
-        for (size_t i = 0; i < userZips.size(); ++i) seen[userZips[i]] = true;
+        for (auto& userZip : userZips) seen[userZip] = true;
     }
 
     // system zips
@@ -361,7 +361,7 @@ std::vector<std::string>& JFileSystem::scanfolder(const std::string& _folderName
         std::vector<std::string> systemZips;
         mSystemFS->scanfolder(folderName, systemZips);
 
-        for (size_t i = 0; i < systemZips.size(); ++i) seen[systemZips[i]] = true;
+        for (auto& systemZip : systemZips) seen[systemZip] = true;
     }
 
     // user real files
@@ -372,9 +372,9 @@ std::vector<std::string>& JFileSystem::scanfolder(const std::string& _folderName
         realFolderName.append(folderName);
         scanRealFolder(realFolderName, userReal);
 
-        for (size_t i = 0; i < userReal.size(); ++i) {
-            std::string asFolder = userReal[i] + "/";
-            if (seen.find(asFolder) == seen.end()) seen[userReal[i]] = true;
+        for (auto& i : userReal) {
+            std::string asFolder = i + "/";
+            if (seen.find(asFolder) == seen.end()) seen[i] = true;
         }
     }
 
@@ -386,14 +386,14 @@ std::vector<std::string>& JFileSystem::scanfolder(const std::string& _folderName
         realFolderName.append(folderName);
         scanRealFolder(realFolderName, systemReal);
 
-        for (size_t i = 0; i < systemReal.size(); ++i) {
-            std::string asFolder = systemReal[i] + "/";
-            if (seen.find(asFolder) == seen.end()) seen[systemReal[i]] = true;
+        for (auto& i : systemReal) {
+            std::string asFolder = i + "/";
+            if (seen.find(asFolder) == seen.end()) seen[i] = true;
         }
     }
 
-    for (auto it = seen.begin(); it != seen.end(); ++it) {
-        results.push_back(it->first);
+    for (auto& it : seen) {
+        results.push_back(it.first);
     }
 
     return results;

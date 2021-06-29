@@ -53,8 +53,8 @@ JGuiController::JGuiController(JGE* jge, int id, JGuiListener* listener) : mEngi
 JGuiController::~JGuiController() {
     for (int i = 0; i < mCount; i++)
         if (mObjects[i] != nullptr) delete mObjects[i];
-    for (size_t i = 0; i < mButtons.size(); i++)
-        if (mButtons[i] != nullptr) delete mButtons[i];
+    for (auto& mButton : mButtons)
+        if (mButton != nullptr) delete mButton;
 }
 
 void JGuiController::Render() {
@@ -117,8 +117,8 @@ bool JGuiController::CheckUserInput(JButton key) {
         int n = mCurr;
         if (mEngine->GetLeftClickCoordinates(x, y)) {
             // first scan the buttons on the screen and then process the other gui elements
-            for (size_t i = 0; i < mButtons.size(); i++) {
-                if (mButtons[i]->ButtonPressed()) {
+            for (auto& mButton : mButtons) {
+                if (mButton->ButtonPressed()) {
                     mEngine->LeftClickedProcessed();
                     return true;
                 }
@@ -159,7 +159,7 @@ void JGuiController::Update(float dt) {
     for (int i = 0; i < mCount; i++)
         if (mObjects[i] != nullptr) mObjects[i]->Update(dt);
 
-    for (size_t i = 0; i < mButtons.size(); i++) mButtons[i]->Update(dt);
+    for (auto& mButton : mButtons) mButton->Update(dt);
 
     if (mEngine) {
         JButton key = mEngine->ReadButton();

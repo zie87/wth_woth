@@ -50,19 +50,19 @@ JResourceManager::JResourceManager() {
 JResourceManager::~JResourceManager() { RemoveAll(); }
 
 void JResourceManager::RemoveJLBFonts() {
-    for (auto font = mFontList.begin(); font != mFontList.end(); ++font) delete *font;
+    for (auto& font : mFontList) delete font;
 
     mFontList.clear();
     mFontMap.clear();
 }
 
 void JResourceManager::RemoveAll() {
-    for (auto tex = mTextureList.begin(); tex != mTextureList.end(); ++tex) delete *tex;
+    for (auto& tex : mTextureList) delete tex;
 
     mTextureList.clear();
     mTextureMap.clear();
 
-    for (auto quad = mQuadList.begin(); quad != mQuadList.end(); ++quad) delete *quad;
+    for (auto& quad : mQuadList) delete quad;
 
     mQuadList.clear();
     mQuadMap.clear();

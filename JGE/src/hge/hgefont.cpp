@@ -134,8 +134,8 @@ hgeFont::hgeFont(const char* szFont, bool bMipmap __attribute__((unused))) {
 }
 
 hgeFont::~hgeFont() {
-    for (int i = 0; i < 256; i++)
-        if (letters[i]) delete letters[i];
+    for (auto& letter : letters)
+        if (letter) delete letter;
     if (hTexture) delete hTexture;
     // hge->Release();
 }
@@ -298,8 +298,8 @@ float hgeFont::GetStringWidth(const char* string) const {
 void hgeFont::SetColor(PIXEL_TYPE col) {
     dwCol = col;
 
-    for (int i = 0; i < 256; i++)
-        if (letters[i]) letters[i]->SetColor(col);
+    for (auto& letter : letters)
+        if (letter) letter->SetColor(col);
 }
 
 void hgeFont::SetZ(float z) {

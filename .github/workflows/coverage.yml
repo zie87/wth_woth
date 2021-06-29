@@ -25,7 +25,7 @@ jobs:
       run: |
         sudo apt update && sudo apt install git lcov libsdl2-dev libpng-dev libjpeg-dev libz-dev
         cmake -E make_directory ${{runner.workspace}}/build
-        ln -sf ./projects/mtg/Res ${{runner.workspace}}/build
+        ln -sf $GITHUB_WORKSPACE/projects/mtg/Res ${{runner.workspace}}/build
 
     - name: Configure
       working-directory: ${{runner.workspace}}/build

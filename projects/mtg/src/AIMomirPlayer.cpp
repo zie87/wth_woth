@@ -50,12 +50,12 @@ int AIMomirPlayer::momir() {
         std::vector<int8_t> _cost;
         _cost.push_back(Constants::MTG_COLOR_ARTIFACT);
         _cost.push_back(converted);
-        ManaCost* cost = NEW ManaCost(_cost);
+        auto* cost            = NEW ManaCost(_cost);
         MTGAbility* ability = getMomirAbility();
         MTGCardInstance* card = game->hand->cards[0];
         if (ability->isReactingToClick(card, cost)) {
             payTheManaCost(cost);
-            AIAction* a = NEW AIAction(this, ability, card);
+            auto* a = NEW AIAction(this, ability, card);
             clickstream.push(a);
             result = 1;
         }
@@ -102,7 +102,7 @@ int AIMomirPlayer::computeActions() {
                 int canPutLandsIntoPlay = game->playRestrictions->canPutIntoZone(card, game->inPlay);
                 if (card && (canPutLandsIntoPlay == PlayRestriction::CAN_PLAY)) {
                     MTGAbility* putIntoPlay = observer->mLayers->actionLayer()->getAbility(MTGAbility::PUT_INTO_PLAY);
-                    AIAction* a = NEW AIAction(this, putIntoPlay, card);  // TODO putinplay action
+                    auto* a                 = NEW AIAction(this, putIntoPlay, card);  // TODO putinplay action
                     clickstream.push(a);
                     return 1;
                 }

@@ -64,7 +64,7 @@ void StyleManager::loadRules() {
                 std::transform(tag.begin(), tag.end(), tag.begin(), ::tolower);
                 if (tag != "case") continue;
 
-                WStyleRule* r = NEW WStyleRule();
+                auto* r = NEW WStyleRule();
                 rules.push_back(r);
 
                 holder = pSlot->Attribute("rule");
@@ -77,7 +77,7 @@ void StyleManager::loadRules() {
             holder = pRule->Attribute("name");
             if (!holder) continue;
             string sname = holder;
-            WStyle* s = NEW WStyle();
+            auto* s      = NEW WStyle();
 
             for (pSlot = pRule->FirstChildElement(); pSlot != nullptr; pSlot = pSlot->NextSiblingElement()) {
                 tag = pSlot->Value();
@@ -108,13 +108,13 @@ void StyleManager::determineActive(MTGDeck* p1, MTGDeck* p2) {
     topRule = -1;
     topSize = 0;
 
-    MTGDeck* tempDeck = NEW MTGDeck(MTGCollection());
+    auto* tempDeck = NEW MTGDeck(MTGCollection());
     if (p1 && playerSrc != 2) tempDeck->add(p1);
     if (p2 && playerSrc != 1) tempDeck->add(p2);
     WCFilterFactory* ff = WCFilterFactory::GetInstance();
 
     if (tempDeck) {
-        DeckDataWrapper* ddw = NEW DeckDataWrapper(tempDeck);
+        auto* ddw = NEW DeckDataWrapper(tempDeck);
         for (int r = 0; r < (int)rules.size(); r++) {
             ddw->clearFilters();
             ddw->addFilter(ff->Construct(rules[r]->filter));
@@ -132,7 +132,7 @@ void StyleManager::determineActive(MTGDeck* p1, MTGDeck* p2) {
     string prior = activeStyle;
     activeStyle = "";
     if (topRule >= 0) {
-        map<string, WStyle*>::iterator mi = styles.find(rules[topRule]->style);
+        auto mi = styles.find(rules[topRule]->style);
         if (mi != styles.end()) activeStyle = mi->first;
     }
     if (prior != activeStyle) WResourceManager::Instance()->Refresh();

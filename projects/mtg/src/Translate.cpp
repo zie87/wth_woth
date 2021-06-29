@@ -19,11 +19,11 @@ int Translator::Add(string from, string to) {
 
 string Translator::translate(string value) {
     // if (!initDone) init();
-    map<string, string>::iterator it = values.find(value);
+    auto it = values.find(value);
     if (it != values.end()) return it->second;
 #if defined DEBUG_TRANSLATE
     if (checkMisses) {
-        map<string, int>::iterator it2 = dontCareValues.find(value);
+        auto it2 = dontCareValues.find(value);
         if (it2 == dontCareValues.end()) missingValues[value] = 1;
     }
 #endif

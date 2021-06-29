@@ -30,8 +30,8 @@ MaxPerTurnRestriction* PlayRestrictions::getMaxPerTurnRestrictionByTargetChooser
     TargetChooser* _tc = tc->clone();
     _tc->setAllZones();  // we don't care about the actual zone for the "equals" check
 
-    for (vector<PlayRestriction*>::iterator iter = restrictions.begin(); iter != restrictions.end(); ++iter) {
-        MaxPerTurnRestriction* mptr = dynamic_cast<MaxPerTurnRestriction*>(*iter);
+    for (auto iter = restrictions.begin(); iter != restrictions.end(); ++iter) {
+        auto* mptr = dynamic_cast<MaxPerTurnRestriction*>(*iter);
         if (mptr && mptr->tc->equals(_tc)) {
             delete _tc;
             return mptr;

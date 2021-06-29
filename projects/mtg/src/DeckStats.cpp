@@ -42,7 +42,7 @@ DeckStats::~DeckStats() {
 
 DeckStat* DeckStats::getDeckStat(string opponentsFile) {
     map<string, DeckStat*> stats = masterDeckStats[currentDeck];
-    map<string, DeckStat*>::iterator it = stats.find(opponentsFile);
+    auto it                      = stats.find(opponentsFile);
     if (it == stats.end()) {
         return nullptr;
     } else {
@@ -63,7 +63,7 @@ int DeckStats::nbGames() {
 
 int DeckStats::percentVictories(string opponentsFile) {
     map<string, DeckStat*> stats = masterDeckStats[currentDeck];
-    map<string, DeckStat*>::iterator it = stats.find(opponentsFile);
+    auto it                      = stats.find(opponentsFile);
     if (it == stats.end()) {
         return 50;
     } else {
@@ -132,7 +132,7 @@ void DeckStats::load(const std::string& filename) {
             if (masterDeckStats[filename].find(deckfile) != masterDeckStats[filename].end()) {
                 SAFE_DELETE(masterDeckStats[filename][deckfile]);
             }
-            DeckStat* newDeckStat = NEW DeckStat(games, victories, manaColorIndex);
+            auto* newDeckStat                     = NEW DeckStat(games, victories, manaColorIndex);
             (masterDeckStats[filename])[deckfile] = newDeckStat;
         }
     }
@@ -181,7 +181,7 @@ void DeckStats::saveStats(Player* player, Player* opponent, GameObserver* game) 
     }
     load(currentDeck);
     map<string, DeckStat*>* stats = &masterDeckStats[currentDeck];
-    map<string, DeckStat*>::iterator it = stats->find(opponent->deckFileSmall);
+    auto it                       = stats->find(opponent->deckFileSmall);
     string manaColorIndex = "";
     DeckManager* deckManager = DeckManager::GetInstance();
     DeckMetaData* aiDeckMeta = deckManager->getDeckMetaDataByFilename(opponent->deckFile, true);
@@ -304,8 +304,8 @@ string StatsWrapper::getManaColorIndex() {
 
 void StatsWrapper::updateStats(string filename, MTGAllCards* collection) {
     if (FileExists(filename)) {
-        MTGDeck* mtgd = NEW MTGDeck(filename.c_str(), collection);
-        DeckDataWrapper* deckDataWrapper = NEW DeckDataWrapper(mtgd);
+        auto* mtgd            = NEW MTGDeck(filename.c_str(), collection);
+        auto* deckDataWrapper = NEW DeckDataWrapper(mtgd);
         updateStats(deckDataWrapper);
         SAFE_DELETE(mtgd);
         SAFE_DELETE(deckDataWrapper);

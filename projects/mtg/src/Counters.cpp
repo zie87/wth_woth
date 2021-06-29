@@ -83,7 +83,7 @@ int Counters::addCounter(const char* _name, int _power, int _toughness) {
                 return mCount;
             }
         }
-        Counter* counter = NEW Counter(target, _name, _power, _toughness);
+        auto* counter = NEW Counter(target, _name, _power, _toughness);
         counters.push_back(counter);
         counter->added();
         WEvent* w = NEW WEventCounters(this, _name, _power, _toughness, true, false);

@@ -96,7 +96,7 @@ bool AIHints::abilityMatches(MTGAbility* ability, AIHint* hint) {
     // This is the poor man's version, based on the fact that most cards are the source of their own abilities
     if (hint->mSourceId && ((!a->source) || a->source->getMTGId() != hint->mSourceId)) return false;
 
-    if (AACounter* counterAbility = dynamic_cast<AACounter*>(a)) {
+    if (auto* counterAbility = dynamic_cast<AACounter*>(a)) {
         vector<string> splitCounter = parseBetween(s, "counter(", ")");
         if (!splitCounter.size()) return false;
 
@@ -105,7 +105,7 @@ bool AIHints::abilityMatches(MTGAbility* ability, AIHint* hint) {
         return (splitCounter[1].compare(counterstring) == 0);
     }
 
-    if (ATokenCreator* tokenAbility = dynamic_cast<ATokenCreator*>(a)) {
+    if (auto* tokenAbility = dynamic_cast<ATokenCreator*>(a)) {
         vector<string> splitToken = parseBetween(s, "token(", ")");
         if (!splitToken.size()) return false;
         return (tokenAbility->tokenId && tokenAbility->tokenId == atoi(splitToken[1].c_str()));

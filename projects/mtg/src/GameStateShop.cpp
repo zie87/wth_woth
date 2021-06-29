@@ -278,7 +278,7 @@ void GameStateShop::purchaseBooster(int controlId) {
     mBooster[controlId].addToDeck(booster, srcCards);
 
     string sort = mBooster[controlId].getSort();
-    DeckDataWrapper* ddw = NEW DeckDataWrapper(booster);
+    auto* ddw   = NEW DeckDataWrapper(booster);
     if (sort == "alpha")
         ddw->Sort(WSrcCards::SORT_ALPHA);
     else if (sort == "collector")
@@ -289,7 +289,7 @@ void GameStateShop::purchaseBooster(int controlId) {
     for (int x = 0; x < ddw->Size(); x++) {
         MTGCard* c = ddw->getCard(x);
         for (int copies = 0; copies < ddw->count(c); ++copies) {
-            MTGCardInstance* ci = NEW MTGCardInstance(c, nullptr);
+            auto* ci = NEW MTGCardInstance(c, nullptr);
             boosterDisplay->AddCard(ci);
             subBooster.push_back(ci);
         }
@@ -305,7 +305,7 @@ void GameStateShop::purchaseBooster(int controlId) {
 int GameStateShop::purchasePrice(int offset) {
     MTGCard* c = nullptr;
     if (!pricelist || !srcCards || (c = srcCards->getCard(offset)) == nullptr) return 0;
-    float price = (float)pricelist->getPurchasePrice(c->getMTGId());
+    auto price    = (float)pricelist->getPurchasePrice(c->getMTGId());
     int filteradd = srcCards->Size(true);
     filteradd = ((filteradd - srcCards->Size()) / filteradd);
 
@@ -633,7 +633,7 @@ void GameStateShop::Render() {
                     string s = descPurchase(i, true);
                     sprintf(buffer, "%s", s.c_str());
                     float x = 310;
-                    float y = static_cast<float>(25 + 20 * i);
+                    auto y  = static_cast<float>(25 + 20 * i);
                     mFont->DrawString(buffer, x, y);
                 }
             }
@@ -695,7 +695,7 @@ void GameStateShop::ButtonPressed(int controllerId, int controlId) {
 
             // Check if we just scored an award...
             if (myCollection && myCollection->totalPrice() > 10000) {
-                GameOptionAward* goa = dynamic_cast<GameOptionAward*>(&options[Options::AWARD_COLLECTOR]);
+                auto* goa = dynamic_cast<GameOptionAward*>(&options[Options::AWARD_COLLECTOR]);
                 if (goa) goa->giveAward();
             }
         }
@@ -829,7 +829,7 @@ void ShopBooster::addToDeck(MTGDeck* d, WSrcCards* srcCards) {
 #ifdef TESTSUITE
 bool ShopBooster::unitTest() {
     // this tests the default random pack creation.
-    MTGDeck* d = NEW MTGDeck(MTGCollection());
+    auto* d = NEW MTGDeck(MTGCollection());
     char result[1024];
 
     randomStandard();
@@ -842,7 +842,7 @@ bool ShopBooster::unitTest() {
         sprintf(buf, "set:%s;|set:%s;", mainSet->id.c_str(), altSet->id.c_str());
     mP->pool = buf;
     mP->assemblePack(d);  // Use the primary packfile. assemblePack deletes pool.
-    DeckDataWrapper* ddw = NEW DeckDataWrapper(d);
+    auto* ddw = NEW DeckDataWrapper(d);
     bool res = true;
 
     int u = 0, r = 0, s = 0;

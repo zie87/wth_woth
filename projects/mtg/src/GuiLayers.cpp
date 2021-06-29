@@ -17,10 +17,10 @@ void GuiLayer::Add(JGuiObject* object) {
     mObjects.push_back(object);
     AbilityFactory af(observer);
 
-    MTGAbility* a = dynamic_cast<MTGAbility*>(object);
+    auto* a = dynamic_cast<MTGAbility*>(object);
 
     if (a != nullptr) {
-        AManaProducer* manaObject = dynamic_cast<AManaProducer*>(af.getCoreAbility(a));
+        auto* manaObject = dynamic_cast<AManaProducer*>(af.getCoreAbility(a));
         if (manaObject) {
             manaObjects.push_back(object);
         }
@@ -29,10 +29,10 @@ void GuiLayer::Add(JGuiObject* object) {
 
 int GuiLayer::Remove(JGuiObject* object) {
     AbilityFactory af(observer);
-    MTGAbility* a = dynamic_cast<MTGAbility*>(object);
+    auto* a = dynamic_cast<MTGAbility*>(object);
 
     if (a != nullptr) {
-        AManaProducer* manaObject = dynamic_cast<AManaProducer*>(af.getCoreAbility(a));
+        auto* manaObject = dynamic_cast<AManaProducer*>(af.getCoreAbility(a));
         if (manaObject) {
             for (size_t i = 0; i < manaObjects.size(); i++)
                 if (manaObjects[i] == object) {
@@ -70,7 +70,7 @@ void GuiLayer::resetObjects() {
             // inside of a CardView, which attempts to clean up its own pointer reference in an MTGCardInstance when
             // it's destroyed.  Ideally, CardView should only hold onto a weak reference, but that's a bigger overhaul.
             // For now, if we get here, clear out the MTGCardInstance pointer of a CardView before calling delete.
-            CardView* cardView = dynamic_cast<CardView*>(mObjects[i]);
+            auto* cardView = dynamic_cast<CardView*>(mObjects[i]);
             if (cardView) {
                 cardView->card = nullptr;
             }

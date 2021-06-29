@@ -31,7 +31,7 @@ DeckMetaData* DeckManager::getDeckMetaDataById(int deckId, bool isAI) {
     DeckMetaData* deck                   = nullptr;
     std::vector<DeckMetaData*>& deckList = isAI ? aiDeckOrderList : playerDeckOrderList;
 
-    std::vector<DeckMetaData*>::iterator pos = find_if(deckList.begin(), deckList.end(), DeckIDMatch(deckId));
+    auto pos = find_if(deckList.begin(), deckList.end(), DeckIDMatch(deckId));
     if (pos != deckList.end()) {
         deck = *pos;
     } else {
@@ -64,7 +64,7 @@ DeckMetaData* DeckManager::getDeckMetaDataByFilename(const string& filename, boo
     DeckMetaData* deck                   = nullptr;
     std::vector<DeckMetaData*>& deckList = isAI ? aiDeckOrderList : playerDeckOrderList;
 
-    std::vector<DeckMetaData*>::iterator pos = find_if(deckList.begin(), deckList.end(), DeckFilenameMatch(filename));
+    auto pos = find_if(deckList.begin(), deckList.end(), DeckFilenameMatch(filename));
     if (pos != deckList.end()) {
         deck = *pos;
     } else {
@@ -130,7 +130,7 @@ StatsWrapper* DeckManager::getExtendedStatsForDeckId(int deckId, MTGAllCards* co
         std::ostringstream deckName;
         deckName << options.profileFile() << "/deck" << deckId << ".txt";
         std::map<std::string, StatsWrapper*>* statsMap = isAI ? &aiDeckStatsMap : &playerDeckStatsMap;
-        StatsWrapper* stats = NEW StatsWrapper(deckId);
+        auto* stats                                    = NEW StatsWrapper(deckId);
         statsMap->insert(std::make_pair(deckName.str(), stats));
         return stats;
     }

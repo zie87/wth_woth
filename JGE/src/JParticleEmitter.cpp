@@ -52,7 +52,7 @@ JParticle* JParticleEmitter::GetIdleParticle() {
     }
 
     if (size < mMaxParticleCount) {
-        JParticle* par = new JParticle();
+        auto* par = new JParticle();
         if (par != nullptr) {
             mParticles.push_back(par);
             return par;
@@ -133,7 +133,7 @@ void JParticleEmitter::Update(float dt) {
     if (mQuantity.mCurr != 0.0f) {
         float timeForOneParticle = 1.0f / mQuantity.mCurr;
 
-        float potentialParticles = (float)((int)(mEmitTimer / timeForOneParticle));
+        auto potentialParticles = (float)((int)(mEmitTimer / timeForOneParticle));
         if (potentialParticles >= 1.0f) mEmitTimer -= (potentialParticles * timeForOneParticle);
 
         count = (int)potentialParticles;

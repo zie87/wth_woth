@@ -331,7 +331,7 @@ int GameOptions::save() {
             opt->write(&file, name);
         }
 
-        for (map<string, GameOption*>::iterator it = unknownMap.begin(); it != unknownMap.end(); it++) {
+        for (auto it = unknownMap.begin(); it != unknownMap.end(); it++) {
             if (it->second) {
                 if (it->second->str.size())
                     file << it->first << "=" << it->second->str << "\n";
@@ -449,11 +449,10 @@ GameOption* GameOptions::get(int optionID) {
 }
 
 GameOptions::~GameOptions() {
-    for (vector<GameOption*>::iterator it = values.begin(); it != values.end(); it++) SAFE_DELETE(*it);
+    for (auto it = values.begin(); it != values.end(); it++) SAFE_DELETE(*it);
     values.clear();
 
-    for (map<string, GameOption*>::iterator it = unknownMap.begin(); it != unknownMap.end(); it++)
-        SAFE_DELETE(it->second);
+    for (auto it = unknownMap.begin(); it != unknownMap.end(); it++) SAFE_DELETE(it->second);
     unknownMap.clear();
 }
 
@@ -516,7 +515,7 @@ bool GameSettings::newAward() {
     if (!profileOptions) return false;
 
     for (int x = Options::BEGIN_AWARDS; x < Options::SET_UNLOCKS + setlist.size(); x++) {
-        GameOptionAward* goa = dynamic_cast<GameOptionAward*>(profileOptions->get(x));
+        auto* goa = dynamic_cast<GameOptionAward*>(profileOptions->get(x));
         if (!goa) continue;
         if (!goa->isViewed()) return true;
     }
@@ -625,9 +624,9 @@ void GameSettings::checkProfile() {
         profileOptions = NEW GameOptions(profileFile(PLAYER_SETTINGS, "", false));
         // Backwards compatibility hack for unlocked modes.
         for (int x = Options::BEGIN_AWARDS; x < Options::LAST_NAMED; x++) {
-            GameOptionAward* goa = dynamic_cast<GameOptionAward*>(globalOptions->get(x));
+            auto* goa = dynamic_cast<GameOptionAward*>(globalOptions->get(x));
             if (goa) {
-                GameOptionAward* dupe = dynamic_cast<GameOptionAward*>(profileOptions->get(x));
+                auto* dupe = dynamic_cast<GameOptionAward*>(profileOptions->get(x));
                 if (dupe && goa->number && !dupe->number) dupe->giveAward();
             }
         }
@@ -673,7 +672,7 @@ void GameSettings::checkProfile() {
 void GameSettings::createUsersFirstDeck(int setId) {
     if (theGame == nullptr || MTGCollection() == nullptr) return;
 
-    MTGDeck* mCollection = NEW MTGDeck(options.profileFile(PLAYER_COLLECTION, "", false).c_str(), MTGCollection());
+    auto* mCollection = NEW MTGDeck(options.profileFile(PLAYER_COLLECTION, "", false).c_str(), MTGCollection());
     if (mCollection->totalCards() > 0) return;
 
     // 10 lands of each
@@ -1006,12 +1005,12 @@ bool GameOptionKeyBindings::read(string input) {
 bool GameOptionKeyBindings::write(std::ofstream* file, string name) {
     JGE* j = JGE::GetInstance();
     *file << name << "=";
-    JGE::keybindings_it start = j->KeyBindings_begin(), end = j->KeyBindings_end();
+    auto start = j->KeyBindings_begin(), end = j->KeyBindings_end();
     if (start != end) {
         *file << start->first << ":" << start->second;
         ++start;
     }
-    for (JGE::keybindings_it it = start; it != end; ++it) *file << "," << it->first << ":" << it->second;
+    for (auto it = start; it != end; ++it) *file << "," << it->first << ":" << it->second;
     *file << std::endl;
     return true;
 }

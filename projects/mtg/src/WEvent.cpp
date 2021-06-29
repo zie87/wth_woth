@@ -199,7 +199,7 @@ std::ostream& WEventZoneChange::toString(std::ostream& out) const {
     return out << "ZONEEVENT " << *card << " : " << *from << " -> " << *to;
 }
 std::ostream& WEventDamage::toString(std::ostream& out) const {
-    if (MTGCardInstance* m = dynamic_cast<MTGCardInstance*>(damage->target))
+    if (auto* m = dynamic_cast<MTGCardInstance*>(damage->target))
         return out << "DAMAGEEVENT " << damage->damage << " >> " << *m;
     else
         return out << "DAMAGEEVENT " << damage->damage << " >> " << damage->target;

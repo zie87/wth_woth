@@ -272,7 +272,7 @@ void TestSuiteGame::assertGame() {
         error++;
     }
     for (int i = 0; i < 2; i++) {
-        TestSuiteAI* p = (TestSuiteAI*)(observer->players[i]);
+        auto* p = (TestSuiteAI*)(observer->players[i]);
         if (p->playMode == Player::MODE_AI) wasAI = true;
 
         if (p->life != endState.players[i]->life) {
@@ -597,7 +597,7 @@ void TestSuite::pregameTests() {
 
 void TestSuite::ThreadProc(void* inParam) {
     WGE_LOG_TRACE("Entering");
-    TestSuite* instance = reinterpret_cast<TestSuite*>(inParam);
+    auto* instance = reinterpret_cast<TestSuite*>(inParam);
     if (instance) {
         string filename;
         float counter = 1.0f;
@@ -668,7 +668,7 @@ void TestSuiteGame::initGame() {
     observer->resetStartupGame();
 
     for (int i = 0; i < 2; i++) {
-        AIPlayerBaka* p = (AIPlayerBaka*)(observer->players[i]);
+        auto* p                = (AIPlayerBaka*)(observer->players[i]);
         p->forceBestAbilityUse = forceAbility;
         p->life = initState.players[i]->life;
         p->poisonCount = initState.players[i]->poisonCount;
@@ -685,7 +685,7 @@ void TestSuiteGame::initGame() {
                 if (card && zone != p->game->library) {
                     if (zone == p->game->inPlay) {
                         MTGCardInstance* copy = p->game->putInZone(card, p->game->library, p->game->stack);
-                        Spell* spell = NEW Spell(observer, copy);
+                        auto* spell           = NEW Spell(observer, copy);
                         spell->resolve();
                         if (!summoningSickness && (size_t)p->game->inPlay->nb_cards > k)
                             p->game->inPlay->cards[k]->summoningSickness = 0;

@@ -84,7 +84,7 @@ void JNetwork::registerCommand(std::string command, processCmd processCommand, p
 }
 
 void JNetwork::ThreadProc(void* param) {
-    JNetwork* pThis = reinterpret_cast<JNetwork*>(param);
+    auto* pThis      = reinterpret_cast<JNetwork*>(param);
     JSocket* pSocket = nullptr;
     if (pThis->serverIP.size()) {
         WGE_LOG_TRACE("Starting Client Thread");

@@ -62,7 +62,7 @@ int OrderedAIAction::getEfficiency() {
     if (s->has(ability)) return 0;
     MTGAbility* a = AbilityFactory::getCoreAbility(ability);
     MTGAbility* transAbility = nullptr;
-    if (ATransformerInstant* atia = dynamic_cast<ATransformerInstant*>(a)) {
+    if (auto* atia = dynamic_cast<ATransformerInstant*>(a)) {
         if (atia->newAbilityFound) {
             AbilityFactory af(g);
             transAbility =
@@ -80,7 +80,7 @@ int OrderedAIAction::getEfficiency() {
         SAFE_DELETE(transAbility);
         return 0;
     }
-    MTGCardInstance* coreAbilityCardTarget = dynamic_cast<MTGCardInstance*>(a->target);
+    auto* coreAbilityCardTarget = dynamic_cast<MTGCardInstance*>(a->target);
 
     // CoreAbility shouldn't return a Lord, but it does.
     // When we don't have a target for a lord action, we assume it's the lord itself
@@ -208,7 +208,7 @@ int OrderedAIAction::getEfficiency() {
 
         if (!_target) break;
 
-        if (AACounter* cc = dynamic_cast<AACounter*>(a)) {
+        if (auto* cc = dynamic_cast<AACounter*>(a)) {
             if (_target->controller() == p && cc->toughness >= 0) {
                 efficiency = 90;
             }
@@ -353,14 +353,14 @@ int OrderedAIAction::getEfficiency() {
 
     case MTGAbility::LIFER: {
         // use life abilities whenever possible.
-        AALifer* alife = (AALifer*)a;
+        auto* alife    = (AALifer*)a;
         Targetable* _t = alife->getTarget();
 
         efficiency = 100;
         AbilityFactory af(g);
         int suggestion = af.abilityEfficiency(a, p, MODE_ABILITY);
 
-        if (MTGCardInstance* cTarget = dynamic_cast<MTGCardInstance*>(_t)) {
+        if (auto* cTarget = dynamic_cast<MTGCardInstance*>(_t)) {
             if ((suggestion == BAKA_EFFECT_BAD && (cTarget)->controller() == p) ||
                 (suggestion == BAKA_EFFECT_GOOD && (cTarget)->controller() != p))
                 efficiency = 0;
@@ -371,7 +371,7 @@ int OrderedAIAction::getEfficiency() {
         break;
     }
     case MTGAbility::STANDARD_DRAW: {
-        AADrawer* drawer = (AADrawer*)a;
+        auto* drawer = (AADrawer*)a;
         // adding this case since i played a few games where Ai litterally decided to mill himself to death. fastest
         // and easiest win ever. this should help a little, tho ultimately it will be decided later what the best
         // course of action is. eff of drawing ability is calculated by base 20 + the amount of cards in library minus
@@ -406,7 +406,7 @@ int OrderedAIAction::getEfficiency() {
         Interruptible* action = g->mLayers->stackLayer()->getAt(-1);
         if (!action) break;
 
-        Spell* spell = dynamic_cast<Spell*>(action);
+        auto* spell = dynamic_cast<Spell*>(action);
         if (!spell) break;
 
         Player* lastStackActionController = spell->source->controller();
@@ -419,7 +419,7 @@ int OrderedAIAction::getEfficiency() {
         if (target) {
             AbilityFactory af(g);
             int suggestion = af.abilityEfficiency(a, p, MODE_ABILITY, nullptr, target);
-            if (AADynamic* ady = dynamic_cast<AADynamic*>(a)) {
+            if (auto* ady = dynamic_cast<AADynamic*>(a)) {
                 if (ady) {
                     // not going into massive detail with this ability, its far to complex, just going to give it a
                     // general idea.
@@ -447,14 +447,14 @@ int OrderedAIAction::getEfficiency() {
         }
         break;
     }
-    if (AUpkeep* auk = dynamic_cast<AUpkeep*>(ability)) {
+    if (auto* auk = dynamic_cast<AUpkeep*>(ability)) {
         // hello, Ai pay your upcost please :P, this entices Ai into paying upcost, the conditional isAi() is required
         // strangely ai is able to pay upcost during YOUR upkeep.
         if (auk && g->getCurrentGamePhase() == MTG_PHASE_UPKEEP && g->currentPlayer == p &&
             p == a->source->controller()) {
             efficiency = 100;
         }
-    } else if (AAMover* aam = dynamic_cast<AAMover*>(a)) {
+    } else if (auto* aam = dynamic_cast<AAMover*>(a)) {
         MTGGameZone* z = aam->destinationZone(target);
         if (target) {
             if (target->currentZone == p->game->library || target->currentZone == p->opponent()->game->inPlay ||
@@ -482,7 +482,7 @@ int OrderedAIAction::getEfficiency() {
         if (playerAbilityTarget && playerAbilityTarget != p) {
             efficiency = 90;
         }
-    } else if (ATokenCreator* atc = dynamic_cast<ATokenCreator*>(a)) {
+    } else if (auto* atc = dynamic_cast<ATokenCreator*>(a)) {
         efficiency = 80;
         if (atc->name.length() && atc->sabilities.length() && atc->types.size() &&
             p->game->inPlay->findByName(atc->name)) {
@@ -496,9 +496,9 @@ int OrderedAIAction::getEfficiency() {
     // At this point the "basic" efficiency is computed, we further tweak it depending on general decisions,
     // independent of theAbility type
 
-    MayAbility* may = dynamic_cast<MayAbility*>(ability);
+    auto* may = dynamic_cast<MayAbility*>(ability);
     if (!efficiency && may) {
-        AIPlayer* chk = (AIPlayer*)p;
+        auto* chk = (AIPlayer*)p;
         if (may->ability->getActionTc() && chk->chooseTarget(may->ability->getActionTc(), nullptr, nullptr, true))
             efficiency = 50 + (owner->getRandomGenerator()->random() % 50);
     }
@@ -587,18 +587,18 @@ bool AIPlayerBaka::payTheManaCost(ManaCost* cost, MTGCardInstance* target, vecto
     }
     if (gotPayments.size()) {
         WGE_LOG_TRACE("Ai had a payment in mind.");
-        ManaCost* paid = NEW ManaCost();
+        auto* paid = NEW ManaCost();
         vector<AIAction*> clicks;
 
         for (size_t k = 0; k < gotPayments.size(); ++k) {
-            if (AManaProducer* amp = dynamic_cast<AManaProducer*>(gotPayments[k])) {
-                AIAction* action = NEW AIAction(this, amp, amp->source);
+            if (auto* amp = dynamic_cast<AManaProducer*>(gotPayments[k])) {
+                auto* action = NEW AIAction(this, amp, amp->source);
                 clicks.push_back(action);
                 paid->add(amp->output);
-            } else if (GenericActivatedAbility* gmp = dynamic_cast<GenericActivatedAbility*>(gotPayments[k])) {
-                AIAction* action = NEW AIAction(this, gmp, gmp->source);
+            } else if (auto* gmp = dynamic_cast<GenericActivatedAbility*>(gotPayments[k])) {
+                auto* action = NEW AIAction(this, gmp, gmp->source);
                 clicks.push_back(action);
-                if (AForeach* fmp = dynamic_cast<AForeach*>(gmp->ability)) {
+                if (auto* fmp = dynamic_cast<AForeach*>(gmp->ability)) {
                     amp = dynamic_cast<AManaProducer*>(fmp->ability);
                     int outPut = fmp->checkActivation();
                     for (int k = 0; k < outPut; ++k) paid->add(amp->output);
@@ -647,7 +647,7 @@ bool AIPlayerBaka::payTheManaCost(ManaCost* cost, MTGCardInstance* target, vecto
                                                                                       // mtgability...hackish
         // Make sure we can use the ability
         MTGAbility* a = ((MTGAbility*)observer->mLayers->actionLayer()->mObjects[i]);
-        AManaProducer* amp = dynamic_cast<AManaProducer*>(a);
+        auto* amp     = dynamic_cast<AManaProducer*>(a);
         if (amp && canHandleCost(amp)) {
             MTGCardInstance* card = amp->source;
             if (card == target) {
@@ -664,7 +664,7 @@ bool AIPlayerBaka::payTheManaCost(ManaCost* cost, MTGCardInstance* target, vecto
                     }
                 }
                 if (doUse) {
-                    AIAction* action = NEW AIAction(this, amp, card);
+                    auto* action = NEW AIAction(this, amp, card);
                     clickstream.push(action);
                 }
             }
@@ -675,16 +675,16 @@ bool AIPlayerBaka::payTheManaCost(ManaCost* cost, MTGCardInstance* target, vecto
 }
 
 ManaCost* AIPlayerBaka::getPotentialMana(MTGCardInstance* target) {
-    ManaCost* result = NEW ManaCost();
+    auto* result = NEW ManaCost();
     map<MTGCardInstance*, bool> used;
     for (size_t i = 0; i < observer->mLayers->actionLayer()->manaObjects.size(); i++) {
         // Make sure we can use the ability
         MTGAbility* a = ((MTGAbility*)observer->mLayers->actionLayer()->manaObjects[i]);
-        AManaProducer* amp = dynamic_cast<AManaProducer*>(a);
-        GenericActivatedAbility* gmp = dynamic_cast<GenericActivatedAbility*>(a);
+        auto* amp     = dynamic_cast<AManaProducer*>(a);
+        auto* gmp     = dynamic_cast<GenericActivatedAbility*>(a);
         if (gmp && canHandleCost(gmp)) {
             // skip for each mana producers.
-            AForeach* fmp = dynamic_cast<AForeach*>(gmp->ability);
+            auto* fmp = dynamic_cast<AForeach*>(gmp->ability);
             if (fmp) {
                 amp = dynamic_cast<AManaProducer*>(fmp->ability);
                 if (amp) {
@@ -717,7 +717,7 @@ vector<MTGAbility*> AIPlayerBaka::canPayMana(MTGCardInstance* target, ManaCost* 
 vector<MTGAbility*> AIPlayerBaka::canPayMana(MTGCardInstance* target, ManaCost* cost,
                                              map<MTGCardInstance*, bool>& used, bool searchingAgain) {
     if (!cost->getConvertedCost()) return vector<MTGAbility*>();
-    ManaCost* result = NEW ManaCost();
+    auto* result = NEW ManaCost();
 
     vector<MTGAbility*> payments = vector<MTGAbility*>();
     if (this->getManaPool()->getConvertedCost()) {
@@ -728,7 +728,7 @@ vector<MTGAbility*> AIPlayerBaka::canPayMana(MTGCardInstance* target, ManaCost* 
     int fullColor = 0;
     for (size_t i = 0; i < observer->mLayers->actionLayer()->manaObjects.size(); i++) {
         MTGAbility* a = ((MTGAbility*)observer->mLayers->actionLayer()->manaObjects[i]);
-        AManaProducer* amp = dynamic_cast<AManaProducer*>(a);
+        auto* amp     = dynamic_cast<AManaProducer*>(a);
         if (amp && (amp->getCost() && amp->getCost()->extraCosts && !amp->getCost()->extraCosts->canPay())) continue;
         if (fullColor == needColorConverted && result->getConvertedCost() < cost->getConvertedCost()) {
             if (cost->hasColor(0) && amp)  // find colorless after color mana.
@@ -750,10 +750,10 @@ vector<MTGAbility*> AIPlayerBaka::canPayMana(MTGCardInstance* target, ManaCost* 
             }
             continue;
         }
-        GenericActivatedAbility* gmp = dynamic_cast<GenericActivatedAbility*>(a);
+        auto* gmp = dynamic_cast<GenericActivatedAbility*>(a);
         if (gmp && canHandleCost(gmp)) {
             // for each mana producers.
-            AForeach* fmp = dynamic_cast<AForeach*>(gmp->ability);
+            auto* fmp = dynamic_cast<AForeach*>(gmp->ability);
             if (fmp) {
                 amp = dynamic_cast<AManaProducer*>(fmp->ability);
                 if (amp) {
@@ -783,9 +783,9 @@ vector<MTGAbility*> AIPlayerBaka::canPayMana(MTGCardInstance* target, ManaCost* 
                     MTGCardInstance* card = amp->source;
                     if (card == target) used[card] = true;  // http://code.google.com/p/wagic/issues/detail?id=76
                     if (!used[card] && amp->isReactingToClick(card) && amp->output->getConvertedCost() >= 1) {
-                        ManaCost* check = NEW ManaCost();
+                        auto* check = NEW ManaCost();
                         check->add(k, cost->getCost(k));
-                        ManaCost* checkResult = NEW ManaCost();
+                        auto* checkResult = NEW ManaCost();
                         checkResult->add(k, result->getCost(k));
                         if (!(checkResult->canAfford(check))) {
                             payments.push_back(amp);
@@ -812,7 +812,7 @@ vector<MTGAbility*> AIPlayerBaka::canPayMana(MTGCardInstance* target, ManaCost* 
             bool foundColor2 = false;
             for (size_t i = 0; i < observer->mLayers->actionLayer()->manaObjects.size(); i++) {
                 MTGAbility* a = ((MTGAbility*)observer->mLayers->actionLayer()->manaObjects[i]);
-                AManaProducer* amp = dynamic_cast<AManaProducer*>(a);
+                auto* amp     = dynamic_cast<AManaProducer*>(a);
                 if (amp && canHandleCost(amp)) {
                     foundColor1 = amp->output->hasColor(hybridCost->color1) ? true : false;
                     foundColor2 = amp->output->hasColor(hybridCost->color2) ? true : false;
@@ -821,10 +821,10 @@ vector<MTGAbility*> AIPlayerBaka::canPayMana(MTGCardInstance* target, ManaCost* 
                         MTGCardInstance* card = amp->source;
                         if (card == target) used[card] = true;  // http://code.google.com/p/wagic/issues/detail?id=76
                         if (!used[card] && amp->isReactingToClick(card) && amp->output->getConvertedCost() >= 1) {
-                            ManaCost* check = NEW ManaCost();
+                            auto* check = NEW ManaCost();
                             check->add(foundColor1 ? hybridCost->color1 : hybridCost->color2,
                                        foundColor1 ? hybridCost->value1 : hybridCost->value2);
-                            ManaCost* checkResult = NEW ManaCost();
+                            auto* checkResult = NEW ManaCost();
                             checkResult->add(foundColor1 ? hybridCost->color1 : hybridCost->color2,
                                              result->getCost(foundColor1 ? hybridCost->color1 : hybridCost->color2));
                             if (((foundColor1 && !foundColor2) || (!foundColor1 && foundColor2)) &&
@@ -845,8 +845,8 @@ vector<MTGAbility*> AIPlayerBaka::canPayMana(MTGCardInstance* target, ManaCost* 
             hyb++;
         }
     } else if (!hybridCost && result->getConvertedCost()) {
-        ManaCost* check = NEW ManaCost();
-        ManaCost* checkResult = NEW ManaCost();
+        auto* check       = NEW ManaCost();
+        auto* checkResult = NEW ManaCost();
         for (int k = 1; k < Constants::NB_Colors; k++) {
             check->add(k, cost->getCost(k));
             checkResult->add(k, result->getCost(k));
@@ -859,7 +859,7 @@ vector<MTGAbility*> AIPlayerBaka::canPayMana(MTGCardInstance* target, ManaCost* 
             }
         }
         if (cost->kicker && !searchingAgain) {
-            ManaCost* withKickerCost = NEW ManaCost(cost->kicker);
+            auto* withKickerCost = NEW ManaCost(cost->kicker);
             int canKick = 0;
             vector<MTGAbility*> kickerPayment;
             bool keepLooking = true;
@@ -886,7 +886,7 @@ vector<MTGAbility*> AIPlayerBaka::canPayMana(MTGCardInstance* target, ManaCost* 
         // add the rest of the mana.
         for (size_t i = 0; i < observer->mLayers->actionLayer()->manaObjects.size(); i++) {
             MTGAbility* a = ((MTGAbility*)observer->mLayers->actionLayer()->manaObjects[i]);
-            AManaProducer* amp = dynamic_cast<AManaProducer*>(a);
+            auto* amp     = dynamic_cast<AManaProducer*>(a);
             if (amp && canHandleCost(amp)) {
                 if (!used[amp->source] && amp->isReactingToClick(amp->source) &&
                     amp->output->getConvertedCost() >= 1) {
@@ -905,7 +905,7 @@ vector<MTGAbility*> AIPlayerBaka::canPaySunBurst(ManaCost* cost) {
     // note it is still possible to use lotus petal for it's first mana ability and not later for a final color
     // a search of true sunburst would cause the game to come to a crawl, trust me, this is the "fast" method for
     // sunburst :)
-    ManaCost* result = NEW ManaCost();
+    auto* result = NEW ManaCost();
     map<MTGCardInstance*, bool> used;
     vector<MTGAbility*> payments = vector<MTGAbility*>();
     int needColorConverted = 6;
@@ -917,7 +917,7 @@ vector<MTGAbility*> AIPlayerBaka::canPaySunBurst(ManaCost* cost) {
             break;
         }
         MTGAbility* a = ((MTGAbility*)observer->mLayers->actionLayer()->manaObjects[i]);
-        AManaProducer* amp = dynamic_cast<AManaProducer*>(a);
+        auto* amp     = dynamic_cast<AManaProducer*>(a);
         if (amp && amp->getCost() && amp->getCost()->extraCosts && !amp->getCost()->extraCosts->canPay())
             continue;  // pentid prism, has no cost but contains a counter cost, without this check ai will think it
                        // can still use this mana.
@@ -927,9 +927,9 @@ vector<MTGAbility*> AIPlayerBaka::canPaySunBurst(ManaCost* cost) {
                     result->getConvertedCost() < cost->getConvertedCost()) {
                     MTGCardInstance* card = amp->source;
                     if (!used[card] && amp->isReactingToClick(card) && amp->output->getConvertedCost() >= 1) {
-                        ManaCost* check = NEW ManaCost();
+                        auto* check = NEW ManaCost();
                         check->add(k, 1);
-                        ManaCost* checkResult = NEW ManaCost();
+                        auto* checkResult = NEW ManaCost();
                         checkResult->add(k, result->getCost(k));
                         if (!(checkResult->canAfford(check))) {
                             payments.push_back(amp);
@@ -948,7 +948,7 @@ vector<MTGAbility*> AIPlayerBaka::canPaySunBurst(ManaCost* cost) {
     for (int i = fullColor; i < cost->getConvertedCost(); i++) {
         for (size_t i = 0; i < observer->mLayers->actionLayer()->manaObjects.size(); i++) {
             MTGAbility* a = ((MTGAbility*)observer->mLayers->actionLayer()->manaObjects[i]);
-            AManaProducer* amp = dynamic_cast<AManaProducer*>(a);
+            auto* amp     = dynamic_cast<AManaProducer*>(a);
             if (amp && canHandleCost(amp)) {
                 MTGCardInstance* card = amp->source;
                 if (!used[card] && amp->isReactingToClick(card) && amp->output->getConvertedCost() >= 1) {
@@ -1029,10 +1029,10 @@ int AIPlayerBaka::createAbilityTargets(MTGAbility* a, MTGCardInstance* c, Rankin
         while (potentialTargets.size()) {
             OrderedAIAction* check = nullptr;
 
-            MTGCardInstance* cTargeting = dynamic_cast<MTGCardInstance*>(potentialTargets[0]);
+            auto* cTargeting = dynamic_cast<MTGCardInstance*>(potentialTargets[0]);
             if (cTargeting) check = NEW OrderedAIAction(this, a, c, cTargeting);
 
-            Player* pTargeting = dynamic_cast<Player*>(potentialTargets[0]);
+            auto* pTargeting = dynamic_cast<Player*>(potentialTargets[0]);
             if (pTargeting) check = NEW OrderedAIAction(this, a, pTargeting, c);
 
             int targetThis = getEfficiency(check);
@@ -1120,7 +1120,7 @@ int AIPlayerBaka::selectAbility() {
                 if (abilityPayment.size()) {
                     fullPayment = NEW ManaCost();
                     for (int ch = 0; ch < int(abilityPayment.size()); ch++) {
-                        AManaProducer* ampp = dynamic_cast<AManaProducer*>(abilityPayment[ch]);
+                        auto* ampp = dynamic_cast<AManaProducer*>(abilityPayment[ch]);
                         if (ampp) fullPayment->add(ampp->output);
                     }
                     if (fullPayment && a->isReactingToClick(card, fullPayment)) createAbilityTargets(a, card, ranking);
@@ -1246,7 +1246,7 @@ int AIPlayerBaka::chooseTarget(TargetChooser* _tc, Player* forceTarget, MTGCardI
                             AbilityFactory af(observer);
                             MTGAbility* withoutGuessing =
                                 af.parseMagicLine(tc->belongsToAbility, 0, nullptr, tc->source);
-                            OrderedAIAction* effCheck =
+                            auto* effCheck =
                                 NEW OrderedAIAction(this, withoutGuessing, (MTGCardInstance*)tc->source, card);
                             if (effCheck->getEfficiency()) {
                                 potentialTargets.push_back(card);
@@ -1295,9 +1295,9 @@ int AIPlayerBaka::getEfficiency(MTGAbility* ability) {
 
     OrderedAIAction* check = nullptr;
 
-    if (MTGCardInstance* cTarget = dynamic_cast<MTGCardInstance*>(ability->target))
+    if (auto* cTarget = dynamic_cast<MTGCardInstance*>(ability->target))
         check = NEW OrderedAIAction(this, ability, ability->source, cTarget);
-    else if (Player* pTarget = dynamic_cast<Player*>(ability->target))
+    else if (auto* pTarget = dynamic_cast<Player*>(ability->target))
         check = NEW OrderedAIAction(this, ability, pTarget, ability->source);
     else
         check = NEW OrderedAIAction(this, ability, ability->source);
@@ -1318,7 +1318,7 @@ int AIPlayerBaka::selectMenuOption() {
         if (object->abilitiesMenu->isMultipleChoice && object->currentActionCard) {
             MenuAbility* currentMenu = nullptr;
             for (size_t m = object->mObjects.size() - 1; m > 0; m--) {
-                MenuAbility* ability = dynamic_cast<MenuAbility*>(object->mObjects[m]);
+                auto* ability = dynamic_cast<MenuAbility*>(object->mObjects[m]);
                 if (ability && ability->triggered) {
                     currentMenu = (MenuAbility*)object->mObjects[m];
                     break;
@@ -1336,7 +1336,7 @@ int AIPlayerBaka::selectMenuOption() {
             for (unsigned int k = 0; k < object->abilitiesMenu->mObjects.size(); k++) {
                 if (object->abilitiesMenu->mObjects[k]->GetId() <= 0) continue;
 
-                MTGAbility* checkEff = (MTGAbility*)object->mObjects[object->abilitiesMenu->mObjects[k]->GetId()];
+                auto* checkEff = (MTGAbility*)object->mObjects[object->abilitiesMenu->mObjects[k]->GetId()];
                 int checked = getEfficiency(checkEff);
                 if (checked > 60 && checked > checkedLast) {
                     doThis = k;
@@ -1518,7 +1518,7 @@ int AIPlayerBaka::computeActions() {
 #endif  // AI_CHANGE_TESTING
 
     Interruptible* action = observer->mLayers->stackLayer()->getAt(-1);
-    Spell* spell = dynamic_cast<Spell*>(action);
+    auto* spell                       = dynamic_cast<Spell*>(action);
     Player* lastStackActionController = spell ? spell->source->controller() : nullptr;
     if (observer->isInterrupting == this &&
         this == currentP
@@ -1551,7 +1551,7 @@ int AIPlayerBaka::computeActions() {
         if (nextCardToPlay) {
             if (ipotential) {
                 if (payTheManaCost(nextCardToPlay->getManaCost(), nextCardToPlay, gotPayments)) {
-                    AIAction* a = NEW AIAction(this, nextCardToPlay);
+                    auto* a = NEW AIAction(this, nextCardToPlay);
                     clickstream.push(a);
                     gotPayments.clear();
                 }
@@ -1616,7 +1616,7 @@ int AIPlayerBaka::computeActions() {
                     // use the manaproducers it does understand better on sunburst by force.
                     vector<MTGAbility*> checking = canPaySunBurst(nextCardToPlay->getManaCost());
                     if (payTheManaCost(nextCardToPlay->getManaCost(), nullptr, checking)) {
-                        AIAction* a = NEW AIAction(this, nextCardToPlay);
+                        auto* a = NEW AIAction(this, nextCardToPlay);
                         clickstream.push(a);
                         return 1;
                     }
@@ -1625,7 +1625,7 @@ int AIPlayerBaka::computeActions() {
                     return 1;
                 }
                 if (payTheManaCost(nextCardToPlay->getManaCost(), nextCardToPlay, gotPayments)) {
-                    AIAction* a = NEW AIAction(this, nextCardToPlay);
+                    auto* a = NEW AIAction(this, nextCardToPlay);
                     clickstream.push(a);
                     gotPayments.clear();
                 }
@@ -1760,7 +1760,7 @@ int AIPlayerBaka::chooseBlockers() {
                 set = 1;
             } else {
                 MTGCardInstance* attacker = card->defenser;
-                map<MTGCardInstance*, int>::iterator it = opponentsToughness.find(attacker);
+                auto it                   = opponentsToughness.find(attacker);
                 if (it == opponentsToughness.end()) {
                     opponentsToughness[attacker] = attacker->toughness;
                     it = opponentsToughness.find(attacker);
@@ -1825,8 +1825,7 @@ int AIPlayerBaka::orderBlockers() {
 
 int AIPlayerBaka::affectCombatDamages(CombatStep step) {
     GuiCombat* gc = observer->mLayers->combatLayer();
-    for (vector<AttackerDamaged*>::iterator attacker = gc->attackers.begin(); attacker != gc->attackers.end();
-         ++attacker)
+    for (auto attacker = gc->attackers.begin(); attacker != gc->attackers.end(); ++attacker)
         gc->autoaffectDamage(*attacker, step);
     return 1;
 }

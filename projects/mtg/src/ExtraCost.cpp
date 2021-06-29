@@ -53,7 +53,7 @@ int ExtraCost::setPayment(MTGCardInstance* card) {
 
 // life cost
 LifeCost* LifeCost::clone() const {
-    LifeCost* ec = NEW LifeCost(*this);
+    auto* ec = NEW LifeCost(*this);
     if (tc) ec->tc = tc->clone();
     return ec;
 }
@@ -61,7 +61,7 @@ LifeCost* LifeCost::clone() const {
 LifeCost::LifeCost(TargetChooser* _tc) : ExtraCost("Life", _tc) {}
 
 int LifeCost::canPay() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (_target->controller()->life <= 0) {
         return 0;
     }
@@ -71,7 +71,7 @@ int LifeCost::canPay() {
 int LifeCost::doPay() {
     if (!target) return 0;
 
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
 
     _target->controller()->loseLife(1);
     target = nullptr;
@@ -81,7 +81,7 @@ int LifeCost::doPay() {
 
 // life or Mana cost
 LifeorManaCost* LifeorManaCost::clone() const {
-    LifeorManaCost* ec = NEW LifeorManaCost(*this);
+    auto* ec = NEW LifeorManaCost(*this);
     if (tc) ec->tc = tc->clone();
     return ec;
 }
@@ -90,7 +90,7 @@ LifeorManaCost::LifeorManaCost(TargetChooser* _tc, string manaType)
     : ExtraCost("Phyrexian Mana", _tc), manaType(manaType) {}
 
 int LifeorManaCost::canPay() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target    = (MTGCardInstance*)target;
     string buildType = "{";
     buildType.append(manaType);
     buildType.append("}");
@@ -106,7 +106,7 @@ int LifeorManaCost::canPay() {
 int LifeorManaCost::doPay() {
     if (!target) return 0;
 
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target    = (MTGCardInstance*)target;
     string buildType = "{";
     buildType.append(manaType);
     buildType.append("}");
@@ -124,7 +124,7 @@ int LifeorManaCost::doPay() {
 // discard a card at random as a cost
 // DiscardRandom cost
 DiscardRandomCost* DiscardRandomCost::clone() const {
-    DiscardRandomCost* ec = NEW DiscardRandomCost(*this);
+    auto* ec = NEW DiscardRandomCost(*this);
     if (tc) ec->tc = tc->clone();
     return ec;
 }
@@ -140,7 +140,7 @@ int DiscardRandomCost::canPay() {
 }
 
 int DiscardRandomCost::doPay() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (target) {
         source->storedCard = target->createSnapShot();
         _target->controller()->game->discardRandom(_target->controller()->game->hand, source);
@@ -153,7 +153,7 @@ int DiscardRandomCost::doPay() {
 // a choosen discard
 
 DiscardCost* DiscardCost::clone() const {
-    DiscardCost* ec = NEW DiscardCost(*this);
+    auto* ec = NEW DiscardCost(*this);
     if (tc) ec->tc = tc->clone();
     return ec;
 }
@@ -161,7 +161,7 @@ DiscardCost* DiscardCost::clone() const {
 DiscardCost::DiscardCost(TargetChooser* _tc) : ExtraCost("Choose card to Discard", _tc) {}
 
 int DiscardCost::doPay() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (target) {
         source->storedCard = target->createSnapShot();
         WEvent* e = NEW WEventCardDiscard(target);
@@ -177,7 +177,7 @@ int DiscardCost::doPay() {
 
 // cycling
 CycleCost* CycleCost::clone() const {
-    CycleCost* ec = NEW CycleCost(*this);
+    auto* ec = NEW CycleCost(*this);
     if (tc) ec->tc = tc->clone();
     return ec;
 }
@@ -185,7 +185,7 @@ CycleCost* CycleCost::clone() const {
 CycleCost::CycleCost(TargetChooser* _tc) : ExtraCost("Cycle", _tc) {}
 
 int CycleCost::doPay() {
-    MTGCardInstance* _source = (MTGCardInstance*)source;
+    auto* _source = (MTGCardInstance*)source;
     if (_source) {
         WEvent* e = NEW WEventCardDiscard(
             target);  // cycling sends 2 events one for the discard and one for the specific cycle trigger
@@ -202,7 +202,7 @@ int CycleCost::doPay() {
 
 // to library cost
 ToLibraryCost* ToLibraryCost::clone() const {
-    ToLibraryCost* ec = NEW ToLibraryCost(*this);
+    auto* ec = NEW ToLibraryCost(*this);
     if (tc) ec->tc = tc->clone();
     return ec;
 }
@@ -210,7 +210,7 @@ ToLibraryCost* ToLibraryCost::clone() const {
 ToLibraryCost::ToLibraryCost(TargetChooser* _tc) : ExtraCost("Put a card on top of Library", _tc) {}
 
 int ToLibraryCost::doPay() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (target) {
         source->storedCard = target->createSnapShot();
         _target->controller()->game->putInLibrary(target);
@@ -223,7 +223,7 @@ int ToLibraryCost::doPay() {
 
 // Mill yourself as a cost
 MillCost* MillCost::clone() const {
-    MillCost* ec = NEW MillCost(*this);
+    auto* ec = NEW MillCost(*this);
     if (tc) ec->tc = tc->clone();
     return ec;
 }
@@ -238,7 +238,7 @@ int MillCost::canPay() {
 }
 
 int MillCost::doPay() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target = (MTGCardInstance*)target;
     if (target) {
         source->storedCard = (MTGCardInstance*)_target->controller()
                                  ->game->library->cards[_target->controller()->game->library->nb_cards - 1]
@@ -259,7 +259,7 @@ MillExileCost::MillExileCost(TargetChooser* _tc) : MillCost(_tc) {
 }
 
 int MillExileCost::doPay() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target      = (MTGCardInstance*)target;
     source->storedCard = (MTGCardInstance*)_target->controller()
                              ->game->library->cards[_target->controller()->game->library->nb_cards - 1]
                              ->createSnapShot();
@@ -276,7 +276,7 @@ int MillExileCost::doPay() {
 
 // Tap cost
 TapCost* TapCost::clone() const {
-    TapCost* ec = NEW TapCost(*this);
+    auto* ec = NEW TapCost(*this);
     return ec;
 }
 
@@ -292,7 +292,7 @@ int TapCost::isPaymentSet() {
 int TapCost::canPay() { return isPaymentSet(); }
 
 int TapCost::doPay() {
-    MTGCardInstance* _source = (MTGCardInstance*)source;
+    auto* _source = (MTGCardInstance*)source;
     if (_source) {
         _source->tap();
         return 1;
@@ -301,7 +301,7 @@ int TapCost::doPay() {
 }
 // unTap cost
 UnTapCost* UnTapCost::clone() const {
-    UnTapCost* ec = NEW UnTapCost(*this);
+    auto* ec = NEW UnTapCost(*this);
     return ec;
 }
 
@@ -317,7 +317,7 @@ int UnTapCost::isPaymentSet() {
 int UnTapCost::canPay() { return isPaymentSet(); }
 
 int UnTapCost::doPay() {
-    MTGCardInstance* _source = (MTGCardInstance*)source;
+    auto* _source = (MTGCardInstance*)source;
     if (_source) {
         _source->untap();
         return 1;
@@ -327,7 +327,7 @@ int UnTapCost::doPay() {
 
 // Tap target cost
 TapTargetCost* TapTargetCost::clone() const {
-    TapTargetCost* ec = NEW TapTargetCost(*this);
+    auto* ec = NEW TapTargetCost(*this);
     if (tc) ec->tc = tc->clone();
     return ec;
 }
@@ -346,7 +346,7 @@ int TapTargetCost::isPaymentSet() {
 }
 
 int TapTargetCost::doPay() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target      = (MTGCardInstance*)target;
     source->storedCard = target->createSnapShot();
     if (target) {
         _target->tap();
@@ -359,7 +359,7 @@ int TapTargetCost::doPay() {
 
 // untap other as a cost
 UnTapTargetCost* UnTapTargetCost::clone() const {
-    UnTapTargetCost* ec = NEW UnTapTargetCost(*this);
+    auto* ec = NEW UnTapTargetCost(*this);
     if (tc) ec->tc = tc->clone();
     return ec;
 }
@@ -378,7 +378,7 @@ int UnTapTargetCost::isPaymentSet() {
 }
 
 int UnTapTargetCost::doPay() {
-    MTGCardInstance* _target = (MTGCardInstance*)target;
+    auto* _target      = (MTGCardInstance*)target;
     source->storedCard = target->createSnapShot();
     if (target) {
         _target->untap();
@@ -391,7 +391,7 @@ int UnTapTargetCost::doPay() {
 
 // exile as cost
 ExileTargetCost* ExileTargetCost::clone() const {
-    ExileTargetCost* ec = NEW ExileTargetCost(*this);
+    auto* ec = NEW ExileTargetCost(*this);
     if (tc) ec->tc = tc->clone();
     return ec;
 }
@@ -411,7 +411,7 @@ int ExileTargetCost::doPay() {
 
 // Bounce as cost
 BounceTargetCost* BounceTargetCost::clone() const {
-    BounceTargetCost* ec = NEW BounceTargetCost(*this);
+    auto* ec = NEW BounceTargetCost(*this);
     if (tc) ec->tc = tc->clone();
     return ec;
 }
@@ -431,7 +431,7 @@ int BounceTargetCost::doPay() {
 
 // Bounce as cost for ninja
 Ninja* Ninja::clone() const {
-    Ninja* ec = NEW Ninja(*this);
+    auto* ec = NEW Ninja(*this);
     if (tc) ec->tc = tc->clone();
     return ec;
 }
@@ -468,7 +468,7 @@ int Ninja::doPay() {
 //------------------------------------------------------------
 
 SacrificeCost* SacrificeCost::clone() const {
-    SacrificeCost* ec = NEW SacrificeCost(*this);
+    auto* ec = NEW SacrificeCost(*this);
     if (tc) ec->tc = tc->clone();
     return ec;
 }
@@ -493,7 +493,7 @@ int SacrificeCost::doPay() {
 // Counter costs
 
 CounterCost* CounterCost::clone() const {
-    CounterCost* ec = NEW CounterCost(*this);
+    auto* ec = NEW CounterCost(*this);
     if (tc) ec->tc = tc->clone();
 
     if (counter) ec->counter = NEW Counter(counter->target, counter->name.c_str(), counter->power, counter->toughness);
@@ -593,7 +593,7 @@ ExtraCosts::ExtraCosts() {
 }
 
 ExtraCosts* ExtraCosts::clone() const {
-    ExtraCosts* ec = NEW ExtraCosts(*this);
+    auto* ec = NEW ExtraCosts(*this);
     ec->costs.clear();
     for (size_t i = 0; i < costs.size(); i++) {
         ec->costs.push_back(costs[i]->clone());

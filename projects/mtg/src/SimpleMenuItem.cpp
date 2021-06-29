@@ -17,7 +17,7 @@ void SimpleMenuItem::Entering() {
     checkUserClick();
     setFocus(true);
     if (getParent() != nullptr) {
-        SimpleMenu* menu = (SimpleMenu*)parent;
+        auto* menu             = (SimpleMenu*)parent;
         menu->selectionTargetY = getY();
     }
 }

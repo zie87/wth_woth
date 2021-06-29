@@ -180,7 +180,7 @@ void DeckMenu::initMenuItems() {
     float sY = mY + kVerticalMargin;
     for (int i = startId; i < mCount; ++i) {
         float y = mY + kVerticalMargin + i * kLineHeight;
-        DeckMenuItem* currentMenuItem = static_cast<DeckMenuItem*>(mObjects[i]);
+        auto* currentMenuItem = static_cast<DeckMenuItem*>(mObjects[i]);
         currentMenuItem->Relocate(mX, y);
         if (currentMenuItem->hasFocus()) sY = y;
     }
@@ -228,7 +228,7 @@ void DeckMenu::Render() {
 
     for (int i = startId; i < startId + maxItems; i++) {
         if (i > mCount - 1) break;
-        DeckMenuItem* currentMenuItem = static_cast<DeckMenuItem*>(mObjects[i]);
+        auto* currentMenuItem = static_cast<DeckMenuItem*>(mObjects[i]);
         if (currentMenuItem->getY() - kLineHeight * startId < mY + height - kLineHeight + 7) {
             // only load stats for visible items in the list
             DeckMetaData* metaData = currentMenuItem->getMetaData();
@@ -330,10 +330,10 @@ void DeckMenu::Update(float dt) {
 }
 
 void DeckMenu::Add(int id, const char* text, string desc, bool forceFocus, DeckMetaData* deckMetaData) {
-    DeckMenuItem* menuItem = NEW DeckMenuItem(this, id, fontId, text, 0, mY + kVerticalMargin + mCount * kLineHeight,
-                                              (mCount == 0), mAutoTranslate, deckMetaData);
+    auto* menuItem         = NEW DeckMenuItem(this, id, fontId, text, 0, mY + kVerticalMargin + mCount * kLineHeight,
+                                      (mCount == 0), mAutoTranslate, deckMetaData);
     Translator* t = Translator::GetInstance();
-    map<string, string>::iterator it = t->deckValues.find(text);
+    auto it                = t->deckValues.find(text);
     string deckDescription = "";
 
     if (it != t->deckValues.end())  // translate decks desc
@@ -358,7 +358,7 @@ void DeckMenu::updateScroller() {
     TaskList taskList;
     mScroller->Reset();
 
-    for (vector<Task*>::iterator it = taskList.tasks.begin(); it != taskList.tasks.end(); it++) {
+    for (auto it = taskList.tasks.begin(); it != taskList.tasks.end(); it++) {
         std::ostringstream taskDescription;
         taskDescription << "Credits: " << std::setw(4) << (*it)->getReward() << " / "
                         << "Days Left: " << (*it)->getExpiration() << std::endl

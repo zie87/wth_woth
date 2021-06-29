@@ -49,7 +49,7 @@ CardPrimitive::CardPrimitive(CardPrimitive* source) {
     suspendedTime = source->suspendedTime;
 
     magicText = source->magicText;
-    for (map<string, string>::const_iterator it = source->magicTexts.begin(); it != source->magicTexts.end(); ++it)
+    for (auto it = source->magicTexts.begin(); it != source->magicTexts.end(); ++it)
         magicTexts[it->first] = source->magicTexts[it->first];
     spellTargetType = source->spellTargetType;
     alias = source->alias;

@@ -49,7 +49,7 @@ void CardDisplay::init(MTGGameZone* zone) {
 void CardDisplay::rotateLeft() {
     if (start_item == 0) return;
     for (size_t i = 0; i < mObjects.size(); i++) {
-        CardGui* cardg = (CardGui*)mObjects[i];
+        auto* cardg = (CardGui*)mObjects[i];
         cardg->x += 30;
     }
     start_item--;
@@ -58,7 +58,7 @@ void CardDisplay::rotateLeft() {
 void CardDisplay::rotateRight() {
     if (start_item == (int)(mObjects.size()) - 1) return;
     for (size_t i = 0; i < mObjects.size(); i++) {
-        CardGui* cardg = (CardGui*)mObjects[i];
+        auto* cardg = (CardGui*)mObjects[i];
         cardg->x -= 30;
     }
     start_item++;
@@ -74,7 +74,7 @@ void CardDisplay::Update(float dt) {
                 update = true;
                 break;
             }
-            CardGui* cardg = (CardGui*)mObjects[i];
+            auto* cardg = (CardGui*)mObjects[i];
             if (cardg->card != zone->cards[i]) update = true;
         }
     }
@@ -93,7 +93,7 @@ bool CardDisplay::CheckUserInput(JButton key) {
 
     if (mActionButton == key) {
         if (mObjects[mCurr] && mObjects[mCurr]->ButtonPressed()) {
-            CardGui* cardg = (CardGui*)mObjects[mCurr];
+            auto* cardg = (CardGui*)mObjects[mCurr];
             if (tc) {
                 tc->toggleTarget(cardg->card);
                 return true;
@@ -196,7 +196,7 @@ void CardDisplay::Render() {
         if (mObjects[i]) {
             mObjects[i]->Render();
             if (tc) {
-                CardGui* cardg = (CardGui*)mObjects[i];
+                auto* cardg = (CardGui*)mObjects[i];
                 if (tc->alreadyHasTarget(cardg->card)) {
                     r->DrawCircle(cardg->x + 5, cardg->y + 5, 5, ARGB(255, 255, 0, 0));
                 } else if (!tc->canTarget(cardg->card)) {

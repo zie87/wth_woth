@@ -146,7 +146,7 @@ void SimpleMenu::Render() {
 
         for (int i = 0; i < mCount; ++i) {
             float y = mY + kVerticalMargin + i * kLineHeight;
-            SimpleMenuItem* smi = static_cast<SimpleMenuItem*>(mObjects[i]);
+            auto* smi = static_cast<SimpleMenuItem*>(mObjects[i]);
             smi->Relocate(mX + mWidth / 2, y);
             if (smi->hasFocus()) sY = y;
         }
@@ -186,7 +186,7 @@ void SimpleMenu::Render() {
     }
     for (int i = startId; i < startId + maxItems; i++) {
         if (i > mCount - 1) break;
-        SimpleMenuItem* currentMenuItem = static_cast<SimpleMenuItem*>(mObjects[i]);
+        auto* currentMenuItem = static_cast<SimpleMenuItem*>(mObjects[i]);
         float currentY = currentMenuItem->getY() - kLineHeight * startId;
         float menuBottomEdge = mY + height - kLineHeight + 7;
         if (currentY < menuBottomEdge) {
@@ -288,8 +288,8 @@ void SimpleMenu::Update(float dt) {
 }
 
 void SimpleMenu::Add(int id, const char* text, string desc, bool forceFocus) {
-    SimpleMenuItem* smi = NEW SimpleMenuItem(this, id, fontId, text, 0, mY + kVerticalMargin + mCount * kLineHeight,
-                                             (mCount == 0), autoTranslate);
+    auto* smi = NEW SimpleMenuItem(this, id, fontId, text, 0, mY + kVerticalMargin + mCount * kLineHeight,
+                                   (mCount == 0), autoTranslate);
 
     smi->setDescription(desc);
     JGuiController::Add(smi);

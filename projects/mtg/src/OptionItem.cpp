@@ -131,7 +131,7 @@ void OptionProfile::populate() {
         return;
     }
     options[Options::ACTIVE_PROFILE].str = selections[value];
-    PlayerData* pdata = NEW PlayerData(MTGCollection());
+    auto* pdata                          = NEW PlayerData(MTGCollection());
 
     int unlocked = 0, sets = setlist.size();
     std::string contents;

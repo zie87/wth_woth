@@ -149,7 +149,7 @@ void CardGui::Render() {
         if (!isActiveConnectedParent) {
             for (size_t i = 0; i < card->childrenCards.size(); ++i) {
                 MTGCardInstance* child = card->childrenCards[i];
-                if (CardView* cv = dynamic_cast<CardView*>(child->view)) {
+                if (auto* cv = dynamic_cast<CardView*>(child->view)) {
                     if (cv->mHasFocus) {
                         isActiveConnectedParent = true;
                         break;
@@ -170,7 +170,7 @@ void CardGui::Render() {
         if (!isActiveConnectedChild) {
             for (size_t i = 0; i < card->parentCards.size(); ++i) {
                 MTGCardInstance* parent = card->parentCards[i];
-                if (CardView* cv = dynamic_cast<CardView*>(parent->view)) {
+                if (auto* cv = dynamic_cast<CardView*>(parent->view)) {
                     if (cv->mHasFocus) {
                         isActiveConnectedChild = true;
                         break;
@@ -367,7 +367,7 @@ void CardGui::AlternateRender(MTGCard* card, const Pos& pos) {
 
                 unsigned i = 0;
                 unsigned h = neofont ? 14 : 11;
-                for (std::vector<string>::const_iterator it = txt.begin(); it != txt.end(); ++it, ++i)
+                for (auto it = txt.begin(); it != txt.end(); ++it, ++i)
                     font->DrawString(it->c_str(), x + (Carditem->mPosX - BigWidth / 2) * pos.actZ,
                                      pos.actY + (-BigHeight / 2 + Carditem->mPosY + h * i) * pos.actZ);
             } else if (Carditem->mName == "mana") {
@@ -380,7 +380,7 @@ void CardGui::AlternateRender(MTGCard* card, const Pos& pos) {
                 unsigned int z = 0;
                 unsigned char t = (JGE::GetInstance()->GetTime() / 3) & 0xFF;
                 unsigned char v = t + 127;
-                float yOffset = (float)Carditem->mPosY;
+                auto yOffset    = (float)Carditem->mPosY;
 
                 JQuadPtr quad = WResourceManager::Instance()->RetrieveQuad("menuicons.png", 0, 0, 0, 0, "",
                                                                            RETRIEVE_NORMAL, TEXTURE_SUB_5551, 1);
@@ -462,7 +462,7 @@ void CardGui::AlternateRender(MTGCard* card, const Pos& pos) {
                 }
 
             } else if (Carditem->mName == "icon") {
-                float yOffseticon = (float)Carditem->mPosY;
+                auto yOffseticon    = (float)Carditem->mPosY;
                 JQuadPtr ExtraIcons = WResourceManager::Instance()->RetrieveQuad(
                     Carditem->mFileName.c_str(), 2 + (float)(Carditem->mIconPosX - 1) * 36,
                     (float)(Carditem->mIconPosY - 1) * 38, 32, 32, "", RETRIEVE_MANAGE);
@@ -630,7 +630,7 @@ void CardGui::TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad) {
 
                 unsigned i = 0;
                 unsigned h = neofont ? 14 : 11;
-                for (std::vector<string>::const_iterator it = txt.begin(); it != txt.end(); ++it, ++i)
+                for (auto it = txt.begin(); it != txt.end(); ++it, ++i)
                     font->DrawString(it->c_str(), x + (Carditem->mPosX - BigWidth / 2) * pos.actZ,
                                      imgBottom + (Carditem->mPosY + h * i) * pos.actZ);
             } else if (Carditem->mName == "mana") {
@@ -643,7 +643,7 @@ void CardGui::TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad) {
                 unsigned int z = 0;
                 unsigned char t = (JGE::GetInstance()->GetTime() / 3) & 0xFF;
                 unsigned char v = t + 127;
-                float yOffset = (float)Carditem->mPosY;
+                auto yOffset    = (float)Carditem->mPosY;
 
                 JQuadPtr quad = WResourceManager::Instance()->RetrieveQuad("menuicons.png", 0, 0, 0, 0, "",
                                                                            RETRIEVE_NORMAL, TEXTURE_SUB_5551, 1);
@@ -725,7 +725,7 @@ void CardGui::TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad) {
                 }
 
             } else if (Carditem->mName == "icon") {
-                float yOffseticon = (float)Carditem->mPosY;
+                auto yOffseticon    = (float)Carditem->mPosY;
                 JQuadPtr ExtraIcons = WResourceManager::Instance()->RetrieveQuad(
                     Carditem->mFileName.c_str(), 2 + (float)(Carditem->mIconPosX - 1) * 36,
                     (float)(Carditem->mIconPosY - 1) * 38, 32, 32, "", RETRIEVE_MANAGE);
@@ -840,7 +840,7 @@ void CardGui::RenderBig(MTGCard* card, const Pos& pos) {
     float x = pos.actX;
 
     JQuadPtr quad = WResourceManager::Instance()->RetrieveCard(card);
-    MTGCardInstance* kcard = dynamic_cast<MTGCardInstance*>(card);
+    auto* kcard   = dynamic_cast<MTGCardInstance*>(card);
     if (kcard && !kcard->isToken && kcard->name != kcard->model->data->name) {
         MTGCard* fcard = MTGCollection()->getCardByName(kcard->name);
         quad = WResourceManager::Instance()->RetrieveCard(fcard);
@@ -875,7 +875,7 @@ string CardGui::FormattedData(string data, string replace, string value) {
 
 bool CardGui::FilterCard(MTGCard* _card, string filter) {
     CardDescriptor cd;
-    MTGCardInstance* card = (MTGCardInstance*)_card->data;
+    auto* card = (MTGCardInstance*)_card->data;
     cd.init();
     cd.mode = CD_OR;
     while (filter.size()) {
@@ -1103,7 +1103,7 @@ bool CardGui::FilterCard(MTGCard* _card, string filter) {
 }
 
 void CardGui::RenderCountersBig(MTGCard* mtgcard, const Pos& pos, int drawMode) {
-    MTGCardInstance* card = dynamic_cast<MTGCardInstance*>(mtgcard);
+    auto* card = dynamic_cast<MTGCardInstance*>(mtgcard);
     if (!card) return;
 
     if (!card->counters) return;

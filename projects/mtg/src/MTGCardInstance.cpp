@@ -45,7 +45,7 @@ MTGCardInstance::MTGCardInstance(MTGCard* card, MTGPlayerCards* arg_belongs_to)
 }
 
 MTGCardInstance* MTGCardInstance::createSnapShot() {
-    MTGCardInstance* snapShot = NEW MTGCardInstance(*this);
+    auto* snapShot            = NEW MTGCardInstance(*this);
     snapShot->previous        = nullptr;
     snapShot->counters = NEW Counters(snapShot);
     controller()->game->garbage->addCard(snapShot);
@@ -81,7 +81,7 @@ void MTGCardInstance::copy(MTGCardInstance* card) {
     int castMethodBackUP = this->castMethod;
     mtgid = source->getId();
     MTGCardInstance* oldStored = this->storedSourceCard;
-    Spell* spell = NEW Spell(observer, this);
+    auto* spell                = NEW Spell(observer, this);
     observer = card->observer;
     AbilityFactory af(observer);
     af.addAbilities(observer->mLayers->actionLayer()->getMaxId(), spell);
@@ -638,8 +638,8 @@ int MTGCardInstance::nbOpponents() {
 }
 
 int MTGCardInstance::raiseBlockerRankOrder(MTGCardInstance* blocker) {
-    list<MTGCardInstance*>::iterator it1 = find(blockers.begin(), blockers.end(), blocker);
-    list<MTGCardInstance*>::iterator it2 = it1;
+    auto it1 = find(blockers.begin(), blockers.end(), blocker);
+    auto it2 = it1;
     if (blockers.begin() == it2)
         ++it2;
     else
@@ -657,7 +657,7 @@ int MTGCardInstance::raiseBlockerRankOrder(MTGCardInstance* blocker) {
 
 int MTGCardInstance::getDefenserRank(MTGCardInstance* blocker) {
     int result = 0;
-    for (list<MTGCardInstance*>::iterator it1 = blockers.begin(); it1 != blockers.end(); ++it1) {
+    for (auto it1 = blockers.begin(); it1 != blockers.end(); ++it1) {
         result++;
         if ((*it1) == blocker) return result;
     }

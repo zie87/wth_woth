@@ -27,7 +27,7 @@ int PriceList::save() {
     std::ofstream file;
     if (JFileSystem::GetInstance()->openForWrite(file, filename)) {
         char writer[20];
-        map<int, int>::iterator it = prices.begin();
+        auto it = prices.begin();
         while (it != prices.end()) {
             sprintf(writer, "%i\n%i\n", (*it).first, (*it).second);
             it++;
@@ -39,7 +39,7 @@ int PriceList::save() {
     return 1;
 }
 int PriceList::getPrice(int cardId) {
-    map<int, int>::iterator it = prices.find(cardId);
+    auto it = prices.find(cardId);
     if (it != prices.end()) return (*it).second;
 
     char rarity = collection->getCardById(cardId)->getRarity();

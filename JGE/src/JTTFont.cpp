@@ -204,7 +204,7 @@ int JTTFont::PreCacheChar(u16 ch, u16 cachedCode) {
     FT_GlyphSlot slot = mFace->glyph;
 
 #if defined(WIN32) || defined(LINUX)
-    DWORD* texBuffer = new DWORD[mMaxCharWidth * mMaxCharHeight];
+    auto* texBuffer = new DWORD[mMaxCharWidth * mMaxCharHeight];
     memset(texBuffer, 0, mMaxCharWidth * mMaxCharHeight * sizeof(DWORD));
 #else
 

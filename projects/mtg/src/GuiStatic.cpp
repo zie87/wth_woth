@@ -158,7 +158,7 @@ void GuiGameZone::Render() {
     mFont->DrawString(buffer, x0, actY);
 
     if (showCards) cd->Render();
-    for (vector<CardView*>::iterator it = cards.begin(); it != cards.end(); ++it) (*it)->Render();
+    for (auto it = cards.begin(); it != cards.end(); ++it) (*it)->Render();
     PlayGuiObject::Render();
 }
 
@@ -173,7 +173,7 @@ void GuiGameZone::Update(float dt) {
     if (showCards) cd->Update(dt);
     PlayGuiObject::Update(dt);
 
-    for (vector<CardView*>::iterator it = cards.begin(); it != cards.end(); ++it) {
+    for (auto it = cards.begin(); it != cards.end(); ++it) {
         CardView* c = (*it);
         c->Update(dt);
 
@@ -195,7 +195,7 @@ GuiGameZone::GuiGameZone(float x, float y, bool hasFocus, MTGGameZone* zone, Gui
 
 GuiGameZone::~GuiGameZone() {
     if (cd) delete cd;
-    for (vector<CardView*>::iterator it = cards.begin(); it != cards.end(); ++it) delete (*it);
+    for (auto it = cards.begin(); it != cards.end(); ++it) delete (*it);
 }
 
 std::ostream& GuiGameZone::toString(std::ostream& out) const {
@@ -208,7 +208,7 @@ GuiGraveyard::GuiGraveyard(float x, float y, bool hasFocus, Player* player, GuiA
 }
 
 int GuiGraveyard::receiveEventPlus(WEvent* e) {
-    if (WEventZoneChange* event = dynamic_cast<WEventZoneChange*>(e))
+    if (auto* event = dynamic_cast<WEventZoneChange*>(e))
         if (event->to == zone) {
             CardView* t;
             if (event->card->view)
@@ -226,9 +226,9 @@ int GuiGraveyard::receiveEventPlus(WEvent* e) {
 }
 
 int GuiGraveyard::receiveEventMinus(WEvent* e) {
-    if (WEventZoneChange* event = dynamic_cast<WEventZoneChange*>(e))
+    if (auto* event = dynamic_cast<WEventZoneChange*>(e))
         if (event->from == zone)
-            for (vector<CardView*>::iterator it = cards.begin(); it != cards.end(); ++it)
+            for (auto it = cards.begin(); it != cards.end(); ++it)
                 if (event->card->previous == (*it)->card) {
                     CardView* cv = *it;
                     cards.erase(it);
@@ -247,7 +247,7 @@ GuiOpponentHand::GuiOpponentHand(float x, float y, bool hasFocus, Player* player
 }
 
 int GuiOpponentHand::receiveEventPlus(WEvent* e) {
-    if (WEventZoneChange* event = dynamic_cast<WEventZoneChange*>(e))
+    if (auto* event = dynamic_cast<WEventZoneChange*>(e))
         if (event->to == zone) {
             CardView* t;
             if (event->card->view)
@@ -265,9 +265,9 @@ int GuiOpponentHand::receiveEventPlus(WEvent* e) {
 }
 
 int GuiOpponentHand::receiveEventMinus(WEvent* e) {
-    if (WEventZoneChange* event = dynamic_cast<WEventZoneChange*>(e))
+    if (auto* event = dynamic_cast<WEventZoneChange*>(e))
         if (event->from == zone)
-            for (vector<CardView*>::iterator it = cards.begin(); it != cards.end(); ++it)
+            for (auto it = cards.begin(); it != cards.end(); ++it)
                 if (event->card->previous == (*it)->card) {
                     CardView* cv = *it;
                     cards.erase(it);

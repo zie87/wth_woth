@@ -54,14 +54,14 @@ PhaseRing::PhaseRing(GameObserver* observer) : observer(observer) {
             vector<string> customRing = split(observer->players[i]->phaseRing, ',');
             for (unsigned int k = 0; k < customRing.size(); k++) {
                 GamePhase customOrder = phaseStrToInt(customRing[k]);
-                Phase* phase = NEW Phase(customOrder, observer->players[i]);
+                auto* phase           = NEW Phase(customOrder, observer->players[i]);
                 addPhase(phase);
                 turnRing.push_back(phase);
             }
             addPhase(NEW Phase(MTG_PHASE_AFTER_EOT, observer->players[i]));
         } else {
             for (int j = 0; j < NB_MTG_PHASES; j++) {
-                Phase* phase = NEW Phase((GamePhase)j, observer->players[i]);
+                auto* phase = NEW Phase((GamePhase)j, observer->players[i]);
                 addPhase(phase);
                 turnRing.push_back(phase);
             }
@@ -281,7 +281,7 @@ int PhaseRing::addPhaseAfter(GamePhase id, Player* player, int after_id) {
             for (auto findP = ring.begin(); findP != ring.end(); findP++) {
                 addPhase = *findP;
                 if (addPhase->id == id && addPhase->player == player) {
-                    Phase* toAdd = NEW Phase(*addPhase);
+                    auto* toAdd    = NEW Phase(*addPhase);
                     toAdd->isExtra = true;
                     turn.insert(it, toAdd);
                     extraPhases.push_back(toAdd);

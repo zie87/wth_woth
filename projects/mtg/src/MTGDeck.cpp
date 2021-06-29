@@ -188,7 +188,7 @@ int MTGAllCards::processConfLine(string& s, MTGCard* card, CardPrimitive* primit
     case 'p':
         if ('r' == key[1]) {  // primitive
             if (!card) card = NEW MTGCard();
-            map<string, CardPrimitive*>::iterator it = primitives.find(val);
+            auto it = primitives.find(val);
             if (it != primitives.end()) card->setPrimitive(it->second);
         } else {  // power
             if (!primitive) primitive = NEW CardPrimitive();
@@ -358,12 +358,11 @@ MTGAllCards* MTGAllCards::instance = nullptr;
 MTGAllCards::MTGAllCards() { init(); }
 
 MTGAllCards::~MTGAllCards() {
-    for (map<int, MTGCard*>::iterator it = collection.begin(); it != collection.end(); it++) delete (it->second);
+    for (auto it = collection.begin(); it != collection.end(); it++) delete (it->second);
     collection.clear();
     ids.clear();
 
-    for (map<string, CardPrimitive*>::iterator it = primitives.begin(); it != primitives.end(); it++)
-        delete (it->second);
+    for (auto it = primitives.begin(); it != primitives.end(); it++) delete (it->second);
     primitives.clear();
 }
 
@@ -477,7 +476,7 @@ CardPrimitive* MTGAllCards::addPrimitive(CardPrimitive* primitive, MTGCard* card
     }
     // translate cards text
     Translator* t = Translator::GetInstance();
-    map<string, string>::iterator it = t->tempValues.find(primitive->name);
+    auto it       = t->tempValues.find(primitive->name);
     if (it != t->tempValues.end()) {
         primitive->setText(it->second);
     }
@@ -492,7 +491,7 @@ CardPrimitive* MTGAllCards::addPrimitive(CardPrimitive* primitive, MTGCard* card
 }
 
 MTGCard* MTGAllCards::getCardById(int id) {
-    map<int, MTGCard*>::iterator it = collection.find(id);
+    auto it = collection.find(id);
     if (it != collection.end()) {
         return (it->second);
     }
@@ -540,7 +539,7 @@ MTGCard* MTGAllCards::getCardByName(string nameDescriptor) {
 
     std::transform(nameDescriptor.begin(), nameDescriptor.end(), nameDescriptor.begin(), ::tolower);
 
-    map<string, MTGCard*>::iterator cached = mtgCardByNameCache.find(nameDescriptor);
+    auto cached = mtgCardByNameCache.find(nameDescriptor);
 
     if (cached != mtgCardByNameCache.end()) {
         return cached->second;
@@ -592,7 +591,7 @@ MTGDeck::MTGDeck(MTGAllCards* _allcards) {
 
 int MTGDeck::totalPrice() {
     int total = 0;
-    PriceList* pricelist = NEW PriceList("settings/prices.dat", MTGCollection());
+    auto* pricelist = NEW PriceList("settings/prices.dat", MTGCollection());
     map<int, int>::iterator it;
     for (it = cards.begin(); it != cards.end(); it++) {
         int nb = it->second;
@@ -1005,7 +1004,7 @@ int MTGSets::Add(const char* name) {
     int setid = findSet(name);
     if (setid != -1) return setid;
 
-    MTGSetInfo* s = NEW MTGSetInfo(name);
+    auto* s = NEW MTGSetInfo(name);
     setinfo.push_back(s);
     setid = (int)setinfo.size();
 

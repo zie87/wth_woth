@@ -168,7 +168,7 @@ void GameStateDuel::Start() {
                 // translate deck creating desc
                 Translator* t = Translator::GetInstance();
                 string desc = "Highly recommended to get\nthe full Wagic experience!";
-                map<string, string>::iterator it = t->deckValues.find("Create your Deck!");
+                auto it       = t->deckValues.find("Create your Deck!");
                 if (it != t->deckValues.end()) desc = it->second;
 
                 deckmenu->Add(MENUITEM_NEW_DECK, "Create your Deck!", desc);
@@ -268,7 +268,7 @@ void GameStateDuel::setGamePhase(int newGamePhase) {
 wge::mutex GameStateDuel::mMutex;
 
 void GameStateDuel::ThreadProc(void* inParam) {
-    GameStateDuel* instance = reinterpret_cast<GameStateDuel*>(inParam);
+    auto* instance = reinterpret_cast<GameStateDuel*>(inParam);
     float counter = 1.0f;
     while (instance->mGamePhase != DUEL_STATE_BACK_TO_MAIN_MENU) {
         GameObserver observer;
@@ -515,7 +515,7 @@ void GameStateDuel::Update(float dt) {
 
             menu->Update(dt);
             if (menu->isClosed()) {
-                PlayerData* playerdata = NEW PlayerData(MTGCollection());
+                auto* playerdata = NEW PlayerData(MTGCollection());
                 playerdata->taskList->passOneDay();
                 playerdata->taskList->save();
                 SAFE_DELETE(playerdata);

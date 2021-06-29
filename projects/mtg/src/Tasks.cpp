@@ -137,7 +137,7 @@ void Task::LoadAIDeckNames() {
                 found = 1;
                 nbDecks++;
                 // TODO: Creating MTGDeck only for getting decks name. Find an easier way.
-                MTGDeck* mtgd = NEW MTGDeck(stream.str().c_str(), nullptr, 1);
+                auto* mtgd = NEW MTGDeck(stream.str().c_str(), nullptr, 1);
                 sAIDeckNames.push_back(mtgd->meta_name);
                 delete mtgd;
             }
@@ -237,7 +237,7 @@ int TaskList::save(string _fileName) {
 
         file << "# Format: <Type>|<Expiration>|<Accepted>|<Opponent>|<Reward>|<Description>[|Additional attributes]\n";
 
-        for (vector<Task*>::iterator it = tasks.begin(); it != tasks.end(); it++) {
+        for (auto it = tasks.begin(); it != tasks.end(); it++) {
             file << (*it)->toString() << "\n";
         }
         file.close();
@@ -305,8 +305,8 @@ void TaskList::Start() {
     mState = TASKS_IN;
     if (!mBgTex) {
         mBgTex = WResourceManager::Instance()->RetrieveTexture("taskboard.png", RETRIEVE_LOCK);
-        float unitH = static_cast<float>(mBgTex->mHeight / 4);
-        float unitW = static_cast<float>(mBgTex->mWidth / 4);
+        auto unitH = static_cast<float>(mBgTex->mHeight / 4);
+        auto unitW = static_cast<float>(mBgTex->mWidth / 4);
         if (unitH == 0 || unitW == 0) return;
 
         for (int i = 0; i < 9; i++) SAFE_DELETE(mBg[i]);
@@ -333,7 +333,7 @@ void TaskList::End() {
 
 void TaskList::passOneDay() {
     // TODO: "You have failed the task" message to the user when accepted task expires
-    for (vector<Task*>::iterator it = tasks.begin(); it != tasks.end();) {
+    for (auto it = tasks.begin(); it != tasks.end();) {
         (*it)->passOneDay();
         if ((*it)->isExpired()) {
             SAFE_DELETE(*it);
@@ -347,7 +347,7 @@ void TaskList::passOneDay() {
 void TaskList::getDoneTasks(GameObserver* observer, GameApp* _app, vector<Task*>* result) {
     result->clear();
     // TODO: Return only accepted tasks
-    for (vector<Task*>::iterator it = tasks.begin(); it != tasks.end(); it++) {
+    for (auto it = tasks.begin(); it != tasks.end(); it++) {
         if ((*it)->isDone(observer, _app)) {
             result->push_back(*it);
         }
@@ -419,7 +419,7 @@ void TaskList::Render() {
         return;
     }
 
-    for (vector<Task*>::iterator it = tasks.begin(); it != tasks.end(); it++) {
+    for (auto it = tasks.begin(); it != tasks.end(); it++) {
         sprintf(buffer, "%s", (*it)->getShortDesc().c_str());
         f2->DrawString(buffer, posX, posY);
         if (mBgTex) {
@@ -494,7 +494,7 @@ string TaskWinAgainst::getShortDesc() {
 }
 
 bool TaskWinAgainst::isDone(GameObserver* observer, GameApp* _app) {
-    AIPlayerBaka* baka = (AIPlayerBaka*)observer->players[1];
+    auto* baka = (AIPlayerBaka*)observer->players[1];
     return ((baka) && (!observer->players[0]->isAI()) && (observer->players[1]->isAI()) &&
             (observer->didWin(observer->players[0]))  // Human player wins
             && (baka->deckId == opponent));
@@ -752,7 +752,7 @@ bool TaskMassiveBurial::isDone(GameObserver* observer, GameApp* _app) {
     int countColor = 0;
     vector<MTGCardInstance*> cards = observer->players[1]->game->graveyard->cards;
 
-    for (vector<MTGCardInstance*>::iterator it = cards.begin(); it != cards.end(); it++) {
+    for (auto it = cards.begin(); it != cards.end(); it++) {
         if ((*it)->hasColor(color)) {
             countColor++;
         }
@@ -831,7 +831,7 @@ bool TaskWisdom::isDone(GameObserver* observer, GameApp* _app) {
     int countColor = 0;
     vector<MTGCardInstance*> cards = observer->players[0]->game->hand->cards;
 
-    for (vector<MTGCardInstance*>::iterator it = cards.begin(); it != cards.end(); it++) {
+    for (auto it = cards.begin(); it != cards.end(); it++) {
         if ((*it)->hasColor(color)) {
             countColor++;
         }

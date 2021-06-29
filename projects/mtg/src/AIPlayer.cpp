@@ -71,7 +71,7 @@ int AIAction::clickMultiAct(vector<Targetable*>& actionTargets) {
     GameObserver* g = owner->getObserver();
     TargetChooser* tc = g->getCurrentTargetChooser();
     if (!tc) return 0;
-    vector<Targetable*>::iterator ite = actionTargets.begin();
+    auto ite = actionTargets.begin();
     while (ite != actionTargets.end()) {
         MTGCardInstance* card = ((MTGCardInstance*)(*ite));
         if (card == (MTGCardInstance*)tc->source)  // click source first.
@@ -88,7 +88,7 @@ int AIAction::clickMultiAct(vector<Targetable*>& actionTargets) {
     owner->getRandomGenerator()->random_shuffle(actionTargets.begin(), actionTargets.end());
 
     for (int k = 0; k < int(actionTargets.size()) && k < tc->maxtargets; k++) {
-        if (MTGCardInstance* card = dynamic_cast<MTGCardInstance*>(actionTargets[k])) {
+        if (auto* card = dynamic_cast<MTGCardInstance*>(actionTargets[k])) {
             if (k + 1 == int(actionTargets.size())) tc->done = true;
             g->cardClick(card);
         }
@@ -119,9 +119,9 @@ int AIPlayer::Act(float dt) {
 }
 
 int AIPlayer::clickMultiTarget(TargetChooser* tc, vector<Targetable*>& potentialTargets) {
-    vector<Targetable*>::iterator ite = potentialTargets.begin();
+    auto ite = potentialTargets.begin();
     while (ite != potentialTargets.end()) {
-        MTGCardInstance* card = dynamic_cast<MTGCardInstance*>(*ite);
+        auto* card = dynamic_cast<MTGCardInstance*>(*ite);
         if (card && card == tc->source)  // if the source is part of the targetting deal with it first. second click is
                                          // "confirming click".
         {
@@ -129,7 +129,7 @@ int AIPlayer::clickMultiTarget(TargetChooser* tc, vector<Targetable*>& potential
             WGE_LOG_TRACE("Ai clicked source as a target: {}", (card ? card->name : "None"));
             ite = potentialTargets.erase(ite);
             continue;
-        } else if (Player* pTarget = dynamic_cast<Player*>(*ite)) {
+        } else if (auto* pTarget = dynamic_cast<Player*>(*ite)) {
             clickstream.push(NEW AIAction(this, pTarget));
             WGE_LOG_TRACE("Ai clicked Player as a target");
             ite = potentialTargets.erase(ite);
@@ -153,9 +153,9 @@ int AIPlayer::clickSingleTarget(TargetChooser* tc, vector<Targetable*>& potentia
                                 MTGCardInstance* chosenCard) {
     int i = randomGenerator.random() % potentialTargets.size();
 
-    if (MTGCardInstance* card = dynamic_cast<MTGCardInstance*>(potentialTargets[i])) {
+    if (auto* card = dynamic_cast<MTGCardInstance*>(potentialTargets[i])) {
         if (!chosenCard) clickstream.push(NEW AIAction(this, card));
-    } else if (Player* player = dynamic_cast<Player*>(potentialTargets[i])) {
+    } else if (auto* player = dynamic_cast<Player*>(potentialTargets[i])) {
         clickstream.push(NEW AIAction(this, player));
     }
 
@@ -194,8 +194,8 @@ AIPlayer* AIPlayerFactory::createAIPlayer(GameObserver* observer, MTGAllCards* c
     }
 
     // AIPlayerBaka will delete MTGDeck when it's time
-    AIPlayerBaka* baka = NEW AIPlayerBaka(observer, deckFile, deckFileSmall, avatarFilename,
-                                          NEW MTGDeck(deckFile, collection, 0, deckSetting));
+    auto* baka   = NEW AIPlayerBaka(observer, deckFile, deckFileSmall, avatarFilename,
+                                    NEW MTGDeck(deckFile, collection, 0, deckSetting));
     baka->deckId = deckid;
     return baka;
 }

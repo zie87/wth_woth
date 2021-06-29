@@ -28,7 +28,7 @@ MTGPlayerCards::MTGPlayerCards(Player* player, int* idList, int idListSize) : ow
     for (i = 0; i < idListSize; i++) {
         MTGCard* card = MTGCollection()->getCardById(idList[i]);
         if (card) {
-            MTGCardInstance* newCard = NEW MTGCardInstance(card, this);
+            auto* newCard = NEW MTGCardInstance(card, this);
             library->addCard(newCard);
         }
     }
@@ -46,7 +46,7 @@ void MTGPlayerCards::initDeck(MTGDeck* deck) {
         MTGCard* card = deck->getCardById(it->first);
         if (card) {
             for (int i = 0; i < it->second; i++) {
-                MTGCardInstance* newCard = NEW MTGCardInstance(card, this);
+                auto* newCard = NEW MTGCardInstance(card, this);
                 library->addCard(newCard);
             }
         }
@@ -545,14 +545,12 @@ int MTGGameZone::seenThisTurn(TargetChooser* tc, int castMethod, bool lastTurn) 
 
     int count = 0;
     if (lastTurn) {
-        for (vector<MTGCardInstance*>::iterator iter = cardsSeenLastTurn.begin(); iter != cardsSeenLastTurn.end();
-             ++iter) {
+        for (auto iter = cardsSeenLastTurn.begin(); iter != cardsSeenLastTurn.end(); ++iter) {
             MTGCardInstance* c = (*iter);
             if (c && c->matchesCastFilter(castMethod) && tc->canTarget(c)) count++;
         }
     } else {
-        for (vector<MTGCardInstance*>::iterator iter = cardsSeenThisTurn.begin(); iter != cardsSeenThisTurn.end();
-             ++iter) {
+        for (auto iter = cardsSeenThisTurn.begin(); iter != cardsSeenThisTurn.end(); ++iter) {
             MTGCardInstance* c = (*iter);
             if (c->matchesCastFilter(castMethod) && tc->canTarget(c)) count++;
         }
@@ -986,7 +984,7 @@ bool MTGGameZone::parseLine(const string& ss) {
             /* For the moment we add the card directly in the final zone.
                 This is not the normal way and this prevents to resolve spells.
                 We'll need a fusion operation afterward to cast relevant spells */
-            MTGCardInstance* newCard = NEW MTGCardInstance(card, owner->game);
+            auto* newCard = NEW MTGCardInstance(card, owner->game);
             addCard(newCard);
             result = true;
         } else {
@@ -994,7 +992,7 @@ bool MTGGameZone::parseLine(const string& ss) {
                 nb_cards++;
             else if (id < 0) {
                 // For the moment, we create a dummy Token to please the testsuite
-                Token* myToken = new Token(id);
+                auto* myToken = new Token(id);
                 addCard(myToken);
                 result = true;
             } else {

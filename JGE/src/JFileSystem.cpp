@@ -231,9 +231,7 @@ bool JFileSystem::openForRead(zfs::izfstream& File, const std::string& FilePath)
     if (!mSystemFS) return false;
 
     File.open(FilePath.c_str(), mSystemFS);
-    if (File) return true;
-
-    return false;
+    return static_cast<bool>(File);
 }
 
 bool JFileSystem::readIntoString(const std::string& FilePath, std::string& target) {
@@ -259,10 +257,7 @@ bool JFileSystem::openForWrite(std::ofstream& File, const std::string& FilePath,
     filename.append(FilePath);
     File.open(filename.c_str(), mode);
 
-    if (File) {
-        return true;
-    }
-    return false;
+    return static_cast<bool>(File);
 }
 
 bool JFileSystem::OpenFile(const std::string& filename) {
@@ -413,7 +408,7 @@ bool JFileSystem::Rename(std::string _from, std::string _to) {
     std::string from = mUserFSPath + _from;
     std::string to = mUserFSPath + _to;
     std::remove(to.c_str());
-    return rename(from.c_str(), to.c_str()) ? true : false;
+    return rename(from.c_str(), to.c_str()) != 0;
 }
 
 int JFileSystem::GetFileSize(zfs::izfstream& file) {

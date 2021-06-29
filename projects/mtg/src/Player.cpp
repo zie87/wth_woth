@@ -242,9 +242,7 @@ bool Player::parseLine(const string& s) {
         game->setOwner(this);
     }
 
-    if (game->parseLine(s)) return true;
-
-    return false;
+    return game->parseLine(s);
 }
 
 void HumanPlayer::End() {

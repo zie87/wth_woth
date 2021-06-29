@@ -22,11 +22,7 @@ void hgeRect::Encapsulate(float x, float y) {
     }
 }
 
-bool hgeRect::TestPoint(float x, float y) const {
-    if (x >= x1 && x < x2 && y >= y1 && y < y2) return true;
-
-    return false;
-}
+bool hgeRect::TestPoint(float x, float y) const { return x >= x1 && x < x2 && y >= y1 && y < y2; }
 
 bool hgeRect::Intersect(const hgeRect* rect) const {
     if (fabs(x1 + x2 - rect->x1 - rect->x2) < (x2 - x1 + rect->x2 - rect->x1))

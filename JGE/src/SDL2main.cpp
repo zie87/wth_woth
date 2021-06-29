@@ -87,7 +87,7 @@ public:
     }
 
     int OnExecute() {
-        if (OnInit() == false) {
+        if (!OnInit()) {
             return -1;
         }
 

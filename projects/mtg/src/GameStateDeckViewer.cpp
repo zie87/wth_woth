@@ -1601,8 +1601,8 @@ void GameStateDeckViewer::OnScroll(int inXVelocity, int inYVelocity) {
     int magnitude = static_cast<int>(sqrtf((float)((inXVelocity * inXVelocity) + (inYVelocity * inYVelocity))));
 
     bool flickHorizontal = (abs(inXVelocity) > abs(inYVelocity));
-    bool flickUp = !flickHorizontal && (inYVelocity > 0) ? true : false;
-    bool flickRight = flickHorizontal && (inXVelocity < 0) ? true : false;
+    bool flickUp         = !flickHorizontal && (inYVelocity > 0);
+    bool flickRight      = flickHorizontal && (inXVelocity < 0);
 
     if (flickHorizontal) {
         if (abs(inXVelocity) > 300) {

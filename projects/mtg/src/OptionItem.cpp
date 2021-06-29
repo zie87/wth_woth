@@ -107,10 +107,7 @@ void OptionProfile::addSelection(string s) {
     OptionDirectory::addSelection(s);
 
     // Check how many options... if 1, we're not selectable.
-    if (selections.size() > 1)
-        canSelect = true;
-    else
-        canSelect = false;
+    canSelect = selections.size() > 1;
 }
 
 void OptionProfile::updateValue() {
@@ -304,15 +301,9 @@ void OptionLanguage::initSelections() {
     }
 }
 
-bool OptionLanguage::Visible() {
-    if (selections.size() > 1) return true;
-    return false;
-}
+bool OptionLanguage::Visible() { return selections.size() > 1; }
 
-bool OptionLanguage::Selectable() {
-    if (selections.size() > 1) return true;
-    return false;
-}
+bool OptionLanguage::Selectable() { return selections.size() > 1; }
 
 // OptionDirectory
 void OptionDirectory::Reload() {
@@ -413,11 +404,7 @@ void OptionTheme::Render() {
     }
 }
 
-bool OptionTheme::Visible() {
-    if (selections.size() <= 1) return false;
-
-    return true;
-}
+bool OptionTheme::Visible() { return selections.size() > 1; }
 
 void OptionTheme::confirmChange(bool confirmed) {
     bChecked = false;

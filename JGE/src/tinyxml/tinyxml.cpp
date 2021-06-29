@@ -967,10 +967,7 @@ bool TiXmlDocument::LoadFile( TiXmlEncoding encoding )
 	// See STL_STRING_BUG below.
 	StringToBuffer buf( value );
 
-	if ( buf.buffer && LoadFile( buf.buffer, encoding ) )
-		return true;
-
-	return false;
+        return buf.buffer && LoadFile(buf.buffer, encoding);
 }
 
 
@@ -979,10 +976,7 @@ bool TiXmlDocument::SaveFile() const
 	// See STL_STRING_BUG below.
 	StringToBuffer buf( value );
 
-	if ( buf.buffer && SaveFile( buf.buffer ) )
-		return true;
-
-	return false;
+        return buf.buffer && SaveFile(buf.buffer);
 }
 
 bool TiXmlDocument::LoadFile( const char* filename, TiXmlEncoding encoding )
@@ -1120,10 +1114,7 @@ bool TiXmlDocument::LoadFile( FILE* file, TiXmlEncoding encoding )
 
         Parse(data.c_str(), nullptr, encoding);
 
-        if (  Error() )
-        return false;
-    else
-		return true;
+        return !Error();
 }
 
 

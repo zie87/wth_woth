@@ -1156,10 +1156,7 @@ TriggerTargetChooser::TriggerTargetChooser(GameObserver* observer, int _triggerT
 
 bool TriggerTargetChooser::targetsZone(MTGGameZone* z) { return true; }
 
-bool TriggerTargetChooser::canTarget(Targetable* _target, bool withoutProtections) {
-    if (_target == target) return true;
-    return false;
-}
+bool TriggerTargetChooser::canTarget(Targetable* _target, bool withoutProtections) { return _target == target; }
 
 TriggerTargetChooser* TriggerTargetChooser::clone() const {
     auto* a = NEW TriggerTargetChooser(*this);
@@ -1199,8 +1196,7 @@ bool myCursesChooser::equals(TargetChooser* tc) {
 /*display cards blockable by source */
 bool BlockableChooser::canTarget(Targetable* target, bool withoutProtections) {
     if (auto* card = dynamic_cast<MTGCardInstance*>(target)) {
-        if (!card->isAttacker() || !source->canBlock(card)) return false;
-        return true;
+        return !(!card->isAttacker() || !source->canBlock(card));
     }
     return TypeTargetChooser::canTarget(target, withoutProtections);
 }
@@ -1221,11 +1217,9 @@ bool BlockableChooser::equals(TargetChooser* tc) {
 /*Proliferate Target */
 bool ProliferateChooser::canTarget(Targetable* target, bool withoutProtections) {
     if (auto* card = dynamic_cast<MTGCardInstance*>(target)) {
-        if (card->counters && card->counters->counters.empty()) return false;
-        return true;
+        return !(card->counters && card->counters->counters.empty());
     } else if (auto* p = dynamic_cast<Player*>(target)) {
-        if (!p->poisonCount) return false;
-        return true;
+        return p->poisonCount != 0;
     }
     return TypeTargetChooser::canTarget(target, withoutProtections);
 }

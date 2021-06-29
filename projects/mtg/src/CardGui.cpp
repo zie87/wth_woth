@@ -1098,8 +1098,7 @@ bool CardGui::FilterCard(MTGCard* _card, string filter) {
             cd.setSubtype(typeName);
         }
     }
-    if (cd.match(card)) return true;
-    return false;
+    return cd.match(card) != nullptr;
 }
 
 void CardGui::RenderCountersBig(MTGCard* mtgcard, const Pos& pos, int drawMode) {

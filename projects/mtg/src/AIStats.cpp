@@ -102,8 +102,7 @@ bool AIStats::isInTop(MTGCardInstance* card, unsigned int max, bool tooSmallCoun
         if (n >= max) return false;
         AIStat* stat = *it;
         if (stat->source == id) {
-            if ((stat->value + card->DangerRanking()) >= 3) return true;
-            return false;
+            return (stat->value + card->DangerRanking()) >= 3;
         }
         n++;
     }

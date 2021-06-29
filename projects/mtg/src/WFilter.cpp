@@ -147,8 +147,7 @@ bool WCFilterLetter::isMatch(MTGCard* c) {
     if (!c || !c->data) return false;
     string s = c->data->getLCName();
     if (!s.size()) return false;
-    if (s[0] == alpha || (alpha == '#' && (isdigit(s[0]) || ispunct(s[0])))) return true;
-    return false;
+    return s[0] == alpha || (alpha == '#' && (isdigit(s[0]) || ispunct(s[0])));
 }
 string WCFilterLetter::getCode() {
     char buf[24];

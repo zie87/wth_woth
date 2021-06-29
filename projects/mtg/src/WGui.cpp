@@ -447,10 +447,7 @@ WDecoCheat::WDecoCheat(WGuiBase* _it) : WGuiDeco(_it) {
     bVisible = (options[Options::ACTIVE_PROFILE].str == SECRET_PROFILE);
 }
 void WDecoCheat::Reload() { bVisible = (options[Options::ACTIVE_PROFILE].str == SECRET_PROFILE); }
-bool WDecoCheat::Visible() {
-    if (bVisible && it && it->Visible()) return true;
-    return false;
-}
+bool WDecoCheat::Visible() { return bVisible && it && it->Visible(); }
 bool WDecoCheat::Selectable() {
     if (!it || !Visible()) return false;
     return it->Selectable();
@@ -480,11 +477,7 @@ void WDecoConfirm::Entering(JButton key) {
     confirmMenu->Add(2, cancel.c_str());
 }
 
-bool WDecoConfirm::isModal() {
-    if (bModal || (it && it->isModal())) return true;
-
-    return false;
-}
+bool WDecoConfirm::isModal() { return bModal || (it && it->isModal()); }
 
 void WDecoConfirm::setModal(bool val) { bModal = val; }
 void WDecoConfirm::setData() {
@@ -695,7 +688,7 @@ bool WGuiSplit::CheckUserInput(JButton key) {
         }
     }
 done:
-    if (result == true) {
+    if (result) {
         JGE::GetInstance()->LeftClickedProcessed();
     }
     return result;
@@ -926,7 +919,7 @@ bool WGuiMenu::nextItem() {
     else
         potential = 0;
 
-    while (potential < nbitems - 1 && items[potential]->Selectable() == false) potential++;
+    while (potential < nbitems - 1 && !items[potential]->Selectable()) potential++;
     if (potential != currentItem && (!now || now->Leaving(buttonNext))) {
         currentItem = potential;
         items[currentItem]->Entering(buttonNext);
@@ -952,7 +945,7 @@ bool WGuiMenu::prevItem() {
     else
         potential = nbitems - 1;
 
-    while (potential > 0 && items[potential]->Selectable() == false) potential--;
+    while (potential > 0 && !items[potential]->Selectable()) potential--;
 
     if ((!(potential < 0 || !items[potential]->Selectable())) &&
         (potential != currentItem && (!now || now->Leaving(buttonNext)))) {
@@ -1169,8 +1162,7 @@ bool WGuiAward::Visible() {
     // WGuiAward is only visible when it's tied to an already achieved award.
     GameOptionAward* goa =
         id ? dynamic_cast<GameOptionAward*>(&options[id]) : dynamic_cast<GameOptionAward*>(&options[textId]);
-    if (!goa || !goa->number) return false;
-    return true;
+    return !(!goa || !goa->number);
 }
 
 // WGuiImage

@@ -1511,10 +1511,9 @@ int AADynamic::resolve() {
         switch (effect) {
         case DYNAMIC_ABILITY_EFFECT_STRIKE:  // deal damage
         {
-            mainAbility =
-                NEW AADamager(game, this->GetId(), source,
-                              tosrc == true ? (Targetable*)OriginalSrc : (Targetable*)_target, sourceamountstring);
-            activateMainAbility(mainAbility, source, tosrc == true ? OriginalSrc : (MTGCardInstance*)_target);
+            mainAbility = NEW AADamager(game, this->GetId(), source,
+                                        tosrc ? (Targetable*)OriginalSrc : (Targetable*)_target, sourceamountstring);
+            activateMainAbility(mainAbility, source, tosrc ? OriginalSrc : (MTGCardInstance*)_target);
             if (eachother) {
                 mainAbility = NEW AADamager(game, this->GetId(), source, (Targetable*)OriginalSrc, targetamountstring);
                 activateMainAbility(mainAbility, source, OriginalSrc);
@@ -1536,26 +1535,23 @@ int AADynamic::resolve() {
         }
         case DYNAMIC_ABILITY_EFFECT_PUMPPOWER:  // pump power
         {
-            mainAbility =
-                NEW PTInstant(game, this->GetId(), source, tosrc == true ? OriginalSrc : (MTGCardInstance*)_target,
-                              NEW WParsedPT(sourceamount, 0));
-            return activateMainAbility(mainAbility, source, tosrc == true ? OriginalSrc : (MTGCardInstance*)_target);
+            mainAbility = NEW PTInstant(game, this->GetId(), source, tosrc ? OriginalSrc : (MTGCardInstance*)_target,
+                                        NEW WParsedPT(sourceamount, 0));
+            return activateMainAbility(mainAbility, source, tosrc ? OriginalSrc : (MTGCardInstance*)_target);
             break;
         }
         case DYNAMIC_ABILITY_EFFECT_PUMPTOUGHNESS:  // pump toughness
         {
-            mainAbility =
-                NEW PTInstant(game, this->GetId(), source, tosrc == true ? OriginalSrc : (MTGCardInstance*)_target,
-                              NEW WParsedPT(0, sourceamount));
-            return activateMainAbility(mainAbility, source, tosrc == true ? OriginalSrc : (MTGCardInstance*)_target);
+            mainAbility = NEW PTInstant(game, this->GetId(), source, tosrc ? OriginalSrc : (MTGCardInstance*)_target,
+                                        NEW WParsedPT(0, sourceamount));
+            return activateMainAbility(mainAbility, source, tosrc ? OriginalSrc : (MTGCardInstance*)_target);
             break;
         }
         case DYNAMIC_ABILITY_EFFECT_PUMPBOTH:  // pump both
         {
-            mainAbility =
-                NEW PTInstant(game, this->GetId(), source, tosrc == true ? OriginalSrc : (MTGCardInstance*)_target,
-                              NEW WParsedPT(sourceamount, sourceamount));
-            return activateMainAbility(mainAbility, source, tosrc == true ? OriginalSrc : (MTGCardInstance*)_target);
+            mainAbility = NEW PTInstant(game, this->GetId(), source, tosrc ? OriginalSrc : (MTGCardInstance*)_target,
+                                        NEW WParsedPT(sourceamount, sourceamount));
+            return activateMainAbility(mainAbility, source, tosrc ? OriginalSrc : (MTGCardInstance*)_target);
             break;
         }
         case DYNAMIC_ABILITY_EFFECT_LIFELOSS:  // lose life
@@ -3561,7 +3557,7 @@ void APhaseAction::Update(float dt) {
                 if (this->oneShot || once) {
                     this->forceDestroy = 1;
                 }
-            } else if (newPhase == phase && next == false)
+            } else if (newPhase == phase && !next)
                 next = true;
         }
     }
@@ -3579,7 +3575,7 @@ const char* APhaseAction::getMenuText() {
 
 APhaseAction* APhaseAction::clone() const {
     auto* a = NEW APhaseAction(*this);
-    if (forcedestroy == false) a->forceDestroy = -1;  // we want this ability to stay alive until it resolves.
+    if (!forcedestroy) a->forceDestroy = -1;  // we want this ability to stay alive until it resolves.
     return a;
 }
 
@@ -3627,7 +3623,7 @@ ABlink::ABlink(GameObserver* observer, int _id, MTGCardInstance* card, MTGCardIn
 }
 
 void ABlink::Update(float dt) {
-    if (resolved == false) {
+    if (!resolved) {
         resolved = true;
         resolveBlink();
     }

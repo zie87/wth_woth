@@ -244,10 +244,7 @@ bool ActionLayer::getMenuIdFromCardAbility(MTGCardInstance* card, MTGAbility* ab
         }
     }
 
-    if (ctr == 0 || ctr == 1) {
-        return false;
-    } else
-        return true;
+    return !(ctr == 0 || ctr == 1);
 }
 
 // TODO Simplify with only object !!!

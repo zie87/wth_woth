@@ -135,10 +135,7 @@ void Translator::init() {
     if (fileExists(name.c_str())) {
         // fixup for multibyte support.
         std::transform(lang.begin(), lang.end(), lang.begin(), ::tolower);
-        if (lang == "cn" || lang == "jp")
-            neofont = true;
-        else
-            neofont = false;
+        neofont  = lang == "cn" || lang == "jp";
         initDone = true;
         load(name, &values);
     }

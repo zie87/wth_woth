@@ -313,9 +313,7 @@ bool filesystem::FileNotZipped(const char* FilePath) const {
     // follow new search_iterator implementation
     std::ifstream File(FilePath);
 
-    if (!File) return false;
-
-    return true;
+    return !!File;
 }
 
 bool filesystem::FindFile(const char* Filename, file_info* FileInfo) const {
@@ -423,7 +421,7 @@ bool filesystem::PreloadZip(const char* Filename, map<string, limited_file_info>
         }
 
         File.close();
-        return (target.size() ? true : false);
+        return (target.size() != 0);
     } else {
         if (!File.seekg(CentralDir(File))) {
             File.close();
@@ -447,7 +445,7 @@ bool filesystem::PreloadZip(const char* Filename, map<string, limited_file_info>
         }
 
         File.close();
-        return (target.size() ? true : false);
+        return (target.size() != 0);
     }
 }
 
@@ -501,10 +499,7 @@ bool filesystem::lt_path::operator()(const string& s1, const string& s2) const {
         // '/' is the same as '\'
         if (!((A[i] == B[i]) || ((A[i] == '\\') && (B[i] == '/')) || ((A[i] == '/') && (B[i] == '\\')))) {
             // This line puts uppercases first
-            if ((A[i] == '\0') || (A[i] < B[i]))
-                return true;
-            else
-                return false;
+            return (A[i] == '\0') || (A[i] < B[i]);
         }
     }
 }

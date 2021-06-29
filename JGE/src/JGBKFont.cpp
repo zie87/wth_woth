@@ -400,11 +400,11 @@ void JGBKFont::GetStringArea(BYTE* str, int* w, int* h) const {
                 if (*src > 0x80) {
                     // index = PreCacheChar(src);
                     src += 2;
-                    if (isChinese == false) xx += 5 * (mFontSize * mScale) / 16;
+                    if (!isChinese) xx += 5 * (mFontSize * mScale) / 16;
                     isChinese = true;
                 } else if (*src >= ' ') {
                     src += 1;
-                    if (isChinese == true) xx -= 3 * (mFontSize * mScale) / 16;
+                    if (isChinese) xx -= 3 * (mFontSize * mScale) / 16;
                     isChinese = false;
                 }
 
@@ -495,12 +495,12 @@ void JGBKFont::RenderString(BYTE* str, float x, float y, int alignment) {
                 if (*src > 0x80) {
                     index = PreCacheChar(src);
                     src += 2;
-                    if (isChinese == false) xx += 5 * (mFontSize * mScale) / 16;
+                    if (!isChinese) xx += 5 * (mFontSize * mScale) / 16;
                     isChinese = true;
                 } else if (*src >= ' ') {
                     index = PreCacheChar(src);
                     src += 1;
-                    if (isChinese == true) xx -= 3 * (mFontSize * mScale) / 16;
+                    if (isChinese) xx -= 3 * (mFontSize * mScale) / 16;
                     isChinese = false;
                 }
 

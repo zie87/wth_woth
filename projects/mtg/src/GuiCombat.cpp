@@ -240,8 +240,7 @@ bool GuiCombat::didClickOnButton(Pos buttonPosition, int& x, int& y) {
     int y1 = static_cast<int>(buttonPosition.y);
     int x2 = static_cast<int>(buttonPosition.x + buttonPosition.width);
     int y2 = static_cast<int>(buttonPosition.y + buttonPosition.height);
-    if ((x >= x1 && x < x2) && (y >= y1 && y < y2)) return true;
-    return false;
+    return (x >= x1 && x < x2) && (y >= y1 && y < y2);
 }
 
 bool GuiCombat::CheckUserInput(JButton key) {

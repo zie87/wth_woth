@@ -195,11 +195,7 @@ unsigned long WCachedSample::size() {
     return sample->fileSize();
 }
 
-bool WCachedSample::isGood() {
-    if (!sample || !sample->mSample) return false;
-
-    return true;
-}
+bool WCachedSample::isGood() { return !(!sample || !sample->mSample); }
 
 void WCachedSample::Refresh() { return; }
 
@@ -223,10 +219,7 @@ bool WCachedSample::Attempt(const string& filename, int submode, int& error) {
 
 // WCachedParticles
 
-bool WCachedParticles::isGood() {
-    if (!particles) return false;
-    return true;
-}
+bool WCachedParticles::isGood() { return particles != nullptr; }
 
 unsigned long WCachedParticles::size() {
     if (!particles) return 0;  // Sizeof(pointer)

@@ -814,8 +814,8 @@ vector<MTGAbility*> AIPlayerBaka::canPayMana(MTGCardInstance* target, ManaCost* 
                 MTGAbility* a = ((MTGAbility*)observer->mLayers->actionLayer()->manaObjects[i]);
                 auto* amp     = dynamic_cast<AManaProducer*>(a);
                 if (amp && canHandleCost(amp)) {
-                    foundColor1 = amp->output->hasColor(hybridCost->color1) ? true : false;
-                    foundColor2 = amp->output->hasColor(hybridCost->color2) ? true : false;
+                    foundColor1 = amp->output->hasColor(hybridCost->color1) != 0;
+                    foundColor2 = amp->output->hasColor(hybridCost->color2) != 0;
                     if ((foundColor1 && result->getCost(hybridCost->color1) < hybridCost->value1) ||
                         (foundColor2 && result->getCost(hybridCost->color2) < hybridCost->value2)) {
                         MTGCardInstance* card = amp->source;

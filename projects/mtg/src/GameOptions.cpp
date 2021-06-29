@@ -186,9 +186,7 @@ bool GameOption::isDefault() {
     string test = str;
     std::transform(test.begin(), test.end(), test.begin(), ::tolower);
 
-    if (!test.size() || test == "default") return true;
-
-    return false;
+    return !test.size() || test == "default";
 }
 
 PIXEL_TYPE GameOption::asColor(PIXEL_TYPE fallback) {

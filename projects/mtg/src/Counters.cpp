@@ -19,7 +19,7 @@ int Counter::init(MTGCardInstance* _target, const char* _name, int _power, int _
 }
 
 bool Counter::sameAs(const char* _name, int _power, int _toughness) const {
-    if (power == 0 && toughness == 0) return (name.compare(_name) == 0);
+    if (power == 0 && toughness == 0) return (name == _name);
     return (power == _power && toughness == _toughness);
 }
 

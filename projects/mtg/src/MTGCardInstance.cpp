@@ -249,7 +249,7 @@ int MTGCardInstance::removeType(int id, int removeAll) {
         // and type, so if we remove a subtype "Forest", we also need to remove its name.
         // This means the card might lose its name, but usually when we force remove a type, we add another one just
         // after that. see "AddType" above which force sets a name if necessary
-        if (name.compare(MTGAllCards::findType(id)) == 0) setName("");
+        if (name == MTGAllCards::findType(id)) setName("");
     }
     WEvent* e = NEW WEventCardChangeType(this, id, before, after);
     if (observer)

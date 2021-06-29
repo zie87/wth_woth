@@ -572,7 +572,7 @@ MTGCard* MTGAllCards::getCardByName(string nameDescriptor) {
         if (setId != -1 && setId != c->setId) continue;
         string cardName = c->data->name;
         std::transform(cardName.begin(), cardName.end(), cardName.begin(), ::tolower);
-        if (cardName.compare(name) == 0) {
+        if (cardName == name) {
             mtgCardByNameCache[nameDescriptor] = c;
             return c;
         }
@@ -1019,7 +1019,7 @@ int MTGSets::findSet(string name) {
         if (!s) continue;
         string set = s->id;
         std::transform(set.begin(), set.end(), set.begin(), ::tolower);
-        if (set.compare(name) == 0) return i;
+        if (set == name) return i;
     }
     return -1;
 }
@@ -1032,7 +1032,7 @@ int MTGSets::findBlock(string s) {
     for (int i = 0; i < (int)blocks.size(); i++) {
         string b = blocks[i];
         std::transform(b.begin(), b.end(), b.begin(), ::tolower);
-        if (b.compare(comp) == 0) return i;
+        if (b == comp) return i;
     }
 
     blocks.push_back(s);
@@ -1126,12 +1126,12 @@ void MTGSetInfo::processConfLine(string line) {
     std::transform(key.begin(), key.end(), key.begin(), ::tolower);
     string value = line.substr(i + 1);
 
-    if (key.compare("name") == 0)
+    if (key == "name")
         name = value;
-    else if (key.compare("author") == 0)
+    else if (key == "author")
         author = value;
-    else if (key.compare("block") == 0)
+    else if (key == "block")
         block = setlist.findBlock(value);
-    else if (key.compare("year") == 0)
+    else if (key == "year")
         year = atoi(value.c_str());
 }

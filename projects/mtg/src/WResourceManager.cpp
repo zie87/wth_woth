@@ -724,7 +724,7 @@ bool ResourceManagerImpl::fileOK(const string& filename) { return JFileSystem::G
 void ResourceManagerImpl::InitFonts(const std::string& inLang) {
     unsigned int idOffset = 0;
 
-    if (inLang.compare("cn") == 0) {
+    if (inLang == "cn") {
         mFontFileExtension = kExtension_gbk;
         LoadWFont("simon", 12, Fonts::MAIN_FONT);
         LoadWFont("f3", 16, Fonts::MENU_FONT);
@@ -734,7 +734,7 @@ void ResourceManagerImpl::InitFonts(const std::string& inLang) {
         idOffset = Fonts::kSingleByteFontOffset;
     }
 
-    if (inLang.compare("jp") == 0) {
+    if (inLang == "jp") {
         mFontFileExtension = kExtension_font;
         LoadWFont("simon", 12, Fonts::MAIN_FONT);
         LoadWFont("f3", 16, Fonts::MENU_FONT);

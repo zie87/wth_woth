@@ -175,7 +175,7 @@ void filesystem::Open(izfstream& File, const char* Filename) {
             (!((ZipPath = FindZip(FileInfo.m_PackID)).empty()))) {
             // Get the position of the compressed data
             if (CurrentZipName.size()) {
-                if ((pCurrentFS != this) || (CurrentZipName.compare(ZipPath) != 0)) {
+                if ((pCurrentFS != this) || (CurrentZipName != ZipPath)) {
                     CurrentZipFile.close();
                     CurrentZipName = "";
                     pCurrentFS     = nullptr;

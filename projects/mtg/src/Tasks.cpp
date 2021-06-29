@@ -75,7 +75,7 @@ int Task::restoreCommonAttribs() {
         return -1;
     }
     expiresIn = atoi(persistentAttribs[1].c_str());
-    accepted = (persistentAttribs[2].compare("1") == 0);
+    accepted     = (persistentAttribs[2] == "1");
     opponent = atoi(persistentAttribs[3].c_str());
     reward = atoi(persistentAttribs[4].c_str());
     description = persistentAttribs[5];

@@ -186,22 +186,22 @@ bool Player::parseLine(const string& s) {
     string areaS;
     if (limiter != string::npos) {
         areaS = s.substr(0, limiter);
-        if (areaS.compare("manapool") == 0) {
+        if (areaS == "manapool") {
             SAFE_DELETE(manaPool);
             manaPool = new ManaPool(this);
             ManaCost::parseManaCost(s.substr(limiter + 1), manaPool);
             return true;
-        } else if (areaS.compare("avatar") == 0) {
+        } else if (areaS == "avatar") {
             mAvatarName = s.substr(limiter + 1);
             loadAvatar(mAvatarName, "bakaAvatar");
             return true;
-        } else if (areaS.compare("customphasering") == 0) {
+        } else if (areaS == "customphasering") {
             phaseRing = s.substr(limiter + 1);
             return true;
-        } else if (areaS.compare("premade") == 0) {
+        } else if (areaS == "premade") {
             premade = (atoi(s.substr(limiter + 1).c_str()) == 1);
             return true;
-        } else if (areaS.compare("deckfile") == 0) {
+        } else if (areaS == "deckfile") {
             deckFile = s.substr(limiter + 1);
             if (playMode == Player::MODE_AI) {
                 sscanf(deckFile.c_str(), "ai/baka/deck%i.txt", &deckId);
@@ -223,10 +223,10 @@ bool Player::parseLine(const string& s) {
                 deckName = mDeck->meta_name;
             }
             return true;
-        } else if (areaS.compare("deckfilesmall") == 0) {
+        } else if (areaS == "deckfilesmall") {
             deckFileSmall = s.substr(limiter + 1);
             return true;
-        } else if (areaS.compare("offerinterruptonphase") == 0) {
+        } else if (areaS == "offerinterruptonphase") {
             for (int i = 0; i < NB_MTG_PHASES; i++) {
                 string phaseStr = Constants::MTGPhaseCodeNames[i];
                 if (s.find(phaseStr) != string::npos) {

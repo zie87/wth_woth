@@ -32,10 +32,10 @@ StoryDialogElement::StoryDialogElement(float x, float y, int id) : JGuiObject(id
 StoryText::StoryText(string text, float _mX, float _mY, string _align, int _font, int id)
     : StoryDialogElement(_mX, _mY, id), text(text), font(_font) {
     align = JGETEXT_LEFT;
-    if (_align.compare("center") == 0) {
+    if (_align == "center") {
         align = JGETEXT_CENTER;
         if (mX == 0) mX = SCREEN_WIDTH / 2;
-    } else if (_align.compare("right") == 0) {
+    } else if (_align == "right") {
         align = JGETEXT_RIGHT;
         if (mX == 0) mX = SCREEN_WIDTH - 10;
     }
@@ -63,9 +63,9 @@ StoryReward::StoryReward(string _type, string _value, string text, float _mX, fl
                          int id)
     : StoryText(text, _mX, _mY, _align, _font, id) {
     type = STORY_REWARD_CREDITS;
-    if (_type.compare("unlockset") == 0) {
+    if (_type == "unlockset") {
         type = STORY_REWARD_SET;
-    } else if (_type.compare("card") == 0) {
+    } else if (_type == "card") {
         type = STORY_REWARD_CARD;
     }
     value = _value;
@@ -349,7 +349,7 @@ StoryDialog::StoryDialog(TiXmlElement* root, StoryFlow* mParent)
                 graphics.push_back(NEW StoryText(text, x, y, "center", Fonts::MENU_FONT));
             } else if (strcmp(element->Value(), "img") == 0) {
                 // special case to force center
-                if (sX.compare("") == 0) {
+                if (sX == "") {
                     x = -1;
                 }
                 string img = string("campaigns/").append(mParent->folder).append("/").append(text);
@@ -500,7 +500,7 @@ bool StoryFlow::parse(string path) {
     auto* pd = NEW PlayerData();
     auto it  = pd->storySaves.find(folder);
     if (it != pd->storySaves.end()) {
-        if (it->second.compare("End") != 0) loadPageId(it->second);
+        if (it->second != "End") loadPageId(it->second);
     }
     SAFE_DELETE(pd);
 

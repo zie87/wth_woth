@@ -459,7 +459,7 @@ void GameApp::DoAnimation(int trans, float dur) { DoTransition(trans, GAME_STATE
 void GameApp::playMusic(string filename, bool loop) {
     if (filename == "") filename = currentMusicFile;
 
-    if (filename.compare(currentMusicFile) == 0 && music) return;
+    if (filename == currentMusicFile && music) return;
 
     if (music) {
         JSoundSystem::GetInstance()->StopMusic(music);

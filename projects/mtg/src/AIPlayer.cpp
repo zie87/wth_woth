@@ -210,7 +210,7 @@ bool AIPlayer::parseLine(const string& s) {
     string areaS;
     if (limiter != string::npos) {
         areaS = s.substr(0, limiter);
-        if (areaS.compare("rvalues") == 0) {
+        if (areaS == "rvalues") {
             randomGenerator.loadRandValues(s.substr(limiter + 1));
             return true;
         }

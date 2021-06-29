@@ -259,13 +259,13 @@ bool Damageable::parseLine(const string& s) {
     string areaS;
     if (limiter != string::npos) {
         areaS = s.substr(0, limiter);
-        if (areaS.compare("life") == 0) {
+        if (areaS == "life") {
             life = atoi((s.substr(limiter + 1)).c_str());
-        } else if (areaS.compare("poisoncount") == 0) {
+        } else if (areaS == "poisoncount") {
             poisonCount = atoi((s.substr(limiter + 1)).c_str());
-        } else if (areaS.compare("damagecount") == 0) {
+        } else if (areaS == "damagecount") {
             damageCount = atoi((s.substr(limiter + 1)).c_str());
-        } else if (areaS.compare("preventable") == 0) {
+        } else if (areaS == "preventable") {
             preventable = atoi((s.substr(limiter + 1)).c_str());
         } else {
             return false;

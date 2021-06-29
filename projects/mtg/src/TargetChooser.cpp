@@ -111,21 +111,21 @@ TargetChooser* TargetChooserFactory::createTargetChooser(string s, MTGCardInstan
             }
             zones[nbzones] = MTGGameZone::MY_BATTLEFIELD;
 
-            if (zoneName.compare("*") == 0) {
+            if (zoneName == "*") {
                 zones[nbzones++] = MTGGameZone::ALL_ZONES;
-            } else if (zoneName.compare("graveyard") == 0) {
+            } else if (zoneName == "graveyard") {
                 zones[nbzones++] = MTGGameZone::MY_GRAVEYARD;
                 zones[nbzones++] = MTGGameZone::OPPONENT_GRAVEYARD;
-            } else if (zoneName.compare("battlefield") == 0 || zoneName.compare("inplay") == 0) {
+            } else if (zoneName == "battlefield" || zoneName == "inplay") {
                 zones[nbzones++] = MTGGameZone::MY_BATTLEFIELD;
                 zones[nbzones++] = MTGGameZone::OPPONENT_BATTLEFIELD;
-            } else if (zoneName.compare("hand") == 0) {
+            } else if (zoneName == "hand") {
                 zones[nbzones++] = MTGGameZone::MY_HAND;
                 zones[nbzones++] = MTGGameZone::OPPONENT_HAND;
-            } else if (zoneName.compare("library") == 0) {
+            } else if (zoneName == "library") {
                 zones[nbzones++] = MTGGameZone::MY_LIBRARY;
                 zones[nbzones++] = MTGGameZone::OPPONENT_LIBRARY;
-            } else if (zoneName.compare("nonbattlezone") == 0) {
+            } else if (zoneName == "nonbattlezone") {
                 zones[nbzones++] = MTGGameZone::MY_GRAVEYARD;
                 zones[nbzones++] = MTGGameZone::OPPONENT_GRAVEYARD;
                 zones[nbzones++] = MTGGameZone::MY_LIBRARY;
@@ -134,7 +134,7 @@ TargetChooser* TargetChooserFactory::createTargetChooser(string s, MTGCardInstan
                 zones[nbzones++] = MTGGameZone::OPPONENT_HAND;
                 zones[nbzones++] = MTGGameZone::MY_EXILE;
                 zones[nbzones++] = MTGGameZone::OPPONENT_EXILE;
-            } else if (zoneName.compare("stack") == 0) {
+            } else if (zoneName == "stack") {
                 zones[nbzones++] = MTGGameZone::MY_STACK;
                 zones[nbzones++] = MTGGameZone::OPPONENT_STACK;
             } else {
@@ -494,7 +494,7 @@ TargetChooser* TargetChooserFactory::createTargetChooser(string s, MTGCardInstan
         }
         if (cd) {
             if (!tc) {
-                if (typeName.compare("*") != 0) cd->setSubtype(typeName);
+                if (typeName != "*") cd->setSubtype(typeName);
 
                 tc = NEW DescriptorTargetChooser(observer, cd, zones, nbzones, card, maxtargets, other, targetMin);
             } else {
@@ -503,11 +503,11 @@ TargetChooser* TargetChooserFactory::createTargetChooser(string s, MTGCardInstan
             }
         } else {
             if (!tc) {
-                if (typeName.compare("*") == 0) {
+                if (typeName == "*") {
                     return NEW TargetZoneChooser(observer, zones, nbzones, card, maxtargets, other, targetMin);
-                } else if (typeName.compare("this") == 0) {
+                } else if (typeName == "this") {
                     return NEW CardTargetChooser(observer, card, card, zones, nbzones);
-                } else if (typeName.compare("mystored") == 0) {
+                } else if (typeName == "mystored") {
                     return NEW CardTargetChooser(observer, card->storedSourceCard, card, zones, nbzones);
                 } else {
                     tc = NEW TypeTargetChooser(observer, typeName.c_str(), zones, nbzones, card, maxtargets, other,

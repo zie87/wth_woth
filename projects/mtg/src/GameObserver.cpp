@@ -1221,10 +1221,10 @@ bool GameObserver::parseLine(const string& s) {
     string areaS;
     if (limiter != string::npos) {
         areaS = s.substr(0, limiter);
-        if (areaS.compare("player") == 0) {
+        if (areaS == "player") {
             currentPlayerId = atoi(s.substr(limiter + 1).c_str()) - 1;
             return true;
-        } else if (areaS.compare("phase") == 0) {
+        } else if (areaS == "phase") {
             currentGamePhase = PhaseRing::phaseStrToInt(s.substr(limiter + 1));
             return true;
         }
@@ -1263,17 +1263,17 @@ bool GameObserver::load(const string& ss, bool undo
         }
         switch (state) {
         case -1:
-            if (s.compare("[init]") == 0) state++;
+            if (s == "[init]") state++;
             break;
         case 0:
-            if (s.compare("[player1]") == 0) {
+            if (s == "[player1]") {
                 state++;
             } else {
                 parseLine(s);
             }
             break;
         case 1:
-            if (s.compare("[player2]") == 0) {
+            if (s == "[player2]") {
                 state++;
             } else {
                 if (players.size() == 0 || !players[0]) {
@@ -1290,7 +1290,7 @@ bool GameObserver::load(const string& ss, bool undo
             }
             break;
         case 2:
-            if (s.compare("[do]") == 0) {
+            if (s == "[do]") {
                 state++;
             } else {
                 if (players.size() == 1 || !players[1]) {
@@ -1307,7 +1307,7 @@ bool GameObserver::load(const string& ss, bool undo
             }
             break;
         case 3:
-            if (s.compare("[end]") == 0) {
+            if (s == "[end]") {
                 turn    = 0;
                 mLayers = NEW DuelLayers();
                 mLayers->init(this);

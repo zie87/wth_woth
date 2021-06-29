@@ -54,7 +54,7 @@ void Rules::unloadAllRules() {
 int Rules::getMTGId(string cardName) {
     int cardnb = atoi(cardName.c_str());
     if (cardnb) return cardnb;
-    if (cardName.compare("*") == 0) return -1;  // Any card
+    if (cardName == "*") return -1;  // Any card
     MTGCard* card = MTGCollection()->getCardByName(cardName);
     if (card) return card->getMTGId();
     WGE_LOG_ERROR("Can't find card \"{}\"", cardName);
@@ -95,7 +95,7 @@ void RulesState::parsePlayerState(int playerId, string s) {
     if (limiter != string::npos) {
         areaS = s.substr(0, limiter);
 
-        if (areaS.compare("auto") == 0) {
+        if (areaS == "auto") {
             playerData[playerId].extraRules.push_back(s.substr(limiter + 1));
             return;
         } else {
@@ -431,19 +431,19 @@ int Rules::load(string _filename) {
             hidden = false;  // To avoid transmitting the hidden param to children
             continue;
         }
-        if (s.compare("[init]") == 0) {
+        if (s == "[init]") {
             state = PARSE_INIT;
             continue;
         }
-        if (s.compare("[players]") == 0) {
+        if (s == "[players]") {
             state = PARSE_PLAYERS;
             continue;
         }
-        if (s.compare("[player1]") == 0) {
+        if (s == "[player1]") {
             state = PARSE_PLAYER1;
             continue;
         }
-        if (s.compare("[player2]") == 0) {
+        if (s == "[player2]") {
             state = PARSE_PLAYER2;
             continue;
         }
@@ -486,11 +486,11 @@ int Rules::load(string _filename) {
 }
 
 GameType Rules::strToGameMode(string s) {
-    if (s.compare("momir") == 0) return GAME_TYPE_MOMIR;
-    if (s.compare("random1") == 0) return GAME_TYPE_RANDOM1;
-    if (s.compare("random2") == 0) return GAME_TYPE_RANDOM2;
-    if (s.compare("story") == 0) return GAME_TYPE_STORY;
-    if (s.compare("stonehewer") == 0) return GAME_TYPE_STONEHEWER;
-    if (s.compare("hermit") == 0) return GAME_TYPE_HERMIT;
+    if (s == "momir") return GAME_TYPE_MOMIR;
+    if (s == "random1") return GAME_TYPE_RANDOM1;
+    if (s == "random2") return GAME_TYPE_RANDOM2;
+    if (s == "story") return GAME_TYPE_STORY;
+    if (s == "stonehewer") return GAME_TYPE_STONEHEWER;
+    if (s == "hermit") return GAME_TYPE_HERMIT;
     return GAME_TYPE_CLASSIC;
 }

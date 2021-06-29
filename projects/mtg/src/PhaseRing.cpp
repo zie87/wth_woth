@@ -8,22 +8,22 @@
 #include <wge/log.hpp>
 // Parses a string and gives phase numer
 GamePhase PhaseRing::phaseStrToInt(string s) {
-    if (s.compare("untap") == 0) return MTG_PHASE_UNTAP;
-    if (s.compare("upkeep") == 0) return MTG_PHASE_UPKEEP;
-    if (s.compare("draw") == 0) return MTG_PHASE_DRAW;
-    if (s.compare("firstmain") == 0) return MTG_PHASE_FIRSTMAIN;
-    if (s.compare("mainphase") == 0) return MTG_PHASE_FIRSTMAIN;
-    if (s.compare("combatbegin") == 0) return MTG_PHASE_COMBATBEGIN;
-    if (s.compare("combatbegins") == 0) return MTG_PHASE_COMBATBEGIN;
-    if (s.compare("combatattackers") == 0) return MTG_PHASE_COMBATATTACKERS;
-    if (s.compare("combatblockers") == 0) return MTG_PHASE_COMBATBLOCKERS;
-    if (s.compare("combatdamage") == 0) return MTG_PHASE_COMBATDAMAGE;
-    if (s.compare("combatend") == 0) return MTG_PHASE_COMBATEND;
-    if (s.compare("combatends") == 0) return MTG_PHASE_COMBATEND;
-    if (s.compare("secondmain") == 0) return MTG_PHASE_SECONDMAIN;
-    if (s.compare("endofturn") == 0) return MTG_PHASE_ENDOFTURN;
-    if (s.compare("end") == 0) return MTG_PHASE_ENDOFTURN;
-    if (s.compare("cleanup") == 0) return MTG_PHASE_CLEANUP;
+    if (s == "untap") return MTG_PHASE_UNTAP;
+    if (s == "upkeep") return MTG_PHASE_UPKEEP;
+    if (s == "draw") return MTG_PHASE_DRAW;
+    if (s == "firstmain") return MTG_PHASE_FIRSTMAIN;
+    if (s == "mainphase") return MTG_PHASE_FIRSTMAIN;
+    if (s == "combatbegin") return MTG_PHASE_COMBATBEGIN;
+    if (s == "combatbegins") return MTG_PHASE_COMBATBEGIN;
+    if (s == "combatattackers") return MTG_PHASE_COMBATATTACKERS;
+    if (s == "combatblockers") return MTG_PHASE_COMBATBLOCKERS;
+    if (s == "combatdamage") return MTG_PHASE_COMBATDAMAGE;
+    if (s == "combatend") return MTG_PHASE_COMBATEND;
+    if (s == "combatends") return MTG_PHASE_COMBATEND;
+    if (s == "secondmain") return MTG_PHASE_SECONDMAIN;
+    if (s == "endofturn") return MTG_PHASE_ENDOFTURN;
+    if (s == "end") return MTG_PHASE_ENDOFTURN;
+    if (s == "cleanup") return MTG_PHASE_CLEANUP;
     WGE_LOG_ERROR("Unknown Phase name: {}", s);
     return MTG_PHASE_INVALID;  // was returning first main...why would we return something that is not == s?
 }

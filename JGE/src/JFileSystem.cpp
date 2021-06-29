@@ -140,9 +140,8 @@ JFileSystem::JFileSystem(const std::string& _userPath, const std::string& _syste
     mSystemFSPath = systemPath;
 
     mUserFS = new zfs::filesystem(userPath.c_str());
-    mSystemFS = (mSystemFSPath.size() && (mSystemFSPath.compare(mUserFSPath) != 0))
-                    ? new zfs::filesystem(systemPath.c_str())
-                    : nullptr;
+    mSystemFS =
+        (mSystemFSPath.size() && (mSystemFSPath != mUserFSPath)) ? new zfs::filesystem(systemPath.c_str()) : nullptr;
 
     mZipAvailable = false;
     mZipCachedElementsCount = 0;

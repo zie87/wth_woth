@@ -126,7 +126,7 @@ void DeckMenu::RenderDeckManaColors() {
     float manaIconY = 55;
     if (mSelectedDeck && displayDeckMana) {
         string deckManaColors = mSelectedDeck->getColorIndex();
-        if (deckManaColors.compare("") != 0 && (deckManaColors.length() == 6)) {
+        if (deckManaColors != "" && (deckManaColors.length() == 6)) {
             // due to space constraints don't display icons for colorless mana.
             for (int colorIdx = Constants::MTG_COLOR_GREEN; colorIdx < Constants::MTG_COLOR_LAND; ++colorIdx) {
                 if ((deckManaColors.at(colorIdx) == '1') != 0) {
@@ -135,7 +135,7 @@ void DeckMenu::RenderDeckManaColors() {
                     manaIconX += 15;
                 }
             }
-        } else if (deckManaColors.compare("") != 0)
+        } else if (deckManaColors != "")
             WGE_LOG_ERROR("Error with color index string for \"{}\". [{}]", mSelectedDeck->getName(), deckManaColors);
     }
 }

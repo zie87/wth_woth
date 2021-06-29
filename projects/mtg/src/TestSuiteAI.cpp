@@ -42,7 +42,7 @@ MTGCardInstance* TestSuiteAI::getCard(string action) {
                 MTGCardInstance* card = zone->cards[k];
                 if (!card) return nullptr;
                 string name = card->getLCName();
-                if (name.compare(action) == 0) return card;
+                if (name == action) return card;
             }
         }
     }
@@ -97,7 +97,7 @@ int TestSuiteAI::Act(float dt) {
     WGE_LOG_TRACE("TESTSUITE command: {}", action);
 
     if (observer->mLayers->stackLayer()->askIfWishesToInterrupt == this) {
-        if (action.compare("no") != 0 && action.compare("yes") != 0) {
+        if (action != "no" && action != "yes") {
             observer->mLayers->stackLayer()->cancelInterruptOffer();
             suite->currentAction--;
             return 1;
@@ -112,18 +112,18 @@ int TestSuiteAI::Act(float dt) {
         return 1;
     }
 
-    if (action.compare("eot") == 0) {
+    if (action == "eot") {
         if (observer->getCurrentGamePhase() != MTG_PHASE_CLEANUP) suite->currentAction--;
         observer->userRequestNextGamePhase();
-    } else if (action.compare("human") == 0) {
+    } else if (action == "human") {
         WGE_LOG_TRACE("TESTSUITE You have control");
         playMode = MODE_HUMAN;
         return 1;
-    } else if (action.compare("ai") == 0) {
+    } else if (action == "ai") {
         WGE_LOG_TRACE("TESTSUITE Switching to AI");
         playMode = MODE_AI;
         return 1;
-    } else if (action.compare("next") == 0 || action.find("goto") != string::npos) {
+    } else if (action == "next" || action.find("goto") != string::npos) {
         if (action.find("goto ") != string::npos) {
             size_t found = action.find("goto ");
             string phase = action.substr(found + 5);
@@ -151,11 +151,11 @@ int TestSuiteAI::Act(float dt) {
             else
                 observer->userRequestNextGamePhase();
         }
-    } else if (action.compare("yes") == 0)
+    } else if (action == "yes")
         observer->mLayers->stackLayer()->setIsInterrupting(this);
-    else if (action.compare("endinterruption") == 0)
+    else if (action == "endinterruption")
         observer->mLayers->stackLayer()->endOfInterruption();
-    else if (action.compare("no") == 0) {
+    else if (action == "no") {
         if (observer->mLayers->stackLayer()->askIfWishesToInterrupt == this)
             observer->mLayers->stackLayer()->cancelInterruptOffer();
     } else if (action.find("choice ") != string::npos) {
@@ -501,11 +501,11 @@ bool TestSuiteGame::load() {
             if (!s.size()) continue;
             if (s[0] == '#') continue;
             std::transform(s.begin(), s.end(), s.begin(), ::tolower);
-            if (s.compare("summoningsickness") == 0) {
+            if (s == "summoningsickness") {
                 summoningSickness = 1;
                 continue;
             }
-            if (s.compare("forceability") == 0) {
+            if (s == "forceability") {
                 forceAbility = true;
                 continue;
             }
@@ -517,58 +517,58 @@ bool TestSuiteGame::load() {
                 aiMaxCalls = atoi(s.substr(8).c_str());
                 continue;
             }
-            if (s.compare("momir") == 0) {
+            if (s == "momir") {
                 gameType = GAME_TYPE_MOMIR;
                 continue;
             }
             switch (state) {
             case -1:
-                if (s.compare("[init]") == 0) state++;
+                if (s == "[init]") state++;
                 break;
             case 0:
-                if (s.compare("[player1]") == 0) {
+                if (s == "[player1]") {
                     state++;
                 } else {
                     initState.phase = PhaseRing::phaseStrToInt(s);
                 }
                 break;
             case 1:
-                if (s.compare("[player2]") == 0) {
+                if (s == "[player2]") {
                     state++;
                 } else {
                     initState.parsePlayerState(0, s);
                 }
                 break;
             case 2:
-                if (s.compare("[do]") == 0) {
+                if (s == "[do]") {
                     state++;
                 } else {
                     initState.parsePlayerState(1, s);
                 }
                 break;
             case 3:
-                if (s.compare("[assert]") == 0) {
+                if (s == "[assert]") {
                     state++;
                 } else {
                     actions.add(s);
                 }
                 break;
             case 4:
-                if (s.compare("[player1]") == 0) {
+                if (s == "[player1]") {
                     state++;
                 } else {
                     endState.phase = PhaseRing::phaseStrToInt(s);
                 }
                 break;
             case 5:
-                if (s.compare("[player2]") == 0) {
+                if (s == "[player2]") {
                     state++;
                 } else {
                     endState.parsePlayerState(0, s);
                 }
                 break;
             case 6:
-                if (s.compare("[end]") == 0) {
+                if (s == "[end]") {
                     state++;
                 } else {
                     endState.parsePlayerState(1, s);

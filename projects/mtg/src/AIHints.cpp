@@ -53,7 +53,7 @@ AIHint* AIHints::getByCondition(string condition) {
     if (!condition.size()) return nullptr;
 
     for (size_t i = 0; i < hints.size(); ++i) {
-        if (hints[i]->mCondition.compare(condition) == 0) return hints[i];
+        if (hints[i]->mCondition == condition) return hints[i];
     }
     return nullptr;
 }
@@ -102,7 +102,7 @@ bool AIHints::abilityMatches(MTGAbility* ability, AIHint* hint) {
 
         string counterstring = counterAbility->name;
         std::transform(counterstring.begin(), counterstring.end(), counterstring.begin(), ::tolower);
-        return (splitCounter[1].compare(counterstring) == 0);
+        return (splitCounter[1] == counterstring);
     }
 
     if (auto* tokenAbility = dynamic_cast<ATokenCreator*>(a)) {

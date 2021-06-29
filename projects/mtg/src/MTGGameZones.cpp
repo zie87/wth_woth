@@ -921,7 +921,7 @@ int MTGGameZone::zoneStringToId(string zoneName) {
     int max = sizeof(values) / sizeof *(values);
 
     for (int i = 0; i < max; ++i) {
-        if (zoneName.compare(strings[i]) == 0) {
+        if (zoneName == strings[i]) {
             return values[i];
         }
     }
@@ -1031,16 +1031,16 @@ bool MTGPlayerCards::parseLine(const string& s) const {
     string areaS;
     if (limiter != string::npos) {
         areaS = s.substr(0, limiter);
-        if (areaS.compare("graveyard") == 0) {
+        if (areaS == "graveyard") {
             graveyard->parseLine(s.substr(limiter + 1));
             return true;
-        } else if (areaS.compare("library") == 0) {
+        } else if (areaS == "library") {
             library->parseLine(s.substr(limiter + 1));
             return true;
-        } else if (areaS.compare("hand") == 0) {
+        } else if (areaS == "hand") {
             hand->parseLine(s.substr(limiter + 1));
             return true;
-        } else if (areaS.compare("inplay") == 0 || areaS.compare("battlefield") == 0) {
+        } else if (areaS == "inplay" || areaS == "battlefield") {
             battlefield->parseLine(s.substr(limiter + 1));
             return true;
         }

@@ -1,7 +1,7 @@
 ---
-Checks:          '-*'
-WarningsAsErrors: ''
-HeaderFilterRegex: ''
-FormatStyle:     none
+Checks:             '-*'
+WarningsAsErrors:   ''
+HeaderFilterRegex:  '^((?!/build/|/extern/)).)*$'
+FormatStyle:        file
 
 

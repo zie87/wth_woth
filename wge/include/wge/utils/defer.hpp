@@ -1,5 +1,5 @@
-#ifndef WOTH_WGE_UTILS_UTILITY_HPP
-#define WOTH_WGE_UTILS_UTILITY_HPP
+#ifndef WOTH_WGE_UTILS_DEFER_HPP
+#define WOTH_WGE_UTILS_DEFER_HPP
 
 #include <type_traits>
 #include <utility>
@@ -51,6 +51,7 @@ struct deferrer {
 
 #define WGE_TOKEN_PASTE(x, y) x##y
 #define WGE_TOKEN_PASTE2(x, y) WGE_TOKEN_PASTE(x, y)
-#define wge_defer [[maybe_unused]] auto WGE_TOKEN_PASTE2(__deferred_lambda_call, __COUNTER__) = wge::detail::deferrer{} << [&]
+#define wge_defer \
+    [[maybe_unused]] auto WGE_TOKEN_PASTE2(__deferred_lambda_call, __COUNTER__) = wge::detail::deferrer{} << [&]
 
-#endif  // WOTH_WGE_UTILS_UTILITY_HPP
+#endif  // WOTH_WGE_UTILS_DEFER_HPP

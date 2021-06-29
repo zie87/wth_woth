@@ -3,7 +3,7 @@
 #include <wge/types.hpp>
 #include <wge/memory.hpp>
 #include <wge/math.hpp>
-#include <wge/utils/utility.hpp>
+#include <wge/utils/defer.hpp>
 #include <wge/utils/warnings.hpp>
 #include <wge/video/utils.hpp>
 

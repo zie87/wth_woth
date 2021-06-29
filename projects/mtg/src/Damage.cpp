@@ -35,7 +35,7 @@ int Damage::resolve() {
     // Replacement Effects
     e = observer->replacementEffects->replace(e);
     if (!e) return 0;
-    WEventDamage* ev = dynamic_cast<WEventDamage*>(e);
+    auto* ev = dynamic_cast<WEventDamage*>(e);
     if (!ev) {
         observer->receiveEvent(e);
         return 0;
@@ -69,7 +69,7 @@ int Damage::resolve() {
 
     //-------------------------------------------------
     if (target->type_as_damageable == DAMAGEABLE_MTGCARDINSTANCE) {
-        MTGCardInstance* _target = (MTGCardInstance*)target;
+        auto* _target = (MTGCardInstance*)target;
         if ((_target)->protectedAgainst(source)) damage = 0;
         // rulings = 10/4/2004	The damage prevention ability works even if it has no counters, as long as some effect
         // keeps its toughness above zero. these creature are essentially immune to damage. however 0/-1 effects applied
@@ -113,7 +113,7 @@ int Damage::resolve() {
     if (target->type_as_damageable == DAMAGEABLE_MTGCARDINSTANCE &&
         (source->has(Constants::WITHER) || source->has(Constants::INFECT))) {
         // Damage for WITHER or poison on creatures. This should probably go in replacement effects
-        MTGCardInstance* _target = (MTGCardInstance*)target;
+        auto* _target = (MTGCardInstance*)target;
         for (int i = 0; i < damage; i++) {
             _target->counters->addCounter(-1, -1);
         }
@@ -122,7 +122,7 @@ int Damage::resolve() {
     } else if (target->type_as_damageable == DAMAGEABLE_PLAYER &&
                (source->has(Constants::INFECT) || source->has(Constants::POISONDAMAGER))) {
         // Poison on player
-        Player* _target = (Player*)target;
+        auto* _target = (Player*)target;
         if (!_target->inPlay()->hasAbility(Constants::POISONSHROUD))
             _target->poisonCount += damage;  // this will be changed to poison counters.
         _target->damageCount += damage;
@@ -130,7 +130,7 @@ int Damage::resolve() {
                (source->has(Constants::POISONTOXIC) || source->has(Constants::POISONTWOTOXIC) ||
                 source->has(Constants::POISONTHREETOXIC))) {
         // Damage + 1, 2, or 3 poison counters on player
-        Player* _target = (Player*)target;
+        auto* _target = (Player*)target;
         a = target->dealDamage(damage);
         target->damageCount += damage;
         if (!_target->inPlay()->hasAbility(Constants::POISONSHROUD)) {
@@ -210,7 +210,7 @@ DamageStack::DamageStack(GameObserver* observer) : GuiLayer(observer), Interrupt
  */
 int DamageStack::resolve() {
     for (int i = (int)(mObjects.size()) - 1; i >= 0; i--) {
-        Damage* damage = (Damage*)mObjects[i];
+        auto* damage = (Damage*)mObjects[i];
         if (damage->state == NOT_RESOLVED) damage->resolve();
     }
     ((Interruptible*)this)->getObserver()->receiveEvent(NEW WEventDamageStackResolved());
@@ -218,11 +218,11 @@ int DamageStack::resolve() {
 }
 
 int DamageStack::receiveEvent(WEvent* e) {
-    WEventDamageStackResolved* event = dynamic_cast<WEventDamageStackResolved*>(e);
+    auto* event = dynamic_cast<WEventDamageStackResolved*>(e);
     if (!event) return 0;
 
     for (int i = (int)(mObjects.size()) - 1; i >= 0; i--) {
-        Damage* damage = (Damage*)mObjects[i];
+        auto* damage = (Damage*)mObjects[i];
         if (damage->state == RESOLVED_OK) damage->target->afterDamage();
     }
     return 1;
@@ -231,7 +231,7 @@ int DamageStack::receiveEvent(WEvent* e) {
 void DamageStack::Render() {
     float currenty = y;
     for (size_t i = 0; i < mObjects.size(); i++) {
-        Damage* damage = (Damage*)mObjects[i];
+        auto* damage = (Damage*)mObjects[i];
         if (damage->state == NOT_RESOLVED) {
             damage->x = x;
             damage->y = currenty;
@@ -259,13 +259,13 @@ bool Damageable::parseLine(const string& s) {
     string areaS;
     if (limiter != string::npos) {
         areaS = s.substr(0, limiter);
-        if (areaS.compare("life") == 0) {
+        if (areaS == "life") {
             life = atoi((s.substr(limiter + 1)).c_str());
-        } else if (areaS.compare("poisoncount") == 0) {
+        } else if (areaS == "poisoncount") {
             poisonCount = atoi((s.substr(limiter + 1)).c_str());
-        } else if (areaS.compare("damagecount") == 0) {
+        } else if (areaS == "damagecount") {
             damageCount = atoi((s.substr(limiter + 1)).c_str());
-        } else if (areaS.compare("preventable") == 0) {
+        } else if (areaS == "preventable") {
             preventable = atoi((s.substr(limiter + 1)).c_str());
         } else {
             return false;

@@ -50,17 +50,17 @@ AIHints::~AIHints() {
 }
 
 AIHint* AIHints::getByCondition(string condition) {
-    if (!condition.size()) return NULL;
+    if (!condition.size()) return nullptr;
 
     for (size_t i = 0; i < hints.size(); ++i) {
-        if (hints[i]->mCondition.compare(condition) == 0) return hints[i];
+        if (hints[i]->mCondition == condition) return hints[i];
     }
-    return NULL;
+    return nullptr;
 }
 
 bool AIHints::HintSaysDontAttack(GameObserver* observer, MTGCardInstance* card) {
     TargetChooserFactory tfc(observer);
-    TargetChooser* hintTc = NULL;
+    TargetChooser* hintTc = nullptr;
     for (unsigned int i = 0; i < hints.size(); i++) {
         if (hints[i]->mCombatAttackTip.size()) {
             hintTc = tfc.createTargetChooser(hints[i]->mCombatAttackTip, card);
@@ -96,16 +96,16 @@ bool AIHints::abilityMatches(MTGAbility* ability, AIHint* hint) {
     // This is the poor man's version, based on the fact that most cards are the source of their own abilities
     if (hint->mSourceId && ((!a->source) || a->source->getMTGId() != hint->mSourceId)) return false;
 
-    if (AACounter* counterAbility = dynamic_cast<AACounter*>(a)) {
+    if (auto* counterAbility = dynamic_cast<AACounter*>(a)) {
         vector<string> splitCounter = parseBetween(s, "counter(", ")");
         if (!splitCounter.size()) return false;
 
         string counterstring = counterAbility->name;
         std::transform(counterstring.begin(), counterstring.end(), counterstring.begin(), ::tolower);
-        return (splitCounter[1].compare(counterstring) == 0);
+        return (splitCounter[1] == counterstring);
     }
 
-    if (ATokenCreator* tokenAbility = dynamic_cast<ATokenCreator*>(a)) {
+    if (auto* tokenAbility = dynamic_cast<ATokenCreator*>(a)) {
         vector<string> splitToken = parseBetween(s, "token(", ")");
         if (!splitToken.size()) return false;
         return (tokenAbility->tokenId && tokenAbility->tokenId == atoi(splitToken[1].c_str()));
@@ -209,19 +209,19 @@ string AIHints::constraintsNotFulfilled(AIAction* action, AIHint* hint, ManaCost
 AIAction* AIHints::findAbilityRecursive(AIHint* hint, ManaCost* potentialMana) {
     RankingContainer ranking = findActions(hint);
 
-    AIAction* a = NULL;
+    AIAction* a = nullptr;
     if (ranking.size()) {
         a = NEW AIAction(ranking.begin()->first);
     }
 
     string s = constraintsNotFulfilled(a, hint, potentialMana);
-    if (hint->mCombatAttackTip.size() || hint->castOrder.size()) return NULL;
+    if (hint->mCombatAttackTip.size() || hint->castOrder.size()) return nullptr;
     if (s.size()) {
         SAFE_DELETE(a);
         AIHint* nextHint = getByCondition(s);
         WGE_LOG_DEBUG("I Need {}, this can be provided by {}", s, (nextHint ? nextHint->mAction : "NULL"));
         if (nextHint && nextHint != hint) return findAbilityRecursive(nextHint, potentialMana);
-        return NULL;
+        return nullptr;
     }
 
     return a;
@@ -239,5 +239,5 @@ AIAction* AIHints::suggestAbility(ManaCost* potentialMana) {
             return a;
         }
     }
-    return NULL;
+    return nullptr;
 }

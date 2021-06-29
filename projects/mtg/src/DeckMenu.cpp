@@ -31,7 +31,7 @@ const int kDetailedInfoButtonId = 10000;
 const PIXEL_TYPE kRedColor = ARGB(0xFF, 0xFF, 0x00, 0x00);
 }  // namespace
 
-hgeParticleSystem* DeckMenu::stars = NULL;
+hgeParticleSystem* DeckMenu::stars = nullptr;
 
 //
 //  For the additional info window, maximum characters per line is roughly 30 characters across.
@@ -43,7 +43,7 @@ DeckMenu::DeckMenu(int id, JGuiListener* listener, int fontId, const string _tit
     : JGuiController(JGE::GetInstance(), id, listener), fontId(fontId), mShowDetailsScreen(showDetailsOverride) {
     backgroundName = "DeckMenuBackdrop";
     mAlwaysShowDetailsButton = false;
-    mSelectedDeck = NULL;
+    mSelectedDeck            = nullptr;
     mY = 50;
     mWidth = 176;
     mX = 115;
@@ -97,7 +97,7 @@ DeckMenu::DeckMenu(int id, JGuiListener* listener, int fontId, const string _tit
 
     mSelectionTargetY = selectionY = kVerticalMargin;
 
-    if (NULL == stars)
+    if (nullptr == stars)
         stars = NEW hgeParticleSystem(WResourceManager::Instance()->RetrievePSI(
             "stars.psi", WResourceManager::Instance()->GetQuad("stars").get()));
     stars->FireAt(mX, mY);
@@ -126,7 +126,7 @@ void DeckMenu::RenderDeckManaColors() {
     float manaIconY = 55;
     if (mSelectedDeck && displayDeckMana) {
         string deckManaColors = mSelectedDeck->getColorIndex();
-        if (deckManaColors.compare("") != 0 && (deckManaColors.length() == 6)) {
+        if (deckManaColors != "" && (deckManaColors.length() == 6)) {
             // due to space constraints don't display icons for colorless mana.
             for (int colorIdx = Constants::MTG_COLOR_GREEN; colorIdx < Constants::MTG_COLOR_LAND; ++colorIdx) {
                 if ((deckManaColors.at(colorIdx) == '1') != 0) {
@@ -135,7 +135,7 @@ void DeckMenu::RenderDeckManaColors() {
                     manaIconX += 15;
                 }
             }
-        } else if (deckManaColors.compare("") != 0)
+        } else if (deckManaColors != "")
             WGE_LOG_ERROR("Error with color index string for \"{}\". [{}]", mSelectedDeck->getName(), deckManaColors);
     }
 }
@@ -161,7 +161,7 @@ void DeckMenu::RenderBackground() {
 DeckMetaData* DeckMenu::getSelectedDeck() {
     if (mSelectedDeck) return mSelectedDeck;
 
-    return NULL;
+    return nullptr;
 }
 
 void DeckMenu::enableDisplayDetailsOverride() { mAlwaysShowDetailsButton = true; }
@@ -180,7 +180,7 @@ void DeckMenu::initMenuItems() {
     float sY = mY + kVerticalMargin;
     for (int i = startId; i < mCount; ++i) {
         float y = mY + kVerticalMargin + i * kLineHeight;
-        DeckMenuItem* currentMenuItem = static_cast<DeckMenuItem*>(mObjects[i]);
+        auto* currentMenuItem = static_cast<DeckMenuItem*>(mObjects[i]);
         currentMenuItem->Relocate(mX, y);
         if (currentMenuItem->hasFocus()) sY = y;
     }
@@ -228,7 +228,7 @@ void DeckMenu::Render() {
 
     for (int i = startId; i < startId + maxItems; i++) {
         if (i > mCount - 1) break;
-        DeckMenuItem* currentMenuItem = static_cast<DeckMenuItem*>(mObjects[i]);
+        auto* currentMenuItem = static_cast<DeckMenuItem*>(mObjects[i]);
         if (currentMenuItem->getY() - kLineHeight * startId < mY + height - kLineHeight + 7) {
             // only load stats for visible items in the list
             DeckMetaData* metaData = currentMenuItem->getMetaData();
@@ -257,7 +257,7 @@ void DeckMenu::Render() {
                             JQuad* evil = quad.get();
                             evil->SetHFlip(true);
                             renderer->RenderQuad(quad.get(), avatarX, avatarY);
-                            evil = NULL;
+                            evil = nullptr;
                         } else
                             renderer->RenderQuad(quad.get(), avatarX, avatarY);
                     }
@@ -330,11 +330,11 @@ void DeckMenu::Update(float dt) {
 }
 
 void DeckMenu::Add(int id, const char* text, string desc, bool forceFocus, DeckMetaData* deckMetaData) {
-    DeckMenuItem* menuItem = NEW DeckMenuItem(this, id, fontId, text, 0, mY + kVerticalMargin + mCount * kLineHeight,
-                                              (mCount == 0), mAutoTranslate, deckMetaData);
+    auto* menuItem         = NEW DeckMenuItem(this, id, fontId, text, 0, mY + kVerticalMargin + mCount * kLineHeight,
+                                      (mCount == 0), mAutoTranslate, deckMetaData);
     Translator* t = Translator::GetInstance();
-    map<string, string>::iterator it = t->deckValues.find(text);
-    string deckDescription = "";
+    auto it                = t->deckValues.find(text);
+    string deckDescription;
 
     if (it != t->deckValues.end())  // translate decks desc
         deckDescription = it->second;
@@ -353,12 +353,12 @@ void DeckMenu::Add(int id, const char* text, string desc, bool forceFocus, DeckM
     }
 }
 
-void DeckMenu::updateScroller() {
+void DeckMenu::updateScroller() const {
     // add all the items from the Tasks db.
     TaskList taskList;
     mScroller->Reset();
 
-    for (vector<Task*>::iterator it = taskList.tasks.begin(); it != taskList.tasks.end(); it++) {
+    for (auto it = taskList.tasks.begin(); it != taskList.tasks.end(); it++) {
         std::ostringstream taskDescription;
         taskDescription << "Credits: " << std::setw(4) << (*it)->getReward() << " / "
                         << "Days Left: " << (*it)->getExpiration() << std::endl
@@ -378,5 +378,5 @@ void DeckMenu::destroy() { SAFE_DELETE(DeckMenu::stars); }
 DeckMenu::~DeckMenu() {
     WResourceManager::Instance()->Release(pspIconsTexture);
     SAFE_DELETE(mScroller);
-    dismissButton = NULL;
+    dismissButton = nullptr;
 }

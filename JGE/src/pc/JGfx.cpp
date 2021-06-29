@@ -273,13 +273,13 @@ static glslFunctions g_glslfuncts;
 
 JQuad::JQuad(JTexture* tex, float x, float y, float width, float height)
     : mTex(tex), mX(x), mY(y), mWidth(width), mHeight(height) {
-    JASSERT(tex != NULL);
+    JASSERT(tex != nullptr);
     JRenderer::GetInstance()->TransferTextureToGLContext(*tex);
 
     mHotSpotX = 0.0f;
     mHotSpotY = 0.0f;
     // mBlend = BLEND_DEFAULT;
-    for (int i = 0; i < 4; i++) mColor[i].color = 0xFFFFFFFF;
+    for (auto& i : mColor) i.color = 0xFFFFFFFF;
 
     mHFlipped = false;
     mVFlipped = false;
@@ -299,7 +299,7 @@ void JQuad::SetTextureRect(float x, float y, float w, float h) {
     mTY1 = (y + h) / mTex->mTexHeight;
 }
 
-void JQuad::GetTextureRect(float* x, float* y, float* w, float* h) {
+void JQuad::GetTextureRect(float* x, float* y, float* w, float* h) const {
     *x = mX;
     *y = mY;
     *w = mWidth;
@@ -307,7 +307,7 @@ void JQuad::GetTextureRect(float* x, float* y, float* w, float* h) {
 }
 
 void JQuad::SetColor(PIXEL_TYPE color) {
-    for (int i = 0; i < 4; i++) mColor[i].color = color;
+    for (auto& i : mColor) i.color = color;
 }
 
 void JQuad::SetHotSpot(float x, float y) {
@@ -317,7 +317,7 @@ void JQuad::SetHotSpot(float x, float y) {
 
 //////////////////////////////////////////////////////////////////////////
 
-JTexture::JTexture() : mBuffer(NULL) { mTexId = -1; }
+JTexture::JTexture() : mBuffer(nullptr) { mTexId = -1; }
 
 JTexture::~JTexture() {
     checkGlError();
@@ -326,7 +326,7 @@ JTexture::~JTexture() {
 
     if (mBuffer) {
         delete[] mBuffer;
-        mBuffer = NULL;
+        mBuffer = nullptr;
     }
 }
 
@@ -339,16 +339,16 @@ void JTexture::UpdateBits(int x, int y, int width, int height, PIXEL_TYPE* bits)
 
 //////////////////////////////////////////////////////////////////////////
 
-JRenderer* JRenderer::mInstance = NULL;
+JRenderer* JRenderer::mInstance = nullptr;
 bool JRenderer::m3DEnabled      = false;
 
 void JRenderer::Set3DFlag(bool flag) { m3DEnabled = flag; }
 
 JRenderer* JRenderer::GetInstance() {
-    if (mInstance == NULL) {
+    if (mInstance == nullptr) {
         mInstance = new JRenderer();
 
-        JASSERT(mInstance != NULL);
+        JASSERT(mInstance != nullptr);
 
         mInstance->InitRenderer();
     }
@@ -360,7 +360,7 @@ void JRenderer::Destroy() {
     if (mInstance) {
         mInstance->DestroyRenderer();
         delete mInstance;
-        mInstance = NULL;
+        mInstance = nullptr;
     }
 }
 
@@ -536,7 +536,7 @@ GLuint esLoadShader(GLenum type, const char* shaderSrc) {
     if (shader == 0) return 0;
 
     // Load the shader source
-    glShaderSource(shader, 1, &shaderSrc, NULL);
+    glShaderSource(shader, 1, &shaderSrc, nullptr);
 
     // Compile the shader
     glCompileShader(shader);
@@ -552,7 +552,7 @@ GLuint esLoadShader(GLenum type, const char* shaderSrc) {
         if (infoLen > 1) {
             char* infoLog = (char*)malloc(sizeof(char) * infoLen);
 
-            glGetShaderInfoLog(shader, infoLen, NULL, infoLog);
+            glGetShaderInfoLog(shader, infoLen, nullptr, infoLog);
             printf("Error compiling shader:\n%s\n", infoLog);
 
             free(infoLog);
@@ -612,7 +612,7 @@ GLuint esLoadProgram(const char* vertShaderSrc, const char* fragShaderSrc) {
         if (infoLen > 1) {
             char* infoLog = (char*)malloc(sizeof(char) * infoLen);
 
-            glGetProgramInfoLog(programObject, infoLen, NULL, infoLog);
+            glGetProgramInfoLog(programObject, infoLen, nullptr, infoLog);
             printf("Error linking program:\n%s\n", infoLog);
 
             free(infoLog);
@@ -636,7 +636,7 @@ GLuint esLoadProgram(const char* vertShaderSrc, const char* fragShaderSrc) {
 void JRenderer::InitRenderer() {
     checkGlError();
     mCurrentTextureFilter = TEX_FILTER_NONE;
-    mImageFilter          = NULL;
+    mImageFilter          = nullptr;
 
     mCurrTexBlendSrc  = BLEND_SRC_ALPHA;
     mCurrTexBlendDest = BLEND_ONE_MINUS_SRC_ALPHA;
@@ -729,7 +729,7 @@ void JRenderer::InitRenderer() {
     checkGlError();
 }
 
-void JRenderer::DestroyRenderer() {
+void JRenderer::DestroyRenderer() const {
     checkGlError();
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
     // Delete program object
@@ -1522,7 +1522,7 @@ JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureForm
 #endif
 
 void JRenderer::TransferTextureToGLContext(JTexture& inTexture) {
-    if (inTexture.mBuffer != NULL) {
+    if (inTexture.mBuffer != nullptr) {
         GLuint texid;
         checkGlError();
         glGenTextures(1, &texid);
@@ -1569,7 +1569,7 @@ void JRenderer::TransferTextureToGLContext(JTexture& inTexture) {
             }
         }
         delete[] inTexture.mBuffer;
-        inTexture.mBuffer = NULL;
+        inTexture.mBuffer = nullptr;
 
         checkGlError();
     }
@@ -1577,7 +1577,7 @@ void JRenderer::TransferTextureToGLContext(JTexture& inTexture) {
 
 JTexture* JRenderer::CreateTexture(int width, int height, int mode __attribute__((unused))) {
     checkGlError();
-    JTexture* tex = new JTexture();
+    auto* tex = new JTexture();
 
     if (tex) {
         int size     = width * height * sizeof(PIXEL_TYPE);  // RGBA
@@ -1608,7 +1608,7 @@ JTexture* JRenderer::CreateTexture(int width, int height, int mode __attribute__
 
         } else {
             delete tex;
-            tex = NULL;
+            tex = nullptr;
         }
     }
 
@@ -1754,7 +1754,7 @@ void JRenderer::RenderTriangles(JTexture* texture, Vertex3D* vertices, int start
 
     int index = start * 3;
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
-    GLubyte* colorCoords = new GLubyte[count * 3 * 4];
+    auto* colorCoords = new GLubyte[count * 3 * 4];
     memset(colorCoords, 255, count * 3 * 4);
 
     // Use the program object
@@ -1839,8 +1839,8 @@ void JRenderer::FillPolygon(float* x, float* y, int count, PIXEL_TYPE color) {
     int i;
 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
-    GLubyte* colors    = new GLubyte[count * 4];
-    GLfloat* vVertices = new GLfloat[count * 3];
+    auto* colors    = new GLubyte[count * 4];
+    auto* vVertices = new GLfloat[count * 3];
 
     for (i = 0; i < count; i++) {
         colors[4 * i + 0] = col.r;
@@ -1932,8 +1932,8 @@ void JRenderer::DrawPolygon(float* x, float* y, int count, PIXEL_TYPE color) {
 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
     int number         = count + 1;
-    GLfloat* vVertices = new GLfloat[3 * number];
-    GLubyte* colors    = new GLubyte[4 * number];
+    auto* vVertices    = new GLfloat[3 * number];
+    auto* colors       = new GLubyte[4 * number];
 
     for (i = 0; i < number; i++) {
         colors[4 * i + 0] = col.r;
@@ -2036,7 +2036,7 @@ void JRenderer::DrawLine(float x1, float y1, float x2, float y2, float lineWidth
     float dx = x2 - x1;
     if (dy == 0 && dx == 0) return;
 
-    float l = (float)hypot(dx, dy);
+    auto l = (float)hypot(dx, dy);
 
     float x[4];
     float y[4];
@@ -2282,8 +2282,8 @@ void JRenderer::DrawPolygon(float x, float y, float size, int count, float start
     int i;
 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
-    GLfloat* vVertices = new GLfloat[3 * count];
-    GLubyte* colors    = new GLubyte[4 * count];
+    auto* vVertices = new GLfloat[3 * count];
+    auto* colors    = new GLubyte[4 * count];
 
     for (i = 0; i < count; i++) {
         colors[4 * i + 0] = col.r;
@@ -2386,8 +2386,8 @@ void JRenderer::FillPolygon(float x, float y, float size, int count, float start
     int i;
 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
-    GLfloat* vVertices = new GLfloat[3 * (count + 2)];
-    GLubyte* colors    = new GLubyte[4 * (count + 2)];
+    auto* vVertices = new GLfloat[3 * (count + 2)];
+    auto* colors    = new GLubyte[4 * (count + 2)];
 
     for (i = 0; i < count + 2; i++) {
         colors[4 * i + 0] = col.r;
@@ -2511,8 +2511,8 @@ void JRenderer::DrawRoundRect(float x, float y, float w, float h, float radius, 
 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
     int number         = 360;
-    GLfloat* vVertices = new GLfloat[3 * number];
-    GLubyte* colors    = new GLubyte[4 * number];
+    auto* vVertices    = new GLfloat[3 * number];
+    auto* colors       = new GLubyte[4 * number];
 
     for (i = 0; i < number; i++) {
         colors[4 * i + 0] = col.r;
@@ -2666,8 +2666,8 @@ void JRenderer::FillRoundRect(float x, float y, float w, float h, float radius, 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
     int i, offset;
     int number         = 2 + 360;
-    GLfloat* vVertices = new GLfloat[3 * number];
-    GLubyte* colors    = new GLubyte[4 * number];
+    auto* vVertices    = new GLfloat[3 * number];
+    auto* colors       = new GLubyte[4 * number];
 
     for (i = 0; i < number; i++) {
         colors[4 * i + 0] = col.r;

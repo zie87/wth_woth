@@ -30,10 +30,10 @@ wge::mutex sCacheMutex;
 wge::mutex sLoadFunctionMutex;
 }  // namespace
 
-WResourceManager* WResourceManager::sInstance = NULL;
+WResourceManager* WResourceManager::sInstance = nullptr;
 
 WResourceManager* WResourceManager::Instance() {
-    if (sInstance == NULL) {
+    if (sInstance == nullptr) {
         sInstance = NEW ResourceManagerImpl;
     }
 
@@ -100,7 +100,7 @@ void ResourceManagerImpl::DebugRender() {
 #endif
 }
 
-unsigned long ResourceManagerImpl::Size() {
+unsigned long ResourceManagerImpl::Size() const {
     unsigned long res = 0;
     res += textureWCache.totalSize;
     res += sampleWCache.totalSize;
@@ -108,7 +108,7 @@ unsigned long ResourceManagerImpl::Size() {
     return res;
 }
 
-unsigned long ResourceManagerImpl::SizeCached() {
+unsigned long ResourceManagerImpl::SizeCached() const {
     unsigned long res = 0;
     res += textureWCache.cacheSize;
     res += sampleWCache.cacheSize;
@@ -116,7 +116,7 @@ unsigned long ResourceManagerImpl::SizeCached() {
     return res;
 }
 
-unsigned long ResourceManagerImpl::SizeManaged() {
+unsigned long ResourceManagerImpl::SizeManaged() const {
     unsigned long res = 0;
     if (textureWCache.totalSize > textureWCache.cacheSize) res += textureWCache.totalSize - textureWCache.cacheSize;
 
@@ -138,7 +138,7 @@ unsigned int ResourceManagerImpl::Count() {
     return count;
 }
 
-unsigned int ResourceManagerImpl::CountCached() {
+unsigned int ResourceManagerImpl::CountCached() const {
     unsigned int count = 0;
     count += textureWCache.cacheItems;
     count += sampleWCache.cacheItems;
@@ -243,7 +243,7 @@ int ResourceManagerImpl::CreateQuad(const string& quadName, const string& textur
                                     float height) {
     if (!quadName.size() || !textureName.size()) return INVALID_ID;
 
-    if (GetQuad(quadName) != NULL) {
+    if (GetQuad(quadName) != nullptr) {
         assert(false);
         return ALREADY_EXISTS;
     }
@@ -273,7 +273,7 @@ int ResourceManagerImpl::CreateQuad(const string& quadName, const string& textur
 
 JQuadPtr ResourceManagerImpl::GetQuad(const string& quadName) {
     JQuadPtr result;
-    ManagedQuadMap::const_iterator found = mManagedQuads.find(quadName);
+    auto found = mManagedQuads.find(quadName);
     if (found != mManagedQuads.end()) {
         result = found->second.texture->GetQuad(quadName);
     }
@@ -285,7 +285,7 @@ JQuadPtr ResourceManagerImpl::GetQuad(int id) {
     JQuadPtr result;
     if (id < 0 || id >= (int)mManagedQuads.size()) return result;
 
-    IDLookupMap::const_iterator key = mIDLookupMap.find(id);
+    auto key = mIDLookupMap.find(id);
     if (key != mIDLookupMap.end()) {
         WCachedTexture* jtex = mManagedQuads[key->second].texture;
         if (jtex) {
@@ -428,7 +428,7 @@ JTexture* ResourceManagerImpl::RetrieveTexture(const string& filename, int style
     }
 #endif
 
-    return NULL;
+    return nullptr;
 }
 
 int ResourceManagerImpl::CreateTexture(const string& textureName) {
@@ -446,9 +446,9 @@ JTexture* ResourceManagerImpl::GetTexture(const string& textureName) {
 
 JTexture* ResourceManagerImpl::GetTexture(int id) {
     map<int, WCachedTexture*>::iterator it;
-    JTexture* jtex = NULL;
+    JTexture* jtex = nullptr;
 
-    if (id == INVALID_ID) return NULL;
+    if (id == INVALID_ID) return nullptr;
 
     for (it = textureWCache.managed.begin(); it != textureWCache.managed.end(); it++) {
         if (it->second) {
@@ -462,7 +462,7 @@ JTexture* ResourceManagerImpl::GetTexture(int id) {
 
 hgeParticleSystemInfo* ResourceManagerImpl::RetrievePSI(const string& filename, JQuad* texture, int style,
                                                         int submode) {
-    if (!texture) return NULL;
+    if (!texture) return nullptr;
 
     WCachedParticles* res = psiWCache.Retrieve(0, filename, style, submode);
     lastError = psiWCache.mError;
@@ -474,11 +474,11 @@ hgeParticleSystemInfo* ResourceManagerImpl::RetrievePSI(const string& filename, 
         return i;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 JSample* ResourceManagerImpl::RetrieveSample(const string& filename, int style, int submode) {
-    WCachedSample* tc = NULL;
+    WCachedSample* tc = nullptr;
     tc = sampleWCache.Retrieve(0, filename, style, submode);
     lastError = sampleWCache.mError;
 
@@ -488,7 +488,7 @@ JSample* ResourceManagerImpl::RetrieveSample(const string& filename, int style, 
         return js;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 string ResourceManagerImpl::graphicsFile(const string& filename) {
@@ -724,7 +724,7 @@ bool ResourceManagerImpl::fileOK(const string& filename) { return JFileSystem::G
 void ResourceManagerImpl::InitFonts(const std::string& inLang) {
     unsigned int idOffset = 0;
 
-    if (inLang.compare("cn") == 0) {
+    if (inLang == "cn") {
         mFontFileExtension = kExtension_gbk;
         LoadWFont("simon", 12, Fonts::MAIN_FONT);
         LoadWFont("f3", 16, Fonts::MENU_FONT);
@@ -734,7 +734,7 @@ void ResourceManagerImpl::InitFonts(const std::string& inLang) {
         idOffset = Fonts::kSingleByteFontOffset;
     }
 
-    if (inLang.compare("jp") == 0) {
+    if (inLang == "jp") {
         mFontFileExtension = kExtension_font;
         LoadWFont("simon", 12, Fonts::MAIN_FONT);
         LoadWFont("f3", 16, Fonts::MENU_FONT);
@@ -784,8 +784,8 @@ WFont* ResourceManagerImpl::LoadWFont(const string& inFontname, int inFontHeight
 }
 
 WFont* ResourceManagerImpl::GetWFont(int id) {
-    WFont* font = NULL;
-    FontMap::iterator iter = mWFontMap.find(id);
+    WFont* font            = nullptr;
+    auto iter              = mWFontMap.find(id);
     if (iter != mWFontMap.end()) {
         font = iter->second;
     }
@@ -793,7 +793,7 @@ WFont* ResourceManagerImpl::GetWFont(int id) {
 }
 
 void ResourceManagerImpl::RemoveWFonts() {
-    for (FontMap::iterator font = mWFontMap.begin(); font != mWFontMap.end(); ++font) {
+    for (auto font = mWFontMap.begin(); font != mWFontMap.end(); ++font) {
         delete font->second;
     }
     mWFontMap.clear();
@@ -822,7 +822,7 @@ void ResourceManagerImpl::ResetCacheLimits() {
 
 JMusic* ResourceManagerImpl::ssLoadMusic(const char* fileName) {
     string file = musicFile(fileName);
-    if (!file.size()) return NULL;
+    if (!file.size()) return nullptr;
     return JSoundSystem::GetInstance()->LoadMusic(file.c_str());
 }
 
@@ -846,9 +846,9 @@ void ResourceManagerImpl::Refresh() {
 // WCache
 template <class cacheItem, class cacheActual>
 bool WCache<cacheItem, cacheActual>::RemoveOldest() {
-    typename map<int, cacheItem*>::iterator oldest = cache.end();
+    auto oldest = cache.end();
 
-    for (typename map<int, cacheItem*>::iterator it = cache.begin(); it != cache.end(); ++it) {
+    for (auto it = cache.begin(); it != cache.end(); ++it) {
         if (it->second && !it->second->isLocked() &&
             (oldest == cache.end() || it->second->lastTime < oldest->second->lastTime))
             oldest = it;
@@ -894,10 +894,10 @@ void WCache<cacheItem, cacheActual>::Resize(unsigned long size, int items) {
 
 template <class cacheItem, class cacheActual>
 cacheItem* WCache<cacheItem, cacheActual>::AttemptNew(const string& filename, int submode) {
-    cacheItem* item = NEW cacheItem;
+    auto* item = NEW cacheItem;
     if (!item) {
         mError = CACHE_ERROR_BAD_ALLOC;
-        return NULL;
+        return nullptr;
     }
 
     mError = CACHE_ERROR_NONE;
@@ -907,12 +907,12 @@ cacheItem* WCache<cacheItem, cacheActual>::AttemptNew(const string& filename, in
         if (mError == CACHE_ERROR_404) {
             //WGE_LOG_ERROR("AttemptNew failed to load. Deleting cache item {0:#x}", fmt::ptr(item));
             SAFE_DELETE(item);
-            return NULL;
+            return nullptr;
         } else {
             //WGE_LOG_ERROR("failed to load (not a 404 error). Deleting cache item {0:#x}", fmt::ptr(item));
             SAFE_DELETE(item);
             mError = CACHE_ERROR_BAD;
-            return NULL;
+            return nullptr;
         }
     }
 
@@ -931,7 +931,7 @@ cacheItem* WCache<cacheItem, cacheActual>::Retrieve(int id, const string& filena
     // Retrieve resource only works on permanent items.
     if (style == RETRIEVE_RESOURCE && tc && !tc->isPermanent()) {
         mError = CACHE_ERROR_NOT_MANAGED;
-        return NULL;
+        return nullptr;
     }
 
     // Perform lock or unlock on entry.
@@ -969,9 +969,9 @@ cacheItem* WCache<cacheItem, cacheActual>::Retrieve(int id, const string& filena
 
     // Record managed failure. Cache failure is recorded in Get().
     if ((style == RETRIEVE_MANAGE || style == RETRIEVE_RESOURCE) && mError == CACHE_ERROR_404)
-        managed[makeID(id, filename, submode)] = NULL;
+        managed[makeID(id, filename, submode)] = nullptr;
 
-    return NULL;
+    return nullptr;
 }
 
 template <class cacheItem, class cacheActual>
@@ -1021,7 +1021,7 @@ cacheItem* WCache<cacheItem, cacheActual>::Get(int id, const string& filename, i
 
     // not hit in the cache, respect the RETRIEVE_EXISTING flag if present
     if (style == RETRIEVE_EXISTING) {
-        return NULL;
+        return nullptr;
     }
 
     // no hit in cache, clear space before attempting to load a new one
@@ -1074,9 +1074,9 @@ cacheItem* WCache<cacheItem, cacheActual>::LoadIntoCache(int id, const string& f
         }
     }
 
-    if (item == NULL) {
+    if (item == nullptr) {
         WGE_LOG_ERROR("Can't locate {}", filename);
-        return NULL;  // Failure
+        return nullptr;  // Failure
     }
 
     // Succeeded in making a new item.
@@ -1168,14 +1168,14 @@ unsigned int WCache<cacheItem, cacheActual>::Flatten() {
 
     if (!cache.size()) return 0;
 
-    for (typename map<int, cacheItem*>::iterator it = cache.begin(); it != cache.end(); ++it) {
+    for (auto it = cache.begin(); it != cache.end(); ++it) {
         if (!it->second) continue;
         items.push_back(it->second);
     }
 
     sort(items.begin(), items.end(), WCacheSort());
 
-    for (typename vector<cacheItem*>::iterator it = items.begin(); it != items.end(); ++it) {
+    for (auto it = items.begin(); it != items.end(); ++it) {
         assert((*it) && (*it)->lastTime > lastSet);
         lastSet = (*it)->lastTime;
         (*it)->lastTime = ++oldest;
@@ -1204,7 +1204,7 @@ template <class cacheItem, class cacheActual>
 bool WCache<cacheItem, cacheActual>::RemoveItem(cacheItem* item, bool force) {
     typename map<int, cacheItem*>::iterator it;
 
-    if (item == NULL) return false;  // Use RemoveMiss to remove cache misses, not this.
+    if (item == nullptr) return false;  // Use RemoveMiss to remove cache misses, not this.
 
     for (it = cache.begin(); it != cache.end(); it++) {
         if (it->second == item) break;
@@ -1220,9 +1220,9 @@ bool WCache<cacheItem, cacheActual>::RemoveItem(cacheItem* item, bool force) {
 
 template <class cacheItem, class cacheActual>
 bool WCache<cacheItem, cacheActual>::UnlinkCache(cacheItem* item) {
-    typename map<int, cacheItem*>::iterator it = cache.end();
+    auto it = cache.end();
 
-    if (item == NULL) return false;  // Use RemoveMiss to remove cache misses, not this.
+    if (item == nullptr) return false;  // Use RemoveMiss to remove cache misses, not this.
 
     for (it = cache.begin(); it != cache.end(); it++) {
         if (it->second == item) break;

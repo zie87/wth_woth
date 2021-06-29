@@ -7,8 +7,8 @@
 #include <dirent.h>
 
 GameStateStory::GameStateStory(GameApp* parent) : GameState(parent, "story") {
-    flow = NULL;
-    menu = NULL;
+    flow = nullptr;
+    menu = nullptr;
 }
 
 GameStateStory::~GameStateStory() { End(); }
@@ -44,8 +44,8 @@ void GameStateStory::loadStoriesMenu(const char* root) {
 }
 
 void GameStateStory::Start() {
-    flow = NULL;
-    menu = NULL;
+    flow = nullptr;
+    menu = nullptr;
     loadStoriesMenu("campaigns/");
 }
 

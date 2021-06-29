@@ -26,8 +26,8 @@ CardDescriptor::CardDescriptor() : MTGCardInstance(), mColorExclusions(0) {
 int CardDescriptor::init() {
     int result = MTGCardInstance::init();
     attacker = 0;
-    defenser = NULL;
-    banding = NULL;
+    defenser   = nullptr;
+    banding    = nullptr;
     anyCounter = 0;
     // Remove unnecessary pointers
     SAFE_DELETE(counters);
@@ -82,26 +82,26 @@ MTGCardInstance* CardDescriptor::match_or(MTGCardInstance* card) {
             }
         }
     }
-    if (!found) return NULL;
+    if (!found) return nullptr;
 
     if (colors) {
         found = (colors & card->colors);
-        if (!found) return NULL;
+        if (!found) return nullptr;
     }
 
     if (mColorExclusions) {
         found = mColorExclusions & card->colors;
-        if (found) return NULL;
+        if (found) return nullptr;
     }
 
     // Quantified restrictions are always AND-ed:
-    if (powerComparisonMode && !valueInRange(powerComparisonMode, card->getPower(), power)) return NULL;
+    if (powerComparisonMode && !valueInRange(powerComparisonMode, card->getPower(), power)) return nullptr;
     if (toughnessComparisonMode && !valueInRange(toughnessComparisonMode, card->getToughness(), toughness))
-        return NULL;
+        return nullptr;
     if (manacostComparisonMode &&
         !valueInRange(manacostComparisonMode, card->getManaCost()->getConvertedCost(), convertedManacost))
-        return NULL;
-    if (nameComparisonMode && compareName != card->name) return NULL;
+        return nullptr;
+    if (nameComparisonMode && compareName != card->name) return nullptr;
     return card;
 }
 
@@ -110,27 +110,27 @@ MTGCardInstance* CardDescriptor::match_and(MTGCardInstance* card) {
     for (size_t i = 0; i < types.size(); i++) {
         if (types[i] >= 0) {
             if (!card->hasSubtype(types[i]) && !(MTGAllCards::findType(card->getLCName(), false) == types[i])) {
-                match = NULL;
+                match = nullptr;
             }
         } else {
             if (card->hasSubtype(-types[i]) || (MTGAllCards::findType(card->getLCName(), false) == -types[i])) {
-                match = NULL;
+                match = nullptr;
             }
         }
     }
-    if ((colors & card->colors) != colors) match = NULL;
+    if ((colors & card->colors) != colors) match = nullptr;
 
     if (mColorExclusions) {
-        if ((mColorExclusions & card->colors) == mColorExclusions) match = NULL;
+        if ((mColorExclusions & card->colors) == mColorExclusions) match = nullptr;
     }
 
-    if (powerComparisonMode && !valueInRange(powerComparisonMode, card->getPower(), power)) match = NULL;
+    if (powerComparisonMode && !valueInRange(powerComparisonMode, card->getPower(), power)) match = nullptr;
     if (toughnessComparisonMode && !valueInRange(toughnessComparisonMode, card->getToughness(), toughness))
-        match = NULL;
+        match = nullptr;
     if (manacostComparisonMode &&
         !valueInRange(manacostComparisonMode, card->getManaCost()->getConvertedCost(), convertedManacost))
-        match = NULL;
-    if (nameComparisonMode && compareName != card->name) match = NULL;
+        match = nullptr;
+    if (nameComparisonMode && compareName != card->name) match = nullptr;
 
     return match;
 }
@@ -145,30 +145,30 @@ MTGCardInstance* CardDescriptor::match(MTGCardInstance* card) {
 
     // Abilities
     BasicAbilitiesSet set = basicAbilities & card->basicAbilities;
-    if (set != basicAbilities) return NULL;
+    if (set != basicAbilities) return nullptr;
 
     BasicAbilitiesSet excludedSet = mAbilityExclusions & card->basicAbilities;
-    if (excludedSet.any()) return NULL;
+    if (excludedSet.any()) return nullptr;
 
     if ((tapped == -1 && card->isTapped()) || (tapped == 1 && !card->isTapped())) {
-        match = NULL;
+        match = nullptr;
     }
 
     if ((fresh == -1 && card->fresh) || (fresh == 1 && !card->fresh)) {
-        match = NULL;
+        match = nullptr;
     }
 
     if ((isMultiColored == -1 && card->isMultiColored) || (isMultiColored == 1 && !card->isMultiColored)) {
-        match = NULL;
+        match = nullptr;
     }
     if ((isLeveler == -1 && card->isLeveler) || (isLeveler == 1 && !card->isLeveler)) {
-        match = NULL;
+        match = nullptr;
     }
     if ((CDenchanted == -1 && card->enchanted) || (CDenchanted == 1 && !card->enchanted)) {
-        match = NULL;
+        match = nullptr;
     }
     if ((CDdamaged == -1 && card->wasDealtDamage) || (CDdamaged == 1 && !card->wasDealtDamage)) {
-        match = NULL;
+        match = nullptr;
     }
     if (CDopponentDamaged == -1 || CDopponentDamaged == 1) {
         Player* p = card->controller()->opponent();  // controller()->opponent();
@@ -176,35 +176,35 @@ MTGCardInstance* CardDescriptor::match(MTGCardInstance* card) {
             (CDopponentDamaged == 1 && !card->damageToOpponent && card->controller() == p) ||
             (CDopponentDamaged == -1 && card->damageToController && card->controller() == p->opponent()) ||
             (CDopponentDamaged == 1 && !card->damageToController && card->controller() == p->opponent())) {
-            match = NULL;
+            match = nullptr;
         }
         if ((CDcontrollerDamaged == -1 && card->damageToController && card->controller() == p) ||
             (CDcontrollerDamaged == 1 && !card->damageToController && card->controller() == p) ||
             (CDcontrollerDamaged == -1 && card->damageToOpponent && card->controller() == p->opponent()) ||
             (CDcontrollerDamaged == 1 && !card->damageToOpponent && card->controller() == p->opponent())) {
-            match = NULL;
+            match = nullptr;
         }
     }
     if ((isToken == -1 && card->isToken) || (isToken == 1 && !card->isToken)) {
-        match = NULL;
+        match = nullptr;
     }
     if (attacker == 1) {
         if (defenser == &AnyCard) {
-            if (!card->attacker && !card->defenser) match = NULL;
+            if (!card->attacker && !card->defenser) match = nullptr;
         } else {
-            if (!card->attacker) match = NULL;
+            if (!card->attacker) match = nullptr;
         }
     } else if (attacker == -1) {
         if (defenser == &NoCard) {
-            if (card->attacker || card->defenser) match = NULL;
+            if (card->attacker || card->defenser) match = nullptr;
         } else {
-            if (card->attacker) match = NULL;
+            if (card->attacker) match = nullptr;
         }
     } else {
         if (defenser == &NoCard) {
-            if (card->defenser) match = NULL;
+            if (card->defenser) match = nullptr;
         } else if (defenser == &AnyCard) {
-            if (!card->defenser) match = NULL;
+            if (!card->defenser) match = nullptr;
         } else {
             // we don't care about the attack/blocker state
         }
@@ -213,22 +213,22 @@ MTGCardInstance* CardDescriptor::match(MTGCardInstance* card) {
     // Counters
     if (anyCounter) {
         if (!(card->counters->mCount)) {
-            match = NULL;
+            match = nullptr;
         } else {
             int hasCounter = 0;
             for (int i = 0; i < card->counters->mCount; i++) {
                 if (card->counters->counters[i]->nb > 0) hasCounter = 1;
             }
-            if (!hasCounter) match = NULL;
+            if (!hasCounter) match = nullptr;
         }
     } else {
         if (counterComparisonMode) {
             Counter* targetCounter = card->counters->hasCounter(counterName.c_str(), counterPower, counterToughness);
             if (targetCounter) {
-                if (!valueInRange(counterComparisonMode, targetCounter->nb, counterNB)) match = NULL;
+                if (!valueInRange(counterComparisonMode, targetCounter->nb, counterNB)) match = nullptr;
             } else {
                 if (counterComparisonMode != COMPARISON_LESS && counterComparisonMode != COMPARISON_AT_MOST)
-                    match = NULL;
+                    match = nullptr;
             }
         }
     }
@@ -236,11 +236,11 @@ MTGCardInstance* CardDescriptor::match(MTGCardInstance* card) {
     return match;
 }
 
-MTGCardInstance* CardDescriptor::match(MTGGameZone* zone) { return (nextmatch(zone, NULL)); }
+MTGCardInstance* CardDescriptor::match(MTGGameZone* zone) { return (nextmatch(zone, nullptr)); }
 
 MTGCardInstance* CardDescriptor::nextmatch(MTGGameZone* zone, MTGCardInstance* previous) {
     int found = 0;
-    if (NULL == previous) found = 1;
+    if (nullptr == previous) found = 1;
     for (int i = 0; i < zone->nb_cards; i++) {
         if (found && match(zone->cards[i])) {
             return zone->cards[i];
@@ -249,7 +249,7 @@ MTGCardInstance* CardDescriptor::nextmatch(MTGGameZone* zone, MTGCardInstance* p
             found = 1;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void CardDescriptor::SetExclusionColor(int _color, int removeAllOthers) {

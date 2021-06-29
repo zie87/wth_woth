@@ -18,7 +18,7 @@ int PlayGuiObjectController::getClosestItem(int direction, float tolerance) {
     }
 
     float maxDist = SCREEN_WIDTH * SCREEN_WIDTH;
-    PlayGuiObject* current = (PlayGuiObject*)mObjects[mCurr];
+    auto* current     = (PlayGuiObject*)mObjects[mCurr];
     int closest_match = -1;
     int available = 0;
     float x0, y0, x1, y1;
@@ -26,7 +26,7 @@ int PlayGuiObjectController::getClosestItem(int direction, float tolerance) {
     y0 = current->y;
     for (size_t i = 0; i < mObjects.size(); i++) {
         if ((int)i == mCurr) continue;
-        PlayGuiObject* other = (PlayGuiObject*)mObjects[i];
+        auto* other = (PlayGuiObject*)mObjects[i];
         x1 = other->x;
         y1 = other->y;
         float dist = (x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1);
@@ -74,7 +74,7 @@ int PlayGuiObjectController::getClosestItem(int direction, float tolerance) {
 void PlayGuiObjectController::Update(float dt) {
     last_user_move += dt;
     for (size_t i = 0; i < mObjects.size(); i++) {
-        if (mObjects[i] != NULL) {
+        if (mObjects[i] != nullptr) {
             mObjects[i]->Update(dt);
         }
     }

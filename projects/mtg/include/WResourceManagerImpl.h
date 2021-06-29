@@ -149,12 +149,12 @@ public:
 
     unsigned int nowTime();
 
-    unsigned long Size();
-    unsigned long SizeCached();
-    unsigned long SizeManaged();
+    unsigned long Size() const;
+    unsigned long SizeCached() const;
+    unsigned long SizeManaged() const;
 
     unsigned int Count();
-    unsigned int CountCached();
+    unsigned int CountCached() const;
     unsigned int CountManaged();
 
     int CreateQuad(const string& quadName, const string& textureName, float x, float y, float width, float height);

@@ -30,10 +30,10 @@ using namespace std;
 // Static variables initialization
 //////////////////////////////////////////////////////////////////////
 
-filesystem* izfstream::pDefaultFS = NULL;
-string filesystem::CurrentZipName = "";
+filesystem* izfstream::pDefaultFS = nullptr;
+string filesystem::CurrentZipName;
 ifstream filesystem::CurrentZipFile;
-filesystem* filesystem::pCurrentFS = NULL;
+filesystem* filesystem::pCurrentFS = nullptr;
 std::vector<filesystem::pooledBuffer*> filesystem::m_Buffers;
 
 static const int STORED = 0;
@@ -66,7 +66,7 @@ filesystem::filesystem(const char* BasePath, const char* FileExt, bool DefaultFS
     // Open each zip files that have been found, in alphabetic order
     sort(ZipFiles.begin(), ZipFiles.end());
 
-    for (vector<string>::const_iterator ZipIt = ZipFiles.begin(); ZipIt != ZipFiles.end(); ++ZipIt)
+    for (auto ZipIt = ZipFiles.begin(); ZipIt != ZipFiles.end(); ++ZipIt)
         InsertZip(ZipIt->c_str(), ZipIt - ZipFiles.begin());
 
     // Should we make this the default File System for ifile?
@@ -80,9 +80,9 @@ filesystem::filesystem(const char* BasePath, const char* FileExt, bool DefaultFS
 zbuffer* filesystem::getValidBuffer(const std::string& filename, const std::string& externalFilename,
                                     std::streamoff Offset, std::streamoff Size) {
     // if exists filename in pool and is not in use, return that
-    for (size_t i = 0; i < m_Buffers.size(); ++i) {
-        if (m_Buffers[i]->filename != filename) continue;
-        zbuffer* buffer = m_Buffers[i]->buffer;
+    for (auto& m_Buffer : m_Buffers) {
+        if (m_Buffer->filename != filename) continue;
+        zbuffer* buffer = m_Buffer->buffer;
         if (buffer && !buffer->is_used()) {
             buffer->use(Offset, Size);
             return buffer;
@@ -102,10 +102,10 @@ zbuffer* filesystem::getValidBuffer(const std::string& filename, const std::stri
     }
 
     // No possiblility to open more files for now
-    if (m_Buffers.size() > 3) return NULL;
+    if (m_Buffers.size() > 3) return nullptr;
 
     // create a new buffer object, add it to the pool, and return that
-    pooledBuffer* pb = new pooledBuffer(filename, externalFilename);
+    auto* pb = new pooledBuffer(filename, externalFilename);
 
     zbuffer* buffer = new zbuffer_stored();
     buffer->open(filename.c_str(), Offset, Size);
@@ -116,13 +116,13 @@ zbuffer* filesystem::getValidBuffer(const std::string& filename, const std::stri
 }
 
 void filesystem::closeBufferPool() {
-    for (size_t i = 0; i < m_Buffers.size(); ++i) {
-        if (m_Buffers[i]) {
-            if (m_Buffers[i]->buffer && m_Buffers[i]->buffer->is_used()) {
+    for (auto& m_Buffer : m_Buffers) {
+        if (m_Buffer) {
+            if (m_Buffer->buffer && m_Buffer->buffer->is_used()) {
                 WGE_LOG_FATAL("File Buffer still in use but need to close");
             }
 
-            delete m_Buffers[i];
+            delete m_Buffer;
         }
     }
     m_Buffers.clear();
@@ -132,9 +132,9 @@ void filesystem::unuse(izfstream& File) {
     File.setstate(std::ios::badbit);
 
     if (!File.Zipped()) {
-        delete (File.rdbuf(NULL));
+        delete (File.rdbuf(nullptr));
     } else {
-        zbuffer* buffer = static_cast<zbuffer*>(File.rdbuf());
+        auto* buffer = static_cast<zbuffer*>(File.rdbuf());
         if (buffer) buffer->unuse();
     }
 }
@@ -150,7 +150,7 @@ void filesystem::Open(izfstream& File, const char* Filename) {
     // File is not zipped
     if (FileNotZipped(FullPath.c_str())) {
         // Link the izfile object with an opened filebuf
-        filebuf* FileBuf = new filebuf;
+        auto* FileBuf = new filebuf;
         FileBuf->open(FullPath.c_str(), ios::binary | ios::in);
 
         if (FileBuf->is_open()) {
@@ -175,10 +175,10 @@ void filesystem::Open(izfstream& File, const char* Filename) {
             (!((ZipPath = FindZip(FileInfo.m_PackID)).empty()))) {
             // Get the position of the compressed data
             if (CurrentZipName.size()) {
-                if ((pCurrentFS != this) || (CurrentZipName.compare(ZipPath) != 0)) {
+                if ((pCurrentFS != this) || (CurrentZipName != ZipPath)) {
                     CurrentZipFile.close();
                     CurrentZipName = "";
-                    pCurrentFS = NULL;
+                    pCurrentFS     = nullptr;
                 }
             }
             if (!CurrentZipName.size()) {
@@ -190,7 +190,7 @@ void filesystem::Open(izfstream& File, const char* Filename) {
 
             if (!CurrentZipFile) {
                 CurrentZipName = "";
-                pCurrentFS = NULL;
+                pCurrentFS     = nullptr;
                 return;
             }
 
@@ -276,11 +276,11 @@ bool filesystem::FileExists(const std::string& fileName) {
 
 // Note: this doesn't scan the folders outside of the zip...should we add that here ?
 std::vector<std::string>& filesystem::scanfolder(const std::string& folderName, std::vector<std::string>& results) {
-    filemap_const_iterator folderPos = m_Files.find(folderName);
+    auto folderPos = m_Files.find(folderName);
 
     if (folderPos == m_Files.end()) return results;
 
-    filemap_const_iterator It = folderPos;
+    auto It = folderPos;
 
     string folderNameLC = folderName;
     std::transform(folderNameLC.begin(), folderNameLC.end(), folderNameLC.begin(), ::tolower);
@@ -313,13 +313,11 @@ bool filesystem::FileNotZipped(const char* FilePath) const {
     // follow new search_iterator implementation
     std::ifstream File(FilePath);
 
-    if (!File) return false;
-
-    return true;
+    return !!File;
 }
 
 bool filesystem::FindFile(const char* Filename, file_info* FileInfo) const {
-    filemap_const_iterator It = m_Files.find(Filename);
+    auto It = m_Files.find(Filename);
 
     if (It == m_Files.end()) return false;  // File not found
 
@@ -330,7 +328,7 @@ bool filesystem::FindFile(const char* Filename, file_info* FileInfo) const {
 const string& filesystem::FindZip(size_t PackID) const {
     static const string EmptyString;
 
-    zipmap_const_iterator It = m_Zips.find(PackID);
+    auto It = m_Zips.find(PackID);
 
     if (It == m_Zips.end()) return EmptyString;  // PackID not valid
 
@@ -423,7 +421,7 @@ bool filesystem::PreloadZip(const char* Filename, map<string, limited_file_info>
         }
 
         File.close();
-        return (target.size() ? true : false);
+        return (target.size() != 0);
     } else {
         if (!File.seekg(CentralDir(File))) {
             File.close();
@@ -447,7 +445,7 @@ bool filesystem::PreloadZip(const char* Filename, map<string, limited_file_info>
         }
 
         File.close();
-        return (target.size() ? true : false);
+        return (target.size() != 0);
     }
 }
 
@@ -459,8 +457,8 @@ ostream& operator<<(ostream& Out, const filesystem& FS) {
     size_t NbFiles = 0;
     filesystem::zipfile_info AllZipsInfo;
 
-    for (filesystem::zipmap_const_iterator It = FS.m_Zips.begin(); It != FS.m_Zips.end(); ++It) {
-        const filesystem::zipfile_info& ZInfo = (*It).second;
+    for (const auto& m_Zip : FS.m_Zips) {
+        const filesystem::zipfile_info& ZInfo = m_Zip.second;
 
         // Print zip filename
         Out << setiosflags(ios::left) << setw(32) << "-> \"" + ZInfo.m_Filename + "\"" << resetiosflags(ios::left);
@@ -501,10 +499,7 @@ bool filesystem::lt_path::operator()(const string& s1, const string& s2) const {
         // '/' is the same as '\'
         if (!((A[i] == B[i]) || ((A[i] == '\\') && (B[i] == '/')) || ((A[i] == '/') && (B[i] == '\\')))) {
             // This line puts uppercases first
-            if ((A[i] == '\0') || (A[i] < B[i]))
-                return true;
-            else
-                return false;
+            return (A[i] == '\0') || (A[i] < B[i]);
         }
     }
 }
@@ -644,7 +639,7 @@ headerid filesystem::NextHeader(istream& File) const {
 
     if (!File.seekg(-4, ios::cur)) return READERROR;
 
-    headerid Signature = headerid(RawSignature);
+    auto Signature = headerid(RawSignature);
 
     switch (Signature) {
     case FILE:

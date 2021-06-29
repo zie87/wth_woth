@@ -16,8 +16,8 @@ SimpleMenuItem::SimpleMenuItem(SimpleMenu* _parent, int id, int fontId, std::str
 void SimpleMenuItem::Entering() {
     checkUserClick();
     setFocus(true);
-    if (getParent() != NULL) {
-        SimpleMenu* menu = (SimpleMenu*)parent;
+    if (getParent() != nullptr) {
+        auto* menu             = (SimpleMenu*)parent;
         menu->selectionTargetY = getY();
     }
 }

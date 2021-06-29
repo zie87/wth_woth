@@ -77,7 +77,7 @@ public:
     virtual void Add(int id, const char* Text, string desc = "", bool forceFocus = false,
                      DeckMetaData* deckMetaData = NULL);
     virtual void Close();
-    void updateScroller();
+    void updateScroller() const;
     void RenderBackground();
     void RenderDeckManaColors();
 

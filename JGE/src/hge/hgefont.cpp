@@ -41,7 +41,7 @@ hgeFont::hgeFont(const char* szFont, bool bMipmap __attribute__((unused))) {
     fRot = 0.0f;
     fTracking = 0.0f;
     fSpacing = 1.0f;
-    hTexture = 0;
+    hTexture    = nullptr;
 
     fZ = 0.5f;
     // nBlend=BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE;
@@ -79,7 +79,7 @@ hgeFont::hgeFont(const char* szFont, bool bMipmap __attribute__((unused))) {
 
     JRenderer* renderer = JRenderer::GetInstance();
 
-    while ((pdesc = _get_line(pdesc, linebuf)) != NULL) {
+    while ((pdesc = _get_line(pdesc, linebuf)) != nullptr) {
         if (!strncmp(linebuf, FNTBITMAPTAG, sizeof(FNTBITMAPTAG) - 1)) {
             strcpy(buf, szFont);
             pbuf = strrchr(buf, '\\');
@@ -134,8 +134,8 @@ hgeFont::hgeFont(const char* szFont, bool bMipmap __attribute__((unused))) {
 }
 
 hgeFont::~hgeFont() {
-    for (int i = 0; i < 256; i++)
-        if (letters[i]) delete letters[i];
+    for (auto& letter : letters)
+        if (letter) delete letter;
     if (hTexture) delete hTexture;
     // hge->Release();
 }
@@ -203,7 +203,7 @@ void hgeFont::printfb(float x, float y, float w, float h, int align, const char*
 
     linestart = buffer;
     pbuf = buffer;
-    prevword = 0;
+    prevword  = nullptr;
 
     for (;;) {
         i = 0;
@@ -298,8 +298,8 @@ float hgeFont::GetStringWidth(const char* string) const {
 void hgeFont::SetColor(PIXEL_TYPE col) {
     dwCol = col;
 
-    for (int i = 0; i < 256; i++)
-        if (letters[i]) letters[i]->SetColor(col);
+    for (auto& letter : letters)
+        if (letter) letter->SetColor(col);
 }
 
 void hgeFont::SetZ(float z) {
@@ -321,7 +321,7 @@ void hgeFont::SetBlendMode(int blend) {
 char* hgeFont::_get_line(char* file, char* line) {
     int i = 0;
 
-    if (!file[i]) return 0;
+    if (!file[i]) return nullptr;
 
     while (file[i] && file[i] != '\n' && file[i] != '\r') {
         line[i] = file[i];

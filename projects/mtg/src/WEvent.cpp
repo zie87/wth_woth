@@ -88,7 +88,7 @@ Targetable* WEventDamage::getTarget(int target) {
     case TARGET_FROM:
         return damage->source;
     }
-    return NULL;
+    return nullptr;
 }
 
 int WEventDamage::getValue() { return damage->damage; }
@@ -97,7 +97,7 @@ Targetable* WEventLife::getTarget(int target) {
     if (target) {
         return player;
     }
-    return NULL;
+    return nullptr;
 }
 
 Targetable* WEventCounters::getTarget() { return targetCard; }
@@ -109,7 +109,7 @@ Targetable* WEventVampire::getTarget(int target) {
     case TARGET_FROM:
         return source;
     }
-    return NULL;
+    return nullptr;
 }
 
 Targetable* WEventTarget::getTarget(int target) {
@@ -119,44 +119,44 @@ Targetable* WEventTarget::getTarget(int target) {
     case TARGET_FROM:
         return source;
     }
-    return NULL;
+    return nullptr;
 }
 
 Targetable* WEventZoneChange::getTarget(int target) {
     if (target) return card;
-    return NULL;
+    return nullptr;
 }
 
 Targetable* WEventCardAttacked::getTarget(int target) {
     if (target) return card;
-    return NULL;
+    return nullptr;
 }
 
 Targetable* WEventCardAttackedAlone::getTarget(int target) {
     if (target) return card;
-    return NULL;
+    return nullptr;
 }
 
 Targetable* WEventCardSacrifice::getTarget(int target) {
     if (target) {
         return cardAfter;
     }
-    return NULL;
+    return nullptr;
 }
 
 Targetable* WEventCardDiscard::getTarget(int target) {
     if (target) return card;
-    return NULL;
+    return nullptr;
 }
 
 Targetable* WEventCardCycle::getTarget(int target) {
     if (target) return card;
-    return NULL;
+    return nullptr;
 }
 
 Targetable* WEventCardAttackedNotBlocked::getTarget(int target) {
     if (target) return card;
-    return NULL;
+    return nullptr;
 }
 
 Targetable* WEventCardAttackedBlocked::getTarget(int target) {
@@ -166,7 +166,7 @@ Targetable* WEventCardAttackedBlocked::getTarget(int target) {
     case TARGET_FROM:
         return opponent;
     }
-    return NULL;
+    return nullptr;
 }
 
 Targetable* WEventCardBlocked::getTarget(int target) {
@@ -176,22 +176,22 @@ Targetable* WEventCardBlocked::getTarget(int target) {
     case TARGET_FROM:
         return opponent;
     }
-    return NULL;
+    return nullptr;
 }
 
 Targetable* WEventCardTap::getTarget(int target) {
     if (target) return card;
-    return NULL;
+    return nullptr;
 }
 
 Targetable* WEventCardTappedForMana::getTarget(int target) {
     if (target) return card;
-    return NULL;
+    return nullptr;
 }
 
 Targetable* WEventcardDraw::getTarget(Player* player) {
     if (player) return player;
-    return NULL;
+    return nullptr;
 }
 
 std::ostream& WEvent::toString(std::ostream& out) const { return out << "EVENT"; }
@@ -199,7 +199,7 @@ std::ostream& WEventZoneChange::toString(std::ostream& out) const {
     return out << "ZONEEVENT " << *card << " : " << *from << " -> " << *to;
 }
 std::ostream& WEventDamage::toString(std::ostream& out) const {
-    if (MTGCardInstance* m = dynamic_cast<MTGCardInstance*>(damage->target))
+    if (auto* m = dynamic_cast<MTGCardInstance*>(damage->target))
         return out << "DAMAGEEVENT " << damage->damage << " >> " << *m;
     else
         return out << "DAMAGEEVENT " << damage->damage << " >> " << damage->target;

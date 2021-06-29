@@ -38,9 +38,9 @@
 
 PlayerType GameApp::players[] = {PLAYER_TYPE_CPU, PLAYER_TYPE_CPU};
 bool GameApp::HasMusic = true;
-JMusic* GameApp::music = NULL;
-string GameApp::currentMusicFile = "";
-string GameApp::systemError = "";
+JMusic* GameApp::music           = nullptr;
+string GameApp::currentMusicFile;
+string GameApp::systemError;
 
 vector<JQuadPtr> manaIcons;
 
@@ -64,23 +64,23 @@ GameApp::GameApp()
 
     mScreenShotCount = 0;
 
-    for (int i = 0; i < GAME_STATE_MAX; i++) mGameStates[i] = NULL;
+    for (int i = 0; i < GAME_STATE_MAX; i++) mGameStates[i] = nullptr;
 
     mShowDebugInfo = false;
     players[0] = PLAYER_TYPE_CPU;
     players[1] = PLAYER_TYPE_CPU;
     gameType = GAME_TYPE_CLASSIC;
 
-    mCurrentState = NULL;
-    mNextState = NULL;
+    mCurrentState = nullptr;
+    mNextState    = nullptr;
 
-    music = NULL;
+    music = nullptr;
 }
 
 GameApp::~GameApp() { WResourceManager::Terminate(); }
 
 void GameApp::Create() {
-    srand((unsigned int)time(0));  // initialize random
+    srand((unsigned int)time(nullptr));  // initialize random
 #if !defined(QT_CONFIG)
 #if defined(WIN32)
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -93,7 +93,7 @@ void GameApp::Create() {
     WGE_LOG_TRACE("starting Game");
 
     string systemFolder = "Res/";
-    string foldersRoot = "";
+    string foldersRoot;
 
     // Find the Res folder
     std::ifstream mfile("Res.txt");
@@ -245,9 +245,9 @@ void GameApp::Create() {
     mGameStates[GAME_STATE_STORY] = NEW GameStateStory(this);
     mGameStates[GAME_STATE_STORY]->Create();
 
-    mGameStates[GAME_STATE_TRANSITION] = NULL;
+    mGameStates[GAME_STATE_TRANSITION] = nullptr;
 
-    mCurrentState = NULL;
+    mCurrentState = nullptr;
     mNextState = mGameStates[GAME_STATE_MENU];
 
     // Set Audio volume
@@ -292,7 +292,7 @@ void GameApp::Destroy() {
     DeckMenu::destroy();
     DeckEditorMenu::destroy();
 
-    options.theGame = NULL;
+    options.theGame = nullptr;
     Unlockable::Destroy();
 
     AutoLineMacro::Destroy();
@@ -328,7 +328,7 @@ void GameApp::Update() {
     if (dt > 35.0f)  // min 30 FPS ;)
         dt = 35.0f;
 
-    TransitionBase* mTrans = NULL;
+    TransitionBase* mTrans = nullptr;
     if (mCurrentState) {
         mCurrentState->Update(dt);
         if (mGameStates[GAME_STATE_TRANSITION] == mCurrentState)
@@ -337,7 +337,7 @@ void GameApp::Update() {
     // Check for finished transitions.
     if (mTrans && mTrans->Finished()) {
         mTrans->End();
-        if (mTrans->to != NULL && !mTrans->bAnimationOnly) {
+        if (mTrans->to != nullptr && !mTrans->bAnimationOnly) {
             SetCurrentState(mTrans->to);
             SAFE_DELETE(mGameStates[GAME_STATE_TRANSITION]);
             mCurrentState->Start();
@@ -346,8 +346,8 @@ void GameApp::Update() {
             SAFE_DELETE(mGameStates[GAME_STATE_TRANSITION]);
         }
     }
-    if (mNextState != NULL) {
-        if (mCurrentState != NULL) mCurrentState->End();
+    if (mNextState != nullptr) {
+        if (mCurrentState != nullptr) mCurrentState->End();
 
         SetCurrentState(mNextState);
 
@@ -361,7 +361,7 @@ void GameApp::Update() {
          */
 #endif
         mCurrentState->Start();
-        mNextState = NULL;
+        mNextState = nullptr;
     }
 }
 
@@ -398,7 +398,7 @@ void GameApp::Render() {
 }
 
 void GameApp::OnScroll(int inXVelocity, int inYVelocity) {
-    if (mCurrentState != NULL) {
+    if (mCurrentState != nullptr) {
         mCurrentState->OnScroll(inXVelocity, inYVelocity);
     }
 }
@@ -420,8 +420,8 @@ void GameApp::Pause() { pauseMusic(); }
 void GameApp::Resume() { resumeMusic(); }
 
 void GameApp::DoTransition(int trans, int tostate, float dur, bool animonly) {
-    TransitionBase* tb = NULL;
-    GameState* toState = NULL;
+    TransitionBase* tb = nullptr;
+    GameState* toState = nullptr;
     if (options[Options::TRANSITIONS].number != 0) {
         if (tostate != GAME_STATE_NONE) SetNextState(tostate);
         return;
@@ -459,7 +459,7 @@ void GameApp::DoAnimation(int trans, float dur) { DoTransition(trans, GAME_STATE
 void GameApp::playMusic(string filename, bool loop) {
     if (filename == "") filename = currentMusicFile;
 
-    if (filename.compare(currentMusicFile) == 0 && music) return;
+    if (filename == currentMusicFile && music) return;
 
     if (music) {
         JSoundSystem::GetInstance()->StopMusic(music);

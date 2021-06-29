@@ -326,7 +326,7 @@ public:
         if (keypad) keypad->Render();
     }
 
-    bool newAward();
+    bool newAward() const;
 
     // These return a filepath accurate to the current mode/profile/theme, and can
     // optionally fallback to a file within a certain directory.
@@ -337,9 +337,9 @@ public:
     void checkProfile();   // Confirms that a profile is loaded and contains a collection.
     void createUsersFirstDeck(int setId);
 
-    GameOption* get(int);
-    GameOption& operator[](int);
-    GameOption& operator[](std::string);
+    GameOption* get(int) const;
+    GameOption& operator[](int) const;
+    GameOption& operator[](std::string) const;
 
     GameOptions* profileOptions;
     GameOptions* globalOptions;

@@ -21,7 +21,7 @@ bool ModRules::load(string filename) {
 
     for (TiXmlNode* node = doc.FirstChild(); node; node = node->NextSibling()) {
         TiXmlElement* element = node->ToElement();
-        if (element != NULL) {
+        if (element != nullptr) {
             if (strcmp(element->Value(), "menu") == 0) {
                 menu.parse(element);
             } else if (strcmp(element->Value(), "general") == 0) {
@@ -39,12 +39,12 @@ bool ModRules::load(string filename) {
 }
 
 int ModRulesMenuItem::strToAction(string str) {
-    if (str.compare("playMenu") == 0) return MENUITEM_PLAY;
-    if (str.compare("deckEditor") == 0) return MENUITEM_DECKEDITOR;
-    if (str.compare("shop") == 0) return MENUITEM_SHOP;
-    if (str.compare("options") == 0) return MENUITEM_OPTIONS;
-    if (str.compare("quit") == 0) return MENUITEM_EXIT;
-    if (str.compare("trophies") == 0) return MENUITEM_TROPHIES;
+    if (str == "playMenu") return MENUITEM_PLAY;
+    if (str == "deckEditor") return MENUITEM_DECKEDITOR;
+    if (str == "shop") return MENUITEM_SHOP;
+    if (str == "options") return MENUITEM_OPTIONS;
+    if (str == "quit") return MENUITEM_EXIT;
+    if (str == "trophies") return MENUITEM_TROPHIES;
 
     return MENUITEM_PLAY;
 }
@@ -54,7 +54,7 @@ ModRulesMenuItem::ModRulesMenuItem(string actionIdStr, std::string displayName) 
     mDisplayName = displayName;
 }
 
-int ModRulesMenuItem::getMatchingGameState() { return getMatchingGameState(mActionId); }
+int ModRulesMenuItem::getMatchingGameState() const { return getMatchingGameState(mActionId); }
 
 int ModRulesMenuItem::getMatchingGameState(int actionId) {
     switch (actionId) {
@@ -76,13 +76,13 @@ ModRulesMainMenuItem::ModRulesMainMenuItem(string actionIdStr, std::string displ
     : ModRulesMenuItem(actionIdStr, displayName), mIconId(iconId), mParticleFile(particleFile) {}
 
 JButton ModRulesOtherMenuItem::strToJButton(string str) {
-    if (str.compare("btn_next") == 0) return JGE_BTN_NEXT;
-    if (str.compare("btn_prev") == 0) return JGE_BTN_PREV;
-    if (str.compare("btn_ctrl") == 0) return JGE_BTN_CTRL;
-    if (str.compare("btn_menu") == 0) return JGE_BTN_MENU;
-    if (str.compare("btn_cancel") == 0) return JGE_BTN_CANCEL;
-    if (str.compare("btn_pri") == 0) return JGE_BTN_PRI;
-    if (str.compare("btn_sec") == 0) return JGE_BTN_SEC;
+    if (str == "btn_next") return JGE_BTN_NEXT;
+    if (str == "btn_prev") return JGE_BTN_PREV;
+    if (str == "btn_ctrl") return JGE_BTN_CTRL;
+    if (str == "btn_menu") return JGE_BTN_MENU;
+    if (str == "btn_cancel") return JGE_BTN_CANCEL;
+    if (str == "btn_pri") return JGE_BTN_PRI;
+    if (str == "btn_sec") return JGE_BTN_SEC;
 
     return JGE_BTN_NEXT;
 }
@@ -171,21 +171,21 @@ SimpleCardEffect* ModRulesCards::parseEffect(string s) {
         function = s;
     }
 
-    if (function.compare("rotate") == 0) {
+    if (function == "rotate") {
         return NEW SimpleCardEffectRotate(M_PI * atoi(params.c_str()) / 180);
     }
 
-    if (function.compare("mask") == 0) {
+    if (function == "mask") {
         auto argb = split(params, ',');
         if (argb.size() < 4) {
             WGE_LOG_ERROR("not enough params in mask");
-            return NULL;
+            return nullptr;
         }
         PIXEL_TYPE mask =
             ARGB(atoi(argb[0].c_str()), atoi(argb[1].c_str()), atoi(argb[2].c_str()), atoi(argb[3].c_str()));
         return NEW SimpleCardEffectMask(mask);
     }
-    return NULL;
+    return nullptr;
 }
 
 void ModRulesCards::parse(TiXmlElement* element) {

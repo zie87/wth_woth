@@ -135,7 +135,7 @@ u32 ramAvailable(void) {
     u32 size, count, x;
 
     // Init variables
-    ram = NULL;
+    ram   = nullptr;
     size = 0;
     count = 0;
 
@@ -209,7 +209,7 @@ std::vector<std::string>& split(const std::string& s, char delim, std::vector<st
 
 std::string join(vector<string>& v, string delim) {
     std::string retVal;
-    for (vector<string>::iterator it = v.begin(); it != v.end(); ++it) {
+    for (auto it = v.begin(); it != v.end(); ++it) {
         retVal.append(*it);
         retVal.append(delim);
     }
@@ -299,7 +299,7 @@ unsigned long hash_djb2(const char* str) {
 }
 
 std::string buildFilePath(const vector<string>& folders, const string& filename) {
-    string result = "";
+    string result;
     for (size_t i = 0; i < folders.size(); ++i) {
         result.append(folders[i]);
         if (result[result.length() - 1] != '/') {

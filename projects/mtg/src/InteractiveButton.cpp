@@ -73,7 +73,7 @@ void InteractiveButton::Render() {
 
     float buttonXOffset = getX() - mXOffset;
     float buttonYOffset = getY() + mYOffset;
-    if (buttonImage != NULL) {
+    if (buttonImage != nullptr) {
         renderer->RenderQuad(buttonImage.get(), buttonXOffset - buttonImage.get()->mWidth / 2,
                              buttonYOffset + mainFontHeight / 2, 0, pspIconsSize, pspIconsSize);
     }

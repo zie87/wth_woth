@@ -5,7 +5,7 @@
 #include "Translate.h"
 
 // WCFilterFactory
-WCFilterFactory* WCFilterFactory::me = NULL;
+WCFilterFactory* WCFilterFactory::me = nullptr;
 
 WCFilterFactory* WCFilterFactory::GetInstance() {
     if (!me) me = NEW WCFilterFactory();
@@ -38,7 +38,7 @@ WCardFilter* WCFilterFactory::Construct(string src) {
         if (c == '(') {  // Parenthesis
             size_t endp = findNext(src, i);
             if (endp != string::npos) {
-                WCFilterGROUP* g = NEW WCFilterGROUP(Construct(src.substr(i + 1, endp - 1)));
+                auto* g = NEW WCFilterGROUP(Construct(src.substr(i + 1, endp - 1)));
                 if (endp < (srcLength - 1)) {
                     if (src[endp + 1] == '|')
                         return NEW WCFilterOR(g, Construct(src.substr(endp + 2)));
@@ -51,7 +51,7 @@ WCardFilter* WCFilterFactory::Construct(string src) {
         } else if (c == '{') {  // Negation
             size_t endp = findNext(src, i, '{', '}');
             if (endp != string::npos) {
-                WCFilterNOT* g = NEW WCFilterNOT(Construct(src.substr(i + 1, endp - 1)));
+                auto* g = NEW WCFilterNOT(Construct(src.substr(i + 1, endp - 1)));
                 if (endp < (srcLength - 1)) {
                     if (src[endp + 1] == '|')
                         return NEW WCFilterOR(g, Construct(src.substr(endp + 2)));
@@ -147,8 +147,7 @@ bool WCFilterLetter::isMatch(MTGCard* c) {
     if (!c || !c->data) return false;
     string s = c->data->getLCName();
     if (!s.size()) return false;
-    if (s[0] == alpha || (alpha == '#' && (isdigit(s[0]) || ispunct(s[0])))) return true;
-    return false;
+    return s[0] == alpha || (alpha == '#' && (isdigit(s[0]) || ispunct(s[0])));
 }
 string WCFilterLetter::getCode() {
     char buf[24];

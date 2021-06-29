@@ -11,8 +11,8 @@
 
 // TODO:better comments this is too cryptic to work on by anyone but original coder.
 bool compare_aistats(AIStat* first, AIStat* second) {
-    float damage1 = static_cast<float>(first->value / first->occurences);
-    float damage2 = static_cast<float>(second->value / second->occurences);
+    auto damage1 = static_cast<float>(first->value / first->occurences);
+    auto damage2 = static_cast<float>(second->value / second->occurences);
     return (damage1 > damage2);
 }
 
@@ -44,7 +44,7 @@ void AIStats::updateStatsCard(MTGCardInstance* cardInstance, Damage* damage, flo
     if (damage->target == player) {
         stat->value += static_cast<int>(multiplier * STATS_PLAYER_MULTIPLIER * damage->damage);
     } else if (damage->target->type_as_damageable == DAMAGEABLE_MTGCARDINSTANCE) {
-        MTGCardInstance* target = (MTGCardInstance*)damage->target;
+        auto* target = (MTGCardInstance*)damage->target;
         if (target->controller() == player && !target->isInPlay(player->getObserver())) {
             // One of my creatures got lethal damage...
             stat->value += static_cast<int>(multiplier * STATS_CREATURE_MULTIPLIER * damage->damage);
@@ -53,7 +53,7 @@ void AIStats::updateStatsCard(MTGCardInstance* cardInstance, Damage* damage, flo
 }
 
 int AIStats::receiveEvent(WEvent* event) {
-    WEventDamage* e = dynamic_cast<WEventDamage*>(event);
+    auto* e = dynamic_cast<WEventDamage*>(event);
     if (!e) return 0;  // we take only Damage events into accountright now
     Damage* damage = e->damage;
     MTGGameZone* opponentZone = player->opponent()->game->inPlay;
@@ -74,14 +74,14 @@ int AIStats::receiveEvent(WEvent* event) {
     map<MTGCardInstance*, int> lords;
     for (size_t i = 1; i < g->mLayers->actionLayer()->mObjects.size(); i++) {  // 0 is not a mtgability...hackish
         MTGAbility* a = ((MTGAbility*)g->mLayers->actionLayer()->mObjects[i]);
-        if (ALord* al = dynamic_cast<ALord*>(a)) {
+        if (auto* al = dynamic_cast<ALord*>(a)) {
             if (al->cards.find(card) != al->cards.end() && opponentZone->hasCard(al->source)) {
                 lords[al->source] = 1;
             }
         }
     }
     if (size_t nb = lords.size()) {
-        for (map<MTGCardInstance*, int>::iterator it = lords.begin(); it != lords.end(); ++it) {
+        for (auto it = lords.begin(); it != lords.end(); ++it) {
             updateStatsCard(it->first, damage, STATS_LORD_MULTIPLIER / nb);
         }
     }
@@ -102,8 +102,7 @@ bool AIStats::isInTop(MTGCardInstance* card, unsigned int max, bool tooSmallCoun
         if (n >= max) return false;
         AIStat* stat = *it;
         if (stat->source == id) {
-            if ((stat->value + card->DangerRanking()) >= 3) return true;
-            return false;
+            return (stat->value + card->DangerRanking()) >= 3;
         }
         n++;
     }
@@ -117,7 +116,7 @@ AIStat* AIStats::find(MTGCard* source) {
         AIStat* stat = *it;
         if (stat->source == id) return stat;
     }
-    return NULL;
+    return nullptr;
 }
 
 void AIStats::load(char* filename) {
@@ -131,7 +130,7 @@ void AIStats::load(char* filename) {
             int value = atoi(s.c_str());
             std::getline(stream, s);
             bool direct = atoi(s.c_str()) > 0;
-            AIStat* stat = NEW AIStat(cardid, value, 1, direct);
+            auto* stat  = NEW AIStat(cardid, value, 1, direct);
             stats.push_back(stat);
         }
     } else {

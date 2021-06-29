@@ -105,7 +105,7 @@ public:
     bool isDualWielding;
     bool stillNeeded;
     Player* lastController;
-    MTGGameZone* getCurrentZone();
+    MTGGameZone* getCurrentZone() const;
     MTGGameZone* previousZone;
     MTGCardInstance* previous;
     MTGCardInstance* next;
@@ -117,7 +117,7 @@ public:
     ManaCost* getReducedManaCost();
     ManaCost* getIncreasedManaCost();
 
-    bool matchesCastFilter(int castMethod);
+    bool matchesCastFilter(int castMethod) const;
 
     // The recommended method to test for summoning Sickness !
     int hasSummoningSickness();
@@ -154,12 +154,12 @@ public:
     int canBlock();
     int canBlock(MTGCardInstance* opponent);
     int canAttack();
-    int isAttacker();
+    int isAttacker() const;
     Targetable* isAttacking;
     MTGCardInstance* storedCard;
     MTGCardInstance* createSnapShot();
     MTGCardInstance* storedSourceCard;
-    MTGCardInstance* isDefenser();
+    MTGCardInstance* isDefenser() const;
     int initAttackersDefensers();
     MTGCardInstance* getNextOpponent(MTGCardInstance* previous = NULL);
     int nbOpponents();
@@ -173,7 +173,7 @@ public:
     MTGCardInstance(MTGCard* card, MTGPlayerCards* _belongs_to);
     int regenerate();
     int triggerRegenerate();
-    Player* controller();
+    Player* controller() const;
 
     virtual ~MTGCardInstance();
     int bury();
@@ -200,8 +200,8 @@ public:
     void copy(MTGCardInstance* card);
 
     void setUntapping();
-    int isUntapping();
-    int isTapped();
+    int isUntapping() const;
+    int isTapped() const;
     void untap();
     void tap();
     void attemptUntap();

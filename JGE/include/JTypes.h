@@ -398,7 +398,7 @@ public:
     /// @return h - Height of the quad.
     ///
     //////////////////////////////////////////////////////////////////////////
-    void GetTextureRect(float* x, float* y, float* w, float* h);
+    void GetTextureRect(float* x, float* y, float* w, float* h) const;
 
     //////////////////////////////////////////////////////////////////////////
     /// Set horizontal flipping.

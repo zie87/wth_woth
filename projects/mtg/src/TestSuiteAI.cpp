@@ -16,7 +16,7 @@
 // NULL is sent in place of a MTGDeck since there is no way to create a MTGDeck without a proper deck file.
 // TestSuiteAI will be responsible for managing its own deck state.
 TestSuiteAI::TestSuiteAI(TestSuiteGame* tsGame, int playerId)
-    : AIPlayerBaka(tsGame->observer, "testsuite", "testsuite", "baka.jpg", NULL) {
+    : AIPlayerBaka(tsGame->observer, "testsuite", "testsuite", "baka.jpg", nullptr) {
     SAFE_DELETE(game);  // game might have been set in the parent with default values
     game = tsGame->buildDeck(this, playerId);
     game->setOwner(this);
@@ -40,25 +40,25 @@ MTGCardInstance* TestSuiteAI::getCard(string action) {
             MTGGameZone* zone = zones[j];
             for (int k = 0; k < zone->nb_cards; k++) {
                 MTGCardInstance* card = zone->cards[k];
-                if (!card) return NULL;
+                if (!card) return nullptr;
                 string name = card->getLCName();
-                if (name.compare(action) == 0) return card;
+                if (name == action) return card;
             }
         }
     }
     WGE_LOG_ERROR("Can't find card: {}", action);
-    return NULL;
+    return nullptr;
 }
 
 Interruptible* TestSuiteGame::getActionByMTGId(int mtgid) {
     ActionStack* as = observer->mLayers->stackLayer();
-    Interruptible* action = NULL;
+    Interruptible* action = nullptr;
     while ((action = as->getNext(action, 0, 0, 1))) {
         if (action->source && action->source->getMTGId() == mtgid) {
             return action;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 int TestSuiteAI::displayStack() {
@@ -67,7 +67,7 @@ int TestSuiteAI::displayStack() {
 }
 
 int TestSuiteAI::Act(float dt) {
-    observer->setLoser(NULL);  // Prevent draw rule from losing the game
+    observer->setLoser(nullptr);  // Prevent draw rule from losing the game
 
     // Last bits of initialization require to be done here, after the first "update" call of the game
 
@@ -97,7 +97,7 @@ int TestSuiteAI::Act(float dt) {
     WGE_LOG_TRACE("TESTSUITE command: {}", action);
 
     if (observer->mLayers->stackLayer()->askIfWishesToInterrupt == this) {
-        if (action.compare("no") != 0 && action.compare("yes") != 0) {
+        if (action != "no" && action != "yes") {
             observer->mLayers->stackLayer()->cancelInterruptOffer();
             suite->currentAction--;
             return 1;
@@ -112,18 +112,18 @@ int TestSuiteAI::Act(float dt) {
         return 1;
     }
 
-    if (action.compare("eot") == 0) {
+    if (action == "eot") {
         if (observer->getCurrentGamePhase() != MTG_PHASE_CLEANUP) suite->currentAction--;
         observer->userRequestNextGamePhase();
-    } else if (action.compare("human") == 0) {
+    } else if (action == "human") {
         WGE_LOG_TRACE("TESTSUITE You have control");
         playMode = MODE_HUMAN;
         return 1;
-    } else if (action.compare("ai") == 0) {
+    } else if (action == "ai") {
         WGE_LOG_TRACE("TESTSUITE Switching to AI");
         playMode = MODE_AI;
         return 1;
-    } else if (action.compare("next") == 0 || action.find("goto") != string::npos) {
+    } else if (action == "next" || action.find("goto") != string::npos) {
         if (action.find("goto ") != string::npos) {
             size_t found = action.find("goto ");
             string phase = action.substr(found + 5);
@@ -151,11 +151,11 @@ int TestSuiteAI::Act(float dt) {
             else
                 observer->userRequestNextGamePhase();
         }
-    } else if (action.compare("yes") == 0)
+    } else if (action == "yes")
         observer->mLayers->stackLayer()->setIsInterrupting(this);
-    else if (action.compare("endinterruption") == 0)
+    else if (action == "endinterruption")
         observer->mLayers->stackLayer()->endOfInterruption();
-    else if (action.compare("no") == 0) {
+    else if (action == "no") {
         if (observer->mLayers->stackLayer()->askIfWishesToInterrupt == this)
             observer->mLayers->stackLayer()->cancelInterruptOffer();
     } else if (action.find("choice ") != string::npos) {
@@ -164,8 +164,8 @@ int TestSuiteAI::Act(float dt) {
         observer->mLayers->actionLayer()->doReactTo(choice);
     } else if (action.find(" -momir- ") != string::npos) {
         int start = action.find(" -momir- ");
-        int cardId = Rules::getMTGId(action.substr(start + 9).c_str());
-        int cardIdHand = Rules::getMTGId(action.substr(0, start).c_str());
+        int cardId      = Rules::getMTGId(action.substr(start + 9));
+        int cardIdHand  = Rules::getMTGId(action.substr(0, start));
         MTGMomirRule* a = ((MTGMomirRule*)observer->mLayers->actionLayer()->getAbility(MTGAbility::MOMIR));
         a->reactToClick(Rules::getCardByMTGId(observer, cardIdHand), cardId);
         observer->mLayers->actionLayer()->stuffHappened = 1;
@@ -173,10 +173,10 @@ int TestSuiteAI::Act(float dt) {
         Player* p = observer->players[1];
         size_t start = action.find("p1");
         if (start != string::npos) p = observer->players[0];
-        observer->cardClick(NULL, p);
+        observer->cardClick(nullptr, p);
     } else {
         int mtgid = Rules::getMTGId(action);
-        Interruptible* toInterrupt = NULL;
+        Interruptible* toInterrupt = nullptr;
         if (mtgid) {
             WGE_LOG_TRACE("TESTSUITE CARD ID: {}", mtgid);
             toInterrupt = suite->getActionByMTGId(mtgid);
@@ -272,7 +272,7 @@ void TestSuiteGame::assertGame() {
         error++;
     }
     for (int i = 0; i < 2; i++) {
-        TestSuiteAI* p = (TestSuiteAI*)(observer->players[i]);
+        auto* p = (TestSuiteAI*)(observer->players[i]);
         if (p->playMode == Player::MODE_AI) wasAI = true;
 
         if (p->life != endState.players[i]->life) {
@@ -323,10 +323,11 @@ void TestSuiteGame::assertGame() {
                 error++;
             }
             for (size_t k = 0; k < (size_t)endstateZones[j]->nb_cards; k++) {
-                MTGCardInstance* cardToCheck = (k < endstateZones[j]->cards.size()) ? endstateZones[j]->cards[k] : 0;
+                MTGCardInstance* cardToCheck =
+                    (k < endstateZones[j]->cards.size()) ? endstateZones[j]->cards[k] : nullptr;
                 if (cardToCheck) {  // Can be NULL if used "*" in the testcase.
                     MTGCardInstance* card = Rules::getCardByMTGId(observer, cardToCheck->getId());
-                    if (card != 0 && !zone->hasCard(card)) {
+                    if (card != nullptr && !zone->hasCard(card)) {
                         sprintf(result, "<span class=\"error\">==Card ID not the same. Didn't find %i</span><br />",
                                 card->getId());
                         Log(result);
@@ -367,10 +368,10 @@ TestSuite::~TestSuite() {
         mWorkerThread.pop_back();
     }
 
-    observer = 0;
+    observer = nullptr;
 }
 
-TestSuite::TestSuite(const char* filename) : TestSuiteGame(0), mRules(0), mProcessing(false) {
+TestSuite::TestSuite(const char* filename) : TestSuiteGame(nullptr), mRules(nullptr), mProcessing(false) {
     timerLimit = 0;
     testsuite = this;
 
@@ -433,7 +434,7 @@ int TestSuite::loadNext() {
     if (filename == "") {
         // we let GameStateDuel delete the latest gameObserver.
         mProcessing = false;
-        observer = 0;
+        observer    = nullptr;
         return 0;
     }
 
@@ -476,7 +477,7 @@ void TestSuiteState::cleanup(TestSuiteGame* tsGame) {
 
 void TestSuite::cleanup() {
     currentAction = 0;
-    observer = 0;
+    observer      = nullptr;
     initState.cleanup(this);
     endState.cleanup(this);
     actions.cleanup();
@@ -500,11 +501,11 @@ bool TestSuiteGame::load() {
             if (!s.size()) continue;
             if (s[0] == '#') continue;
             std::transform(s.begin(), s.end(), s.begin(), ::tolower);
-            if (s.compare("summoningsickness") == 0) {
+            if (s == "summoningsickness") {
                 summoningSickness = 1;
                 continue;
             }
-            if (s.compare("forceability") == 0) {
+            if (s == "forceability") {
                 forceAbility = true;
                 continue;
             }
@@ -516,58 +517,58 @@ bool TestSuiteGame::load() {
                 aiMaxCalls = atoi(s.substr(8).c_str());
                 continue;
             }
-            if (s.compare("momir") == 0) {
+            if (s == "momir") {
                 gameType = GAME_TYPE_MOMIR;
                 continue;
             }
             switch (state) {
             case -1:
-                if (s.compare("[init]") == 0) state++;
+                if (s == "[init]") state++;
                 break;
             case 0:
-                if (s.compare("[player1]") == 0) {
+                if (s == "[player1]") {
                     state++;
                 } else {
                     initState.phase = PhaseRing::phaseStrToInt(s);
                 }
                 break;
             case 1:
-                if (s.compare("[player2]") == 0) {
+                if (s == "[player2]") {
                     state++;
                 } else {
                     initState.parsePlayerState(0, s);
                 }
                 break;
             case 2:
-                if (s.compare("[do]") == 0) {
+                if (s == "[do]") {
                     state++;
                 } else {
                     initState.parsePlayerState(1, s);
                 }
                 break;
             case 3:
-                if (s.compare("[assert]") == 0) {
+                if (s == "[assert]") {
                     state++;
                 } else {
                     actions.add(s);
                 }
                 break;
             case 4:
-                if (s.compare("[player1]") == 0) {
+                if (s == "[player1]") {
                     state++;
                 } else {
                     endState.phase = PhaseRing::phaseStrToInt(s);
                 }
                 break;
             case 5:
-                if (s.compare("[player2]") == 0) {
+                if (s == "[player2]") {
                     state++;
                 } else {
                     endState.parsePlayerState(0, s);
                 }
                 break;
             case 6:
-                if (s.compare("[end]") == 0) {
+                if (s == "[end]") {
                     state++;
                 } else {
                     endState.parsePlayerState(1, s);
@@ -596,7 +597,7 @@ void TestSuite::pregameTests() {
 
 void TestSuite::ThreadProc(void* inParam) {
     WGE_LOG_TRACE("Entering");
-    TestSuite* instance = reinterpret_cast<TestSuite*>(inParam);
+    auto* instance = reinterpret_cast<TestSuite*>(inParam);
     if (instance) {
         string filename;
         float counter = 1.0f;
@@ -635,7 +636,7 @@ TestSuiteGame::TestSuiteGame(TestSuite* testsuite)
       gameType(GAME_TYPE_CLASSIC),
       timerLimit(0),
       currentAction(0),
-      observer(0),
+      observer(nullptr),
       testsuite(testsuite) {}
 
 TestSuiteGame::TestSuiteGame(TestSuite* testsuite, string _filename)
@@ -644,7 +645,7 @@ TestSuiteGame::TestSuiteGame(TestSuite* testsuite, string _filename)
       gameType(GAME_TYPE_CLASSIC),
       timerLimit(3),
       currentAction(0),
-      observer(0),
+      observer(nullptr),
       testsuite(testsuite) {
     filename = _filename;
     observer = new GameObserver();
@@ -667,7 +668,7 @@ void TestSuiteGame::initGame() {
     observer->resetStartupGame();
 
     for (int i = 0; i < 2; i++) {
-        AIPlayerBaka* p = (AIPlayerBaka*)(observer->players[i]);
+        auto* p                = (AIPlayerBaka*)(observer->players[i]);
         p->forceBestAbilityUse = forceAbility;
         p->life = initState.players[i]->life;
         p->poisonCount = initState.players[i]->poisonCount;
@@ -684,7 +685,7 @@ void TestSuiteGame::initGame() {
                 if (card && zone != p->game->library) {
                     if (zone == p->game->inPlay) {
                         MTGCardInstance* copy = p->game->putInZone(card, p->game->library, p->game->stack);
-                        Spell* spell = NEW Spell(observer, copy);
+                        auto* spell           = NEW Spell(observer, copy);
                         spell->resolve();
                         if (!summoningSickness && (size_t)p->game->inPlay->nb_cards > k)
                             p->game->inPlay->cards[k]->summoningSickness = 0;
@@ -713,7 +714,7 @@ void TestSuiteGame::initGame() {
 MTGPlayerCards* TestSuiteGame::buildDeck(Player* player, int playerId) {
     int list[100];
     int nbcards = 0;
-    MTGPlayerCards* deck = NULL;
+    MTGPlayerCards* deck = nullptr;
 
     if (initState.players.size() > (size_t)playerId) {
         MTGGameZone* loadedPlayerZones[] = {

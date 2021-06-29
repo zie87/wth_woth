@@ -102,7 +102,7 @@ DuelLayers::~DuelLayers() {
     for (int i = 0; i < _nbitems; ++i) {
         if (objects[i] != mCardSelector) {
             SAFE_DELETE(objects[i]);
-            objects[i] = NULL;
+            objects[i] = nullptr;
         }
     }
 
@@ -133,7 +133,7 @@ int DuelLayers::receiveEvent(WEvent* e) {
     for (int i = 0; i < nbitems; ++i) used |= objects[i]->receiveEventPlus(e);
     if (!used) {
         Pos* p;
-        if (WEventZoneChange* event = dynamic_cast<WEventZoneChange*>(e)) {
+        if (auto* event = dynamic_cast<WEventZoneChange*>(e)) {
             MTGCardInstance* card = event->card;
             if (card->view)
                 waiters.push_back(p = NEW Pos(*(card->view)));
@@ -148,7 +148,7 @@ int DuelLayers::receiveEvent(WEvent* e) {
     }
     for (int i = 0; i < nbitems; ++i) objects[i]->receiveEventMinus(e);
 
-    if (WEventPhaseChange* event = dynamic_cast<WEventPhaseChange*>(e))
+    if (auto* event = dynamic_cast<WEventPhaseChange*>(e))
         if (MTG_PHASE_BEFORE_BEGIN == event->to->id) observer->mTrash->cleanup();
 
     return 1;

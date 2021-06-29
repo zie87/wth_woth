@@ -26,10 +26,10 @@ JQuadPtr SimpleMenu::spadeR;
 JQuadPtr SimpleMenu::spadeL;
 JQuadPtr SimpleMenu::jewel;
 JQuadPtr SimpleMenu::side;
-JTexture* SimpleMenu::spadeRTex = NULL;
-JTexture* SimpleMenu::spadeLTex = NULL;
-JTexture* SimpleMenu::jewelTex = NULL;
-JTexture* SimpleMenu::sideTex = NULL;
+JTexture* SimpleMenu::spadeRTex = nullptr;
+JTexture* SimpleMenu::spadeLTex = nullptr;
+JTexture* SimpleMenu::jewelTex  = nullptr;
+JTexture* SimpleMenu::sideTex   = nullptr;
 
 SimpleMenu::SimpleMenu(JGE* jge, int id, JGuiListener* listener, int fontId, float x, float y, const char* _title,
                        int _maxItems, bool centerHorizontal, bool centerVertical)
@@ -146,7 +146,7 @@ void SimpleMenu::Render() {
 
         for (int i = 0; i < mCount; ++i) {
             float y = mY + kVerticalMargin + i * kLineHeight;
-            SimpleMenuItem* smi = static_cast<SimpleMenuItem*>(mObjects[i]);
+            auto* smi = static_cast<SimpleMenuItem*>(mObjects[i]);
             smi->Relocate(mX + mWidth / 2, y);
             if (smi->hasFocus()) sY = y;
         }
@@ -186,7 +186,7 @@ void SimpleMenu::Render() {
     }
     for (int i = startId; i < startId + maxItems; i++) {
         if (i > mCount - 1) break;
-        SimpleMenuItem* currentMenuItem = static_cast<SimpleMenuItem*>(mObjects[i]);
+        auto* currentMenuItem = static_cast<SimpleMenuItem*>(mObjects[i]);
         float currentY = currentMenuItem->getY() - kLineHeight * startId;
         float menuBottomEdge = mY + height - kLineHeight + 7;
         if (currentY < menuBottomEdge) {
@@ -242,12 +242,12 @@ bool SimpleMenu::CheckUserInput(JButton key) {
             if (n >= mCount) n = mCount - 1;
 
             // check to see if the user clicked
-            if (n != mCurr && mObjects[mCurr] != NULL && mObjects[mCurr]->Leaving(JGE_BTN_DOWN)) {
+            if (n != mCurr && mObjects[mCurr] != nullptr && mObjects[mCurr]->Leaving(JGE_BTN_DOWN)) {
                 mCurr = n;
                 mObjects[mCurr]->Entering();
             }
             // if the same object was selected process click
-            else if (n == mCurr && mObjects[mCurr] != NULL && mObjects[mCurr]->Leaving(JGE_BTN_OK)) {
+            else if (n == mCurr && mObjects[mCurr] != nullptr && mObjects[mCurr]->Leaving(JGE_BTN_OK)) {
                 mObjects[mCurr]->Entering();
             }
 
@@ -288,8 +288,8 @@ void SimpleMenu::Update(float dt) {
 }
 
 void SimpleMenu::Add(int id, const char* text, string desc, bool forceFocus) {
-    SimpleMenuItem* smi = NEW SimpleMenuItem(this, id, fontId, text, 0, mY + kVerticalMargin + mCount * kLineHeight,
-                                             (mCount == 0), autoTranslate);
+    auto* smi = NEW SimpleMenuItem(this, id, fontId, text, 0, mY + kVerticalMargin + mCount * kLineHeight,
+                                   (mCount == 0), autoTranslate);
 
     smi->setDescription(desc);
     JGuiController::Add(smi);

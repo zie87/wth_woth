@@ -21,7 +21,7 @@ WResource::WResource() {
 
 bool WResource::isLocked() { return (locks != WRES_UNLOCKED); }
 
-bool WResource::isPermanent() { return (locks == WRES_PERMANENT); }
+bool WResource::isPermanent() const { return (locks == WRES_PERMANENT); }
 
 void WResource::deadbolt() {
     if (locks <= WRES_MAX_LOCK) locks = WRES_PERMANENT;
@@ -52,7 +52,7 @@ void WResource::hit() { lastTime = WResourceManager::Instance()->nowTime(); }
 WCachedResource::~WCachedResource() { WGE_LOG_TRACE("Destroying WCachedResource: {}", mFilename); }
 
 // WCachedTexture
-WCachedTexture::WCachedTexture() { texture = NULL; }
+WCachedTexture::WCachedTexture() { texture = nullptr; }
 
 WCachedTexture::~WCachedTexture() {
     if (texture) SAFE_DELETE(texture);
@@ -79,7 +79,7 @@ JQuadPtr WCachedTexture::GetQuad(float offX, float offY, float width, float heig
         if (resname != kGenericCardID && resname != kGenericCardThumbnailID) resource = kPlaceholderID;
     }
 
-    std::map<string, JQuadPtr>::iterator iter = mTrackedQuads.find(resource);
+    auto iter = mTrackedQuads.find(resource);
     if (iter != mTrackedQuads.end()) return iter->second;
 
     JQuadPtr quad(NEW JQuad(texture, offX, offY, width, height));
@@ -92,7 +92,7 @@ JQuadPtr WCachedTexture::GetQuad(float offX, float offY, float width, float heig
 
 JQuadPtr WCachedTexture::GetQuad(const string& resname) {
     JQuadPtr result;
-    std::map<string, JQuadPtr>::iterator iter = mTrackedQuads.find(resname);
+    auto iter = mTrackedQuads.find(resname);
     if (iter != mTrackedQuads.end()) result = iter->second;
 
     return result;
@@ -115,12 +115,12 @@ unsigned long WCachedTexture::size() {
     return texture->mTexHeight * texture->mTexWidth * pixel_size;
 }
 
-bool WCachedTexture::isGood() { return (texture != NULL); }
+bool WCachedTexture::isGood() { return (texture != nullptr); }
 
 void WCachedTexture::Refresh() {
     int error = 0;
     JTexture* old = texture;
-    texture = NULL;
+    texture       = nullptr;
 
     if (!Attempt(mFilename, loadedMode, error)) SAFE_DELETE(texture);
 
@@ -131,7 +131,7 @@ void WCachedTexture::Refresh() {
 
     JRenderer::GetInstance()->TransferTextureToGLContext(*texture);
 
-    for (map<string, JQuadPtr>::iterator it = mTrackedQuads.begin(); it != mTrackedQuads.end(); ++it) {
+    for (auto it = mTrackedQuads.begin(); it != mTrackedQuads.end(); ++it) {
         if (it->second.get()) it->second->mTex = texture;
     }
 }
@@ -184,7 +184,7 @@ bool WCachedTexture::Attempt(const string& filename, int submode, int& error) {
 }
 
 // WCachedSample
-WCachedSample::WCachedSample() { sample = NULL; }
+WCachedSample::WCachedSample() { sample = nullptr; }
 
 WCachedSample::~WCachedSample() { SAFE_DELETE(sample); }
 
@@ -195,11 +195,7 @@ unsigned long WCachedSample::size() {
     return sample->fileSize();
 }
 
-bool WCachedSample::isGood() {
-    if (!sample || !sample->mSample) return false;
-
-    return true;
-}
+bool WCachedSample::isGood() { return !(!sample || !sample->mSample); }
 
 void WCachedSample::Refresh() { return; }
 
@@ -223,10 +219,7 @@ bool WCachedSample::Attempt(const string& filename, int submode, int& error) {
 
 // WCachedParticles
 
-bool WCachedParticles::isGood() {
-    if (!particles) return false;
-    return true;
-}
+bool WCachedParticles::isGood() { return particles != nullptr; }
 
 unsigned long WCachedParticles::size() {
     if (!particles) return 0;  // Sizeof(pointer)
@@ -271,12 +264,12 @@ bool WCachedParticles::Attempt(const string& filename, int submode, int& error) 
     fileSys->ReadFile(&(particles->nEmission), sizeof(hgeParticleSystemInfo) - sizeof(void*));
     fileSys->CloseFile();
 
-    particles->sprite = NULL;
+    particles->sprite = nullptr;
     error = CACHE_ERROR_NONE;
     return true;
 }
 
 hgeParticleSystemInfo* WCachedParticles::Actual() { return particles; }
 
-WCachedParticles::WCachedParticles() { particles = NULL; }
+WCachedParticles::WCachedParticles() { particles = nullptr; }
 WCachedParticles::~WCachedParticles() { SAFE_DELETE(particles); }

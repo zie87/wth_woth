@@ -42,7 +42,7 @@ WSrcCards::WSrcCards(float delay) {
     mDelay = delay;
     mLastInput = 0;
     currentPos = 0;
-    filtersRoot = NULL;
+    filtersRoot = nullptr;
 }
 
 JQuadPtr WSrcCards::getImage(int offset) {
@@ -68,6 +68,7 @@ void WSrcCards::bakeFilters() {
     vector<MTGCard*> temp;
 
     setOffset(0);
+    temp.reserve(Size());
     for (int t = 0; t < Size(); t++) {
         temp.push_back(getCard(t));
     }
@@ -92,10 +93,10 @@ int WSrcCards::Size(bool all) {
 MTGCard* WSrcCards::getCard(int offset, bool ignore) {
     int oldpos;
     int size = (int)cards.size();
-    MTGCard* c = NULL;
+    MTGCard* c = nullptr;
     if (!ignore && filtersRoot) size = (int)validated.size();
 
-    if (!size) return NULL;
+    if (!size) return nullptr;
 
     oldpos = currentPos;
     if (offset != 0) currentPos += offset;
@@ -144,7 +145,7 @@ int WSrcCards::loadMatches(WSrcCards* src, bool all) {
     int count = 0;
     if (!src) return count;
 
-    MTGCard* c = NULL;
+    MTGCard* c = nullptr;
 
     int oldp = src->getOffset();
     src->setOffset(0);
@@ -274,7 +275,7 @@ bool WSrcCards::isEmptySet(WCardFilter* f) {
 }
 
 void WSrcCards::addFilter(WCardFilter* f) {
-    if (filtersRoot == NULL)
+    if (filtersRoot == nullptr)
         filtersRoot = f;
     else
         filtersRoot = NEW WCFilterAND(f, filtersRoot);
@@ -292,7 +293,7 @@ void WSrcCards::clearFilters() {
 }
 WCardFilter* WSrcCards::unhookFilters() {
     WCardFilter* temp = filtersRoot;
-    filtersRoot = NULL;
+    filtersRoot       = nullptr;
     clearFilters();
     return temp;
 }
@@ -318,7 +319,7 @@ WSrcUnlockedCards::WSrcUnlockedCards(float delay) : WSrcCards(delay) {
     MTGAllCards* ac = MTGCollection();
     map<int, MTGCard*>::iterator it;
 
-    char* unlocked = NULL;
+    char* unlocked = nullptr;
     unlocked = (char*)calloc(setlist.size(), sizeof(char));
     // Figure out which sets are available.
     for (int i = 0; i < setlist.size(); i++) {
@@ -330,7 +331,7 @@ WSrcUnlockedCards::WSrcUnlockedCards(float delay) : WSrcCards(delay) {
     }
     if (unlocked) {
         free(unlocked);
-        unlocked = NULL;
+        unlocked = nullptr;
     }
 
     if (cards.size()) {
@@ -374,7 +375,7 @@ void WSrcDeck::clearCounts() {
 
 void WSrcDeck::addCount(MTGCard* c, int qty) {
     if (!c || !c->data) return;
-    map<int, int>::iterator cp = copies.find(c->getMTGId());
+    auto cp = copies.find(c->getMTGId());
 
     if (matchesFilters(c)) {
         counts[FILTERED_COPIES] += qty;
@@ -406,7 +407,7 @@ int WSrcDeck::Add(MTGCard* c, int quantity) {
 
 int WSrcDeck::Remove(MTGCard* c, int quantity, bool erase) {
     if (!c) return 0;
-    map<int, int>::iterator it = copies.find(c->getMTGId());
+    auto it = copies.find(c->getMTGId());
     if (it == copies.end()) return 0;
     int amt = it->second;
     if (amt < quantity) return 0;
@@ -414,7 +415,7 @@ int WSrcDeck::Remove(MTGCard* c, int quantity, bool erase) {
     it->second = amt;
     if (erase && amt == 0) {
         copies.erase(it);
-        vector<MTGCard*>::iterator i = find(cards.begin(), cards.end(), c);
+        auto i = find(cards.begin(), cards.end(), c);
         if (i != cards.end()) cards.erase(i);
     }
     addCount(c, -quantity);
@@ -446,7 +447,7 @@ int WSrcDeck::countByName(MTGCard* card, bool editions) {
             if (editions)
                 total++;
             else {
-                map<int, int>::iterator mi = copies.find((*it)->getMTGId());
+                auto mi = copies.find((*it)->getMTGId());
                 if (mi != copies.end()) total += mi->second;
             }
         }
@@ -461,7 +462,7 @@ int WSrcDeck::getCount(int count) {
 
 int WSrcDeck::totalPrice() {
     int total = 0;
-    PriceList* pricelist = NEW PriceList("settings/prices.dat", MTGCollection());
+    auto* pricelist = NEW PriceList("settings/prices.dat", MTGCollection());
     map<int, int>::iterator it;
     for (it = copies.begin(); it != copies.end(); it++) {
         int nb = it->second;

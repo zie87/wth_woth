@@ -25,17 +25,17 @@ float StoryDialog::currentY = 2;
 float StoryDialog::previousY = 2;
 bool StoryReward::rewardSoundPlayed = false;
 bool StoryReward::rewardsEnabled = true;
-MTGDeck* StoryReward::collection = NULL;
+MTGDeck* StoryReward::collection    = nullptr;
 
 StoryDialogElement::StoryDialogElement(float x, float y, int id) : JGuiObject(id), mX(x), mY(y) {}
 
 StoryText::StoryText(string text, float _mX, float _mY, string _align, int _font, int id)
     : StoryDialogElement(_mX, _mY, id), text(text), font(_font) {
     align = JGETEXT_LEFT;
-    if (_align.compare("center") == 0) {
+    if (_align == "center") {
         align = JGETEXT_CENTER;
         if (mX == 0) mX = SCREEN_WIDTH / 2;
-    } else if (_align.compare("right") == 0) {
+    } else if (_align == "right") {
         align = JGETEXT_RIGHT;
         if (mX == 0) mX = SCREEN_WIDTH - 10;
     }
@@ -63,9 +63,9 @@ StoryReward::StoryReward(string _type, string _value, string text, float _mX, fl
                          int id)
     : StoryText(text, _mX, _mY, _align, _font, id) {
     type = STORY_REWARD_CREDITS;
-    if (_type.compare("unlockset") == 0) {
+    if (_type == "unlockset") {
         type = STORY_REWARD_SET;
-    } else if (_type.compare("card") == 0) {
+    } else if (_type == "card") {
         type = STORY_REWARD_CARD;
     }
     value = _value;
@@ -105,7 +105,7 @@ void StoryReward::Update(float dt) {
     }
     case STORY_REWARD_CARD: {
         int cardId = 0;
-        MTGCard* card = NULL;
+        MTGCard* card = nullptr;
         if (value.size()) {
             card = MTGCollection()->getCardByName(value);
             if (card) {
@@ -217,7 +217,7 @@ bool StoryChoice::Leaving(JButton key) {
 
 bool StoryChoice::ButtonPressed() { return true; }
 
-bool StoryChoice::hasFocus() { return mHasFocus; }
+bool StoryChoice::hasFocus() const { return mHasFocus; }
 
 std::ostream& StoryChoice::toString(std::ostream& out) const {
     return out << "StoryChoice ::: mHasFocus : " << mHasFocus;
@@ -256,8 +256,8 @@ void StoryDuel::init() {
 }
 
 StoryDuel::StoryDuel(TiXmlElement* root, StoryFlow* mParent) : StoryPage(mParent) {
-    game = NULL;
-    rules = NULL;
+    game   = nullptr;
+    rules  = nullptr;
     pageId = root->Attribute("id");
     for (TiXmlNode* node = root->FirstChild(); node; node = node->NextSibling()) {
         TiXmlElement* element = node->ToElement();
@@ -321,19 +321,19 @@ int StoryPage::loadElement(TiXmlElement* element) {
 }
 
 StoryDialog::StoryDialog(TiXmlElement* root, StoryFlow* mParent)
-    : StoryPage(mParent), JGuiListener(), JGuiController(JGE::GetInstance(), 1, NULL) {
+    : StoryPage(mParent), JGuiListener(), JGuiController(JGE::GetInstance(), 1, nullptr) {
     currentY = 0;
 
     for (TiXmlNode* node = root->FirstChild(); node; node = node->NextSibling()) {
         TiXmlElement* element = node->ToElement();
         if (element) {
             string sX = safeAttribute(element, "x");
-            float x = static_cast<float>(atof(sX.c_str()));
+            auto x    = static_cast<float>(atof(sX.c_str()));
             if (x > 0 && x < 1) {
                 x = SCREEN_WIDTH_F * x;
             }
             string sY = safeAttribute(element, "y");
-            float y = static_cast<float>(atof(sY.c_str()));
+            auto y    = static_cast<float>(atof(sY.c_str()));
             if (y > 0 && y < 1) {
                 y = SCREEN_HEIGHT_F * y;
             }
@@ -349,7 +349,7 @@ StoryDialog::StoryDialog(TiXmlElement* root, StoryFlow* mParent)
                 graphics.push_back(NEW StoryText(text, x, y, "center", Fonts::MENU_FONT));
             } else if (strcmp(element->Value(), "img") == 0) {
                 // special case to force center
-                if (sX.compare("") == 0) {
+                if (sX == "") {
                     x = -1;
                 }
                 string img = string("campaigns/").append(mParent->folder).append("/").append(text);
@@ -358,7 +358,7 @@ StoryDialog::StoryDialog(TiXmlElement* root, StoryFlow* mParent)
                 string id = element->Attribute("goto");
                 if (!align.size()) align = "center";
                 int i = mObjects.size();
-                StoryChoice* sc = NEW StoryChoice(id, text, i, x, y, align, font, (i == 0));
+                auto* sc = NEW StoryChoice(id, text, i, x, y, align, font, (i == 0));
                 graphics.push_back(sc);
                 Add(sc);
             } else if (strcmp(element->Value(), "reward") == 0) {
@@ -401,7 +401,7 @@ void StoryDialog::Render() {
     currentY = 2;
     previousY = currentY;
     for (size_t i = 0; i < graphics.size(); ++i) {
-        StoryDialogElement* elmt = (StoryDialogElement*)(graphics[i]);
+        auto* elmt = (StoryDialogElement*)(graphics[i]);
         if (mCount && elmt == mObjects[0]) currentY += SPACE_BEFORE_CHOICES;
         RenderElement(elmt);
     }
@@ -429,8 +429,8 @@ StoryFlow::StoryFlow(string folder) : folder(folder) {
 
 StoryPage* StoryFlow::loadPage(TiXmlElement* element) {
     TiXmlNode* typeNode = element->FirstChild("type");
-    if (!typeNode) return NULL;
-    StoryPage* result = NULL;
+    if (!typeNode) return nullptr;
+    StoryPage* result = nullptr;
     const char* type = typeNode->ToElement()->GetText();
     if (strcmp(type, "duel") == 0) {
         result = NEW StoryDuel(element, this);
@@ -467,7 +467,7 @@ bool StoryFlow::parse(string path) {
     JFileSystem* fileSystem = JFileSystem::GetInstance();
     if (!fileSystem) return false;
 
-    if (!fileSystem->OpenFile(path.c_str())) return false;
+    if (!fileSystem->OpenFile(path)) return false;
 
     int size = fileSystem->GetFileSize();
     char* xmlBuffer = NEW char[size];
@@ -481,7 +481,7 @@ bool StoryFlow::parse(string path) {
 
     for (TiXmlNode* node = doc.FirstChild(); node; node = node->NextSibling()) {
         TiXmlElement* element = node->ToElement();
-        if (element != NULL) {
+        if (element != nullptr) {
             if (strcmp(element->Value(), "page") == 0) {
                 string id = element->Attribute("id");
 
@@ -497,10 +497,10 @@ bool StoryFlow::parse(string path) {
     }
 
     // autoLoad
-    PlayerData* pd = NEW PlayerData();
-    map<string, string>::iterator it = pd->storySaves.find(folder);
+    auto* pd = NEW PlayerData();
+    auto it  = pd->storySaves.find(folder);
     if (it != pd->storySaves.end()) {
-        if (it->second.compare("End") != 0) loadPageId(it->second);
+        if (it->second != "End") loadPageId(it->second);
     }
     SAFE_DELETE(pd);
 
@@ -512,13 +512,13 @@ void StoryFlow::Update(float dt) { pages[currentPageId]->Update(dt); }
 void StoryFlow::Render() { pages[currentPageId]->Render(); }
 
 StoryFlow::~StoryFlow() {
-    for (map<string, StoryPage*>::iterator i = pages.begin(); i != pages.end(); ++i) {
+    for (auto i = pages.begin(); i != pages.end(); ++i) {
         SAFE_DELETE(i->second);
     }
     pages.clear();
 
     // autoSave progress
-    PlayerData* pd = NEW PlayerData();
+    auto* pd               = NEW PlayerData();
     pd->storySaves[folder] = currentPageId;
     pd->save();
     SAFE_DELETE(pd);

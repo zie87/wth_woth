@@ -59,7 +59,7 @@ public:
     // Used for mouse support so that the GUI engine can found out which Object was selected
     virtual bool getTopLeft(float& top, float& left) { return false; };
 
-    int GetId();
+    int GetId() const;
 };
 
 class JGuiController {
@@ -109,7 +109,7 @@ public:
     void SetStyle(int style);
     void SetCursor(JSprite* cursor);
 
-    bool IsActive();
+    bool IsActive() const;
     void SetActive(bool flag);
 };
 

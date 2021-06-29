@@ -47,7 +47,7 @@ SimplePad::SimplePad() {
     buf[1] = '\0';
     SimpleKey* k;
 
-    for (int x = 0; x < KPD_MAX; x++) keys[x] = NULL;
+    for (int x = 0; x < KPD_MAX; x++) keys[x] = nullptr;
 
     // Add the alphabet. We cheat a bit here.
     for (int x = 'a'; x <= 'z'; x++) {
@@ -112,13 +112,13 @@ SimplePad::~SimplePad() {
 }
 
 SimpleKey* SimplePad::Add(string display, unsigned char id) {
-    if (nbitems >= KPD_MAX) return NULL;
+    if (nbitems >= KPD_MAX) return nullptr;
 
     keys[nbitems++] = NEW SimpleKey(display, id);
     return keys[nbitems - 1];
 }
 void SimplePad::pressKey(unsigned char key) {
-    string input = "";
+    string input;
 
     if (isalpha(key)) {
         if (bCapslock)
@@ -179,8 +179,8 @@ void SimplePad::Update(float dt) {
     unsigned int minDistance = -1;
     if (mEngine->GetLeftClickCoordinates(x, y)) {
         for (int i = 0; i < nbitems; i++) {
-            unsigned int distance = static_cast<unsigned int>((keys[i]->mY - (float)y) * (keys[i]->mY - (float)y) +
-                                                              (keys[i]->mX - (float)x) * (keys[i]->mX - (float)x));
+            auto distance = static_cast<unsigned int>((keys[i]->mY - (float)y) * (keys[i]->mY - (float)y) +
+                                                      (keys[i]->mX - (float)x) * (keys[i]->mX - (float)x));
             if (distance < minDistance) {
                 minDistance = distance;
                 n = i;
@@ -267,7 +267,7 @@ string SimplePad::Finish() {
 
     // Return result.
     if (bCanceled) {
-        dest = NULL;
+        dest = nullptr;
         return original;
     } else {  // Strip trailing spaces.
         string whitespaces(" \t\f\v\n\r");
@@ -278,10 +278,10 @@ string SimplePad::Finish() {
             buffer = "";
     }
 
-    if (dest != NULL) {
+    if (dest != nullptr) {
         dest->clear();
         dest->insert(0, buffer);
-        dest = NULL;
+        dest = nullptr;
     }
     return buffer;
 }
@@ -311,7 +311,7 @@ void SimplePad::Render() {
 
     // Draw text-entry title, if we've got one.
     if (title != "") {
-        mFont->DrawString(_(title.c_str()), mX, mY);
+        mFont->DrawString(_(title), mX, mY);
     }
     mY += kH + 12;
 
@@ -400,7 +400,7 @@ void SimplePad::Render() {
         }
 }
 
-unsigned int SimplePad::cursorPos() {
+unsigned int SimplePad::cursorPos() const {
     if (cursor > buffer.size()) return buffer.size();
 
     return cursor;

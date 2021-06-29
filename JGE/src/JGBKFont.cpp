@@ -14,13 +14,13 @@
 #include "JGBKFont.h"
 #include "JFileSystem.h"
 
-JRenderer* JGBKFont::mRenderer = NULL;
+JRenderer* JGBKFont::mRenderer = nullptr;
 
 JGBKFont::JGBKFont() {
     mRenderer = JRenderer::GetInstance();
 
-    mChnFont = NULL;
-    mEngFont = NULL;
+    mChnFont = nullptr;
+    mEngFont = nullptr;
 
     mCurr = 0;
 
@@ -32,11 +32,11 @@ JGBKFont::JGBKFont() {
     mRotation = 0.0f;
 
     mCount = 0;
-    mTexture = NULL;
-    mSprites = NULL;
-    mGBCode = NULL;
+    mTexture = nullptr;
+    mSprites = nullptr;
+    mGBCode  = nullptr;
 
-    mCharBuffer = NULL;
+    mCharBuffer = nullptr;
 }
 
 JGBKFont::~JGBKFont() {
@@ -350,7 +350,7 @@ int JGBKFont::GetStringHeight(BYTE* str) {
     GetStringArea(str, &w, &h);
     return h;
 }
-void JGBKFont::GetStringArea(BYTE* str, int* w, int* h) {
+void JGBKFont::GetStringArea(BYTE* str, int* w, int* h) const {
     BYTE* src = str;
     float len = 0;
     float xx = 0;
@@ -400,11 +400,11 @@ void JGBKFont::GetStringArea(BYTE* str, int* w, int* h) {
                 if (*src > 0x80) {
                     // index = PreCacheChar(src);
                     src += 2;
-                    if (isChinese == false) xx += 5 * (mFontSize * mScale) / 16;
+                    if (!isChinese) xx += 5 * (mFontSize * mScale) / 16;
                     isChinese = true;
                 } else if (*src >= ' ') {
                     src += 1;
-                    if (isChinese == true) xx -= 3 * (mFontSize * mScale) / 16;
+                    if (isChinese) xx -= 3 * (mFontSize * mScale) / 16;
                     isChinese = false;
                 }
 
@@ -495,12 +495,12 @@ void JGBKFont::RenderString(BYTE* str, float x, float y, int alignment) {
                 if (*src > 0x80) {
                     index = PreCacheChar(src);
                     src += 2;
-                    if (isChinese == false) xx += 5 * (mFontSize * mScale) / 16;
+                    if (!isChinese) xx += 5 * (mFontSize * mScale) / 16;
                     isChinese = true;
                 } else if (*src >= ' ') {
                     index = PreCacheChar(src);
                     src += 1;
-                    if (isChinese == true) xx -= 3 * (mFontSize * mScale) / 16;
+                    if (isChinese) xx -= 3 * (mFontSize * mScale) / 16;
                     isChinese = false;
                 }
 

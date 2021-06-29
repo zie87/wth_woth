@@ -16,9 +16,9 @@ public:
     ManaCostHybrid(int c1, int v1, int c2, int v2);
 
     void init(int c1, int v1, int c2, int v2);
-    int hasColor(int color);
-    std::string toString();
-    int getConvertedCost();
+    int hasColor(int color) const;
+    std::string toString() const;
+    int getConvertedCost() const;
 
     friend std::ostream& operator<<(std::ostream& out, ManaCostHybrid& m);
     friend std::ostream& operator<<(std::ostream& out, ManaCostHybrid* m);

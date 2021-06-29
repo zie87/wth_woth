@@ -8,13 +8,13 @@
 #include "GameObserver.h"
 
 CardDisplay::CardDisplay(GameObserver* game) : PlayGuiObjectController(game), mId(0) {
-    tc = NULL;
-    listener = NULL;
+    tc                 = nullptr;
+    listener           = nullptr;
     nb_displayed_items = 7;
     start_item = 0;
     x = 0;
     y = 0;
-    zone = NULL;
+    zone               = nullptr;
 }
 
 CardDisplay::CardDisplay(int id, GameObserver* game, int _x, int _y, JGuiListener* _listener, TargetChooser* _tc,
@@ -26,7 +26,7 @@ CardDisplay::CardDisplay(int id, GameObserver* game, int _x, int _y, JGuiListene
     start_item = 0;
     if (x + nb_displayed_items * 30 + 25 > SCREEN_WIDTH) x = SCREEN_WIDTH - (nb_displayed_items * 30 + 25);
     if (y + 55 > SCREEN_HEIGHT) y = SCREEN_HEIGHT - 55;
-    zone = NULL;
+    zone = nullptr;
 }
 
 void CardDisplay::AddCard(MTGCardInstance* _card) {
@@ -49,7 +49,7 @@ void CardDisplay::init(MTGGameZone* zone) {
 void CardDisplay::rotateLeft() {
     if (start_item == 0) return;
     for (size_t i = 0; i < mObjects.size(); i++) {
-        CardGui* cardg = (CardGui*)mObjects[i];
+        auto* cardg = (CardGui*)mObjects[i];
         cardg->x += 30;
     }
     start_item--;
@@ -58,7 +58,7 @@ void CardDisplay::rotateLeft() {
 void CardDisplay::rotateRight() {
     if (start_item == (int)(mObjects.size()) - 1) return;
     for (size_t i = 0; i < mObjects.size(); i++) {
-        CardGui* cardg = (CardGui*)mObjects[i];
+        auto* cardg = (CardGui*)mObjects[i];
         cardg->x -= 30;
     }
     start_item++;
@@ -74,7 +74,7 @@ void CardDisplay::Update(float dt) {
                 update = true;
                 break;
             }
-            CardGui* cardg = (CardGui*)mObjects[i];
+            auto* cardg = (CardGui*)mObjects[i];
             if (cardg->card != zone->cards[i]) update = true;
         }
     }
@@ -93,7 +93,7 @@ bool CardDisplay::CheckUserInput(JButton key) {
 
     if (mActionButton == key) {
         if (mObjects[mCurr] && mObjects[mCurr]->ButtonPressed()) {
-            CardGui* cardg = (CardGui*)mObjects[mCurr];
+            auto* cardg = (CardGui*)mObjects[mCurr];
             if (tc) {
                 tc->toggleTarget(cardg->card);
                 return true;
@@ -116,7 +116,7 @@ bool CardDisplay::CheckUserInput(JButton key) {
                 rotateLeft();
             }
         }
-        if (n != mCurr && mObjects[mCurr] != NULL && mObjects[mCurr]->Leaving(JGE_BTN_LEFT)) {
+        if (n != mCurr && mObjects[mCurr] != nullptr && mObjects[mCurr]->Leaving(JGE_BTN_LEFT)) {
             mCurr = n;
             mObjects[mCurr]->Entering();
         }
@@ -131,7 +131,7 @@ bool CardDisplay::CheckUserInput(JButton key) {
         if (n >= start_item + nb_displayed_items) {
             rotateRight();
         }
-        if (n != mCurr && mObjects[mCurr] != NULL && mObjects[mCurr]->Leaving(JGE_BTN_RIGHT)) {
+        if (n != mCurr && mObjects[mCurr] != nullptr && mObjects[mCurr]->Leaving(JGE_BTN_RIGHT)) {
             mCurr = n;
             mObjects[mCurr]->Entering();
         }
@@ -172,7 +172,7 @@ bool CardDisplay::CheckUserInput(JButton key) {
                     rotateRight();
                 }
 
-                if (n != mCurr && mObjects[mCurr] != NULL && mObjects[mCurr]->Leaving(key)) {
+                if (n != mCurr && mObjects[mCurr] != nullptr && mObjects[mCurr]->Leaving(key)) {
                     mCurr = n;
                     mObjects[mCurr]->Entering();
                     result = true;
@@ -196,7 +196,7 @@ void CardDisplay::Render() {
         if (mObjects[i]) {
             mObjects[i]->Render();
             if (tc) {
-                CardGui* cardg = (CardGui*)mObjects[i];
+                auto* cardg = (CardGui*)mObjects[i];
                 if (tc->alreadyHasTarget(cardg->card)) {
                     r->DrawCircle(cardg->x + 5, cardg->y + 5, 5, ARGB(255, 255, 0, 0));
                 } else if (!tc->canTarget(cardg->card)) {
@@ -207,7 +207,7 @@ void CardDisplay::Render() {
     }
 
     // TODO: CardSelector should handle the graveyard and the library in the future...
-    if (mObjects.size() && mObjects[mCurr] != NULL) {
+    if (mObjects.size() && mObjects[mCurr] != nullptr) {
         mObjects[mCurr]->Render();
         CardGui* cardg = ((CardGui*)mObjects[mCurr]);
         Pos pos = Pos(CardGui::BigWidth / 2, CardGui::BigHeight / 2 - 10, 1.0, 0.0, 220);

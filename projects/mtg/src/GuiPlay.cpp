@@ -134,7 +134,7 @@ void GuiPlay::BattleField::Render() {
 GuiPlay::GuiPlay(GameObserver* game) : GuiLayer(game) { end_spells = cards.end(); }
 
 GuiPlay::~GuiPlay() {
-    for (iterator it = cards.begin(); it != cards.end(); ++it) {
+    for (auto it = cards.begin(); it != cards.end(); ++it) {
         delete (*it);
     }
 }
@@ -148,7 +148,7 @@ void GuiPlay::Replace() {
 
     end_spells = stable_partition(cards.begin(), cards.end(), &isSpell);
 
-    for (iterator it = cards.begin(); it != end_spells; ++it)
+    for (auto it = cards.begin(); it != end_spells; ++it)
         if (!(*it)->card->target) {
             if ((!(*it)->card->hasSubtype(Subtypes::TYPE_AURA) ||
                  ((*it)->card->hasSubtype(Subtypes::TYPE_AURA) && (*it)->card->playerTarget)) &&
@@ -159,7 +159,7 @@ void GuiPlay::Replace() {
                     ++opponentSpellsN;
             }
         }
-    for (iterator it = end_spells; it != cards.end(); ++it) {
+    for (auto it = end_spells; it != cards.end(); ++it) {
         if ((*it)->card->isCreature()) {
             if ((*it)->card->isAttacker())
                 ++battleFieldAttackersN;
@@ -180,7 +180,7 @@ void GuiPlay::Replace() {
     opponentSpells.reset(opponentSpellsN, 18, 60);
     selfSpells.reset(selfSpellsN, 18, 215);
 
-    for (iterator it = cards.begin(); it != end_spells; ++it)
+    for (auto it = cards.begin(); it != end_spells; ++it)
         if (!(*it)->card->target) {
             if ((!(*it)->card->hasSubtype(Subtypes::TYPE_AURA) ||
                  ((*it)->card->hasSubtype(Subtypes::TYPE_AURA) && (*it)->card->playerTarget)) &&
@@ -202,7 +202,7 @@ void GuiPlay::Replace() {
     selfCreatures.reset(selfCreaturesN, myx, 195);
     selfLands.reset(selfLandsN, myx, 240);
 
-    for (iterator it = end_spells; it != cards.end(); ++it) {
+    for (auto it = end_spells; it != cards.end(); ++it) {
         if ((*it)->card->isCreature()) {
             if ((*it)->card->isAttacker())
                 battleField.EnstackAttacker(*it);
@@ -220,7 +220,7 @@ void GuiPlay::Replace() {
         }
     }
     // rerun the iter reattaching planes walkers to the back of the lands.
-    for (iterator it = end_spells; it != cards.end(); ++it) {
+    for (auto it = end_spells; it != cards.end(); ++it) {
         if ((*it)->card->hasType(Subtypes::TYPE_PLANESWALKER)) {
             if (observer->players[0] == (*it)->card->controller())
                 selfLands.Enstack(*it);
@@ -233,7 +233,7 @@ void GuiPlay::Replace() {
 void GuiPlay::Render() {
     battleField.Render();
 
-    for (iterator it = cards.begin(); it != cards.end(); ++it)
+    for (auto it = cards.begin(); it != cards.end(); ++it)
         if ((*it)->card->isLand()) {
             if (observer->players[0] == (*it)->card->controller())
                 selfLands.Render(*it, cards.begin(), end_spells);
@@ -262,11 +262,11 @@ void GuiPlay::Render() {
 }
 void GuiPlay::Update(float dt) {
     battleField.Update(dt);
-    for (iterator it = cards.begin(); it != cards.end(); ++it) (*it)->Update(dt);
+    for (auto it = cards.begin(); it != cards.end(); ++it) (*it)->Update(dt);
 }
 
 int GuiPlay::receiveEventPlus(WEvent* e) {
-    if (WEventZoneChange* event = dynamic_cast<WEventZoneChange*>(e)) {
+    if (auto* event = dynamic_cast<WEventZoneChange*>(e)) {
         if ((observer->players[0]->inPlay() == event->to) || (observer->players[1]->inPlay() == event->to)) {
             CardView* card;
             if (event->card->view) {
@@ -292,22 +292,22 @@ int GuiPlay::receiveEventPlus(WEvent* e) {
             observer->getCardSelector()->Add(card);
             return 1;
         }
-    } else if (WEventCreatureAttacker* event = dynamic_cast<WEventCreatureAttacker*>(e)) {
-        if (NULL != event->after)
+    } else if (auto* event = dynamic_cast<WEventCreatureAttacker*>(e)) {
+        if (nullptr != event->after)
             battleField.addAttacker(event->card);
-        else if (NULL != event->before)
+        else if (nullptr != event->before)
             battleField.removeAttacker(event->card);
         Replace();
     } else if (dynamic_cast<WEventCreatureBlocker*>(e)) {
         Replace();
-    } else if (WEventCardTap* event = dynamic_cast<WEventCardTap*>(e)) {
-        if (CardView* cv = dynamic_cast<CardView*>(event->card->view)) {
+    } else if (auto* event = dynamic_cast<WEventCardTap*>(e)) {
+        if (auto* cv = dynamic_cast<CardView*>(event->card->view)) {
             if (event->after)
                 gModRules.cards.activateEffect->doEffect(cv);
             else
                 gModRules.cards.activateEffect->undoEffect(cv);
             // cv->t = event->after ? M_PI / 2 : 0;
-        } else if (event->card->view != NULL) {
+        } else if (event->card->view != nullptr) {
             if (event->after)
                 gModRules.cards.activateEffect->doEffect(event->card->view);
             else
@@ -318,7 +318,7 @@ int GuiPlay::receiveEventPlus(WEvent* e) {
             assert(false);
         }
         return 1;
-    } else if (WEventPhaseChange* event = dynamic_cast<WEventPhaseChange*>(e)) {
+    } else if (auto* event = dynamic_cast<WEventPhaseChange*>(e)) {
         if (MTG_PHASE_COMBATEND == event->to->id) battleField.colorFlow = -1;
     } else if (dynamic_cast<WEventCardChangeType*>(e))
         Replace();
@@ -326,9 +326,9 @@ int GuiPlay::receiveEventPlus(WEvent* e) {
 }
 
 int GuiPlay::receiveEventMinus(WEvent* e) {
-    if (WEventZoneChange* event = dynamic_cast<WEventZoneChange*>(e)) {
+    if (auto* event = dynamic_cast<WEventZoneChange*>(e)) {
         if ((observer->players[0]->inPlay() == event->from) || (observer->players[1]->inPlay() == event->from))
-            for (iterator it = cards.begin(); it != cards.end(); ++it)
+            for (auto it = cards.begin(); it != cards.end(); ++it)
                 if (event->card->previous == (*it)->card || event->card == (*it)->card) {
                     if (event->card->previous && event->card->previous->attacker)
                         battleField.removeAttacker(event->card->previous);

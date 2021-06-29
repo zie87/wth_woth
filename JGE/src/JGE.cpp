@@ -163,15 +163,15 @@ void JGE::ReleaseKey(const JButton sym) {
     keyBuffer = r;
 }
 void JGE::Update(float dt) {
-    for (auto it = holds.begin(); it != holds.end(); ++it) {
-        if (it->second < 0) {
-            keyBuffer.push(triplet(LOCAL_KEY_NONE, it->first, true));
-            it->second = REPEAT_PERIOD;
+    for (auto& hold : holds) {
+        if (hold.second < 0) {
+            keyBuffer.push(triplet(LOCAL_KEY_NONE, hold.first, true));
+            hold.second = REPEAT_PERIOD;
         }
-        it->second -= dt;
+        hold.second -= dt;
     }
 
-    if (mApp != NULL) mApp->Update();
+    if (mApp != nullptr) mApp->Update();
 
     oldHolds = holds;
 }
@@ -202,9 +202,9 @@ u32 JGE::BindKey(LocalKeySym sym, JButton button) {
 }
 
 u32 JGE::UnbindKey(LocalKeySym sym, JButton button) {
-    for (keycodes_it it = keyBinds.begin(); it != keyBinds.end();)
+    for (auto it = keyBinds.begin(); it != keyBinds.end();)
         if (sym == it->first && button == it->second) {
-            keycodes_it er = it;
+            auto er = it;
             ++it;
             keyBinds.erase(er);
         } else
@@ -245,7 +245,7 @@ void JGE::LeftClickedProcessed() {
     mlastLeftClickY = -1;
 }
 
-bool JGE::GetLeftClickCoordinates(int& x, int& y) {
+bool JGE::GetLeftClickCoordinates(int& x, int& y) const {
     if (mLastLeftClickX != -1 || mlastLeftClickY != -1) {
         x = mLastLeftClickX;
         y = mlastLeftClickY;
@@ -255,10 +255,10 @@ bool JGE::GetLeftClickCoordinates(int& x, int& y) {
 }
 
 JGE::JGE() {
-    mApp = NULL;
+    mApp = nullptr;
 #if defined(WIN32) || defined(LINUX)
     strcpy(mDebuggingMsg, "");
-    mCurrentMusic = NULL;
+    mCurrentMusic = nullptr;
 #endif
     Init();
 }
@@ -370,26 +370,26 @@ void JGE::Init() {
 #endif  ///// Non PSP  code
 
 //////////////////////////////////////////////////////////////////////////
-JGE* JGE::mInstance = NULL;
+JGE* JGE::mInstance = nullptr;
 
 // returns number of milliseconds since game started
 int JGE::GetTime() { return JGEGetTime(); }
 
 void JGE::SetDelta(float delta) { mDeltaTime = delta; }
 
-float JGE::GetDelta() { return mDeltaTime; }
+float JGE::GetDelta() const { return mDeltaTime; }
 
-float JGE::GetFPS() { return mDeltaTime > 0 ? 1.0f / mDeltaTime : 0; }
+float JGE::GetFPS() const { return mDeltaTime > 0 ? 1.0f / mDeltaTime : 0; }
 
 JGE* JGE::GetInstance() {
-    if (mInstance == NULL) mInstance = new JGE();
+    if (mInstance == nullptr) mInstance = new JGE();
     return mInstance;
 }
 
 void JGE::Destroy() {
     if (mInstance) {
         delete mInstance;
-        mInstance = NULL;
+        mInstance = nullptr;
     }
 }
 
@@ -408,7 +408,7 @@ void JGE::Render() {
     JRenderer* renderer = JRenderer::GetInstance();
 
     renderer->BeginScene();
-    if (mApp != NULL) mApp->Render();
+    if (mApp != nullptr) mApp->Render();
     renderer->EndScene();
 }
 
@@ -426,7 +426,7 @@ void JGE::Pause() {
     if (mPaused) return;
 
     mPaused = true;
-    if (mApp != NULL) mApp->Pause();
+    if (mApp != nullptr) mApp->Pause();
 
     JFileSystem::GetInstance()->Pause();
 }
@@ -434,7 +434,7 @@ void JGE::Pause() {
 void JGE::Resume() {
     if (mPaused) {
         mPaused = false;
-        if (mApp != NULL) mApp->Resume();
+        if (mApp != nullptr) mApp->Resume();
     }
 }
 
@@ -445,7 +445,7 @@ void JGE::Assert(const char* filename, long lineNumber) {
 }
 
 void JGE::Scroll(int inXVelocity, int inYVelocity) {
-    if (mApp != NULL) {
+    if (mApp != nullptr) {
         mApp->OnScroll(inXVelocity, inYVelocity);
     }
 }

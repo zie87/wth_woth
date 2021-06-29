@@ -56,10 +56,10 @@ public:
     string getDesc();
     virtual string createDesc() = 0;
     virtual string getShortDesc() = 0;
-    int getExpiration();
+    int getExpiration() const;
     int getReward();
     virtual bool isDone(GameObserver* observer, GameApp* _app) = 0;
-    bool isExpired();
+    bool isExpired() const;
     void setExpiration(int _expiresIn);
     void passOneDay();
 };
@@ -94,7 +94,7 @@ public:
     void removeTask(Task* task);
     void passOneDay();
     void getDoneTasks(GameObserver* observer, GameApp* _app, vector<Task*>* result);
-    int getTaskCount();
+    int getTaskCount() const;
 
     void Start();
     void End();

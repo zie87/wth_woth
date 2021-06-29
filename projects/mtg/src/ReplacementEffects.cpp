@@ -17,7 +17,7 @@ REDamagePrevention::REDamagePrevention(MTGAbility* source, TargetChooser* tcSour
 WEvent* REDamagePrevention::replace(WEvent* event) {
     if (!event) return event;
     if (!damage) return event;
-    WEventDamage* e = dynamic_cast<WEventDamage*>(event);
+    auto* e = dynamic_cast<WEventDamage*>(event);
     if (!e) return event;
     Damage* d = e->damage;
     if (d->typeOfDamage != typeOfDamage && typeOfDamage != DAMAGE_ALL_TYPES) return event;
@@ -26,18 +26,18 @@ WEvent* REDamagePrevention::replace(WEvent* event) {
             d->damage = 0;
             delete event;
             if (oneShot) damage = 0;
-            return NULL;
+            return nullptr;
         }
         if (damage >= d->damage) {
             damage -= d->damage;
             d->damage = 0;
             delete event;
-            return NULL;
+            return nullptr;
         }
         d->damage -= damage;
         damage = 0;
         delete event;
-        WEventDamage* newEvent = NEW WEventDamage(d);
+        auto* newEvent = NEW WEventDamage(d);
         return newEvent;
     }
     return event;
@@ -53,16 +53,16 @@ RECountersPrevention::RECountersPrevention(MTGAbility* source, MTGCardInstance* 
 
 WEvent* RECountersPrevention::replace(WEvent* event) {
     if (!event) return event;
-    WEventCounters* e = dynamic_cast<WEventCounters*>(event);
+    auto* e = dynamic_cast<WEventCounters*>(event);
     if (!e) return event;
     if ((MTGCardInstance*)e->targetCard) {
         if ((MTGCardInstance*)e->targetCard == cardSource && counter) {
             if (e->power == counter->power && e->toughness == counter->toughness && e->name == counter->name)
-                return event = NULL;
+                return event = nullptr;
         } else if ((MTGCardInstance*)e->targetCard == cardSource)
-            return event = NULL;
+            return event = nullptr;
         else if (TargetingCards && TargetingCards->canTarget((MTGCardInstance*)e->targetCard))
-            return event = NULL;
+            return event = nullptr;
     }
     return event;
 }
@@ -74,7 +74,7 @@ WEvent* ReplacementEffects::replace(WEvent* e) {
     for (auto it = modifiers.begin(); it != modifiers.end(); it++) {
         ReplacementEffect* re = *it;
         WEvent* newEvent = re->replace(e);
-        if (!newEvent) return NULL;
+        if (!newEvent) return nullptr;
         if (newEvent != e) return replace(newEvent);
     }
     return e;

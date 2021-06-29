@@ -178,7 +178,7 @@ private:
 
     bool mSmallEnglishFont;
 
-    void GetStringArea(BYTE* str, int* w, int* h);
+    void GetStringArea(BYTE* str, int* w, int* h) const;
 };
 
 #endif

@@ -12,7 +12,7 @@
 #include <wge/log.hpp>
 
 TargetChooser* TargetChooserFactory::createTargetChooser(string s, MTGCardInstance* card, MTGAbility* ability) {
-    if (!s.size()) return NULL;
+    if (!s.size()) return nullptr;
 
     int zones[10];
     int nbzones = 0;
@@ -111,21 +111,21 @@ TargetChooser* TargetChooserFactory::createTargetChooser(string s, MTGCardInstan
             }
             zones[nbzones] = MTGGameZone::MY_BATTLEFIELD;
 
-            if (zoneName.compare("*") == 0) {
+            if (zoneName == "*") {
                 zones[nbzones++] = MTGGameZone::ALL_ZONES;
-            } else if (zoneName.compare("graveyard") == 0) {
+            } else if (zoneName == "graveyard") {
                 zones[nbzones++] = MTGGameZone::MY_GRAVEYARD;
                 zones[nbzones++] = MTGGameZone::OPPONENT_GRAVEYARD;
-            } else if (zoneName.compare("battlefield") == 0 || zoneName.compare("inplay") == 0) {
+            } else if (zoneName == "battlefield" || zoneName == "inplay") {
                 zones[nbzones++] = MTGGameZone::MY_BATTLEFIELD;
                 zones[nbzones++] = MTGGameZone::OPPONENT_BATTLEFIELD;
-            } else if (zoneName.compare("hand") == 0) {
+            } else if (zoneName == "hand") {
                 zones[nbzones++] = MTGGameZone::MY_HAND;
                 zones[nbzones++] = MTGGameZone::OPPONENT_HAND;
-            } else if (zoneName.compare("library") == 0) {
+            } else if (zoneName == "library") {
                 zones[nbzones++] = MTGGameZone::MY_LIBRARY;
                 zones[nbzones++] = MTGGameZone::OPPONENT_LIBRARY;
-            } else if (zoneName.compare("nonbattlezone") == 0) {
+            } else if (zoneName == "nonbattlezone") {
                 zones[nbzones++] = MTGGameZone::MY_GRAVEYARD;
                 zones[nbzones++] = MTGGameZone::OPPONENT_GRAVEYARD;
                 zones[nbzones++] = MTGGameZone::MY_LIBRARY;
@@ -134,7 +134,7 @@ TargetChooser* TargetChooserFactory::createTargetChooser(string s, MTGCardInstan
                 zones[nbzones++] = MTGGameZone::OPPONENT_HAND;
                 zones[nbzones++] = MTGGameZone::MY_EXILE;
                 zones[nbzones++] = MTGGameZone::OPPONENT_EXILE;
-            } else if (zoneName.compare("stack") == 0) {
+            } else if (zoneName == "stack") {
                 zones[nbzones++] = MTGGameZone::MY_STACK;
                 zones[nbzones++] = MTGGameZone::OPPONENT_STACK;
             } else {
@@ -149,10 +149,10 @@ TargetChooser* TargetChooserFactory::createTargetChooser(string s, MTGCardInstan
         zones[1] = MTGGameZone::OPPONENT_BATTLEFIELD;
     }
 
-    TargetChooser* tc = NULL;
+    TargetChooser* tc  = nullptr;
     int maxtargets = 1;
     bool targetMin = false;
-    CardDescriptor* cd = NULL;
+    CardDescriptor* cd = nullptr;
     // max targets allowed
     size_t limit = s1.find('<');
     if (limit != string::npos) {
@@ -172,7 +172,7 @@ TargetChooser* TargetChooserFactory::createTargetChooser(string s, MTGCardInstan
                 maxtargets = TargetChooser::UNLITMITED_TARGETS;
                 targetMin = false;
             } else {
-                WParsedInt* howmuch = NEW WParsedInt(howmany, NULL, card);
+                auto* howmuch = NEW WParsedInt(howmany, nullptr, card);
                 maxtargets = howmuch->getValue();
                 delete howmuch;
             }
@@ -182,7 +182,7 @@ TargetChooser* TargetChooserFactory::createTargetChooser(string s, MTGCardInstan
     }
 
     if (s1.find("children") != string::npos || s1.find("parents") != string::npos) {
-        TargetChooser* deeperTc = NULL;
+        TargetChooser* deeperTc = nullptr;
         if (s1.find("[") != string::npos) {
             AbilityFactory af(observer);
             vector<string> deepTc = parseBetween(s1, "[", "]");
@@ -239,7 +239,7 @@ TargetChooser* TargetChooserFactory::createTargetChooser(string s, MTGCardInstan
                     if (operatorPosition != string::npos) {
                         string numberCD =
                             attribute.substr(operatorPosition + 1, attribute.size() - operatorPosition - 1);
-                        WParsedInt* val = NEW WParsedInt(numberCD, NULL, card);
+                        auto* val           = NEW WParsedInt(numberCD, nullptr, card);
                         comparisonCriterion = val->getValue();
                         delete val;
                         switch (attribute[operatorPosition - 1]) {
@@ -374,7 +374,7 @@ TargetChooser* TargetChooserFactory::createTargetChooser(string s, MTGCardInstan
                     string CDtype = attribute.substr(start + 6, end - start);
 
                     if (card && card->isSpell() && card->backupTargets.size()) {
-                        if (Spell* targetSpell = dynamic_cast<Spell*>(card->backupTargets[0])) {
+                        if (auto* targetSpell = dynamic_cast<Spell*>(card->backupTargets[0])) {
                             // spells always store their targets in :targets[]
                             // however they are all erased as the spell resolves
                             // added a array to store these backups incase theyre needed
@@ -494,20 +494,20 @@ TargetChooser* TargetChooserFactory::createTargetChooser(string s, MTGCardInstan
         }
         if (cd) {
             if (!tc) {
-                if (typeName.compare("*") != 0) cd->setSubtype(typeName);
+                if (typeName != "*") cd->setSubtype(typeName);
 
                 tc = NEW DescriptorTargetChooser(observer, cd, zones, nbzones, card, maxtargets, other, targetMin);
             } else {
                 delete (cd);
-                return NULL;
+                return nullptr;
             }
         } else {
             if (!tc) {
-                if (typeName.compare("*") == 0) {
+                if (typeName == "*") {
                     return NEW TargetZoneChooser(observer, zones, nbzones, card, maxtargets, other, targetMin);
-                } else if (typeName.compare("this") == 0) {
+                } else if (typeName == "this") {
                     return NEW CardTargetChooser(observer, card, card, zones, nbzones);
-                } else if (typeName.compare("mystored") == 0) {
+                } else if (typeName == "mystored") {
                     return NEW CardTargetChooser(observer, card->storedSourceCard, card, zones, nbzones);
                 } else {
                     tc = NEW TypeTargetChooser(observer, typeName.c_str(), zones, nbzones, card, maxtargets, other,
@@ -523,7 +523,7 @@ TargetChooser* TargetChooserFactory::createTargetChooser(string s, MTGCardInstan
 }
 
 TargetChooser* TargetChooserFactory::createTargetChooser(MTGCardInstance* card) {
-    if (!card) return NULL;
+    if (!card) return nullptr;
     int id = card->getId();
     string s = card->spellTargetType;
     if (card->alias) {
@@ -567,7 +567,7 @@ TargetChooser* TargetChooserFactory::createTargetChooser(MTGCardInstance* card) 
         return NEW DamageTargetChooser(observer, card, -1, 1, RESOLVED_OK);
     }
     default: {
-        return NULL;
+        return nullptr;
     }
     }
 }
@@ -586,14 +586,14 @@ TargetChooser::TargetChooser(GameObserver* observer, MTGCardInstance* card, int 
     if (source)
         Owner = source->controller();
     else
-        Owner = 0;
+        Owner = nullptr;
 }
 
 // Default targetter : every card can be targetted, unless it is protected from the targetter card
 // For spells that do not "target" a specific card, set targetter to NULL
 bool TargetChooser::canTarget(Targetable* target, bool withoutProtections) {
     if (!target) return false;
-    if (MTGCardInstance* card = dynamic_cast<MTGCardInstance*>(target)) {
+    if (auto* card = dynamic_cast<MTGCardInstance*>(target)) {
         if (other) {
             MTGCardInstance* tempcard = card;
             while (tempcard) {
@@ -726,7 +726,7 @@ CardTargetChooser::CardTargetChooser(GameObserver* observer, MTGCardInstance* _c
 bool CardTargetChooser::canTarget(Targetable* target, bool withoutProtections) {
     if (!target) return false;
 
-    MTGCardInstance* card = dynamic_cast<MTGCardInstance*>(target);
+    auto* card = dynamic_cast<MTGCardInstance*>(target);
     if (!card) return false;
     if (!nbzones && !TargetChooser::canTarget(target, withoutProtections)) return false;
     if (nbzones && !TargetZoneChooser::canTarget(target, withoutProtections)) return false;
@@ -739,12 +739,12 @@ bool CardTargetChooser::canTarget(Targetable* target, bool withoutProtections) {
 }
 
 CardTargetChooser* CardTargetChooser::clone() const {
-    CardTargetChooser* a = NEW CardTargetChooser(*this);
+    auto* a = NEW CardTargetChooser(*this);
     return a;
 }
 
 bool CardTargetChooser::equals(TargetChooser* tc) {
-    CardTargetChooser* ctc = dynamic_cast<CardTargetChooser*>(tc);
+    auto* ctc = dynamic_cast<CardTargetChooser*>(tc);
     if (!ctc) return false;
 
     if (validTarget != ctc->validTarget)  // todo, check also previous cards, see "cantarget"...
@@ -792,7 +792,7 @@ void TypeTargetChooser::addType(int type) {
 
 bool TypeTargetChooser::canTarget(Targetable* target, bool withoutProtections) {
     if (!TargetZoneChooser::canTarget(target, withoutProtections)) return false;
-    if (MTGCardInstance* card = dynamic_cast<MTGCardInstance*>(target)) {
+    if (auto* card = dynamic_cast<MTGCardInstance*>(target)) {
         for (int i = 0; i < nbtypes; i++) {
             if (card->hasSubtype(types[i])) return true;
             if (card->getLCName().size()) {
@@ -800,9 +800,9 @@ bool TypeTargetChooser::canTarget(Targetable* target, bool withoutProtections) {
             }
         }
         return false;
-    } else if (Interruptible* action = dynamic_cast<Interruptible*>(target)) {
+    } else if (auto* action = dynamic_cast<Interruptible*>(target)) {
         if (action->type == ACTION_SPELL && action->state == NOT_RESOLVED) {
-            Spell* spell = (Spell*)action;
+            auto* spell           = (Spell*)action;
             MTGCardInstance* card = spell->source;
             for (int i = 0; i < nbtypes; i++) {
                 if (card->hasSubtype(types[i])) return true;
@@ -815,12 +815,12 @@ bool TypeTargetChooser::canTarget(Targetable* target, bool withoutProtections) {
 }
 
 TypeTargetChooser* TypeTargetChooser::clone() const {
-    TypeTargetChooser* a = NEW TypeTargetChooser(*this);
+    auto* a = NEW TypeTargetChooser(*this);
     return a;
 }
 
 bool TypeTargetChooser ::equals(TargetChooser* tc) {
-    TypeTargetChooser* ttc = dynamic_cast<TypeTargetChooser*>(tc);
+    auto* ttc = dynamic_cast<TypeTargetChooser*>(tc);
     if (!ttc) return false;
 
     if (nbtypes != ttc->nbtypes) return false;
@@ -864,11 +864,11 @@ DescriptorTargetChooser::DescriptorTargetChooser(GameObserver* observer, CardDes
 
 bool DescriptorTargetChooser::canTarget(Targetable* target, bool withoutProtections) {
     if (!TargetZoneChooser::canTarget(target, withoutProtections)) return false;
-    if (MTGCardInstance* _target = dynamic_cast<MTGCardInstance*>(target)) {
+    if (auto* _target = dynamic_cast<MTGCardInstance*>(target)) {
         if (cd->match(_target)) return true;
-    } else if (Interruptible* action = dynamic_cast<Interruptible*>(target)) {
+    } else if (auto* action = dynamic_cast<Interruptible*>(target)) {
         if (action->type == ACTION_SPELL && action->state == NOT_RESOLVED) {
-            Spell* spell = (Spell*)action;
+            auto* spell           = (Spell*)action;
             MTGCardInstance* card = spell->source;
             if (cd->match(card)) return true;
         }
@@ -879,13 +879,13 @@ bool DescriptorTargetChooser::canTarget(Targetable* target, bool withoutProtecti
 DescriptorTargetChooser::~DescriptorTargetChooser() { SAFE_DELETE(cd); }
 
 DescriptorTargetChooser* DescriptorTargetChooser::clone() const {
-    DescriptorTargetChooser* a = NEW DescriptorTargetChooser(*this);
+    auto* a = NEW DescriptorTargetChooser(*this);
     a->cd = NEW CardDescriptor(*cd);
     return a;
 }
 
 bool DescriptorTargetChooser::equals(TargetChooser* tc) {
-    DescriptorTargetChooser* dtc = dynamic_cast<DescriptorTargetChooser*>(tc);
+    auto* dtc = dynamic_cast<DescriptorTargetChooser*>(tc);
     if (!dtc) return false;
 
     // TODO Descriptors need to have an "equals" method too -_-
@@ -897,7 +897,7 @@ bool DescriptorTargetChooser::equals(TargetChooser* tc) {
 TargetZoneChooser::TargetZoneChooser(GameObserver* observer, MTGCardInstance* card, int _maxtargets, bool other,
                                      bool targetMin)
     : TargetChooser(observer, card, _maxtargets, other, targetMin) {
-    init(NULL, 0);
+    init(nullptr, 0);
 }
 
 TargetZoneChooser::TargetZoneChooser(GameObserver* observer, int* _zones, int _nbzones, MTGCardInstance* card,
@@ -925,12 +925,12 @@ int TargetZoneChooser::setAllZones() {
 
 bool TargetZoneChooser::canTarget(Targetable* target, bool withoutProtections) {
     if (!TargetChooser::canTarget(target, withoutProtections)) return false;
-    if (MTGCardInstance* card = dynamic_cast<MTGCardInstance*>(target)) {
+    if (auto* card = dynamic_cast<MTGCardInstance*>(target)) {
         for (int i = 0; i < nbzones; i++) {
             if (zones[i] == MTGGameZone::ALL_ZONES) return true;
             if (MTGGameZone::intToZone(observer, zones[i], source, card)->hasCard(card)) return true;
         }
-    } else if (Spell* spell = dynamic_cast<Spell*>(target)) {
+    } else if (auto* spell = dynamic_cast<Spell*>(target)) {
         WGE_LOG_TRACE("CHECKING Spell");
         if (spell->state == NOT_RESOLVED) {
             MTGCardInstance* card = spell->source;
@@ -954,12 +954,12 @@ bool TargetZoneChooser::targetsZone(MTGGameZone* z, MTGCardInstance* mSource) {
 }
 
 TargetZoneChooser* TargetZoneChooser::clone() const {
-    TargetZoneChooser* a = NEW TargetZoneChooser(*this);
+    auto* a = NEW TargetZoneChooser(*this);
     return a;
 }
 
 bool TargetZoneChooser::equals(TargetChooser* tc) {
-    TargetZoneChooser* tzc = dynamic_cast<TargetZoneChooser*>(tc);
+    auto* tzc = dynamic_cast<TargetZoneChooser*>(tc);
     if (!tzc) return false;
 
     if (nbzones != tzc->nbzones) return false;
@@ -998,17 +998,17 @@ bool PlayerTargetChooser::canTarget(Targetable* target, bool withoutProtections)
         targetter->controller() == target)
         return false;
 
-    Player* pTarget = dynamic_cast<Player*>(target);
+    auto* pTarget = dynamic_cast<Player*>(target);
     return (pTarget && (!p || p == pTarget));
 }
 
 PlayerTargetChooser* PlayerTargetChooser::clone() const {
-    PlayerTargetChooser* a = NEW PlayerTargetChooser(*this);
+    auto* a = NEW PlayerTargetChooser(*this);
     return a;
 }
 
 bool PlayerTargetChooser::equals(TargetChooser* tc) {
-    PlayerTargetChooser* ptc = dynamic_cast<PlayerTargetChooser*>(tc);
+    auto* ptc = dynamic_cast<PlayerTargetChooser*>(tc);
     if (!ptc) return false;
 
     if (p != ptc->p) return false;
@@ -1037,12 +1037,12 @@ bool DamageableTargetChooser::canTarget(Targetable* target, bool withoutProtecti
 }
 
 DamageableTargetChooser* DamageableTargetChooser::clone() const {
-    DamageableTargetChooser* a = NEW DamageableTargetChooser(*this);
+    auto* a = NEW DamageableTargetChooser(*this);
     return a;
 }
 
 bool DamageableTargetChooser::equals(TargetChooser* tc) {
-    DamageableTargetChooser* dtc = dynamic_cast<DamageableTargetChooser*>(tc);
+    auto* dtc = dynamic_cast<DamageableTargetChooser*>(tc);
     if (!dtc) return false;
 
     return TypeTargetChooser::equals(tc);
@@ -1057,7 +1057,7 @@ SpellTargetChooser::SpellTargetChooser(GameObserver* observer, MTGCardInstance* 
 }
 
 bool SpellTargetChooser::canTarget(Targetable* target, bool withoutProtections) {
-    Spell* spell = dynamic_cast<Spell*>(target);
+    auto* spell = dynamic_cast<Spell*>(target);
     if (!spell) return false;
 
     if (spell->state == NOT_RESOLVED) {
@@ -1069,12 +1069,12 @@ bool SpellTargetChooser::canTarget(Targetable* target, bool withoutProtections) 
 }
 
 SpellTargetChooser* SpellTargetChooser::clone() const {
-    SpellTargetChooser* a = NEW SpellTargetChooser(*this);
+    auto* a = NEW SpellTargetChooser(*this);
     return a;
 }
 
 bool SpellTargetChooser::equals(TargetChooser* tc) {
-    SpellTargetChooser* stc = dynamic_cast<SpellTargetChooser*>(tc);
+    auto* stc = dynamic_cast<SpellTargetChooser*>(tc);
     if (!stc) return false;
 
     if (color != stc->color) return false;
@@ -1092,9 +1092,9 @@ SpellOrPermanentTargetChooser::SpellOrPermanentTargetChooser(GameObserver* obser
 }
 
 bool SpellOrPermanentTargetChooser::canTarget(Targetable* target, bool withoutProtections) {
-    if (MTGCardInstance* card = dynamic_cast<MTGCardInstance*>(target)) {
+    if (auto* card = dynamic_cast<MTGCardInstance*>(target)) {
         if (color == -1 || card->hasColor(color)) return TargetZoneChooser::canTarget(target, withoutProtections);
-    } else if (Spell* spell = dynamic_cast<Spell*>(target)) {
+    } else if (auto* spell = dynamic_cast<Spell*>(target)) {
         if (spell->state == NOT_RESOLVED) {
             MTGCardInstance* card = spell->source;
             if (card && (color == -1 || card->hasColor(color))) return true;
@@ -1104,12 +1104,12 @@ bool SpellOrPermanentTargetChooser::canTarget(Targetable* target, bool withoutPr
 }
 
 SpellOrPermanentTargetChooser* SpellOrPermanentTargetChooser::clone() const {
-    SpellOrPermanentTargetChooser* a = NEW SpellOrPermanentTargetChooser(*this);
+    auto* a = NEW SpellOrPermanentTargetChooser(*this);
     return a;
 }
 
 bool SpellOrPermanentTargetChooser::equals(TargetChooser* tc) {
-    SpellOrPermanentTargetChooser* sptc = dynamic_cast<SpellOrPermanentTargetChooser*>(tc);
+    auto* sptc = dynamic_cast<SpellOrPermanentTargetChooser*>(tc);
     if (!sptc) return false;
 
     if (color != sptc->color) return false;
@@ -1126,7 +1126,7 @@ DamageTargetChooser::DamageTargetChooser(GameObserver* observer, MTGCardInstance
 }
 
 bool DamageTargetChooser::canTarget(Targetable* target, bool withoutProtections) {
-    if (Damage* damage = dynamic_cast<Damage*>(target)) {
+    if (auto* damage = dynamic_cast<Damage*>(target)) {
         if (damage->state == state || state == -1) {
             MTGCardInstance* card = damage->source;
             if (card && (color == -1 || card->hasColor(color))) return true;
@@ -1136,12 +1136,12 @@ bool DamageTargetChooser::canTarget(Targetable* target, bool withoutProtections)
 }
 
 DamageTargetChooser* DamageTargetChooser::clone() const {
-    DamageTargetChooser* a = NEW DamageTargetChooser(*this);
+    auto* a = NEW DamageTargetChooser(*this);
     return a;
 }
 
 bool DamageTargetChooser::equals(TargetChooser* tc) {
-    DamageTargetChooser* dtc = dynamic_cast<DamageTargetChooser*>(tc);
+    auto* dtc = dynamic_cast<DamageTargetChooser*>(tc);
     if (!dtc) return false;
 
     if (color != dtc->color || state != dtc->state) return false;
@@ -1151,23 +1151,20 @@ bool DamageTargetChooser::equals(TargetChooser* tc) {
 
 TriggerTargetChooser::TriggerTargetChooser(GameObserver* observer, int _triggerTarget) : TargetChooser(observer) {
     triggerTarget = _triggerTarget;
-    target = NULL;
+    target        = nullptr;
 }
 
 bool TriggerTargetChooser::targetsZone(MTGGameZone* z) { return true; }
 
-bool TriggerTargetChooser::canTarget(Targetable* _target, bool withoutProtections) {
-    if (_target == target) return true;
-    return false;
-}
+bool TriggerTargetChooser::canTarget(Targetable* _target, bool withoutProtections) { return _target == target; }
 
 TriggerTargetChooser* TriggerTargetChooser::clone() const {
-    TriggerTargetChooser* a = NEW TriggerTargetChooser(*this);
+    auto* a = NEW TriggerTargetChooser(*this);
     return a;
 }
 
 bool TriggerTargetChooser::equals(TargetChooser* tc) {
-    TriggerTargetChooser* ttc = dynamic_cast<TriggerTargetChooser*>(tc);
+    auto* ttc = dynamic_cast<TriggerTargetChooser*>(tc);
     if (!ttc) return false;
 
     if (triggerTarget != ttc->triggerTarget) return false;
@@ -1185,12 +1182,12 @@ bool myCursesChooser::canTarget(Targetable* target, bool withoutProtections) {
 }
 
 myCursesChooser* myCursesChooser::clone() const {
-    myCursesChooser* a = NEW myCursesChooser(*this);
+    auto* a = NEW myCursesChooser(*this);
     return a;
 }
 
 bool myCursesChooser::equals(TargetChooser* tc) {
-    myCursesChooser* dtc = dynamic_cast<myCursesChooser*>(tc);
+    auto* dtc = dynamic_cast<myCursesChooser*>(tc);
     if (!dtc) return false;
 
     return TypeTargetChooser::equals(tc);
@@ -1198,20 +1195,19 @@ bool myCursesChooser::equals(TargetChooser* tc) {
 
 /*display cards blockable by source */
 bool BlockableChooser::canTarget(Targetable* target, bool withoutProtections) {
-    if (MTGCardInstance* card = dynamic_cast<MTGCardInstance*>(target)) {
-        if (!card->isAttacker() || !source->canBlock(card)) return false;
-        return true;
+    if (auto* card = dynamic_cast<MTGCardInstance*>(target)) {
+        return !(!card->isAttacker() || !source->canBlock(card));
     }
     return TypeTargetChooser::canTarget(target, withoutProtections);
 }
 
 BlockableChooser* BlockableChooser::clone() const {
-    BlockableChooser* a = NEW BlockableChooser(*this);
+    auto* a = NEW BlockableChooser(*this);
     return a;
 }
 
 bool BlockableChooser::equals(TargetChooser* tc) {
-    BlockableChooser* dtc = dynamic_cast<BlockableChooser*>(tc);
+    auto* dtc = dynamic_cast<BlockableChooser*>(tc);
     if (!dtc) return false;
 
     return TypeTargetChooser::equals(tc);
@@ -1220,23 +1216,21 @@ bool BlockableChooser::equals(TargetChooser* tc) {
 //-----------
 /*Proliferate Target */
 bool ProliferateChooser::canTarget(Targetable* target, bool withoutProtections) {
-    if (MTGCardInstance* card = dynamic_cast<MTGCardInstance*>(target)) {
-        if (card->counters && card->counters->counters.empty()) return false;
-        return true;
-    } else if (Player* p = dynamic_cast<Player*>(target)) {
-        if (!p->poisonCount) return false;
-        return true;
+    if (auto* card = dynamic_cast<MTGCardInstance*>(target)) {
+        return !(card->counters && card->counters->counters.empty());
+    } else if (auto* p = dynamic_cast<Player*>(target)) {
+        return p->poisonCount != 0;
     }
     return TypeTargetChooser::canTarget(target, withoutProtections);
 }
 
 ProliferateChooser* ProliferateChooser::clone() const {
-    ProliferateChooser* a = NEW ProliferateChooser(*this);
+    auto* a = NEW ProliferateChooser(*this);
     return a;
 }
 
 bool ProliferateChooser::equals(TargetChooser* tc) {
-    ProliferateChooser* dtc = dynamic_cast<ProliferateChooser*>(tc);
+    auto* dtc = dynamic_cast<ProliferateChooser*>(tc);
     if (!dtc) return false;
 
     return TypeTargetChooser::equals(tc);
@@ -1244,7 +1238,7 @@ bool ProliferateChooser::equals(TargetChooser* tc) {
 
 /*parents or children Target */
 bool ParentChildChooser::canTarget(Targetable* target, bool withoutProtections) {
-    if (MTGCardInstance* card = dynamic_cast<MTGCardInstance*>(target)) {
+    if (auto* card = dynamic_cast<MTGCardInstance*>(target)) {
         if (type == 1) {
             if (!source->childrenCards.size()) return false;
             for (unsigned int w = 0; w < source->childrenCards.size(); w++) {
@@ -1274,12 +1268,12 @@ bool ParentChildChooser::canTarget(Targetable* target, bool withoutProtections) 
 }
 
 ParentChildChooser* ParentChildChooser::clone() const {
-    ParentChildChooser* a = NEW ParentChildChooser(*this);
+    auto* a = NEW ParentChildChooser(*this);
     return a;
 }
 
 bool ParentChildChooser::equals(TargetChooser* tc) {
-    ParentChildChooser* dtc = dynamic_cast<ParentChildChooser*>(tc);
+    auto* dtc = dynamic_cast<ParentChildChooser*>(tc);
     if (!dtc) return false;
 
     return TypeTargetChooser::equals(tc);

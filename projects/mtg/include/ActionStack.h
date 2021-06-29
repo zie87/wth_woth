@@ -100,24 +100,24 @@ public:
     TargetChooser* tc;
     ManaCost* cost;
     int payResult;
-    int computeX(MTGCardInstance* card);
+    int computeX(MTGCardInstance* card) const;
     Spell(GameObserver* observer, MTGCardInstance* _source);
     Spell(GameObserver* observer, int id, MTGCardInstance* _source, TargetChooser* _tc, ManaCost* _cost,
           int payResult);
     ~Spell();
     int resolve();
     void Render();
-    bool FullfilledAlternateCost(const int& costType);
+    bool FullfilledAlternateCost(const int& costType) const;
     const std::string getDisplayName() const;
     virtual std::ostream& toString(std::ostream& out) const;
-    MTGCardInstance* getNextCardTarget(MTGCardInstance* previous = 0);
-    Player* getNextPlayerTarget(Player* previous = 0);
-    Damageable* getNextDamageableTarget(Damageable* previous = 0);
-    Interruptible* getNextInterruptible(Interruptible* previous, int type);
-    Spell* getNextSpellTarget(Spell* previous = 0);
-    Damage* getNextDamageTarget(Damage* previous = 0);
-    Targetable* getNextTarget(Targetable* previous = 0);
-    int getNbTargets();
+    MTGCardInstance* getNextCardTarget(MTGCardInstance* previous = 0) const;
+    Player* getNextPlayerTarget(Player* previous = 0) const;
+    Damageable* getNextDamageableTarget(Damageable* previous = 0) const;
+    Interruptible* getNextInterruptible(Interruptible* previous, int type) const;
+    Spell* getNextSpellTarget(Spell* previous = 0) const;
+    Damage* getNextDamageTarget(Damage* previous = 0) const;
+    Targetable* getNextTarget(Targetable* previous = 0) const;
+    int getNbTargets() const;
 };
 
 class StackAbility : public Interruptible {
@@ -175,7 +175,7 @@ protected:
     ATutorialMessage* currentTutorial;
     int interruptBtnXOffset, noBtnXOffset, noToAllBtnXOffset, interruptDialogWidth;
 
-    JButton handleInterruptRequest(JButton inputKey, int& x, int& y);
+    JButton handleInterruptRequest(JButton inputKey, int& x, int& y) const;
 
 public:
     Player* lastActionController;

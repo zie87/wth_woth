@@ -19,7 +19,7 @@
 // Players Game
 //------------------------------
 
-MTGPlayerCards::MTGPlayerCards() : owner(0) { init(); }
+MTGPlayerCards::MTGPlayerCards() : owner(nullptr) { init(); }
 
 MTGPlayerCards::MTGPlayerCards(Player* player, int* idList, int idListSize) : owner(player) {
     init();
@@ -28,13 +28,13 @@ MTGPlayerCards::MTGPlayerCards(Player* player, int* idList, int idListSize) : ow
     for (i = 0; i < idListSize; i++) {
         MTGCard* card = MTGCollection()->getCardById(idList[i]);
         if (card) {
-            MTGCardInstance* newCard = NEW MTGCardInstance(card, this);
+            auto* newCard = NEW MTGCardInstance(card, this);
             library->addCard(newCard);
         }
     }
 }
 
-MTGPlayerCards::MTGPlayerCards(MTGDeck* deck) : owner(0) {
+MTGPlayerCards::MTGPlayerCards(MTGDeck* deck) : owner(nullptr) {
     init();
     initDeck(deck);
 }
@@ -46,7 +46,7 @@ void MTGPlayerCards::initDeck(MTGDeck* deck) {
         MTGCard* card = deck->getCardById(it->first);
         if (card) {
             for (int i = 0; i < it->second; i++) {
-                MTGCardInstance* newCard = NEW MTGCardInstance(card, this);
+                auto* newCard = NEW MTGCardInstance(card, this);
                 library->addCard(newCard);
             }
         }
@@ -93,7 +93,7 @@ void MTGPlayerCards::setOwner(Player* player) {
     temp->setOwner(player);
 }
 
-void MTGPlayerCards::initGame(int shuffle, int draw) {
+void MTGPlayerCards::initGame(int shuffle, int draw) const {
     if (shuffle) library->shuffle();
     if (draw) {
         for (int i = 0; i < 7; i++) {
@@ -108,7 +108,7 @@ void MTGPlayerCards::OptimizedHand(Player* who, int amount, int lands, int creat
 
     if (!game->players[0]->isAI() && game->players[1]->isAI()) {
         Player* p = who;
-        MTGCardInstance* card = NULL;
+        MTGCardInstance* card = nullptr;
         MTGGameZone* z = p->game->library;
 
         int optimizedland = 0;
@@ -178,7 +178,7 @@ void MTGPlayerCards::OptimizedHand(Player* who, int amount, int lands, int creat
     //----------------------------
 }
 
-void MTGPlayerCards::drawFromLibrary() {
+void MTGPlayerCards::drawFromLibrary() const {
     if (!library->nb_cards) {
         if (inPlay->hasAbility(Constants::CANTLOSE) || inPlay->hasAbility(Constants::CANTMILLLOSE) ||
             owner->opponent()->game->inPlay->hasAbility(Constants::CANTWIN)) {
@@ -231,32 +231,32 @@ void MTGPlayerCards::init() {
     playRestrictions = NEW PlayRestrictions();
 }
 
-void MTGPlayerCards::showHand() { hand->debugPrint(); }
+void MTGPlayerCards::showHand() const { hand->debugPrint(); }
 
 // Moves a card to its owner's graveyard
-MTGCardInstance* MTGPlayerCards::putInGraveyard(MTGCardInstance* card) {
+MTGCardInstance* MTGPlayerCards::putInGraveyard(MTGCardInstance* card) const {
     return putInZone(card, card->currentZone, card->owner->game->graveyard);
 }
 
 // Moves a card to its owner's exile
-MTGCardInstance* MTGPlayerCards::putInExile(MTGCardInstance* card) {
+MTGCardInstance* MTGPlayerCards::putInExile(MTGCardInstance* card) const {
     return putInZone(card, card->currentZone, card->owner->game->exile);
 }
 
 // Moves a card to its owner's library
-MTGCardInstance* MTGPlayerCards::putInLibrary(MTGCardInstance* card) {
+MTGCardInstance* MTGPlayerCards::putInLibrary(MTGCardInstance* card) const {
     return putInZone(card, card->currentZone, card->owner->game->library);
 }
 
 // Moves a card to its *owner's* (not controller!) hand
-MTGCardInstance* MTGPlayerCards::putInHand(MTGCardInstance* card) {
+MTGCardInstance* MTGPlayerCards::putInHand(MTGCardInstance* card) const {
     return putInZone(card, card->currentZone, card->owner->game->hand);
 }
 
 // Moves a card from one zone to another
 // If the card is not actually in the expected "from" zone, does nothing and returns null
-MTGCardInstance* MTGPlayerCards::putInZone(MTGCardInstance* card, MTGGameZone* from, MTGGameZone* to) {
-    MTGCardInstance* copy = NULL;
+MTGCardInstance* MTGPlayerCards::putInZone(MTGCardInstance* card, MTGGameZone* from, MTGGameZone* to) const {
+    MTGCardInstance* copy = nullptr;
     GameObserver* g = owner->getObserver();
     if (!from || !to) return card;  // Error check
 
@@ -267,7 +267,7 @@ MTGCardInstance* MTGPlayerCards::putInZone(MTGCardInstance* card, MTGGameZone* f
         doCopy = 0;
     }
 
-    if (!(copy = from->removeCard(card, doCopy))) return NULL;  // ERROR
+    if (!(copy = from->removeCard(card, doCopy))) return nullptr;  // ERROR
 
     if (options[Options::SFXVOLUME].number > 0) {
         if (to == g->players[0]->game->graveyard || to == g->players[1]->game->graveyard) {
@@ -307,8 +307,8 @@ MTGCardInstance* MTGPlayerCards::putInZone(MTGCardInstance* card, MTGGameZone* f
             from = previous->previousZone;
             copy->previous = previous2;
             if (previous2) previous2->next = copy;
-            previous->previous = NULL;
-            previous->next = NULL;
+            previous->previous = nullptr;
+            previous->next     = nullptr;
             SAFE_DELETE(previous);
         }
     }
@@ -319,7 +319,7 @@ MTGCardInstance* MTGPlayerCards::putInZone(MTGCardInstance* card, MTGGameZone* f
     return ret;
 }
 
-void MTGPlayerCards::discardRandom(MTGGameZone* from, MTGCardInstance* source) {
+void MTGPlayerCards::discardRandom(MTGGameZone* from, MTGCardInstance* source) const {
     if (!from->nb_cards) return;
     int r = owner->getObserver()->getRandomGenerator()->random() % (from->nb_cards);
     WEvent* e = NEW WEventCardDiscard(from->cards[r]);
@@ -328,7 +328,7 @@ void MTGPlayerCards::discardRandom(MTGGameZone* from, MTGCardInstance* source) {
     putInZone(from->cards[r], from, graveyard);
 }
 
-int MTGPlayerCards::isInPlay(MTGCardInstance* card) {
+int MTGPlayerCards::isInPlay(MTGCardInstance* card) const {
     if (inPlay->hasCard(card)) {
         return 1;
     }
@@ -344,7 +344,7 @@ int MTGPlayerCards::isInZone(MTGCardInstance* card, MTGGameZone* zone) {
 // Zones specific code
 //--------------------------------------
 
-MTGGameZone::MTGGameZone() : nb_cards(0), lastCardDrawn(NULL), needShuffle(false) {}
+MTGGameZone::MTGGameZone() : nb_cards(0), lastCardDrawn(nullptr), needShuffle(false) {}
 
 MTGGameZone::~MTGGameZone() {
     for (size_t i = 0; i < cards.size(); i++) {
@@ -354,7 +354,7 @@ MTGGameZone::~MTGGameZone() {
     }
     cards.clear();
     cardsMap.clear();
-    owner = NULL;
+    owner = nullptr;
 }
 
 void MTGGameZone::beforeBeginPhase() {
@@ -380,14 +380,14 @@ MTGCardInstance* MTGGameZone::removeCard(MTGCardInstance* card, int createCopy) 
     cardsMap.erase(card);
     for (i = 0; i < (nb_cards); i++) {
         if (cards[i] == card) {
-            card->currentZone = NULL;
+            card->currentZone = nullptr;
             nb_cards--;
             cards.erase(cards.begin() + i);
             MTGCardInstance* copy = card;
             // if (card->isToken) //TODO better than this ?
             //  return card;
             // card->lastController = card->controller();
-            if (!card) return NULL;
+            if (!card) return nullptr;
             if (createCopy) {
                 copy = card->clone();
                 copy->previous = card;
@@ -409,12 +409,12 @@ MTGCardInstance* MTGGameZone::removeCard(MTGCardInstance* card, int createCopy) 
             return copy;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 MTGCardInstance* MTGGameZone::hasCard(MTGCardInstance* card) {
     if (card->currentZone == this) return card;
-    return NULL;
+    return nullptr;
 }
 
 size_t MTGGameZone::getIndex(MTGCardInstance* card) {
@@ -453,7 +453,7 @@ MTGCardInstance* MTGGameZone::findByName(string name) {
             return cards[i];
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 bool MTGGameZone::hasType(const char* value) {
@@ -541,18 +541,16 @@ bool MTGGameZone::hasAbility(int ability) {
 int MTGGameZone::seenThisTurn(TargetChooser* tc, int castMethod, bool lastTurn) {
     // The following 2 lines modify the passed TargetChooser. Call this function with care :/
     tc->setAllZones();  // This is to allow targetting cards without caring about the actual zone
-    tc->targetter = NULL;
+    tc->targetter = nullptr;
 
     int count = 0;
     if (lastTurn) {
-        for (vector<MTGCardInstance*>::iterator iter = cardsSeenLastTurn.begin(); iter != cardsSeenLastTurn.end();
-             ++iter) {
+        for (auto iter = cardsSeenLastTurn.begin(); iter != cardsSeenLastTurn.end(); ++iter) {
             MTGCardInstance* c = (*iter);
             if (c && c->matchesCastFilter(castMethod) && tc->canTarget(c)) count++;
         }
     } else {
-        for (vector<MTGCardInstance*>::iterator iter = cardsSeenThisTurn.begin(); iter != cardsSeenThisTurn.end();
-             ++iter) {
+        for (auto iter = cardsSeenThisTurn.begin(); iter != cardsSeenThisTurn.end(); ++iter) {
             MTGCardInstance* c = (*iter);
             if (c->matchesCastFilter(castMethod) && tc->canTarget(c)) count++;
         }
@@ -562,7 +560,7 @@ int MTGGameZone::seenThisTurn(TargetChooser* tc, int castMethod, bool lastTurn) 
 
 int MTGGameZone::seenThisTurn(string targetChooserDefinition, int castMethod) {
     TargetChooserFactory tcf(owner->getObserver());
-    TargetChooser* tc = tcf.createTargetChooser(targetChooserDefinition, NULL);
+    TargetChooser* tc = tcf.createTargetChooser(targetChooserDefinition, nullptr);
     int result = seenThisTurn(tc, castMethod, false);
     SAFE_DELETE(tc);
     return result;
@@ -570,7 +568,7 @@ int MTGGameZone::seenThisTurn(string targetChooserDefinition, int castMethod) {
 
 int MTGGameZone::seenLastTurn(string targetChooserDefinition, int castMethod) {
     TargetChooserFactory tcf(owner->getObserver());
-    TargetChooser* tc = tcf.createTargetChooser(targetChooserDefinition, NULL);
+    TargetChooser* tc = tcf.createTargetChooser(targetChooserDefinition, nullptr);
     int result = seenThisTurn(tc, castMethod, true);
     SAFE_DELETE(tc);
     return result;
@@ -599,7 +597,7 @@ void MTGGameZone::debugPrint() {
 //------------------------------
 MTGCardInstance* MTGInPlay::getNextAttacker(MTGCardInstance* previous) {
     int foundprevious = 0;
-    if (previous == NULL) {
+    if (previous == nullptr) {
         foundprevious = 1;
     }
     for (int i = 0; i < nb_cards; i++) {
@@ -610,7 +608,7 @@ MTGCardInstance* MTGInPlay::getNextAttacker(MTGCardInstance* previous) {
             return current;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void MTGInPlay::untapAll() {
@@ -667,7 +665,7 @@ MTGGameZone* MTGGameZone::intToZone(int zoneId, Player* p, Player* p2) {
     case STACK:
         return p->game->stack;
     }
-    if (!p2) return NULL;
+    if (!p2) return nullptr;
     switch (zoneId) {
     case TARGET_CONTROLLER_GRAVEYARD:
         return p2->game->graveyard;
@@ -688,7 +686,7 @@ MTGGameZone* MTGGameZone::intToZone(int zoneId, Player* p, Player* p2) {
         return p2->game->stack;
 
     default:
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -784,7 +782,7 @@ MTGGameZone* MTGGameZone::intToZone(GameObserver* g, int zoneId, MTGCardInstance
         else
             return source->controller()->game->stack;
     default:
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -923,7 +921,7 @@ int MTGGameZone::zoneStringToId(string zoneName) {
     int max = sizeof(values) / sizeof *(values);
 
     for (int i = 0; i < max; ++i) {
-        if (zoneName.compare(strings[i]) == 0) {
+        if (zoneName == strings[i]) {
             return values[i];
         }
     }
@@ -969,7 +967,7 @@ bool MTGGameZone::parseLine(const string& ss) {
 
     while (s.size()) {
         size_t limiter = s.find(",");
-        MTGCard* card = 0;
+        MTGCard* card  = nullptr;
         string toFind;
         if (limiter != string::npos) {
             toFind = trim(s.substr(0, limiter));
@@ -986,7 +984,7 @@ bool MTGGameZone::parseLine(const string& ss) {
             /* For the moment we add the card directly in the final zone.
                 This is not the normal way and this prevents to resolve spells.
                 We'll need a fusion operation afterward to cast relevant spells */
-            MTGCardInstance* newCard = NEW MTGCardInstance(card, owner->game);
+            auto* newCard = NEW MTGCardInstance(card, owner->game);
             addCard(newCard);
             result = true;
         } else {
@@ -994,7 +992,7 @@ bool MTGGameZone::parseLine(const string& ss) {
                 nb_cards++;
             else if (id < 0) {
                 // For the moment, we create a dummy Token to please the testsuite
-                Token* myToken = new Token(id);
+                auto* myToken = new Token(id);
                 addCard(myToken);
                 result = true;
             } else {
@@ -1027,22 +1025,22 @@ std::ostream& operator<<(std::ostream& out, const MTGPlayerCards& z) {
     return out;
 }
 
-bool MTGPlayerCards::parseLine(const string& s) {
+bool MTGPlayerCards::parseLine(const string& s) const {
     size_t limiter = s.find("=");
     if (limiter == string::npos) limiter = s.find(":");
     string areaS;
     if (limiter != string::npos) {
         areaS = s.substr(0, limiter);
-        if (areaS.compare("graveyard") == 0) {
+        if (areaS == "graveyard") {
             graveyard->parseLine(s.substr(limiter + 1));
             return true;
-        } else if (areaS.compare("library") == 0) {
+        } else if (areaS == "library") {
             library->parseLine(s.substr(limiter + 1));
             return true;
-        } else if (areaS.compare("hand") == 0) {
+        } else if (areaS == "hand") {
             hand->parseLine(s.substr(limiter + 1));
             return true;
-        } else if (areaS.compare("inplay") == 0 || areaS.compare("battlefield") == 0) {
+        } else if (areaS == "inplay" || areaS == "battlefield") {
             battlefield->parseLine(s.substr(limiter + 1));
             return true;
         }

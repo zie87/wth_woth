@@ -31,7 +31,7 @@ JGameObject::JGameObject(JTexture* tex, float x, float y, float width, float hei
     mHitPoint = 1;
 
     mCollided = false;
-    mCollisionTarget = NULL;
+    mCollisionTarget = nullptr;
     mFlashing = false;
 
     // mActive = false;
@@ -153,7 +153,7 @@ void JGameObject::SetBBox(float x, float y, float width, float height) {
     mBBoxHeight = height;
 }
 
-void JGameObject::GetBBox(float x, float y, float* xNow, float* yNow, float* width, float* height) {
+void JGameObject::GetBBox(float x, float y, float* xNow, float* yNow, float* width, float* height) const {
     *xNow = x + mBBoxX;
     *yNow = y + mBBoxY;
     *width = mBBoxWidth;
@@ -195,7 +195,7 @@ void JGameObject::SetCollisionTarget(JGameObject* target) {
     mCollisionTarget = target;
 }
 
-int JGameObject::GetHitPoint() { return mHitPoint; }
+int JGameObject::GetHitPoint() const { return mHitPoint; }
 
 void JGameObject::SetHitPoint(int pt) { mHitPoint = pt; }
 
@@ -204,7 +204,7 @@ void JGameObject::SetBlood(int pt) {
     mBlood = pt;
 }
 
-int JGameObject::GetBlood() { return mBlood; }
+int JGameObject::GetBlood() const { return mBlood; }
 
 void JGameObject::OnCollide() {}
 
@@ -216,7 +216,7 @@ void JGameObject::StartFlashing() {
 
 void JGameObject::StopFlashing() { mFlashing = false; }
 
-bool JGameObject::IsFlashing() { return mFlashing; }
+bool JGameObject::IsFlashing() const { return mFlashing; }
 
 void JGameObject::SetRenderFlags(int flags) { mRenderFlags = flags; }
 

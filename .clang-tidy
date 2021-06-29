@@ -1,7 +1,7 @@
 ---
-Checks:             '-*'
+Checks:             '-*,modernize-use-nullptr,modernize-use-auto,llvm-namespace-comment,performance-inefficient-algorithm,performance-inefficient-string-concatenation,performance-inefficient-vector-operation,readability-redundant-string-cstr,readability-redundant-string-init,readability-make-member-function-const,readability-string-compare,readability-qualified-auto,readability-simplify-boolean-expr'
 WarningsAsErrors:   ''
-HeaderFilterRegex:  '^((?!/build/|/extern/)).)*$'
+HeaderFilterRegex:  '^((?!/build/|/extern/|/tinyxml/)).)*$'
 FormatStyle:        file
 
 

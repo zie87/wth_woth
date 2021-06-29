@@ -31,17 +31,17 @@ void ManaCostHybrid::init(int c1, int v1, int c2, int v2) {
     value2 = v2;
 }
 
-int ManaCostHybrid::getConvertedCost() {
+int ManaCostHybrid::getConvertedCost() const {
     if (value2 > value1) return value2;
     return value1;
 }
 
-int ManaCostHybrid::hasColor(int color) {
+int ManaCostHybrid::hasColor(int color) const {
     if (((color1 == color) && value1) || ((color2 == color) && value2)) return 1;
     return 0;
 }
 
-string ManaCostHybrid::toString() {
+string ManaCostHybrid::toString() const {
     std::ostringstream oss;
     if (color1 != 0 && color2 != 0)
         oss << "{" << Constants::MTGColorChars[color1] << "/" << Constants::MTGColorChars[color2] << "}";

@@ -37,7 +37,7 @@ int MTGPackSlot::add(WSrcCards* ocean, MTGDeck* to, int carryover) {
     if (!entries.size()) return copies;
     int fails = 0;
     int amt = copies + carryover;
-    WSrcCards* myPool = NULL;
+    WSrcCards* myPool = nullptr;
     if (pool.size()) myPool = MTGPack::getPool(pool);
     if (!myPool) myPool = ocean;
 
@@ -52,7 +52,7 @@ int MTGPackSlot::add(WSrcCards* ocean, MTGDeck* to, int carryover) {
 }
 
 WSrcCards* MTGPack::getPool(string poolstr) {
-    WSrcCards* mySrc = NULL;
+    WSrcCards* mySrc    = nullptr;
     size_t s = poolstr.find("all");
     WCFilterFactory* ff = WCFilterFactory::GetInstance();
 
@@ -127,7 +127,7 @@ void MTGPack::load(string filename) {
     if (tag != "pack") return;
     // After validating, handle actual loading.
     TiXmlElement* pSlot;
-    const char* holder = NULL;
+    const char* holder = nullptr;
     holder = pPack->Attribute("price");
     if (holder)
         price = atoi(holder);
@@ -157,13 +157,13 @@ void MTGPack::load(string filename) {
         sort = "";
     std::transform(sort.begin(), sort.end(), sort.begin(), ::tolower);
 
-    for (pSlot = pPack->FirstChildElement(); pSlot != NULL; pSlot = pSlot->NextSiblingElement()) {
+    for (pSlot = pPack->FirstChildElement(); pSlot != nullptr; pSlot = pSlot->NextSiblingElement()) {
         TiXmlElement* pEntry;
         // Load slot.
         tag = pSlot->Value();
         std::transform(tag.begin(), tag.end(), tag.begin(), ::tolower);
         if (tag != "slot") continue;
-        MTGPackSlot* s = NEW MTGPackSlot();
+        auto* s = NEW MTGPackSlot();
         slotss.push_back(s);
         holder = pSlot->Attribute("copies");
         if (holder)
@@ -173,11 +173,11 @@ void MTGPack::load(string filename) {
         holder = pSlot->Attribute("pool");
         if (holder) s->pool = holder;
 
-        for (pEntry = pSlot->FirstChildElement(); pEntry != NULL; pEntry = pEntry->NextSiblingElement()) {
+        for (pEntry = pSlot->FirstChildElement(); pEntry != nullptr; pEntry = pEntry->NextSiblingElement()) {
             tag = pEntry->Value();
             std::transform(tag.begin(), tag.end(), tag.begin(), ::tolower);
             if (tag == "card") {  // Load specific card
-                MTGPackEntrySpecific* es = NEW MTGPackEntrySpecific();
+                auto* es = NEW MTGPackEntrySpecific();
                 holder = pEntry->Attribute("copies");
                 if (holder)
                     es->copies = atoi(holder);
@@ -186,7 +186,7 @@ void MTGPack::load(string filename) {
                 es->card = MTGCollection()->getCardByName(pEntry->Value());
                 s->addEntry(es);
             } else if (tag == "random_card") {  // Load random card
-                MTGPackEntryRandom* er = NEW MTGPackEntryRandom();
+                auto* er = NEW MTGPackEntryRandom();
                 holder = pEntry->Attribute("copies");
                 if (holder)
                     er->copies = atoi(holder);
@@ -196,7 +196,7 @@ void MTGPack::load(string filename) {
                 if (text) er->filter = text;
                 s->addEntry(er);
             } else if (tag == "nothing") {
-                MTGPackEntryNothing* nt = NEW MTGPackEntryNothing();
+                auto* nt = NEW MTGPackEntryNothing();
                 s->addEntry(nt);
             }
         }
@@ -226,7 +226,7 @@ MTGPacks::~MTGPacks() {
 MTGPack* MTGPacks::randomPack(int key) {
     if (!key) key = rand();
     size_t s = packs.size();
-    if (!s) return NULL;
+    if (!s) return nullptr;
     return packs[key % s];
 }
 void MTGPacks::loadAll() {
@@ -237,7 +237,7 @@ void MTGPacks::loadAll() {
         sprintf(myFilename, "packs/%s", relative.c_str());
         if (relative[0] == '.') continue;
         if (!strcmp(relative.c_str(), "default_booster.txt")) continue;
-        MTGPack* p = NEW MTGPack(myFilename);
+        auto* p = NEW MTGPack(myFilename);
         if (!p->isValid()) {
             SAFE_DELETE(p);
             continue;
@@ -286,7 +286,7 @@ MTGPack* MTGPacks::getDefault() {
         defaultBooster.load("packs/default_booster.txt");
         defaultBooster.unlockStatus = 1;
         if (!defaultBooster.isValid()) {
-            MTGPackSlot* ps = NEW MTGPackSlot();
+            auto* ps   = NEW MTGPackSlot();
             ps->copies = 1;
             ps->addEntry(NEW MTGPackEntryRandom("rarity:mythic;"));
             for (int i = 0; i < 7; i++) ps->addEntry(NEW MTGPackEntryRandom("rarity:rare;"));

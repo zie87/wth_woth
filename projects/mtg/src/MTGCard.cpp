@@ -34,7 +34,7 @@ MTGCard::~MTGCard() {}
 int MTGCard::init() {
     setId = 0;
     mtgid = 0;
-    data = NULL;
+    data   = nullptr;
     rarity = Constants::RARITY_C;
     return 1;
 }
@@ -47,7 +47,7 @@ char MTGCard::getRarity() const { return rarity; }
 
 void MTGCard::setRarity(char _rarity) { rarity = _rarity; }
 
-const string MTGCard::getImageName() {
+const string MTGCard::getImageName() const {
     std::stringstream out;
     if (mtgid < 0) {
         // tokens that have negative id have an image name that is the absolute value of their id + letter "t"

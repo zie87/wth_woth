@@ -14,7 +14,7 @@ PlayerData::PlayerData(MTGAllCards* allcards) {
 }
 
 void PlayerData::init() {
-    collection = NULL;
+    collection = nullptr;
 
     // CREDITS
     credits = 3000;  // Default value
@@ -47,7 +47,7 @@ void PlayerData::init() {
         }
     }
 
-    taskList = NEW TaskList(options.profileFile(PLAYER_TASKS).c_str());
+    taskList = NEW TaskList(options.profileFile(PLAYER_TASKS));
 }
 
 int PlayerData::save() {
@@ -58,7 +58,7 @@ int PlayerData::save() {
         file << writer;
 
         // Story Saves
-        for (map<string, string>::iterator it = storySaves.begin(); it != storySaves.end(); ++it) {
+        for (auto it = storySaves.begin(); it != storySaves.end(); ++it) {
             sprintf(writer, "s %s=%s\n", it->first.c_str(), it->second.c_str());
             file << writer;
         }

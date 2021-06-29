@@ -31,7 +31,7 @@ necessary but provides a nice way to distinguish The content that users should n
 
 #include <dirent.h>
 
-JFileSystem* JFileSystem::mInstance = NULL;
+JFileSystem* JFileSystem::mInstance = nullptr;
 
 JZipCache::JZipCache() {}
 
@@ -51,7 +51,7 @@ void JFileSystem::preloadZip(const std::string& filename) {
         clearZipCache();
     }
 
-    JZipCache* cache = new JZipCache();
+    auto* cache         = new JZipCache();
     mZipCache[filename] = cache;
 
     if (!mZipAvailable || !mZipFile) {
@@ -140,21 +140,20 @@ JFileSystem::JFileSystem(const std::string& _userPath, const std::string& _syste
     mSystemFSPath = systemPath;
 
     mUserFS = new zfs::filesystem(userPath.c_str());
-    mSystemFS = (mSystemFSPath.size() && (mSystemFSPath.compare(mUserFSPath) != 0))
-                    ? new zfs::filesystem(systemPath.c_str())
-                    : NULL;
+    mSystemFS =
+        (mSystemFSPath.size() && (mSystemFSPath != mUserFSPath)) ? new zfs::filesystem(systemPath.c_str()) : nullptr;
 
     mZipAvailable = false;
     mZipCachedElementsCount = 0;
-    mPassword = NULL;
+    mPassword               = nullptr;
     mFileSize = 0;
-    mCurrentFileInZip = NULL;
+    mCurrentFileInZip       = nullptr;
 };
 
 void JFileSystem::Destroy() {
     if (mInstance) {
         delete mInstance;
-        mInstance = NULL;
+        mInstance = nullptr;
     }
 }
 
@@ -184,8 +183,8 @@ JFileSystem::~JFileSystem() {
 void JFileSystem::clearZipCache() {
     DetachZipFile();
 
-    for (auto it = mZipCache.begin(); it != mZipCache.end(); ++it) {
-        delete (it->second);
+    for (auto& it : mZipCache) {
+        delete (it.second);
     }
     mZipCache.clear();
     mZipCachedElementsCount = 0;
@@ -221,7 +220,7 @@ void JFileSystem::DetachZipFile() {
     if (mZipFile) {
         mZipFile.close();
     }
-    mCurrentFileInZip = NULL;
+    mCurrentFileInZip = nullptr;
     mZipAvailable = false;
 }
 
@@ -232,9 +231,7 @@ bool JFileSystem::openForRead(zfs::izfstream& File, const std::string& FilePath)
     if (!mSystemFS) return false;
 
     File.open(FilePath.c_str(), mSystemFS);
-    if (File) return true;
-
-    return false;
+    return static_cast<bool>(File);
 }
 
 bool JFileSystem::readIntoString(const std::string& FilePath, std::string& target) {
@@ -260,14 +257,11 @@ bool JFileSystem::openForWrite(std::ofstream& File, const std::string& FilePath,
     filename.append(FilePath);
     File.open(filename.c_str(), mode);
 
-    if (File) {
-        return true;
-    }
-    return false;
+    return static_cast<bool>(File);
 }
 
 bool JFileSystem::OpenFile(const std::string& filename) {
-    mCurrentFileInZip = NULL;
+    mCurrentFileInZip = nullptr;
 
     if (!mZipAvailable || !mZipFile) return openForRead(mFile, filename);
 
@@ -279,7 +273,7 @@ bool JFileSystem::OpenFile(const std::string& filename) {
         return openForRead(mFile, filename);
     }
     JZipCache* zc = it->second;
-    std::map<std::string, zfs::filesystem::limited_file_info>::iterator it2 = zc->dir.find(filename);
+    auto it2      = zc->dir.find(filename);
     if (it2 == zc->dir.end()) {
         /*DetachZipFile();
         return OpenFile(filename); */
@@ -293,7 +287,7 @@ bool JFileSystem::OpenFile(const std::string& filename) {
 
 void JFileSystem::CloseFile() {
     if (mZipAvailable && mZipFile) {
-        mCurrentFileInZip = NULL;
+        mCurrentFileInZip = nullptr;
     }
 
     if (mFile) mFile.close();
@@ -352,7 +346,7 @@ std::vector<std::string>& JFileSystem::scanfolder(const std::string& _folderName
         std::vector<std::string> userZips;
         mUserFS->scanfolder(folderName, userZips);
 
-        for (size_t i = 0; i < userZips.size(); ++i) seen[userZips[i]] = true;
+        for (auto& userZip : userZips) seen[userZip] = true;
     }
 
     // system zips
@@ -361,7 +355,7 @@ std::vector<std::string>& JFileSystem::scanfolder(const std::string& _folderName
         std::vector<std::string> systemZips;
         mSystemFS->scanfolder(folderName, systemZips);
 
-        for (size_t i = 0; i < systemZips.size(); ++i) seen[systemZips[i]] = true;
+        for (auto& systemZip : systemZips) seen[systemZip] = true;
     }
 
     // user real files
@@ -372,9 +366,9 @@ std::vector<std::string>& JFileSystem::scanfolder(const std::string& _folderName
         realFolderName.append(folderName);
         scanRealFolder(realFolderName, userReal);
 
-        for (size_t i = 0; i < userReal.size(); ++i) {
-            std::string asFolder = userReal[i] + "/";
-            if (seen.find(asFolder) == seen.end()) seen[userReal[i]] = true;
+        for (auto& i : userReal) {
+            std::string asFolder = i + "/";
+            if (seen.find(asFolder) == seen.end()) seen[i] = true;
         }
     }
 
@@ -386,14 +380,14 @@ std::vector<std::string>& JFileSystem::scanfolder(const std::string& _folderName
         realFolderName.append(folderName);
         scanRealFolder(realFolderName, systemReal);
 
-        for (size_t i = 0; i < systemReal.size(); ++i) {
-            std::string asFolder = systemReal[i] + "/";
-            if (seen.find(asFolder) == seen.end()) seen[systemReal[i]] = true;
+        for (auto& i : systemReal) {
+            std::string asFolder = i + "/";
+            if (seen.find(asFolder) == seen.end()) seen[i] = true;
         }
     }
 
-    for (auto it = seen.begin(); it != seen.end(); ++it) {
-        results.push_back(it->first);
+    for (auto& it : seen) {
+        results.push_back(it.first);
     }
 
     return results;
@@ -414,7 +408,7 @@ bool JFileSystem::Rename(std::string _from, std::string _to) {
     std::string from = mUserFSPath + _from;
     std::string to = mUserFSPath + _to;
     std::remove(to.c_str());
-    return rename(from.c_str(), to.c_str()) ? true : false;
+    return rename(from.c_str(), to.c_str()) != 0;
 }
 
 int JFileSystem::GetFileSize(zfs::izfstream& file) {

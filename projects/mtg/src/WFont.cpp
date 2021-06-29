@@ -99,7 +99,7 @@ static inline int charWidth(const u8 s) {
 
 //
 
-JRenderer* WFBFont::mRenderer = NULL;
+JRenderer* WFBFont::mRenderer = nullptr;
 
 WLBFont::WLBFont(int inFontID, const char* fontname, int lineheight, bool useVideoRAM) : WFont(inFontID) {
     string path(fontname);
@@ -137,9 +137,9 @@ void WLBFont::FormatText(string& s, vector<string>& output) {
 WFBFont::WFBFont(int inFontID, const char* fontname, int lineheight, bool useVideoRAM) : WFont(inFontID) {
     mRenderer = JRenderer::GetInstance();
 
-    mCharBuffer = NULL;
-    mSprites = NULL;
-    mGBCode = NULL;
+    mCharBuffer = nullptr;
+    mSprites    = nullptr;
+    mGBCode     = nullptr;
     mCurr = 0;
 
     char tmpFileName[32], engFileName[32];
@@ -218,7 +218,7 @@ WFBFont::~WFBFont() {
         delete[] mSprites;
     }
 
-    if (NULL != mIndex) delete[] mIndex;
+    if (nullptr != mIndex) delete[] mIndex;
 
     if (mGBCode) delete[] mGBCode;
 
@@ -521,9 +521,9 @@ float WFBFont::GetHeight() const { return (mFontSize * mScale); }
 WGBKFont::WGBKFont(int inFontID, const char* fontname, int lineheight, bool useVideoRAM) : WFBFont(inFontID) {
     mRenderer = JRenderer::GetInstance();
 
-    mCharBuffer = NULL;
-    mSprites = NULL;
-    mGBCode = NULL;
+    mCharBuffer = nullptr;
+    mSprites    = nullptr;
+    mGBCode     = nullptr;
     mCurr = 0;
 
     char tmpFileName[32], engFileName[32];
@@ -546,7 +546,7 @@ WGBKFont::WGBKFont(int inFontID, const char* fontname, int lineheight, bool useV
     fileSys->ReadFile(mStdFont, size);
     fileSys->CloseFile();
 
-    mIndex = 0;
+    mIndex = nullptr;
 
     mColor0 = ARGB(255, 255, 255, 255);
     mColor = mColor0;

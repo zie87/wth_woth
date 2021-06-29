@@ -186,9 +186,7 @@ bool GameOption::isDefault() {
     string test = str;
     std::transform(test.begin(), test.end(), test.begin(), ::tolower);
 
-    if (!test.size() || test == "default") return true;
-
-    return false;
+    return !test.size() || test == "default";
 }
 
 PIXEL_TYPE GameOption::asColor(PIXEL_TYPE fallback) {
@@ -331,7 +329,7 @@ int GameOptions::save() {
             opt->write(&file, name);
         }
 
-        for (map<string, GameOption*>::iterator it = unknownMap.begin(); it != unknownMap.end(); it++) {
+        for (auto it = unknownMap.begin(); it != unknownMap.end(); it++) {
             if (it->second) {
                 if (it->second->str.size())
                     file << it->first << "=" << it->second->str << "\n";
@@ -380,15 +378,15 @@ GameOption* GameOptions::get(string optionName) {
 
 GameOption* GameOptions::get(int optionID) {
     // Invalid options!
-    if (optionID < 0) return NULL;
+    if (optionID < 0) return nullptr;
 
     // Option doesn't exist, so build it
     int x = (int)values.size();
     values.reserve(optionID);
 
     while (x <= optionID) {
-        GameOption* go = NULL;
-        GameOptionEnum* goEnum = NULL;
+        GameOption* go         = nullptr;
+        GameOptionEnum* goEnum = nullptr;
         switch (x) {
         // Enum options
         case Options::HANDDIRECTION:
@@ -449,11 +447,10 @@ GameOption* GameOptions::get(int optionID) {
 }
 
 GameOptions::~GameOptions() {
-    for (vector<GameOption*>::iterator it = values.begin(); it != values.end(); it++) SAFE_DELETE(*it);
+    for (auto it = values.begin(); it != values.end(); it++) SAFE_DELETE(*it);
     values.clear();
 
-    for (map<string, GameOption*>::iterator it = unknownMap.begin(); it != unknownMap.end(); it++)
-        SAFE_DELETE(it->second);
+    for (auto it = unknownMap.begin(); it != unknownMap.end(); it++) SAFE_DELETE(it->second);
     unknownMap.clear();
 }
 
@@ -464,17 +461,17 @@ GameOptions::~GameOptions() {
 GameSettings options;
 
 GameSettings::GameSettings() {
-    styleMan = NULL;
-    globalOptions = NULL;
-    theGame = NULL;
-    profileOptions = NULL;
+    styleMan       = nullptr;
+    globalOptions  = nullptr;
+    theGame        = nullptr;
+    profileOptions = nullptr;
     // reloadProfile should be before using options.
 }
 
 WStyle* GameSettings::getStyle() {
     if (!styleMan) {
         styleMan = new StyleManager();
-        styleMan->determineActive(NULL, NULL);
+        styleMan->determineActive(nullptr, nullptr);
     }
     return styleMan->get();
 }
@@ -512,11 +509,11 @@ GameSettings::~GameSettings() {
     SAFE_DELETE(styleMan);
 }
 
-bool GameSettings::newAward() {
+bool GameSettings::newAward() const {
     if (!profileOptions) return false;
 
     for (int x = Options::BEGIN_AWARDS; x < Options::SET_UNLOCKS + setlist.size(); x++) {
-        GameOptionAward* goa = dynamic_cast<GameOptionAward*>(profileOptions->get(x));
+        auto* goa = dynamic_cast<GameOptionAward*>(profileOptions->get(x));
         if (!goa) continue;
         if (!goa->isViewed()) return true;
     }
@@ -525,14 +522,14 @@ bool GameSettings::newAward() {
 
 GameOption GameSettings::invalid_option = GameOption(0);
 
-GameOption& GameSettings::operator[](int optionID) {
+GameOption& GameSettings::operator[](int optionID) const {
     GameOption* go = get(optionID);
     if (!go) return invalid_option;
 
     return *go;
 }
 
-GameOption& GameSettings::operator[](string optionName) {
+GameOption& GameSettings::operator[](string optionName) const {
     int id = Options::getID(optionName);
     if (id != INVALID_OPTION) return operator[](id);
 
@@ -545,7 +542,7 @@ GameOption& GameSettings::operator[](string optionName) {
     return *go;
 }
 
-GameOption* GameSettings::get(int optionID) {
+GameOption* GameSettings::get(int optionID) const {
     if (optionID < 0)
         return &invalid_option;
     else if (globalOptions && optionID <= Options::LAST_GLOBAL)
@@ -625,16 +622,16 @@ void GameSettings::checkProfile() {
         profileOptions = NEW GameOptions(profileFile(PLAYER_SETTINGS, "", false));
         // Backwards compatibility hack for unlocked modes.
         for (int x = Options::BEGIN_AWARDS; x < Options::LAST_NAMED; x++) {
-            GameOptionAward* goa = dynamic_cast<GameOptionAward*>(globalOptions->get(x));
+            auto* goa = dynamic_cast<GameOptionAward*>(globalOptions->get(x));
             if (goa) {
-                GameOptionAward* dupe = dynamic_cast<GameOptionAward*>(profileOptions->get(x));
+                auto* dupe = dynamic_cast<GameOptionAward*>(profileOptions->get(x));
                 if (dupe && goa->number && !dupe->number) dupe->giveAward();
             }
         }
     }
 
     // Validation of collection, etc, only happens if the game is up.
-    if (theGame == NULL || MTGCollection() == NULL) return;
+    if (theGame == nullptr || MTGCollection() == nullptr) return;
 
     string pcFile = profileFile(PLAYER_COLLECTION, "", false);
     if (!pcFile.size() || !fileExists(pcFile.c_str())) {
@@ -667,32 +664,32 @@ void GameSettings::checkProfile() {
         // Give the player their first deck
         createUsersFirstDeck(setId);
     }
-    getStyleMan()->determineActive(NULL, NULL);
+    getStyleMan()->determineActive(nullptr, nullptr);
 }
 
 void GameSettings::createUsersFirstDeck(int setId) {
-    if (theGame == NULL || MTGCollection() == NULL) return;
+    if (theGame == nullptr || MTGCollection() == nullptr) return;
 
-    MTGDeck* mCollection = NEW MTGDeck(options.profileFile(PLAYER_COLLECTION, "", false).c_str(), MTGCollection());
+    auto* mCollection = NEW MTGDeck(options.profileFile(PLAYER_COLLECTION, "", false).c_str(), MTGCollection());
     if (mCollection->totalCards() > 0) return;
 
     // 10 lands of each
     int sets[] = {setId};
     if (!mCollection->addRandomCards(10, sets, 1, Constants::RARITY_L, "Forest"))
-        mCollection->addRandomCards(10, 0, 0, Constants::RARITY_L, "Forest");
+        mCollection->addRandomCards(10, nullptr, 0, Constants::RARITY_L, "Forest");
     if (!mCollection->addRandomCards(10, sets, 1, Constants::RARITY_L, "Plains"))
-        mCollection->addRandomCards(10, 0, 0, Constants::RARITY_L, "Plains");
+        mCollection->addRandomCards(10, nullptr, 0, Constants::RARITY_L, "Plains");
     if (!mCollection->addRandomCards(10, sets, 1, Constants::RARITY_L, "Swamp"))
-        mCollection->addRandomCards(10, 0, 0, Constants::RARITY_L, "Swamp");
+        mCollection->addRandomCards(10, nullptr, 0, Constants::RARITY_L, "Swamp");
     if (!mCollection->addRandomCards(10, sets, 1, Constants::RARITY_L, "Mountain"))
-        mCollection->addRandomCards(10, 0, 0, Constants::RARITY_L, "Mountain");
+        mCollection->addRandomCards(10, nullptr, 0, Constants::RARITY_L, "Mountain");
     if (!mCollection->addRandomCards(10, sets, 1, Constants::RARITY_L, "Island"))
-        mCollection->addRandomCards(10, 0, 0, Constants::RARITY_L, "Island");
+        mCollection->addRandomCards(10, nullptr, 0, Constants::RARITY_L, "Island");
 
     // Starter Deck
-    mCollection->addRandomCards(3, sets, 1, Constants::RARITY_R, NULL);
-    mCollection->addRandomCards(9, sets, 1, Constants::RARITY_U, NULL);
-    mCollection->addRandomCards(48, sets, 1, Constants::RARITY_C, NULL);
+    mCollection->addRandomCards(3, sets, 1, Constants::RARITY_R, nullptr);
+    mCollection->addRandomCards(9, sets, 1, Constants::RARITY_U, nullptr);
+    mCollection->addRandomCards(48, sets, 1, Constants::RARITY_C, nullptr);
 
     // Boosters
     for (int i = 0; i < 2; i++) {
@@ -705,12 +702,12 @@ void GameSettings::createUsersFirstDeck(int setId) {
 }
 
 void GameSettings::keypadTitle(string set) {
-    if (keypad != NULL) keypad->title = set;
+    if (keypad != nullptr) keypad->title = set;
 }
 
 SimplePad* GameSettings::keypadStart(string input, string* _dest, bool _cancel, bool _numpad, float _x, float _y) {
-    if (keypad == NULL) keypad = NEW SimplePad();
-        // show keyboard
+    if (keypad == nullptr) keypad = NEW SimplePad();
+    // show keyboard
 
     keypad->bShowCancel = _cancel;
     keypad->bShowNumpad = _numpad;
@@ -721,7 +718,7 @@ SimplePad* GameSettings::keypadStart(string input, string* _dest, bool _cancel, 
 }
 
 string GameSettings::keypadFinish() {
-    if (keypad == NULL) return "";
+    if (keypad == nullptr) return "";
     return keypad->Finish();
 }
 
@@ -865,14 +862,14 @@ OptionKicker::OptionKicker() {
 
 // GameOptionAward
 GameOptionAward::GameOptionAward() {
-    achieved = time(NULL);
+    achieved = time(nullptr);
     number = 0;
     viewed = false;
 }
 bool GameOptionAward::read(string input) {
     // This is quick and dirty.
 
-    achieved = time(NULL);
+    achieved = time(nullptr);
     tm* at = localtime(&achieved);
     viewed = false;
 
@@ -916,7 +913,7 @@ bool GameOptionAward::read(string input) {
     at->tm_isdst = -1;
 
     achieved = mktime(at);
-    if (achieved == -1) achieved = time(NULL);
+    if (achieved == -1) achieved = time(nullptr);
     return true;
 }
 
@@ -939,7 +936,7 @@ bool GameOptionAward::write(std::ofstream* file, string name) {
 bool GameOptionAward::giveAward() {
     if (number) return false;
 
-    achieved = time(NULL);
+    achieved = time(nullptr);
     viewed = false;
     number = 1;
     options.save();  // TODO - Consider efficiency of this placement.
@@ -1006,12 +1003,12 @@ bool GameOptionKeyBindings::read(string input) {
 bool GameOptionKeyBindings::write(std::ofstream* file, string name) {
     JGE* j = JGE::GetInstance();
     *file << name << "=";
-    JGE::keybindings_it start = j->KeyBindings_begin(), end = j->KeyBindings_end();
+    auto start = j->KeyBindings_begin(), end = j->KeyBindings_end();
     if (start != end) {
         *file << start->first << ":" << start->second;
         ++start;
     }
-    for (JGE::keybindings_it it = start; it != end; ++it) *file << "," << it->first << ":" << it->second;
+    for (auto it = start; it != end; ++it) *file << "," << it->first << ":" << it->second;
     *file << std::endl;
     return true;
 }

@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-JRenderer* JLBFont::mRenderer = NULL;
+JRenderer* JLBFont::mRenderer = nullptr;
 
 JLBFont::JLBFont(const char* fontname, int lineheight, bool useVideoRAM) {
     mRenderer = JRenderer::GetInstance();
@@ -26,8 +26,8 @@ JLBFont::JLBFont(const char* fontname, int lineheight, bool useVideoRAM) {
     mTracking = 0.0f;
     mColor = ARGB(255, 255, 255, 255);
 
-    mTexture = NULL;
-    mQuad = NULL;
+    mTexture = nullptr;
+    mQuad    = nullptr;
     mBase = 0;
 
     char filename[256];
@@ -45,7 +45,7 @@ JLBFont::JLBFont(const char* fontname, int lineheight, bool useVideoRAM) {
     sprintf(filename, "%s.png", fontname);
     mTexture = mRenderer->LoadTexture(filename, useVideoRAM);
 
-    if (mTexture == NULL) return;
+    if (mTexture == nullptr) return;
 
     mHeight = (float)lineheight;
 
@@ -94,7 +94,7 @@ void JLBFont::DrawString(const char* string, float x, float y, int align, float 
     char* p = (char*)string;
     float dx0 = x, dy = y;
 
-    if (mQuad == NULL) return;
+    if (mQuad == nullptr) return;
 
     float width = GetStringWidth(string);
 

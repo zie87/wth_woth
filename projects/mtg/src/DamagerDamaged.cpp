@@ -15,14 +15,14 @@ DamagerDamaged::~DamagerDamaged() {}
 
 int DamagerDamaged::sumDamages() {
     int total = 0;
-    for (vector<Damage>::iterator i = damages.begin(); i != damages.end(); ++i) total += i->damage;
+    for (auto i = damages.begin(); i != damages.end(); ++i) total += i->damage;
     return total;
 }
 
 bool DamagerDamaged::hasLethalDamage() { return (sumDamages() >= card->life); }
 
 void DamagerDamaged::addDamage(int damage, DamagerDamaged* source) {
-    for (vector<Damage>::iterator i = damages.begin(); i != damages.end(); ++i)
+    for (auto i = damages.begin(); i != damages.end(); ++i)
         if (i->source == source->card) {
             i->damage += damage;
             if (0 >= i->damage) damages.erase(i);
@@ -33,7 +33,7 @@ void DamagerDamaged::addDamage(int damage, DamagerDamaged* source) {
 }
 
 int DamagerDamaged::removeDamagesFrom(DamagerDamaged* source) {
-    for (vector<Damage>::iterator i = damages.begin(); i != damages.end(); ++i)
+    for (auto i = damages.begin(); i != damages.end(); ++i)
         if (i->source == source->card) {
             int damage = i->damage;
             damages.erase(i);
@@ -74,5 +74,5 @@ AttackerDamaged::AttackerDamaged(MTGCardInstance* card, const Pos& ref, bool sho
     : DamagerDamaged(card, ref, show, damageSelecter) {}
 
 AttackerDamaged::~AttackerDamaged() {
-    for (vector<DefenserDamaged*>::iterator q = blockers.begin(); q != blockers.end(); ++q) delete (*q);
+    for (auto q = blockers.begin(); q != blockers.end(); ++q) delete (*q);
 }

@@ -248,7 +248,7 @@ public:
 protected:
     FT_Library GetFontLibrary();
     FT_Byte* GetFontBits();
-    int GetFontBitsSize();
+    int GetFontBitsSize() const;
 
 private:
     int RenderString(const u16* text, float x, float y, bool render);

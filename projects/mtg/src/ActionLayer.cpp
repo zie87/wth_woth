@@ -16,7 +16,7 @@ MTGAbility* ActionLayer::getAbility(int type) {
             return a;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 int ActionLayer::removeFromGame(ActionElement* e) {
@@ -24,7 +24,7 @@ int ActionLayer::removeFromGame(ActionElement* e) {
     int i = getIndexOf(e);
     if (i == -1) return 0;
 
-    if (isWaitingForAnswer() == e) setCurrentWaitingAction(NULL);
+    if (isWaitingForAnswer() == e) setCurrentWaitingAction(nullptr);
     assert(e);
     e->destroy();
 
@@ -32,10 +32,10 @@ int ActionLayer::removeFromGame(ActionElement* e) {
     if (i == -1) return 0;  // Should not happen, it means we deleted thesame object twice?
     AbilityFactory af(observer);
 
-    MTGAbility* a = dynamic_cast<MTGAbility*>(e);
-    if (a != NULL) {
+    auto* a = dynamic_cast<MTGAbility*>(e);
+    if (a != nullptr) {
         MTGAbility* toCheck = af.getCoreAbility(a);
-        AManaProducer* manaObject = dynamic_cast<AManaProducer*>(toCheck);
+        auto* manaObject    = dynamic_cast<AManaProducer*>(toCheck);
         if (manaObject) {
             for (size_t i = 0; i < manaObjects.size(); i++)
                 if (manaObjects[i] == e) {
@@ -76,15 +76,15 @@ int ActionLayer::reactToTargetClick(ActionElement* ability, Targetable* card) {
 
 bool ActionLayer::CheckUserInput(JButton key) {
     if (observer->mExtraPayment && key == JGE_BTN_SEC) {
-        observer->mExtraPayment = NULL;
+        observer->mExtraPayment = nullptr;
         return 1;
     }
     if (menuObject) {
         return false;
     }
     for (size_t i = 0; i < mObjects.size(); i++) {
-        if (mObjects[i] != NULL) {
-            ActionElement* currentAction = (ActionElement*)mObjects[i];
+        if (mObjects[i] != nullptr) {
+            auto* currentAction = (ActionElement*)mObjects[i];
             if (currentAction->CheckUserInput(key)) return true;
         }
     }
@@ -106,15 +106,15 @@ void ActionLayer::Update(float dt) {
             if (i < 0) break;
         }
 
-        if (mObjects[i] != NULL) {
-            ActionElement* currentAction = (ActionElement*)mObjects[i];
+        if (mObjects[i] != nullptr) {
+            auto* currentAction = (ActionElement*)mObjects[i];
             if (currentAction->testDestroy()) observer->removeObserver(currentAction);
         }
     }
     GamePhase newPhase = observer->getCurrentGamePhase();
     for (size_t i = 0; i < mObjects.size(); i++) {
-        if (mObjects[i] != NULL) {
-            ActionElement* currentAction = (ActionElement*)mObjects[i];
+        if (mObjects[i] != nullptr) {
+            auto* currentAction     = (ActionElement*)mObjects[i];
             currentAction->newPhase = newPhase;
             currentAction->Update(dt);
             currentAction->currentPhase = newPhase;
@@ -156,8 +156,8 @@ void ActionLayer::Render() {
     }
 
     for (size_t i = 0; i < mObjects.size(); i++) {
-        if (mObjects[i] != NULL) {
-            ActionElement* currentAction = (ActionElement*)mObjects[i];
+        if (mObjects[i] != nullptr) {
+            auto* currentAction = (ActionElement*)mObjects[i];
             currentAction->Render();
         }
     }
@@ -172,7 +172,7 @@ void ActionLayer::setCurrentWaitingAction(ActionElement* ae) {
 
 TargetChooser* ActionLayer::getCurrentTargetChooser() {
     if (currentWaitingAction && currentWaitingAction->waitingForAnswer) return currentWaitingAction->getActionTc();
-    return NULL;
+    return nullptr;
 }
 
 int ActionLayer::cancelCurrentAction() {
@@ -180,18 +180,18 @@ int ActionLayer::cancelCurrentAction() {
     if (!ae) return 0;
     if (cantCancel && ae->getActionTc()->validTargetsExist()) return 0;
     ae->waitingForAnswer = 0;  // TODO MOVE THIS IN ActionElement
-    setCurrentWaitingAction(NULL);
+    setCurrentWaitingAction(nullptr);
     return 1;
 }
 
 ActionElement* ActionLayer::isWaitingForAnswer() {
     if (currentWaitingAction && currentWaitingAction->waitingForAnswer) return currentWaitingAction;
-    return NULL;
+    return nullptr;
 }
 
 int ActionLayer::stillInUse(MTGCardInstance* card) {
     for (size_t i = 0; i < mObjects.size(); i++) {
-        ActionElement* currentAction = (ActionElement*)mObjects[i];
+        auto* currentAction = (ActionElement*)mObjects[i];
         if (currentAction->stillInUse(card)) return 1;
     }
     return 0;
@@ -200,7 +200,7 @@ int ActionLayer::stillInUse(MTGCardInstance* card) {
 int ActionLayer::receiveEventPlus(WEvent* event) {
     int result = 0;
     for (size_t i = 0; i < mObjects.size(); i++) {
-        ActionElement* currentAction = (ActionElement*)mObjects[i];
+        auto* currentAction = (ActionElement*)mObjects[i];
         result += currentAction->receiveEvent(event);
     }
     return 0;
@@ -212,7 +212,7 @@ int ActionLayer::isReactingToTargetClick(Targetable* card) {
     if (isWaitingForAnswer()) return -1;
 
     for (size_t i = 0; i < mObjects.size(); i++) {
-        ActionElement* currentAction = (ActionElement*)mObjects[i];
+        auto* currentAction = (ActionElement*)mObjects[i];
         result += currentAction->isReactingToTargetClick(card);
     }
     return result;
@@ -225,7 +225,7 @@ int ActionLayer::reactToTargetClick(Targetable* card) {
     if (ae) return reactToTargetClick(ae, card);
 
     for (size_t i = 0; i < mObjects.size(); i++) {
-        ActionElement* currentAction = (ActionElement*)mObjects[i];
+        auto* currentAction = (ActionElement*)mObjects[i];
         result += currentAction->reactToTargetClick(card);
     }
     return result;
@@ -234,7 +234,7 @@ int ActionLayer::reactToTargetClick(Targetable* card) {
 bool ActionLayer::getMenuIdFromCardAbility(MTGCardInstance* card, MTGAbility* ability, int& menuId) {
     int ctr = 0;
     for (size_t i = 0; i < mObjects.size(); i++) {
-        ActionElement* currentAction = (ActionElement*)mObjects[i];
+        auto* currentAction = (ActionElement*)mObjects[i];
         if (currentAction->isReactingToClick(card)) {
             if (currentAction == ability) {
                 // code corresponding to that is in setMenuObject
@@ -244,10 +244,7 @@ bool ActionLayer::getMenuIdFromCardAbility(MTGCardInstance* card, MTGAbility* ab
         }
     }
 
-    if (ctr == 0 || ctr == 1) {
-        return false;
-    } else
-        return true;
+    return !(ctr == 0 || ctr == 1);
 }
 
 // TODO Simplify with only object !!!
@@ -257,7 +254,7 @@ int ActionLayer::isReactingToClick(MTGCardInstance* card) {
     if (isWaitingForAnswer()) return -1;
 
     for (size_t i = 0; i < mObjects.size(); i++) {
-        ActionElement* currentAction = (ActionElement*)mObjects[i];
+        auto* currentAction = (ActionElement*)mObjects[i];
         if (currentAction->isReactingToClick(card)) {
             ++result;
             mReactions.insert(currentAction);
@@ -273,8 +270,8 @@ int ActionLayer::reactToClick(MTGCardInstance* card) {
     ActionElement* ae = isWaitingForAnswer();
     if (ae) return reactToClick(ae, card);
 
-    std::set<ActionElement*>::const_iterator iter = mReactions.begin();
-    std::set<ActionElement*>::const_iterator end = mReactions.end();
+    auto iter = mReactions.begin();
+    auto end  = mReactions.end();
     for (; iter != end; ++iter) {
         result += reactToClick(*iter, card);
         if (result) break;
@@ -298,7 +295,7 @@ void ActionLayer::setMenuObject(Targetable* object, bool must) {
     menuObject = object;
 
     SAFE_DELETE(abilitiesMenu);
-    abilitiesTriggered = NULL;
+    abilitiesTriggered = nullptr;
 
     abilitiesMenu =
         NEW SimpleMenu(observer->getInput(), 10, this, Fonts::MAIN_FONT, 100, 100, object->getDisplayName().c_str());
@@ -306,7 +303,7 @@ void ActionLayer::setMenuObject(Targetable* object, bool must) {
         NEW SimpleMenu(observer->getInput(), 10, this, Fonts::MAIN_FONT, 100, 100, object->getDisplayName().c_str());
     currentActionCard = (MTGCardInstance*)object;
     for (size_t i = 0; i < mObjects.size(); i++) {
-        ActionElement* currentAction = (ActionElement*)mObjects[i];
+        auto* currentAction = (ActionElement*)mObjects[i];
         if (currentAction->isReactingToTargetClick(object)) {
             if (dynamic_cast<MTGAbility*>(currentAction)->getCost() ||
                 dynamic_cast<PermanentAbility*>(currentAction)) {
@@ -346,11 +343,11 @@ void ActionLayer::setCustomMenuObject(Targetable* object, bool must, vector<MTGA
     SAFE_DELETE(abilitiesMenu);
     abilitiesMenu =
         NEW SimpleMenu(observer->getInput(), 10, this, Fonts::MAIN_FONT, 100, 100, object->getDisplayName().c_str());
-    currentActionCard = NULL;
+    currentActionCard               = nullptr;
     abilitiesMenu->isMultipleChoice = false;
     if (abilities.size()) {
         abilitiesMenu->isMultipleChoice = true;
-        ActionElement* currentAction = NULL;
+        ActionElement* currentAction    = nullptr;
         for (int w = 0; w < int(abilities.size()); w++) {
             currentAction = (ActionElement*)abilities[w];
             currentActionCard = (MTGCardInstance*)abilities[0]->target;
@@ -387,14 +384,14 @@ void ActionLayer::ButtonPressed(int controllerid, int controlid) {
         return ButtonPressedOnMultipleChoice();
     }
     if (controlid >= 0 && controlid < static_cast<int>(mObjects.size())) {
-        ActionElement* currentAction = (ActionElement*)mObjects[controlid];
+        auto* currentAction = (ActionElement*)mObjects[controlid];
         currentAction->reactToTargetClick(menuObject);
-        menuObject = 0;
-        currentActionCard = NULL;
+        menuObject        = nullptr;
+        currentActionCard = nullptr;
     } else if (controlid == kCancelMenuID) {
         observer->mLayers->stackLayer()->endOfInterruption(false);
-        menuObject = 0;
-        currentActionCard = NULL;
+        menuObject        = nullptr;
+        currentActionCard = nullptr;
     } else {
         // fallthrough case. We have an id we don't recognize - do nothing, don't clear the menu!
         // assert(false);
@@ -406,31 +403,31 @@ void ActionLayer::ButtonPressedOnMultipleChoice(int choice) {
     for (int i = int(mObjects.size() - 1); i > 0; i--) {
         // the currently displayed menu is not always the currently listenning action object
         // find the menu which is displayed.
-        MenuAbility* ma = dynamic_cast<MenuAbility*>(mObjects[i]);  // find the active menu
+        auto* ma = dynamic_cast<MenuAbility*>(mObjects[i]);  // find the active menu
         if (ma && ma->triggered) {
             currentMenuObject = i;
             break;
         }
     }
     if (currentMenuObject >= 0 && currentMenuObject < static_cast<int>(mObjects.size())) {
-        ActionElement* currentAction = (ActionElement*)mObjects[currentMenuObject];
+        auto* currentAction = (ActionElement*)mObjects[currentMenuObject];
         currentAction->reactToChoiceClick(menuObject, choice > -1 ? choice : this->abilitiesMenu->getmCurr(),
                                           currentMenuObject);
-        MenuAbility* ma = dynamic_cast<MenuAbility*>(mObjects[currentMenuObject]);
+        auto* ma = dynamic_cast<MenuAbility*>(mObjects[currentMenuObject]);
         if (ma) ma->removeMenu = true;  // we clicked something, close menu now.
     } else if (currentMenuObject == kCancelMenuID) {
         observer->mLayers->stackLayer()->endOfInterruption(false);
     }
-    menuObject = 0;
-    currentActionCard = NULL;
+    menuObject        = nullptr;
+    currentActionCard = nullptr;
 }
 
 ActionLayer::ActionLayer(GameObserver* observer) : GuiLayer(observer) {
-    menuObject = NULL;
-    abilitiesMenu = NULL;
-    abilitiesTriggered = NULL;
+    menuObject           = nullptr;
+    abilitiesMenu        = nullptr;
+    abilitiesTriggered   = nullptr;
     stuffHappened = 0;
-    currentWaitingAction = NULL;
+    currentWaitingAction = nullptr;
     cantCancel = 0;
 }
 

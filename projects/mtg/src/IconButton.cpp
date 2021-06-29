@@ -7,7 +7,8 @@
 #define SCALE_SELECTED 1.2f
 #define SCALE_NORMAL 1.0f
 
-IconButtonsController::IconButtonsController(JGE* jge, float x, float y) : JGuiController(jge, 0, NULL), mX(x), mY(y) {
+IconButtonsController::IconButtonsController(JGE* jge, float x, float y)
+    : JGuiController(jge, 0, nullptr), mX(x), mY(y) {
     mListener = this;
 }
 
@@ -19,7 +20,7 @@ void IconButtonsController::SetColor(PIXEL_TYPE color) {
 IconButton::IconButton(int id, IconButtonsController* parent, string texture, float x, float y, float scale,
                        int fontId, string text, float textRelativeX, float textRelativeY, bool hasFocus)
     : JGuiObject(id) {
-    mQuad = NULL;
+    mQuad = nullptr;
     mTex = WResourceManager::Instance()->RetrieveTexture(texture, RETRIEVE_LOCK);
     if (mTex) {
         mQuad = NEW JQuad(mTex, 0, 0, (float)mTex->mWidth, (float)mTex->mHeight);
@@ -30,7 +31,7 @@ IconButton::IconButton(int id, IconButtonsController* parent, string texture, fl
 IconButton::IconButton(int id, IconButtonsController* parent, JQuad* quad, float x, float y, float scale, int fontId,
                        string text, float textRelativeX, float textRelativeY, bool hasFocus)
     : JGuiObject(id) {
-    mTex = NULL;
+    mTex = nullptr;
     init(parent, quad, x, y, scale, fontId, text, textRelativeX, textRelativeY, hasFocus);
 }
 
@@ -54,7 +55,7 @@ void IconButton::init(IconButtonsController* parent, JQuad* quad, float x, float
 
 void IconButton::SetColor(PIXEL_TYPE color) { mColor = color; }
 
-bool IconButton::hasFocus() { return mHasFocus; }
+bool IconButton::hasFocus() const { return mHasFocus; }
 
 void IconButton::Render() {
     JRenderer* r = JRenderer::GetInstance();

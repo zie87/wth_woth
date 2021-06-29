@@ -39,13 +39,13 @@ const int kHitzonePliancy = 50;
 const int kTapEventTimeout = 250;
 
 uint64_t lastTickCount;
-JGE* g_engine = NULL;
-JApp* g_app = NULL;
-JGameLauncher* g_launcher = NULL;
+JGE* g_engine             = nullptr;
+JApp* g_app               = nullptr;
+JGameLauncher* g_launcher = nullptr;
 
 class SdlApp;
 
-SdlApp* g_SdlApp = NULL;
+SdlApp* g_SdlApp = nullptr;
 
 class SdlApp {
 public: /* For easy interfacing with JGE static functions */
@@ -67,8 +67,8 @@ public: /* For easy interfacing with JGE static functions */
 public:
     SdlApp()
         : Running(true),
-          window(NULL),
-          gl_context(NULL),
+          window(nullptr),
+          gl_context(nullptr),
           lastMouseUpTime(0),
           lastFingerDownTime(0),
           mMouseDownX(0),
@@ -87,7 +87,7 @@ public:
     }
 
     int OnExecute() {
-        if (OnInit() == false) {
+        if (!OnInit()) {
             return -1;
         }
 
@@ -142,8 +142,8 @@ public:
 
     void OnKeyPressed(const SDL_KeyboardEvent& event);
     void OnMouseDoubleClicked(const SDL_MouseButtonEvent& event);
-    void OnMouseClicked(const SDL_MouseButtonEvent& event);
-    void OnMouseMoved(const SDL_MouseMotionEvent& event);
+    void OnMouseClicked(const SDL_MouseButtonEvent& event) const;
+    void OnMouseMoved(const SDL_MouseMotionEvent& event) const;
     void OnMouseWheel(int x, int y);
 
     void OnTouchEvent(const SDL_TouchFingerEvent& event);
@@ -211,14 +211,14 @@ public:
         }
     }
 
-    void OnUpdate();
+    void OnUpdate() const;
 
-    void OnCleanup() {
+    void OnCleanup() const {
         SDL_GL_DeleteContext(gl_context);
         SDL_Quit();
     }
 };
-SdlApp* SdlApp::sInstance = 0;
+SdlApp* SdlApp::sInstance = nullptr;
 
 static const struct {
     LocalKeySym keysym;
@@ -325,22 +325,22 @@ bool InitGame(void) {
 }
 
 void DestroyGame(void) {
-    if (g_engine != NULL) {
-        g_engine->SetApp(NULL);
+    if (g_engine != nullptr) {
+        g_engine->SetApp(nullptr);
     }
 
     if (g_app) {
         g_app->Destroy();
         delete g_app;
-        g_app = NULL;
+        g_app = nullptr;
     }
 
     JGE::Destroy();
 
-    g_engine = NULL;
+    g_engine = nullptr;
 }
 
-void SdlApp::OnUpdate() {
+void SdlApp::OnUpdate() const {
     static int tickCount = 0;
     tickCount = JGEGetTime();
     int64_t dt = (tickCount - lastTickCount);
@@ -372,7 +372,7 @@ void SdlApp::OnKeyPressed(const SDL_KeyboardEvent& event) {
     }
 }
 
-void SdlApp::OnMouseMoved(const SDL_MouseMotionEvent& event) {
+void SdlApp::OnMouseMoved(const SDL_MouseMotionEvent& event) const {
     int actualWidth = (int)JRenderer::GetInstance()->GetActualWidth();
     int actualHeight = (int)JRenderer::GetInstance()->GetActualHeight();
 
@@ -399,7 +399,7 @@ void SdlApp::OnMouseWheel(int x, int y) {
     }
 }
 
-void SdlApp::OnMouseClicked(const SDL_MouseButtonEvent& event) {
+void SdlApp::OnMouseClicked(const SDL_MouseButtonEvent& event) const {
     if (event.type == SDL_MOUSEBUTTONDOWN) {
         if (event.button == SDL_BUTTON_LEFT) /* Left button */
         {
@@ -513,7 +513,7 @@ bool SdlApp::OnInit() {
     Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
     window = SDL_CreateWindow(g_launcher->GetName(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_w,
                               window_h, flags);
-    if (window == NULL) {
+    if (window == nullptr) {
         WGE_LOG_ERROR( "SDL Error: {}", SDL_GetError());
         return false;
     }

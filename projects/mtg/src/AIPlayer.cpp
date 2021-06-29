@@ -19,7 +19,7 @@ int AIPlayer::totalAIDecks = -1;
 const char* const MTG_LAND_TEXTS[] = {"artifact", "forest", "island", "mountain", "swamp", "plains", "other lands"};
 
 AIAction::AIAction(AIPlayer* owner, MTGCardInstance* c, MTGCardInstance* t)
-    : owner(owner), ability(NULL), player(NULL), click(c), target(t) {
+    : owner(owner), ability(nullptr), player(nullptr), click(c), target(t) {
     // useability tweak - assume that the user is probably going to want to see the full res card,
     // so prefetch it. The idea is that we do it here as we want to start the prefetch before it's time to render,
     // and waiting for it to actually go into play is too late, as we start drawing the card during the interrupt
@@ -42,7 +42,7 @@ AIAction::AIAction(AIPlayer* owner, MTGCardInstance* c, MTGCardInstance* t)
 int AIAction::Act() {
     GameObserver* g = owner->getObserver();
     if (player && !playerAbilityTarget) {
-        g->cardClick(NULL, player);
+        g->cardClick(nullptr, player);
         return 1;
     }
     if (ability) {
@@ -51,7 +51,7 @@ int AIAction::Act() {
             g->cardClick(target);
             return 1;
         } else if (playerAbilityTarget && !mAbilityTargets.size()) {
-            g->cardClick(NULL, (Player*)playerAbilityTarget);
+            g->cardClick(nullptr, (Player*)playerAbilityTarget);
             return 1;
         }
         if (mAbilityTargets.size()) {
@@ -67,11 +67,11 @@ int AIAction::Act() {
     return 0;
 }
 
-int AIAction::clickMultiAct(vector<Targetable*>& actionTargets) {
+int AIAction::clickMultiAct(vector<Targetable*>& actionTargets) const {
     GameObserver* g = owner->getObserver();
     TargetChooser* tc = g->getCurrentTargetChooser();
     if (!tc) return 0;
-    vector<Targetable*>::iterator ite = actionTargets.begin();
+    auto ite = actionTargets.begin();
     while (ite != actionTargets.end()) {
         MTGCardInstance* card = ((MTGCardInstance*)(*ite));
         if (card == (MTGCardInstance*)tc->source)  // click source first.
@@ -88,7 +88,7 @@ int AIAction::clickMultiAct(vector<Targetable*>& actionTargets) {
     owner->getRandomGenerator()->random_shuffle(actionTargets.begin(), actionTargets.end());
 
     for (int k = 0; k < int(actionTargets.size()) && k < tc->maxtargets; k++) {
-        if (MTGCardInstance* card = dynamic_cast<MTGCardInstance*>(actionTargets[k])) {
+        if (auto* card = dynamic_cast<MTGCardInstance*>(actionTargets[k])) {
             if (k + 1 == int(actionTargets.size())) tc->done = true;
             g->cardClick(card);
         }
@@ -119,9 +119,9 @@ int AIPlayer::Act(float dt) {
 }
 
 int AIPlayer::clickMultiTarget(TargetChooser* tc, vector<Targetable*>& potentialTargets) {
-    vector<Targetable*>::iterator ite = potentialTargets.begin();
+    auto ite = potentialTargets.begin();
     while (ite != potentialTargets.end()) {
-        MTGCardInstance* card = dynamic_cast<MTGCardInstance*>(*ite);
+        auto* card = dynamic_cast<MTGCardInstance*>(*ite);
         if (card && card == tc->source)  // if the source is part of the targetting deal with it first. second click is
                                          // "confirming click".
         {
@@ -129,7 +129,7 @@ int AIPlayer::clickMultiTarget(TargetChooser* tc, vector<Targetable*>& potential
             WGE_LOG_TRACE("Ai clicked source as a target: {}", (card ? card->name : "None"));
             ite = potentialTargets.erase(ite);
             continue;
-        } else if (Player* pTarget = dynamic_cast<Player*>(*ite)) {
+        } else if (auto* pTarget = dynamic_cast<Player*>(*ite)) {
             clickstream.push(NEW AIAction(this, pTarget));
             WGE_LOG_TRACE("Ai clicked Player as a target");
             ite = potentialTargets.erase(ite);
@@ -139,7 +139,7 @@ int AIPlayer::clickMultiTarget(TargetChooser* tc, vector<Targetable*>& potential
     }
 
     randomGenerator.random_shuffle(potentialTargets.begin(), potentialTargets.end());
-    if (potentialTargets.size()) clickstream.push(NEW AIAction(this, NULL, tc->source, potentialTargets));
+    if (potentialTargets.size()) clickstream.push(NEW AIAction(this, nullptr, tc->source, potentialTargets));
     while (clickstream.size()) {
         AIAction* action = clickstream.front();
         action->Act();
@@ -153,9 +153,9 @@ int AIPlayer::clickSingleTarget(TargetChooser* tc, vector<Targetable*>& potentia
                                 MTGCardInstance* chosenCard) {
     int i = randomGenerator.random() % potentialTargets.size();
 
-    if (MTGCardInstance* card = dynamic_cast<MTGCardInstance*>(potentialTargets[i])) {
+    if (auto* card = dynamic_cast<MTGCardInstance*>(potentialTargets[i])) {
         if (!chosenCard) clickstream.push(NEW AIAction(this, card));
-    } else if (Player* player = dynamic_cast<Player*>(potentialTargets[i])) {
+    } else if (auto* player = dynamic_cast<Player*>(potentialTargets[i])) {
         clickstream.push(NEW AIAction(this, player));
     }
 
@@ -177,7 +177,7 @@ AIPlayer* AIPlayerFactory::createAIPlayer(GameObserver* observer, MTGAllCards* c
         if (!deckid) {
             // random deck
             int nbdecks = MIN(AIPlayer::getTotalAIDecks(), options[Options::AIDECKS_UNLOCKED].number);
-            if (!nbdecks) return NULL;
+            if (!nbdecks) return nullptr;
             deckid = 1 + WRand() % (nbdecks);
         }
         sprintf(deckFile, "ai/baka/deck%i.txt", deckid);
@@ -194,8 +194,8 @@ AIPlayer* AIPlayerFactory::createAIPlayer(GameObserver* observer, MTGAllCards* c
     }
 
     // AIPlayerBaka will delete MTGDeck when it's time
-    AIPlayerBaka* baka = NEW AIPlayerBaka(observer, deckFile, deckFileSmall, avatarFilename,
-                                          NEW MTGDeck(deckFile, collection, 0, deckSetting));
+    auto* baka   = NEW AIPlayerBaka(observer, deckFile, deckFileSmall, avatarFilename,
+                                    NEW MTGDeck(deckFile, collection, 0, deckSetting));
     baka->deckId = deckid;
     return baka;
 }
@@ -210,7 +210,7 @@ bool AIPlayer::parseLine(const string& s) {
     string areaS;
     if (limiter != string::npos) {
         areaS = s.substr(0, limiter);
-        if (areaS.compare("rvalues") == 0) {
+        if (areaS == "rvalues") {
             randomGenerator.loadRandValues(s.substr(limiter + 1));
             return true;
         }
@@ -244,7 +244,7 @@ AIPlayer* AIPlayerFactory::createAIPlayerTest(GameObserver* observer, MTGAllCard
     }
     if (!nbdecks) {
         if (_folder.size()) return createAIPlayerTest(observer, collection, opponent, "");
-        return NULL;
+        return nullptr;
     }
     deckid = 1 + WRand() % (nbdecks);
 

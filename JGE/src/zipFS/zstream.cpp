@@ -20,7 +20,7 @@ using namespace std;
 void izstream::open(const char* Filename, streamoff Offset, streamoff Size, int CompMethod) {
     // Change the buffer if need
     if (m_CompMethod == CompMethod) {
-        if (rdbuf() != NULL) static_cast<zbuffer*>(rdbuf())->close();
+        if (rdbuf() != nullptr) static_cast<zbuffer*>(rdbuf())->close();
     } else
         SetCompMethod(CompMethod);
 
@@ -56,7 +56,7 @@ zbuffer* izstream::GetRightBuffer(int CompMethod) const {
 
     // else not supported
     default:
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -89,10 +89,10 @@ bool zbuffer::use(std::streamoff Offset, std::streamoff Size) {
 zbuffer_stored* zbuffer_stored::open(const char* Filename, streamoff Offset, streamoff Size) {
     // open main compressed file
     m_ZipFile.open(Filename, ios::binary);
-    if (!m_ZipFile) return NULL;
+    if (!m_ZipFile) return nullptr;
 
     // adjust file position
-    if (!use(Offset, Size)) return NULL;
+    if (!use(Offset, Size)) return nullptr;
 
     m_Opened = true;
     m_Filename = Filename;
@@ -101,7 +101,7 @@ zbuffer_stored* zbuffer_stored::open(const char* Filename, streamoff Offset, str
 
 zbuffer_stored* zbuffer_stored::close() {
     if (!m_Opened)
-        return NULL;
+        return nullptr;
     else {
         m_Opened = false;
         m_Used = false;
@@ -185,7 +185,7 @@ streampos zbuffer_stored::seekoff(streamoff off, ios::seekdir dir, ios::openmode
 
 int zbuffer_stored::sync() { return 0; }
 
-streambuf* zbuffer_stored::setbuf(char* pr, int nLength) { return NULL; }
+streambuf* zbuffer_stored::setbuf(char* pr, int nLength) { return nullptr; }
 
 //////////////////////////////////////////////////////////////////////
 // zbuffer_deflated Member Functions
@@ -194,10 +194,10 @@ streambuf* zbuffer_stored::setbuf(char* pr, int nLength) { return NULL; }
 zbuffer_deflated* zbuffer_deflated::open(const char* Filename, streamoff Offset, streamoff Size) {
     // open main compressed file
     m_ZipFile.open(Filename, ios::binary);
-    if (!m_ZipFile) return NULL;
+    if (!m_ZipFile) return nullptr;
 
     // adjust file position
-    if (!use(Offset, Size)) return NULL;
+    if (!use(Offset, Size)) return nullptr;
 
     // z_stream (NULL) Initialization
     m_ZStream.next_in = Z_NULL;
@@ -211,7 +211,7 @@ zbuffer_deflated* zbuffer_deflated::open(const char* Filename, streamoff Offset,
     m_ZStream.opaque = Z_NULL;
 
     // inflate routine Initialization: Window Size = -MAX_WBITS tells there are no header
-    if (inflateInit2(&m_ZStream, -MAX_WBITS) != Z_OK) return NULL;
+    if (inflateInit2(&m_ZStream, -MAX_WBITS) != Z_OK) return nullptr;
 
     m_Opened = true;
     m_StreamEnd = false;
@@ -224,14 +224,14 @@ zbuffer_deflated* zbuffer_deflated::open(const char* Filename, streamoff Offset,
 
 zbuffer_deflated* zbuffer_deflated::close() {
     if (!m_Opened)
-        return NULL;
+        return nullptr;
     else {
         m_Opened = false;
         m_Used = false;
         m_ZipFile.close();
 
         // z_stream unitialization.
-        if (inflateEnd(&m_ZStream) != Z_OK) return NULL;
+        if (inflateEnd(&m_ZStream) != Z_OK) return nullptr;
     }
 
     return this;
@@ -357,6 +357,6 @@ streampos zbuffer_deflated::seekoff(std::streamoff off, std::ios::seekdir dir, s
 
 int zbuffer_deflated::sync() { return 0; }
 
-streambuf* zbuffer_deflated::setbuf(char* pr, int nLength) { return NULL; }
+streambuf* zbuffer_deflated::setbuf(char* pr, int nLength) { return nullptr; }
 
 }  // namespace zip_file_system

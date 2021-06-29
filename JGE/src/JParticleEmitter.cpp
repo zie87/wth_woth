@@ -22,7 +22,7 @@ JParticleEmitter::JParticleEmitter(JParticleEffect* parent) {
     mSrcBlending = BLEND_SRC_ALPHA;
     mDestBlending = BLEND_ONE;
 
-    mQuad = NULL;
+    mQuad = nullptr;
 
     mQuadIndex = 0;
     mWidth = 8;
@@ -52,14 +52,14 @@ JParticle* JParticleEmitter::GetIdleParticle() {
     }
 
     if (size < mMaxParticleCount) {
-        JParticle* par = new JParticle();
-        if (par != NULL) {
+        auto* par = new JParticle();
+        if (par != nullptr) {
             mParticles.push_back(par);
             return par;
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void JParticleEmitter::Start() {
@@ -133,7 +133,7 @@ void JParticleEmitter::Update(float dt) {
     if (mQuantity.mCurr != 0.0f) {
         float timeForOneParticle = 1.0f / mQuantity.mCurr;
 
-        float potentialParticles = (float)((int)(mEmitTimer / timeForOneParticle));
+        auto potentialParticles = (float)((int)(mEmitTimer / timeForOneParticle));
         if (potentialParticles >= 1.0f) mEmitTimer -= (potentialParticles * timeForOneParticle);
 
         count = (int)potentialParticles;
@@ -159,7 +159,7 @@ void JParticleEmitter::EmitParticles(int count) {
 
     for (int i = 0; i < count; i++) {
         particle = GetIdleParticle();
-        if (particle != NULL) {
+        if (particle != nullptr) {
             particle->SetQuad(mQuad);
 
             dataPtr = particle->GetDataPtr();
@@ -233,7 +233,7 @@ void JParticleEmitter::SetBlending(int srcBlend, int destBlend) {
     mDestBlending = destBlend;
 }
 
-bool JParticleEmitter::Done() { return !mActive && mActiveParticleCount == 0; }
+bool JParticleEmitter::Done() const { return !mActive && mActiveParticleCount == 0; }
 
 void JParticleEmitter::SetActive(bool flag) { mActive = flag; }
 

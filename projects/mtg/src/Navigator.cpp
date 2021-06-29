@@ -151,7 +151,7 @@ public:
      **
      */
     PlayGuiObject* GetCurrentCard() {
-        PlayGuiObject* current = NULL;
+        PlayGuiObject* current = nullptr;
         if (mCards.size()) {
             if (mCurrentCard < mCards.size()) {
                 current = mCards[mCurrentCard];
@@ -284,7 +284,7 @@ public:
 CardZone* CreatureCardZone::EnterZone(JButton inDirection) {
     if ((inDirection == JGE_BTN_LEFT || inDirection == JGE_BTN_RIGHT) && mCards.empty()) {
         LandCardZone* landZone = dynamic_cast<LandCardZone*>(mNeighbours[JGE_BTN_DOWN]);
-        if (landZone == NULL) {
+        if (landZone == nullptr) {
             landZone = dynamic_cast<LandCardZone*>(mNeighbours[JGE_BTN_UP]);
         }
 
@@ -303,7 +303,7 @@ CardZone* CreatureCardZone::EnterZone(JButton inDirection) {
 CardZone* LandCardZone::EnterZone(JButton inDirection) {
     if ((inDirection == JGE_BTN_LEFT || inDirection == JGE_BTN_RIGHT) && mCards.empty()) {
         CreatureCardZone* creatureZone = dynamic_cast<CreatureCardZone*>(mNeighbours[JGE_BTN_DOWN]);
-        if (creatureZone == NULL) {
+        if (creatureZone == nullptr) {
             creatureZone = dynamic_cast<CreatureCardZone*>(mNeighbours[JGE_BTN_UP]);
         }
 
@@ -427,7 +427,7 @@ Navigator::Navigator(GameObserver* observer, DuelLayers* inDuelLayers)
  **
  */
 Navigator::~Navigator() {
-    std::map<int, CardZone*>::iterator iter = mCardZones.begin();
+    auto iter = mCardZones.begin();
     for (; iter != mCardZones.end(); ++iter) {
         SAFE_DELETE(iter->second);
     }
@@ -478,7 +478,7 @@ bool Navigator::CheckUserInput(int x, int y) {
 void Navigator::Update(float dt) {
     float boundary = mDuelLayers->RightBoundary();
     float position = boundary - CardGui::BigWidth / 2;
-    if (GetCurrentCard() != NULL) {
+    if (GetCurrentCard() != nullptr) {
         if ((GetCurrentCard()->x + CardGui::Width / 2 > position - CardGui::BigWidth / 2) &&
             (GetCurrentCard()->x - CardGui::Width / 2 < position + CardGui::BigWidth / 2)) {
             position = CardGui::BigWidth / 2 - 10;
@@ -494,16 +494,16 @@ void Navigator::Update(float dt) {
 /*
  **
  */
-PlayGuiObject* Navigator::GetCurrentCard() { return mCurrentZone ? mCurrentZone->GetCurrentCard() : NULL; }
+PlayGuiObject* Navigator::GetCurrentCard() { return mCurrentZone ? mCurrentZone->GetCurrentCard() : nullptr; }
 
 /*
  **
  */
 void Navigator::Render() {
-    if (GetCurrentCard() != NULL) {
+    if (GetCurrentCard() != nullptr) {
         GetCurrentCard()->Render();
 
-        CardView* card = dynamic_cast<CardView*>(GetCurrentCard());
+        auto* card = dynamic_cast<CardView*>(GetCurrentCard());
         if (card) {
             card->DrawCard(mDrawPosition, mDrawMode);
         }
@@ -540,7 +540,7 @@ void Navigator::PushLimitor() {}
  **
  */
 void Navigator::Limit(LimitorFunctor<PlayGuiObject>* inLimitor, CardView::SelectorZone inZone) {
-    mLimitorEnabled = (inLimitor != NULL);
+    mLimitorEnabled = (inLimitor != nullptr);
     if (inZone == CardView::handZone) {
         mCurrentZone->LeaveZone(JGE_BTN_NONE);
 
@@ -551,7 +551,7 @@ void Navigator::Limit(LimitorFunctor<PlayGuiObject>* inLimitor, CardView::Select
             mCurrentZone = mCurrentZoneStack.top();
             mCurrentZoneStack.pop();
             assert(mCurrentZone);
-            if (mCurrentZone == NULL) {
+            if (mCurrentZone == nullptr) {
                 mCurrentZone = mCardZones[kCardZone_PlayerHand];
             }
         }
@@ -565,7 +565,7 @@ void Navigator::Limit(LimitorFunctor<PlayGuiObject>* inLimitor, CardView::Select
  */
 int Navigator::CardToCardZone(PlayGuiObject* inCard) {
     int result = kCardZone_Unknown;
-    GuiAvatar* avatar = dynamic_cast<GuiAvatar*>(inCard);
+    auto* avatar = dynamic_cast<GuiAvatar*>(inCard);
     if (avatar) {
         if (avatar->player->isAI()) {
             result = kCardZone_AIAvatar;
@@ -574,7 +574,7 @@ int Navigator::CardToCardZone(PlayGuiObject* inCard) {
         }
     }
 
-    GuiGraveyard* graveyard = dynamic_cast<GuiGraveyard*>(inCard);
+    auto* graveyard = dynamic_cast<GuiGraveyard*>(inCard);
     if (graveyard) {
         if (graveyard->player->isAI()) {
             result = kCardZone_AIGraveyard;
@@ -583,7 +583,7 @@ int Navigator::CardToCardZone(PlayGuiObject* inCard) {
         }
     }
 
-    GuiLibrary* library = dynamic_cast<GuiLibrary*>(inCard);
+    auto* library = dynamic_cast<GuiLibrary*>(inCard);
     if (library) {
         if (library->player->isAI()) {
             result = kCardZone_AILibrary;
@@ -592,12 +592,12 @@ int Navigator::CardToCardZone(PlayGuiObject* inCard) {
         }
     }
 
-    GuiOpponentHand* opponentHand = dynamic_cast<GuiOpponentHand*>(inCard);
+    auto* opponentHand = dynamic_cast<GuiOpponentHand*>(inCard);
     if (opponentHand) {
         result = kCardZone_AIHand;
     }
 
-    CardView* card = dynamic_cast<CardView*>(inCard);
+    auto* card = dynamic_cast<CardView*>(inCard);
     {
         if (card) {
             if (card->owner == CardView::handZone) {
@@ -610,7 +610,7 @@ int Navigator::CardToCardZone(PlayGuiObject* inCard) {
                 } else if (card->getCard()->isLand()) {
                     result = isAI ? kCardZone_AILands : kCardZone_PlayerLands;
                 } else if (card->getCard()->isSpell()) {
-                    if (card->getCard()->target != NULL) isAI = card->getCard()->target->owner->isAI();
+                    if (card->getCard()->target != nullptr) isAI = card->getCard()->target->owner->isAI();
 
                     // nasty hack:  the lines above don't always work, as when an enchantment comes into play, its
                     // ability hasn't been activated yet, so it doesn't yet have a target.  Instead, we now look at the

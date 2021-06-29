@@ -14,12 +14,12 @@
 #include <wge/log.hpp>
 
 Player::Player(GameObserver* observer, string file, string fileSmall, MTGDeck* deck)
-    : Damageable(observer, 20), mAvatarName(""), offerInterruptOnPhase(MTG_PHASE_DRAW) {
-    if (deck == NULL && file != "testsuite" && file != "remote" && file != "")
+    : Damageable(observer, 20), offerInterruptOnPhase(MTG_PHASE_DRAW) {
+    if (deck == nullptr && file != "testsuite" && file != "remote" && file != "")
         deck = NEW MTGDeck(file.c_str(), MTGCollection());
 
     premade = false;
-    game = NULL;
+    game               = nullptr;
     deckFile = file;
     deckFileSmall = fileSmall;
     handsize = 0;
@@ -28,12 +28,12 @@ Player::Player(GameObserver* observer, string file, string fileSmall, MTGDeck* d
     poisonCount = 0;
     damageCount = 0;
     preventable = 0;
-    mAvatarTex = NULL;
+    mAvatarTex         = nullptr;
     type_as_damageable = DAMAGEABLE_PLAYER;
     playMode = MODE_HUMAN;
     skippingTurn = 0;
     extraTurn = 0;
-    if (deck != NULL) {
+    if (deck != nullptr) {
         game = NEW MTGPlayerCards(deck);
         // This automatically sets the observer pointer on all the deck cards
         game->setOwner(this);
@@ -58,7 +58,7 @@ Player::~Player() {
     SAFE_DELETE(manaPool);
     SAFE_DELETE(game);
     if (mAvatarTex && observer->getResourceManager()) observer->getResourceManager()->Release(mAvatarTex);
-    mAvatarTex = NULL;
+    mAvatarTex = nullptr;
     SAFE_DELETE(mDeck);
 }
 
@@ -68,7 +68,7 @@ bool Player::loadAvatar(string file, string resName) {
 
     if (mAvatarTex) {
         rm->Release(mAvatarTex);
-        mAvatarTex = NULL;
+        mAvatarTex = nullptr;
     }
     mAvatarTex = rm->RetrieveTexture(file, RETRIEVE_LOCK, TEXTURE_SUB_AVATAR);
     if (mAvatarTex) {
@@ -84,7 +84,7 @@ const string Player::getDisplayName() const {
     return "Player 2";
 }
 
-MTGInPlay* Player::inPlay() { return game->inPlay; }
+MTGInPlay* Player::inPlay() const { return game->inPlay; }
 
 int Player::getId() {
     for (int i = 0; i < 2; i++) {
@@ -100,7 +100,7 @@ JQuadPtr Player::getIcon() {
 }
 
 Player* Player::opponent() {
-    if (!observer || (observer->players.size() < 2)) return NULL;
+    if (!observer || (observer->players.size() < 2)) return nullptr;
     return this == observer->players[0] ? observer->players[1] : observer->players[0];
 }
 
@@ -153,7 +153,7 @@ int Player::damaged() { return damageCount; }
 
 int Player::prevented() { return preventable; }
 
-void Player::takeMulligan() {
+void Player::takeMulligan() const {
     MTGPlayerCards* currentPlayerZones = game;
     int cardsinhand = currentPlayerZones->hand->nb_cards;
     for (int i = 0; i < cardsinhand; i++)  // Discard hand
@@ -167,12 +167,12 @@ void Player::takeMulligan() {
 }
 
 // Cleanup phase at the end of a turn
-void Player::cleanupPhase() {
+void Player::cleanupPhase() const {
     game->inPlay->cleanupPhase();
     game->graveyard->cleanupPhase();
 }
 
-std::string Player::GetCurrentDeckStatsFile() {
+std::string Player::GetCurrentDeckStatsFile() const {
     std::ostringstream filename;
     filename << "stats/" << deckFileSmall << ".txt";
     return options.profileFile(filename.str());
@@ -186,22 +186,22 @@ bool Player::parseLine(const string& s) {
     string areaS;
     if (limiter != string::npos) {
         areaS = s.substr(0, limiter);
-        if (areaS.compare("manapool") == 0) {
+        if (areaS == "manapool") {
             SAFE_DELETE(manaPool);
             manaPool = new ManaPool(this);
             ManaCost::parseManaCost(s.substr(limiter + 1), manaPool);
             return true;
-        } else if (areaS.compare("avatar") == 0) {
+        } else if (areaS == "avatar") {
             mAvatarName = s.substr(limiter + 1);
             loadAvatar(mAvatarName, "bakaAvatar");
             return true;
-        } else if (areaS.compare("customphasering") == 0) {
+        } else if (areaS == "customphasering") {
             phaseRing = s.substr(limiter + 1);
             return true;
-        } else if (areaS.compare("premade") == 0) {
+        } else if (areaS == "premade") {
             premade = (atoi(s.substr(limiter + 1).c_str()) == 1);
             return true;
-        } else if (areaS.compare("deckfile") == 0) {
+        } else if (areaS == "deckfile") {
             deckFile = s.substr(limiter + 1);
             if (playMode == Player::MODE_AI) {
                 sscanf(deckFile.c_str(), "ai/baka/deck%i.txt", &deckId);
@@ -223,10 +223,10 @@ bool Player::parseLine(const string& s) {
                 deckName = mDeck->meta_name;
             }
             return true;
-        } else if (areaS.compare("deckfilesmall") == 0) {
+        } else if (areaS == "deckfilesmall") {
             deckFileSmall = s.substr(limiter + 1);
             return true;
-        } else if (areaS.compare("offerinterruptonphase") == 0) {
+        } else if (areaS == "offerinterruptonphase") {
             for (int i = 0; i < NB_MTG_PHASES; i++) {
                 string phaseStr = Constants::MTGPhaseCodeNames[i];
                 if (s.find(phaseStr) != string::npos) {
@@ -242,9 +242,7 @@ bool Player::parseLine(const string& s) {
         game->setOwner(this);
     }
 
-    if (game->parseLine(s)) return true;
-
-    return false;
+    return game->parseLine(s);
 }
 
 void HumanPlayer::End() {

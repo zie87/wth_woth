@@ -22,16 +22,16 @@ vector<DeckMetaData*>* DeckManager::getAIDeckOrderList() { return &aiDeckOrderLi
 struct DeckIDMatch {
     DeckIDMatch(int id) : mID(id) {}
 
-    bool operator()(DeckMetaData* inPtr) { return inPtr->getDeckId() == mID; }
+    bool operator()(DeckMetaData* inPtr) const { return inPtr->getDeckId() == mID; }
 
     int mID;
 };
 
 DeckMetaData* DeckManager::getDeckMetaDataById(int deckId, bool isAI) {
-    DeckMetaData* deck = NULL;
+    DeckMetaData* deck                   = nullptr;
     std::vector<DeckMetaData*>& deckList = isAI ? aiDeckOrderList : playerDeckOrderList;
 
-    std::vector<DeckMetaData*>::iterator pos = find_if(deckList.begin(), deckList.end(), DeckIDMatch(deckId));
+    auto pos = find_if(deckList.begin(), deckList.end(), DeckIDMatch(deckId));
     if (pos != deckList.end()) {
         deck = *pos;
     } else {
@@ -55,16 +55,16 @@ DeckMetaData* DeckManager::getDeckMetaDataById(int deckId, bool isAI) {
 struct DeckFilenameMatch {
     DeckFilenameMatch(const std::string& filename) : mFilename(filename) {}
 
-    bool operator()(DeckMetaData* inPtr) { return inPtr->getFilename() == mFilename; }
+    bool operator()(DeckMetaData* inPtr) const { return inPtr->getFilename() == mFilename; }
 
     std::string mFilename;
 };
 
 DeckMetaData* DeckManager::getDeckMetaDataByFilename(const string& filename, bool isAI) {
-    DeckMetaData* deck = NULL;
+    DeckMetaData* deck                   = nullptr;
     std::vector<DeckMetaData*>& deckList = isAI ? aiDeckOrderList : playerDeckOrderList;
 
-    std::vector<DeckMetaData*>::iterator pos = find_if(deckList.begin(), deckList.end(), DeckFilenameMatch(filename));
+    auto pos = find_if(deckList.begin(), deckList.end(), DeckFilenameMatch(filename));
     if (pos != deckList.end()) {
         deck = *pos;
     } else {
@@ -126,11 +126,11 @@ void DeckManager::DeleteMetaData(const string& filename, bool isAI) {
 
 StatsWrapper* DeckManager::getExtendedStatsForDeckId(int deckId, MTGAllCards* collection, bool isAI) {
     DeckMetaData* selectedDeck = getDeckMetaDataById(deckId, isAI);
-    if (selectedDeck == NULL) {
+    if (selectedDeck == nullptr) {
         std::ostringstream deckName;
         deckName << options.profileFile() << "/deck" << deckId << ".txt";
         std::map<std::string, StatsWrapper*>* statsMap = isAI ? &aiDeckStatsMap : &playerDeckStatsMap;
-        StatsWrapper* stats = NEW StatsWrapper(deckId);
+        auto* stats                                    = NEW StatsWrapper(deckId);
         statsMap->insert(std::make_pair(deckName.str(), stats));
         return stats;
     }
@@ -138,7 +138,7 @@ StatsWrapper* DeckManager::getExtendedStatsForDeckId(int deckId, MTGAllCards* co
 }
 
 StatsWrapper* DeckManager::getExtendedDeckStats(DeckMetaData* selectedDeck, MTGAllCards* collection, bool isAI) {
-    StatsWrapper* stats = NULL;
+    StatsWrapper* stats = nullptr;
 
     string deckName = selectedDeck ? selectedDeck->getFilename() : "";
     int deckId = selectedDeck ? selectedDeck->getDeckId() : 0;
@@ -155,7 +155,7 @@ StatsWrapper* DeckManager::getExtendedDeckStats(DeckMetaData* selectedDeck, MTGA
     return stats;
 }
 
-DeckManager* DeckManager::mInstance = NULL;
+DeckManager* DeckManager::mInstance = nullptr;
 
 void DeckManager::EndInstance() { SAFE_DELETE(mInstance); }
 

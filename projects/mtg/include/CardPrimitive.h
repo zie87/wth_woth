@@ -69,9 +69,9 @@ public:
     void setColor(int _color, int removeAllOthers = 0);
     void setColor(const string& _color, int removeAllOthers = 0);
     void removeColor(int color);
-    int getColor();
-    bool hasColor(int inColor);
-    int countColors();
+    int getColor() const;
+    bool hasColor(int inColor) const;
+    int countColors() const;
 
     static uint8_t ConvertColorToBitMask(int inColor);
 
@@ -106,9 +106,9 @@ public:
     bool isSpell();
 
     void setPower(int _power);
-    int getPower();
+    int getPower() const;
     void setToughness(int _toughness);
-    int getToughness();
+    int getToughness() const;
     void setRestrictions(string _restriction);
     const std::string getRestrictions();
     void setOtherRestrictions(string _restriction);

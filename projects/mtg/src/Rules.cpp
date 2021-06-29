@@ -25,13 +25,13 @@ Rules* Rules::getRulesByFilename(string _filename) {
     for (size_t i = 0; i < RulesList.size(); ++i) {
         if (RulesList[i]->filename == _filename) return RulesList[i];
     }
-    return NULL;
+    return nullptr;
 }
 
 int Rules::loadAllRules() {
     vector<string> rulesFiles = JFileSystem::GetInstance()->scanfolder("rules");
     for (size_t i = 0; i < rulesFiles.size(); ++i) {
-        Rules* rules = NEW Rules();
+        auto* rules = NEW Rules();
         if (rules->load(rulesFiles[i])) {
             RulesList.push_back(rules);
         } else {
@@ -54,7 +54,7 @@ void Rules::unloadAllRules() {
 int Rules::getMTGId(string cardName) {
     int cardnb = atoi(cardName.c_str());
     if (cardnb) return cardnb;
-    if (cardName.compare("*") == 0) return -1;  // Any card
+    if (cardName == "*") return -1;  // Any card
     MTGCard* card = MTGCollection()->getCardByName(cardName);
     if (card) return card->getMTGId();
     WGE_LOG_ERROR("Can't find card \"{}\"", cardName);
@@ -69,15 +69,15 @@ MTGCardInstance* Rules::getCardByMTGId(GameObserver* g, int mtgid) {
             MTGGameZone* zone = zones[j];
             for (int k = 0; k < zone->nb_cards; k++) {
                 MTGCardInstance* card = zone->cards[k];
-                if (!card) return NULL;
+                if (!card) return nullptr;
                 if (card->getMTGId() == mtgid) return card;
             }
         }
     }
-    return NULL;
+    return nullptr;
 }
 
-RulesPlayerData::RulesPlayerData() : player(0) {}
+RulesPlayerData::RulesPlayerData() : player(nullptr) {}
 
 RulesPlayerData::~RulesPlayerData() { SAFE_DELETE(player); }
 
@@ -95,7 +95,7 @@ void RulesState::parsePlayerState(int playerId, string s) {
     if (limiter != string::npos) {
         areaS = s.substr(0, limiter);
 
-        if (areaS.compare("auto") == 0) {
+        if (areaS == "auto") {
             playerData[playerId].extraRules.push_back(s.substr(limiter + 1));
             return;
         } else {
@@ -117,11 +117,12 @@ void Rules::addExtraRules(GameObserver* g) {
         g->ExtraRules[i].owner = p;
         for (size_t j = 0; j < initState.playerData[i].extraRules.size(); ++j) {
             AbilityFactory af(g);
-            MTGPlayerCards* hand = NULL;
+            MTGPlayerCards* hand   = nullptr;
             int handsize = 7;
             int difficultyRating = 0;
             int Optimizedhandcheat = options[Options::OPTIMIZE_HAND].number;
-            MTGAbility* a = af.parseMagicLine(initState.playerData[i].extraRules[j], id++, NULL, &(g->ExtraRules[i]));
+            MTGAbility* a =
+                af.parseMagicLine(initState.playerData[i].extraRules[j], id++, nullptr, &(g->ExtraRules[i]));
             if (p->playMode != Player::MODE_TEST_SUITE && g->mRules->gamemode != GAME_TYPE_MOMIR &&
                 g->mRules->gamemode != GAME_TYPE_RANDOM1 && g->mRules->gamemode != GAME_TYPE_RANDOM2 &&
                 g->mRules->gamemode != GAME_TYPE_STORY && g->mRules->gamemode != GAME_TYPE_DEMO &&
@@ -172,7 +173,7 @@ void Rules::addExtraRules(GameObserver* g) {
 
     for (size_t j = 0; j < extraRules.size(); ++j) {
         AbilityFactory af(g);
-        MTGAbility* a = af.parseMagicLine(extraRules[j], id++, NULL, &(g->ExtraRules[0]));
+        MTGAbility* a = af.parseMagicLine(extraRules[j], id++, nullptr, &(g->ExtraRules[0]));
         if (a) {
             if (a->oneShot) {
                 a->resolve();
@@ -188,21 +189,20 @@ Player* Rules::loadPlayerMomir(GameObserver* observer, int isAI) {
     string deckFileSmall = "momir";
     char empty[] = "";
 
-    MTGDeck* tempDeck =
+    auto* tempDeck =
         NEW MTGDeck(MTGCollection());  // Autogenerate a momir deck. Leave the "momir.txt" bits below for stats.
-    tempDeck->addRandomCards(12, 0, 0, Constants::RARITY_L, "Forest");
-    tempDeck->addRandomCards(12, 0, 0, Constants::RARITY_L, "Plains");
-    tempDeck->addRandomCards(12, 0, 0, Constants::RARITY_L, "Swamp");
-    tempDeck->addRandomCards(12, 0, 0, Constants::RARITY_L, "Mountain");
-    tempDeck->addRandomCards(12, 0, 0, Constants::RARITY_L, "Island");
+    tempDeck->addRandomCards(12, nullptr, 0, Constants::RARITY_L, "Forest");
+    tempDeck->addRandomCards(12, nullptr, 0, Constants::RARITY_L, "Plains");
+    tempDeck->addRandomCards(12, nullptr, 0, Constants::RARITY_L, "Swamp");
+    tempDeck->addRandomCards(12, nullptr, 0, Constants::RARITY_L, "Mountain");
+    tempDeck->addRandomCards(12, nullptr, 0, Constants::RARITY_L, "Island");
 
-    Player* player = NULL;
+    Player* player = nullptr;
     if (!isAI)  // Human Player
-        player = NEW HumanPlayer(observer, options.profileFile("momir.txt", "", true).c_str(), deckFileSmall, false,
-                                 tempDeck);
+        player = NEW HumanPlayer(observer, options.profileFile("momir.txt", "", true), deckFileSmall, false, tempDeck);
     else
-        player = NEW AIMomirPlayer(observer, options.profileFile("momir.txt", "", true).c_str(), deckFileSmall, empty,
-                                   tempDeck);
+        player =
+            NEW AIMomirPlayer(observer, options.profileFile("momir.txt", "", true), deckFileSmall, empty, tempDeck);
 
     return player;
 }
@@ -217,21 +217,21 @@ Player* Rules::loadPlayerRandom(GameObserver* observer, int isAI, int mode) {
 
     string lands[] = {"forest", "forest", "island", "mountain", "swamp", "plains", "forest"};
 
-    MTGDeck* tempDeck = NEW MTGDeck(MTGCollection());
-    tempDeck->addRandomCards(9, 0, 0, -1, lands[color1].c_str());
-    tempDeck->addRandomCards(9, 0, 0, -1, lands[color2].c_str());
-    tempDeck->addRandomCards(1, 0, 0, 'U', "land");
-    tempDeck->addRandomCards(1, 0, 0, 'R', "land");
-    tempDeck->addRandomCards(12, 0, 0, -1, "creature", colors, nbcolors);
-    tempDeck->addRandomCards(2, 0, 0, -1, "sorcery", colors, nbcolors);
-    tempDeck->addRandomCards(2, 0, 0, -1, "enchantment", colors, nbcolors);
-    tempDeck->addRandomCards(2, 0, 0, -1, "instant", colors, nbcolors);
-    tempDeck->addRandomCards(2, 0, 0, -1, "artifact", colors, nbcolors);
+    auto* tempDeck = NEW MTGDeck(MTGCollection());
+    tempDeck->addRandomCards(9, nullptr, 0, -1, lands[color1].c_str());
+    tempDeck->addRandomCards(9, nullptr, 0, -1, lands[color2].c_str());
+    tempDeck->addRandomCards(1, nullptr, 0, 'U', "land");
+    tempDeck->addRandomCards(1, nullptr, 0, 'R', "land");
+    tempDeck->addRandomCards(12, nullptr, 0, -1, "creature", colors, nbcolors);
+    tempDeck->addRandomCards(2, nullptr, 0, -1, "sorcery", colors, nbcolors);
+    tempDeck->addRandomCards(2, nullptr, 0, -1, "enchantment", colors, nbcolors);
+    tempDeck->addRandomCards(2, nullptr, 0, -1, "instant", colors, nbcolors);
+    tempDeck->addRandomCards(2, nullptr, 0, -1, "artifact", colors, nbcolors);
 
     string deckFile = "random";
     string deckFileSmall = "random";
 
-    Player* player = NULL;
+    Player* player = nullptr;
     if (!isAI)  // Human Player
         player = NEW HumanPlayer(observer, deckFile, deckFileSmall, false, tempDeck);
     else
@@ -241,7 +241,7 @@ Player* Rules::loadPlayerRandom(GameObserver* observer, int isAI, int mode) {
 }
 
 Player* Rules::initPlayer(GameObserver* g, int playerId) {
-    Player* p = g->players.size() > 1 ? g->players[playerId] : NULL;
+    Player* p = g->players.size() > 1 ? g->players[playerId] : nullptr;
     if (!p) {
         int isAI = 1;
         if (GameApp::players[playerId] == PLAYER_TYPE_HUMAN) isAI = 0;
@@ -249,13 +249,13 @@ Player* Rules::initPlayer(GameObserver* g, int playerId) {
         case GAME_TYPE_MOMIR:
             return loadPlayerMomir(g, isAI);
         case GAME_TYPE_CLASSIC:
-            return NULL;  // Error for the time being
+            return nullptr;  // Error for the time being
         case GAME_TYPE_RANDOM1:
             return loadPlayerRandom(g, isAI, GAME_TYPE_RANDOM1);
         case GAME_TYPE_RANDOM2:
             return loadPlayerRandom(g, isAI, GAME_TYPE_RANDOM2);
         default:
-            return NULL;
+            return nullptr;
         }
     }
     // TODO p may still be NULL, what do we do to handle this? Above switch has no default case to handle the case
@@ -267,7 +267,7 @@ Player* Rules::initPlayer(GameObserver* g, int playerId) {
 
 MTGDeck* Rules::buildDeck(int playerId) {
     int nbcards = 0;
-    MTGDeck* deck = NEW MTGDeck(MTGCollection());
+    auto* deck  = NEW MTGDeck(MTGCollection());
 
     MTGGameZone* loadedPlayerZones[] = {
         initState.playerData[playerId].player->game->graveyard, initState.playerData[playerId].player->game->library,
@@ -282,7 +282,7 @@ MTGDeck* Rules::buildDeck(int playerId) {
     }
     if (!nbcards) {
         delete (deck);
-        return NULL;
+        return nullptr;
     }
     return deck;
 }
@@ -338,7 +338,7 @@ void Rules::initGame(GameObserver* g) {
                 if (card && zone != p->game->library) {
                     if (zone == p->game->inPlay) {
                         MTGCardInstance* copy = p->game->putInZone(card, p->game->library, p->game->stack);
-                        Spell* spell = NEW Spell(g, copy);
+                        auto* spell           = NEW Spell(g, copy);
                         spell->resolve();
                         delete spell;
                     } else {
@@ -374,7 +374,7 @@ void Rules::postUpdateInit(GameObserver* observer) {
 
 void RulesPlayerData::cleanup() {
     SAFE_DELETE(player);
-    player = new Player(NULL, "", "");
+    player = new Player(nullptr, "", "");
 }
 
 void RulesState::cleanup() {
@@ -393,7 +393,7 @@ Rules::Rules(string _bg) {
     postUpdateInitDone = false;
 }
 
-bool Rules::canChooseDeck() {
+bool Rules::canChooseDeck() const {
     return (gamemode == GAME_TYPE_CLASSIC || gamemode == GAME_TYPE_STONEHEWER || gamemode == GAME_TYPE_HERMIT);
 }
 
@@ -431,19 +431,19 @@ int Rules::load(string _filename) {
             hidden = false;  // To avoid transmitting the hidden param to children
             continue;
         }
-        if (s.compare("[init]") == 0) {
+        if (s == "[init]") {
             state = PARSE_INIT;
             continue;
         }
-        if (s.compare("[players]") == 0) {
+        if (s == "[players]") {
             state = PARSE_PLAYERS;
             continue;
         }
-        if (s.compare("[player1]") == 0) {
+        if (s == "[player1]") {
             state = PARSE_PLAYER1;
             continue;
         }
-        if (s.compare("[player2]") == 0) {
+        if (s == "[player2]") {
             state = PARSE_PLAYER2;
             continue;
         }
@@ -486,11 +486,11 @@ int Rules::load(string _filename) {
 }
 
 GameType Rules::strToGameMode(string s) {
-    if (s.compare("momir") == 0) return GAME_TYPE_MOMIR;
-    if (s.compare("random1") == 0) return GAME_TYPE_RANDOM1;
-    if (s.compare("random2") == 0) return GAME_TYPE_RANDOM2;
-    if (s.compare("story") == 0) return GAME_TYPE_STORY;
-    if (s.compare("stonehewer") == 0) return GAME_TYPE_STONEHEWER;
-    if (s.compare("hermit") == 0) return GAME_TYPE_HERMIT;
+    if (s == "momir") return GAME_TYPE_MOMIR;
+    if (s == "random1") return GAME_TYPE_RANDOM1;
+    if (s == "random2") return GAME_TYPE_RANDOM2;
+    if (s == "story") return GAME_TYPE_STORY;
+    if (s == "stonehewer") return GAME_TYPE_STONEHEWER;
+    if (s == "hermit") return GAME_TYPE_HERMIT;
     return GAME_TYPE_CLASSIC;
 }

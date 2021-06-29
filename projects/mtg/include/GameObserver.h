@@ -85,7 +85,7 @@ public:
     Trash* mTrash;
 
     GameType gameType() const { return mGameType; };
-    TargetChooser* getCurrentTargetChooser();
+    TargetChooser* getCurrentTargetChooser() const;
     void stackObjectClicked(Interruptible* action);
 
     int cardClickLog(bool log, Player* clickedPlayer, MTGGameZone* zone, MTGCardInstance* backup, size_t index,
@@ -93,9 +93,9 @@ public:
     int cardClick(MTGCardInstance* card, MTGAbility* ability);
     int cardClick(MTGCardInstance* card, int abilityType);
     int cardClick(MTGCardInstance* card, Targetable* _object = NULL, bool log = true);
-    GamePhase getCurrentGamePhase();
-    const char* getCurrentGamePhaseName();
-    const char* getNextGamePhaseName();
+    GamePhase getCurrentGamePhase() const;
+    const char* getCurrentGamePhaseName() const;
+    const char* getNextGamePhaseName() const;
     void nextCombatStep();
     void userRequestNextGamePhase(bool allowInterrupt = true, bool log = true);
     void cleanupPhase();
@@ -112,16 +112,16 @@ public:
     Player* isInterrupting;
     Player* opponent();
     Player* nextTurnsPlayer();
-    Player* currentlyActing();
+    Player* currentlyActing() const;
     GameObserver(WResourceManager* output = 0, JGE* input = 0);
     ~GameObserver();
     void gameStateBasedEffects();
     void enchantmentStatus();
     void Affinity();
-    void addObserver(MTGAbility* observer);
-    bool removeObserver(ActionElement* observer);
+    void addObserver(MTGAbility* observer) const;
+    bool removeObserver(ActionElement* observer) const;
     void startGame(GameType, Rules* rules);
-    void untapPhase();
+    void untapPhase() const;
     MTGCardInstance* isCardWaiting() { return cardWaitingForTargets; }
     int isInPlay(MTGCardInstance* card);
     int isInGrave(MTGCardInstance* card);
@@ -154,7 +154,7 @@ public:
     bool operator==(const GameObserver& aGame);
     JGE* getInput() { return mJGE; };
     DeckManager* getDeckManager() { return mDeckManager; };
-    void dumpAssert(bool val);
+    void dumpAssert(bool val) const;
     void resetStartupGame();
     void setLoser(Player* aPlayer) { gameOver = aPlayer; };
 

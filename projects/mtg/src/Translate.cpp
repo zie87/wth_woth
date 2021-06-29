@@ -3,7 +3,7 @@
 #include "Translate.h"
 #include "utils.h"
 
-Translator* Translator::mInstance = NULL;
+Translator* Translator::mInstance = nullptr;
 
 Translator* Translator::GetInstance() {
     if (!mInstance) mInstance = NEW Translator();
@@ -19,11 +19,11 @@ int Translator::Add(string from, string to) {
 
 string Translator::translate(string value) {
     // if (!initDone) init();
-    map<string, string>::iterator it = values.find(value);
+    auto it = values.find(value);
     if (it != values.end()) return it->second;
 #if defined DEBUG_TRANSLATE
     if (checkMisses) {
-        map<string, int>::iterator it2 = dontCareValues.find(value);
+        auto it2 = dontCareValues.find(value);
         if (it2 == dontCareValues.end()) missingValues[value] = 1;
     }
 #endif
@@ -135,10 +135,7 @@ void Translator::init() {
     if (fileExists(name.c_str())) {
         // fixup for multibyte support.
         std::transform(lang.begin(), lang.end(), lang.begin(), ::tolower);
-        if (lang.compare("cn") == 0 || lang.compare("jp") == 0)
-            neofont = true;
-        else
-            neofont = false;
+        neofont  = lang == "cn" || lang == "jp";
         initDone = true;
         load(name, &values);
     }

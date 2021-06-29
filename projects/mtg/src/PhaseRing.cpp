@@ -8,22 +8,22 @@
 #include <wge/log.hpp>
 // Parses a string and gives phase numer
 GamePhase PhaseRing::phaseStrToInt(string s) {
-    if (s.compare("untap") == 0) return MTG_PHASE_UNTAP;
-    if (s.compare("upkeep") == 0) return MTG_PHASE_UPKEEP;
-    if (s.compare("draw") == 0) return MTG_PHASE_DRAW;
-    if (s.compare("firstmain") == 0) return MTG_PHASE_FIRSTMAIN;
-    if (s.compare("mainphase") == 0) return MTG_PHASE_FIRSTMAIN;
-    if (s.compare("combatbegin") == 0) return MTG_PHASE_COMBATBEGIN;
-    if (s.compare("combatbegins") == 0) return MTG_PHASE_COMBATBEGIN;
-    if (s.compare("combatattackers") == 0) return MTG_PHASE_COMBATATTACKERS;
-    if (s.compare("combatblockers") == 0) return MTG_PHASE_COMBATBLOCKERS;
-    if (s.compare("combatdamage") == 0) return MTG_PHASE_COMBATDAMAGE;
-    if (s.compare("combatend") == 0) return MTG_PHASE_COMBATEND;
-    if (s.compare("combatends") == 0) return MTG_PHASE_COMBATEND;
-    if (s.compare("secondmain") == 0) return MTG_PHASE_SECONDMAIN;
-    if (s.compare("endofturn") == 0) return MTG_PHASE_ENDOFTURN;
-    if (s.compare("end") == 0) return MTG_PHASE_ENDOFTURN;
-    if (s.compare("cleanup") == 0) return MTG_PHASE_CLEANUP;
+    if (s == "untap") return MTG_PHASE_UNTAP;
+    if (s == "upkeep") return MTG_PHASE_UPKEEP;
+    if (s == "draw") return MTG_PHASE_DRAW;
+    if (s == "firstmain") return MTG_PHASE_FIRSTMAIN;
+    if (s == "mainphase") return MTG_PHASE_FIRSTMAIN;
+    if (s == "combatbegin") return MTG_PHASE_COMBATBEGIN;
+    if (s == "combatbegins") return MTG_PHASE_COMBATBEGIN;
+    if (s == "combatattackers") return MTG_PHASE_COMBATATTACKERS;
+    if (s == "combatblockers") return MTG_PHASE_COMBATBLOCKERS;
+    if (s == "combatdamage") return MTG_PHASE_COMBATDAMAGE;
+    if (s == "combatend") return MTG_PHASE_COMBATEND;
+    if (s == "combatends") return MTG_PHASE_COMBATEND;
+    if (s == "secondmain") return MTG_PHASE_SECONDMAIN;
+    if (s == "endofturn") return MTG_PHASE_ENDOFTURN;
+    if (s == "end") return MTG_PHASE_ENDOFTURN;
+    if (s == "cleanup") return MTG_PHASE_CLEANUP;
     WGE_LOG_ERROR("Unknown Phase name: {}", s);
     return MTG_PHASE_INVALID;  // was returning first main...why would we return something that is not == s?
 }
@@ -54,14 +54,14 @@ PhaseRing::PhaseRing(GameObserver* observer) : observer(observer) {
             vector<string> customRing = split(observer->players[i]->phaseRing, ',');
             for (unsigned int k = 0; k < customRing.size(); k++) {
                 GamePhase customOrder = phaseStrToInt(customRing[k]);
-                Phase* phase = NEW Phase(customOrder, observer->players[i]);
+                auto* phase           = NEW Phase(customOrder, observer->players[i]);
                 addPhase(phase);
                 turnRing.push_back(phase);
             }
             addPhase(NEW Phase(MTG_PHASE_AFTER_EOT, observer->players[i]));
         } else {
             for (int j = 0; j < NB_MTG_PHASES; j++) {
-                Phase* phase = NEW Phase((GamePhase)j, observer->players[i]);
+                auto* phase = NEW Phase((GamePhase)j, observer->players[i]);
                 addPhase(phase);
                 turnRing.push_back(phase);
             }
@@ -87,7 +87,7 @@ std::list<Phase*> PhaseRing::currentTurn() {
 
 std::list<Phase*> PhaseRing::nextTurn() {
     std::list<Phase*> temp = observer->gameTurn[observer->nextTurnsPlayer()->getId()];
-    Phase* currentIter = NULL;
+    Phase* currentIter     = nullptr;
     nextTurnList.clear();
     for (auto tempiter = temp.begin(); tempiter != temp.end(); tempiter++) {
         currentIter = *tempiter;
@@ -199,10 +199,10 @@ int PhaseRing::addCombatAfter(Player* player, int after_id, bool withMain) {
         if (currentPhase->id == after_id) {
             beforeLeaving = currentPhase;
             it++;
-            Phase* addPhase = NULL;
+            Phase* addPhase = nullptr;
             for (auto findP = ring.begin(); findP != ring.end(); findP++) {
                 addPhase = *findP;
-                Phase* toAdd = NULL;
+                Phase* toAdd = nullptr;
                 bool add = false;
                 if (addPhase->player == player) {
                     switch (addPhase->id) {
@@ -269,7 +269,7 @@ Phase* PhaseRing::getPhase(int _id) {
             return currentPhase;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 int PhaseRing::addPhaseAfter(GamePhase id, Player* player, int after_id) {
@@ -277,11 +277,11 @@ int PhaseRing::addPhaseAfter(GamePhase id, Player* player, int after_id) {
         Phase* currentPhase = *it;
         if (currentPhase->id == after_id) {
             it++;
-            Phase* addPhase = NULL;
+            Phase* addPhase = nullptr;
             for (auto findP = ring.begin(); findP != ring.end(); findP++) {
                 addPhase = *findP;
                 if (addPhase->id == id && addPhase->player == player) {
-                    Phase* toAdd = NEW Phase(*addPhase);
+                    auto* toAdd    = NEW Phase(*addPhase);
                     toAdd->isExtra = true;
                     turn.insert(it, toAdd);
                     extraPhases.push_back(toAdd);

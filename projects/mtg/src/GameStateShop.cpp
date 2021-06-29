@@ -45,19 +45,19 @@ bool BoosterDisplay::CheckUserInput(JButton key) {
 }
 
 GameStateShop::GameStateShop(GameApp* parent) : GameState(parent, "shop") {
-    menu = NULL;
-    boosterDisplay = NULL;
-    taskList = NULL;
-    srcCards = NULL;
-    shopMenu = NULL;
-    bigDisplay = NULL;
-    myCollection = NULL;
-    packlist = NULL;
-    pricelist = NULL;
-    playerdata = NULL;
-    booster = NULL;
+    menu           = nullptr;
+    boosterDisplay = nullptr;
+    taskList       = nullptr;
+    srcCards       = nullptr;
+    shopMenu       = nullptr;
+    bigDisplay     = nullptr;
+    myCollection   = nullptr;
+    packlist       = nullptr;
+    pricelist      = nullptr;
+    playerdata     = nullptr;
+    booster        = nullptr;
     lightAlpha = 0;
-    filterMenu = NULL;
+    filterMenu     = nullptr;
     alphaChange = 0;
     for (int i = 0; i < SHOP_ITEMS; i++) {
         mPrices[i] = 0;
@@ -68,10 +68,10 @@ GameStateShop::GameStateShop(GameApp* parent) : GameState(parent, "shop") {
     kOtherCardsString = _(kOtherCardsString);
     kCreditsString = _(kCreditsString);
 
-    cycleCardsButton = NEW InteractiveButton(NULL, kCycleCardsButtonId, Fonts::MAIN_FONT, "New Cards",
+    cycleCardsButton = NEW InteractiveButton(nullptr, kCycleCardsButtonId, Fonts::MAIN_FONT, "New Cards",
                                              SCREEN_WIDTH_F - 80, SCREEN_HEIGHT_F - 20, JGE_BTN_PRI);
 
-    showCardListButton = NEW InteractiveButton(NULL, kShowCardListButtonId, Fonts::MAIN_FONT, "Show List",
+    showCardListButton = NEW InteractiveButton(nullptr, kShowCardListButtonId, Fonts::MAIN_FONT, "Show List",
                                                SCREEN_WIDTH_F - 150, SCREEN_HEIGHT_F - 20, JGE_BTN_SEC);
     disablePurchase = false;
     clearInput = false;
@@ -86,13 +86,13 @@ GameStateShop::~GameStateShop() {
 void GameStateShop::Create() {}
 
 void GameStateShop::Start() {
-    menu = NULL;
+    menu       = nullptr;
     bListCards = false;
     mTouched = false;
     mStage = STAGE_FADE_IN;
     mElapsed = 0;
     needLoad = true;
-    booster = NULL;
+    booster    = nullptr;
     srcCards = NEW WSrcUnlockedCards(0);
     srcCards->setElapsed(15);
     srcCards->addFilter(NEW WCFilterNOT(NEW WCFilterRarity("T")));
@@ -107,7 +107,7 @@ void GameStateShop::Start() {
     for (int i = 0; i < SHOP_SLOTS; i++) {
         WGuiCardDistort* dist;
         if (i < BOOSTER_SLOTS)
-            dist = NEW WGuiCardDistort(NULL, true);
+            dist = NEW WGuiCardDistort(nullptr, true);
         else {
             dist = NEW WGuiCardDistort(srcCards, true);
             dist->mOffset.setOffset(i - BOOSTER_SLOTS);
@@ -135,7 +135,7 @@ void GameStateShop::Start() {
 
     JRenderer::GetInstance()->EnableVSync(true);
 
-    taskList = NULL;
+    taskList = nullptr;
     packlist = NEW MTGPacks();
     packlist->loadAll();
     load();
@@ -274,11 +274,11 @@ void GameStateShop::purchaseBooster(int controlId) {
     SAFE_DELETE(booster);
     deleteDisplay();
     booster = NEW MTGDeck(MTGCollection());
-    boosterDisplay = NEW BoosterDisplay(12, NULL, SCREEN_WIDTH - 200, SCREEN_HEIGHT / 2, this, NULL, 5);
+    boosterDisplay = NEW BoosterDisplay(12, nullptr, SCREEN_WIDTH - 200, SCREEN_HEIGHT / 2, this, nullptr, 5);
     mBooster[controlId].addToDeck(booster, srcCards);
 
     string sort = mBooster[controlId].getSort();
-    DeckDataWrapper* ddw = NEW DeckDataWrapper(booster);
+    auto* ddw   = NEW DeckDataWrapper(booster);
     if (sort == "alpha")
         ddw->Sort(WSrcCards::SORT_ALPHA);
     else if (sort == "collector")
@@ -289,7 +289,7 @@ void GameStateShop::purchaseBooster(int controlId) {
     for (int x = 0; x < ddw->Size(); x++) {
         MTGCard* c = ddw->getCard(x);
         for (int copies = 0; copies < ddw->count(c); ++copies) {
-            MTGCardInstance* ci = NEW MTGCardInstance(c, NULL);
+            auto* ci = NEW MTGCardInstance(c, nullptr);
             boosterDisplay->AddCard(ci);
             subBooster.push_back(ci);
         }
@@ -303,9 +303,9 @@ void GameStateShop::purchaseBooster(int controlId) {
 }
 
 int GameStateShop::purchasePrice(int offset) {
-    MTGCard* c = NULL;
-    if (!pricelist || !srcCards || (c = srcCards->getCard(offset)) == NULL) return 0;
-    float price = (float)pricelist->getPurchasePrice(c->getMTGId());
+    MTGCard* c = nullptr;
+    if (!pricelist || !srcCards || (c = srcCards->getCard(offset)) == nullptr) return 0;
+    auto price    = (float)pricelist->getPurchasePrice(c->getMTGId());
     int filteradd = srcCards->Size(true);
     filteradd = ((filteradd - srcCards->Size()) / filteradd);
 
@@ -337,8 +337,8 @@ void GameStateShop::load() {
         mPrices[i] = pricelist->getOtherPrice(mBooster[i].basePrice());
     }
     for (int i = BOOSTER_SLOTS; i < SHOP_ITEMS; i++) {
-        MTGCard* c = NULL;
-        if ((c = srcCards->getCard(i - BOOSTER_SLOTS)) == NULL) {
+        MTGCard* c = nullptr;
+        if ((c = srcCards->getCard(i - BOOSTER_SLOTS)) == nullptr) {
             mPrices[i] = 0;
             mCounts[i] = 0;
             mInventory[i] = 0;
@@ -613,7 +613,7 @@ void GameStateShop::Render() {
             if (bigDisplay->mOffset.getPos() >= 0)
                 bigDisplay->setSource(srcCards);
             else
-                bigDisplay->setSource(NULL);
+                bigDisplay->setSource(nullptr);
             bigDisplay->Render();
             float elp = srcCards->getElapsed();
             // Render the card list overlay.
@@ -633,7 +633,7 @@ void GameStateShop::Render() {
                     string s = descPurchase(i, true);
                     sprintf(buffer, "%s", s.c_str());
                     float x = 310;
-                    float y = static_cast<float>(25 + 20 * i);
+                    auto y  = static_cast<float>(25 + 20 * i);
                     mFont->DrawString(buffer, x, y);
                 }
             }
@@ -695,7 +695,7 @@ void GameStateShop::ButtonPressed(int controllerId, int controlId) {
 
             // Check if we just scored an award...
             if (myCollection && myCollection->totalPrice() > 10000) {
-                GameOptionAward* goa = dynamic_cast<GameOptionAward*>(&options[Options::AWARD_COLLECTOR]);
+                auto* goa = dynamic_cast<GameOptionAward*>(&options[Options::AWARD_COLLECTOR]);
                 if (goa) goa->giveAward();
             }
         }
@@ -739,9 +739,9 @@ void GameStateShop::OnScroll(int inXVelocity, int inYVelocity) {
 
 // ShopBooster
 ShopBooster::ShopBooster() {
-    pack = NULL;
-    mainSet = NULL;
-    altSet = NULL;
+    pack    = nullptr;
+    mainSet = nullptr;
+    altSet  = nullptr;
 }
 string ShopBooster::getSort() {
     if (pack) return pack->getSort();
@@ -750,7 +750,7 @@ string ShopBooster::getSort() {
 string ShopBooster::getName() {
     char buffer[512];
     if (!mainSet && pack) return pack->getName();
-    if (altSet == mainSet) altSet = NULL;
+    if (altSet == mainSet) altSet = nullptr;
     if (altSet)
         sprintf(buffer, _("%s & %s (15 Cards)").c_str(), mainSet->id.c_str(), altSet->id.c_str());
     else if (mainSet)
@@ -759,9 +759,9 @@ string ShopBooster::getName() {
 }
 
 void ShopBooster::randomize(MTGPacks* packlist) {
-    mainSet = NULL;
-    altSet = NULL;
-    pack = NULL;
+    mainSet = nullptr;
+    altSet  = nullptr;
+    pack    = nullptr;
     if (!setlist.size()) return;
     if (packlist && setlist.size() > 10) {  // FIXME make these an unlockable item.
         int rnd = rand() % 100;
@@ -781,13 +781,13 @@ int ShopBooster::basePrice() {
 }
 void ShopBooster::randomCustom(MTGPacks* packlist) {
     pack = packlist->randomPack();
-    if (pack && !pack->isUnlocked()) pack = NULL;
+    if (pack && !pack->isUnlocked()) pack = nullptr;
     if (!pack) randomStandard();
 }
 void ShopBooster::randomStandard() {
     MTGSetInfo* si = setlist.randomSet(-1);
     mainSet = si;
-    altSet = NULL;
+    altSet         = nullptr;
 
     int mSetCount = si->counts[MTGSetInfo::TOTAL_CARDS];
     if (mSetCount < 80) {
@@ -804,7 +804,7 @@ void ShopBooster::randomStandard() {
         if (altSet != mainSet) break;
         altSet = setlist.randomSet(-1, 80 - mSetCount);
     }
-    if (altSet == mainSet) altSet = NULL;  // Prevent "10E & 10E Booster"
+    if (altSet == mainSet) altSet = nullptr;  // Prevent "10E & 10E Booster"
     if (!altSet) pack = mainSet->mPack;
 }
 int ShopBooster::maxInventory() {
@@ -829,7 +829,7 @@ void ShopBooster::addToDeck(MTGDeck* d, WSrcCards* srcCards) {
 #ifdef TESTSUITE
 bool ShopBooster::unitTest() {
     // this tests the default random pack creation.
-    MTGDeck* d = NEW MTGDeck(MTGCollection());
+    auto* d = NEW MTGDeck(MTGCollection());
     char result[1024];
 
     randomStandard();
@@ -842,7 +842,7 @@ bool ShopBooster::unitTest() {
         sprintf(buf, "set:%s;|set:%s;", mainSet->id.c_str(), altSet->id.c_str());
     mP->pool = buf;
     mP->assemblePack(d);  // Use the primary packfile. assemblePack deletes pool.
-    DeckDataWrapper* ddw = NEW DeckDataWrapper(d);
+    auto* ddw = NEW DeckDataWrapper(d);
     bool res = true;
 
     int u = 0, r = 0, s = 0;

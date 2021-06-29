@@ -42,7 +42,7 @@ bool JNetwork::isConnected() {
     return socket->isConnected();
 }
 
-JNetwork::JNetwork() : mpWorkerThread(NULL) {
+JNetwork::JNetwork() : mpWorkerThread(nullptr) {
 #if (defined WIN32) || (defined LINUX)
     connected_to_ap = 1;
 #else
@@ -84,8 +84,8 @@ void JNetwork::registerCommand(std::string command, processCmd processCommand, p
 }
 
 void JNetwork::ThreadProc(void* param) {
-    JNetwork* pThis = reinterpret_cast<JNetwork*>(param);
-    JSocket* pSocket = NULL;
+    auto* pThis      = reinterpret_cast<JNetwork*>(param);
+    JSocket* pSocket = nullptr;
     if (pThis->serverIP.size()) {
         WGE_LOG_TRACE("Starting Client Thread");
         pThis->socket = new JSocket(pThis->serverIP);

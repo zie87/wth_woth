@@ -81,15 +81,15 @@ int GameStateDuel::selectedAIDeckId = 0;
 
 GameStateDuel::GameStateDuel(GameApp* parent) : GameState(parent, "duel") {
     premadeDeck = false;
-    game = NULL;
-    deckmenu = NULL;
-    opponentMenu = NULL;
-    menu = NULL;
-    popupScreen = NULL;
+    game         = nullptr;
+    deckmenu     = nullptr;
+    opponentMenu = nullptr;
+    menu         = nullptr;
+    popupScreen  = nullptr;
     mGamePhase = DUEL_STATE_UNSET;
 
 #ifdef TESTSUITE
-    testSuite = NULL;
+    testSuite = nullptr;
 #endif
 
 #ifdef AI_CHANGE_TESTING
@@ -110,7 +110,7 @@ GameStateDuel::GameStateDuel(GameApp* parent) : GameState(parent, "duel") {
     }
 #endif
 
-    credits = NULL;
+    credits = nullptr;
 
 #ifdef NETWORK_SUPPORT
     RegisterNetworkPlayers();
@@ -134,7 +134,7 @@ void GameStateDuel::Start() {
     setGamePhase(DUEL_STATE_CHOOSE_DECK1);
     credits = NEW Credits();
 
-    menu = NULL;
+    menu = nullptr;
 
     int decksneeded = 0;
     for (int i = 0; i < 2; i++) {
@@ -168,7 +168,7 @@ void GameStateDuel::Start() {
                 // translate deck creating desc
                 Translator* t = Translator::GetInstance();
                 string desc = "Highly recommended to get\nthe full Wagic experience!";
-                map<string, string>::iterator it = t->deckValues.find("Create your Deck!");
+                auto it       = t->deckValues.find("Create your Deck!");
                 if (it != t->deckValues.end()) desc = it->second;
 
                 deckmenu->Add(MENUITEM_NEW_DECK, "Create your Deck!", desc);
@@ -185,7 +185,7 @@ void GameStateDuel::Start() {
 }
 
 void GameStateDuel::initRand(unsigned int seed) {
-    if (!seed) seed = static_cast<unsigned int>(time(0));
+    if (!seed) seed = static_cast<unsigned int>(time(nullptr));
     srand(seed);
 }
 
@@ -237,19 +237,19 @@ bool GameStateDuel::MusicExist(string FileName) {
 }
 
 void GameStateDuel::ConstructOpponentMenu() {
-    if (opponentMenu == NULL) {
+    if (opponentMenu == nullptr) {
         opponentMenu = NEW DeckMenu(DUEL_MENU_CHOOSE_OPPONENT, this, Fonts::OPTION_FONT, "Choose Opponent",
                                     GameStateDuel::selectedAIDeckId, true);
         opponentMenu->Add(MENUITEM_RANDOM_AI, "Random");
         if (options[Options::EVILTWIN_MODE_UNLOCKED].number)
-            opponentMenu->Add(MENUITEM_EVIL_TWIN, "Evil Twin", _("Can you defeat yourself?").c_str());
+            opponentMenu->Add(MENUITEM_EVIL_TWIN, "Evil Twin", _("Can you defeat yourself?"));
         DeckManager* deckManager = DeckManager::GetInstance();
         vector<DeckMetaData*> opponentDeckList;
         int nbUnlockedDecks =
             options[Options::CHEATMODEAIDECK].number ? 1000 : options[Options::AIDECKS_UNLOCKED].number;
         opponentDeckList = fillDeckMenu(opponentMenu, "ai/baka", "ai_baka", game->getPlayer(0), nbUnlockedDecks);
         deckManager->updateMetaDataList(&opponentDeckList, true);
-        opponentMenu->Add(MENUITEM_CANCEL, "Cancel", _("Choose a different player deck").c_str());
+        opponentMenu->Add(MENUITEM_CANCEL, "Cancel", _("Choose a different player deck"));
         opponentDeckList.clear();
     }
 }
@@ -268,7 +268,7 @@ void GameStateDuel::setGamePhase(int newGamePhase) {
 wge::mutex GameStateDuel::mMutex;
 
 void GameStateDuel::ThreadProc(void* inParam) {
-    GameStateDuel* instance = reinterpret_cast<GameStateDuel*>(inParam);
+    auto* instance = reinterpret_cast<GameStateDuel*>(inParam);
     float counter = 1.0f;
     while (instance->mGamePhase != DUEL_STATE_BACK_TO_MAIN_MENU) {
         GameObserver observer;
@@ -515,7 +515,7 @@ void GameStateDuel::Update(float dt) {
 
             menu->Update(dt);
             if (menu->isClosed()) {
-                PlayerData* playerdata = NEW PlayerData(MTGCollection());
+                auto* playerdata = NEW PlayerData(MTGCollection());
                 playerdata->taskList->passOneDay();
                 playerdata->taskList->save();
                 SAFE_DELETE(playerdata);
@@ -782,7 +782,7 @@ void GameStateDuel::ButtonPressed(int controllerId, int controlId) {
             {
                 setGamePhase(DUEL_STATE_CHOOSE_DECK1_TO_2);
             }
-            playerDeck = NULL;
+            playerDeck = nullptr;
         } else {
             game->loadPlayer(1, mParent->players[1], controlId, premadeDeck);
             deckmenu->Close();

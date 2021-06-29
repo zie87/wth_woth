@@ -36,7 +36,7 @@ JAnimator::~JAnimator() {
 
 bool JAnimator::Load(const char* scriptFile) {
     JFileSystem* fileSystem = JFileSystem::GetInstance();
-    if (fileSystem == NULL) return false;
+    if (fileSystem == nullptr) return false;
 
     if (!fileSystem->OpenFile(scriptFile)) return false;
 
@@ -47,11 +47,11 @@ bool JAnimator::Load(const char* scriptFile) {
     TiXmlDocument doc;
     doc.Parse(xmlBuffer);
 
-    TiXmlNode* script = 0;
-    TiXmlNode* frame = 0;
-    TiXmlNode* obj = 0;
-    TiXmlNode* param = 0;
-    TiXmlElement* element = 0;
+    TiXmlNode* script     = nullptr;
+    TiXmlNode* frame      = nullptr;
+    TiXmlNode* obj        = nullptr;
+    TiXmlNode* param      = nullptr;
+    TiXmlElement* element = nullptr;
 
     float defaultTime = 0.033f;
 
@@ -76,7 +76,7 @@ bool JAnimator::Load(const char* scriptFile) {
         defaultTime = 1 / fps;
 
         for (frame = script->FirstChild("frame"); frame; frame = frame->NextSibling()) {
-            JAnimatorFrame* aniFrame = new JAnimatorFrame(this);
+            auto* aniFrame = new JAnimatorFrame(this);
 
             float duration;
             element = frame->ToElement();
@@ -86,7 +86,7 @@ bool JAnimator::Load(const char* scriptFile) {
             for (obj = frame->FirstChild(); obj; obj = obj->NextSibling()) {
                 for (param = obj->FirstChild(); param; param = param->NextSibling()) {
                     element = param->ToElement();
-                    if (element != NULL) {
+                    if (element != nullptr) {
                         if (strcmp(element->Value(), "settings") == 0) {
                             const char* quadName = element->Attribute("quad");
                             JQuad* quad = mResource->GetQuad(quadName);
@@ -118,7 +118,7 @@ bool JAnimator::Load(const char* scriptFile) {
 
                             if (element->QueryIntAttribute("flip", &value) == TIXML_SUCCESS) flipped = (value == 1);
 
-                            JAnimatorObject* object = new JAnimatorObject();
+                            auto* object = new JAnimatorObject();
                             object->SetQuad(quad);
                             object->SetPosition(x, y);
                             object->SetHScale(hsize);
@@ -202,11 +202,11 @@ void JAnimator::Render() {
     mFrames[mCurrentFrame]->Render(mX - mHotSpotX, mY - mHotSpotY);
 }
 
-bool JAnimator::IsActive() { return mActive; }
+bool JAnimator::IsActive() const { return mActive; }
 
-bool JAnimator::IsAnimating() { return mAnimating; }
+bool JAnimator::IsAnimating() const { return mAnimating; }
 
-int JAnimator::GetCurrentFrameIndex() { return mCurrentFrame; }
+int JAnimator::GetCurrentFrameIndex() const { return mCurrentFrame; }
 
 void JAnimator::SetCurrentFrameIndex(int index) {
     if (index < (int)mFrames.size()) mCurrentFrame = index;

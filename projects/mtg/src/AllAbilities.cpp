@@ -397,7 +397,7 @@ const char* AACounter::getMenuText() {
 
     if (name.size()) {
         std::string s = name;
-        menu.append(s.c_str());
+        menu.append(s);
     }
 
     if (power != 0 || toughness != 0) {
@@ -557,7 +557,7 @@ const char* AARemoveAllCounter::getMenuText() {
 
     if (name.size()) {
         std::string s = name;
-        menu.append(s.c_str());
+        menu.append(s);
     }
 
     if (power != 0 || toughness != 0) {
@@ -2652,7 +2652,7 @@ int GenericTargetAbility::resolve() {
     counters++;
     tc->done = false;
     if (sideEffects && usesBeforeSideEffects.size()) {
-        auto* use = NEW WParsedInt(usesBeforeSideEffects.c_str(), nullptr, source);
+        auto* use = NEW WParsedInt(usesBeforeSideEffects, nullptr, source);
         uses = use->getValue();
         delete use;
         if (counters == uses) {
@@ -2673,7 +2673,7 @@ int GenericTargetAbility::resolve() {
 int GenericTargetAbility::isReactingToClick(MTGCardInstance* card, ManaCost* mana) {
     limitPerTurn = 0;
     if (limit.size()) {
-        WParsedInt value(limit.c_str(), nullptr, source);
+        WParsedInt value(limit, nullptr, source);
         limitPerTurn = value.getValue();
     }
     if (limitPerTurn && counters >= limitPerTurn) return 0;
@@ -3525,7 +3525,7 @@ APhaseAction::APhaseAction(GameObserver* observer, int _id, MTGCardInstance* car
     if (ability)
         psMenuText = ability->getMenuText();
     else
-        psMenuText = sAbility.c_str();
+        psMenuText = sAbility;
     delete (ability);
 }
 

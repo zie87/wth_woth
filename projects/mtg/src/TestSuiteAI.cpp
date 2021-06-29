@@ -164,8 +164,8 @@ int TestSuiteAI::Act(float dt) {
         observer->mLayers->actionLayer()->doReactTo(choice);
     } else if (action.find(" -momir- ") != string::npos) {
         int start = action.find(" -momir- ");
-        int cardId = Rules::getMTGId(action.substr(start + 9).c_str());
-        int cardIdHand = Rules::getMTGId(action.substr(0, start).c_str());
+        int cardId      = Rules::getMTGId(action.substr(start + 9));
+        int cardIdHand  = Rules::getMTGId(action.substr(0, start));
         MTGMomirRule* a = ((MTGMomirRule*)observer->mLayers->actionLayer()->getAbility(MTGAbility::MOMIR));
         a->reactToClick(Rules::getCardByMTGId(observer, cardIdHand), cardId);
         observer->mLayers->actionLayer()->stuffHappened = 1;

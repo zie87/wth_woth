@@ -467,7 +467,7 @@ bool StoryFlow::parse(string path) {
     JFileSystem* fileSystem = JFileSystem::GetInstance();
     if (!fileSystem) return false;
 
-    if (!fileSystem->OpenFile(path.c_str())) return false;
+    if (!fileSystem->OpenFile(path)) return false;
 
     int size = fileSystem->GetFileSize();
     char* xmlBuffer = NEW char[size];

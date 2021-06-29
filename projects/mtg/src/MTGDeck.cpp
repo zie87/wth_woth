@@ -1131,7 +1131,7 @@ void MTGSetInfo::processConfLine(string line) {
     else if (key.compare("author") == 0)
         author = value;
     else if (key.compare("block") == 0)
-        block = setlist.findBlock(value.c_str());
+        block = setlist.findBlock(value);
     else if (key.compare("year") == 0)
         year = atoi(value.c_str());
 }

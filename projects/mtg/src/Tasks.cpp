@@ -215,7 +215,7 @@ Task* Task::createFromStr(const string params, bool rand) {
 TaskList::TaskList(string _fileName) {
     fileName = _fileName;
     if (fileName == "") {
-        fileName = options.profileFile(PLAYER_TASKS).c_str();
+        fileName = options.profileFile(PLAYER_TASKS);
     }
     load(fileName);
     for (int i = 0; i < 9; i++) mBg[i] = nullptr;

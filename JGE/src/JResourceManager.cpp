@@ -79,7 +79,7 @@ bool JResourceManager::LoadResource(const std::string& resourceName) {
     JFileSystem* fileSystem = JFileSystem::GetInstance();
     if (fileSystem == nullptr) return false;
 
-    if (!fileSystem->OpenFile(path.c_str())) return false;
+    if (!fileSystem->OpenFile(path)) return false;
 
     int size = fileSystem->GetFileSize();
     char* xmlBuffer = new char[size];

@@ -97,7 +97,7 @@ void GameState::renderDeckMenu(SimpleMenu* _menu, const vector<DeckMetaData*>& d
         DeckMetaData* deckMetaData = *i;
         string deckName = deckMetaData->getName();
         string deckDescription = deckMetaData->getDescription();
-        _menu->Add(deckNumber++, deckName.c_str(), deckDescription.c_str());
+        _menu->Add(deckNumber++, deckName.c_str(), deckDescription);
     }
 }
 
@@ -108,7 +108,7 @@ void GameState::renderDeckMenu(DeckMenu* _menu, const vector<DeckMetaData*>& dec
         DeckMetaData* deckMetaData = *i;
         string deckName = deckMetaData->getName();
         string deckDescription = deckMetaData->getDescription();
-        _menu->Add(deckNumber++, deckName.c_str(), deckDescription.c_str(), false, deckMetaData);
+        _menu->Add(deckNumber++, deckName.c_str(), deckDescription, false, deckMetaData);
     }
 }
 

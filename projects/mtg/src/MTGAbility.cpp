@@ -138,7 +138,7 @@ int AbilityFactory::parseCastRestrictions(MTGCardInstance* card, Player* player,
                     if (foundSeen == string::npos) foundSeen = comparasion[i].find("thisturn(");
                     if (foundType != string::npos) {
                         end = comparasion[i].find(")", foundType);
-                        rtc = comparasion[i].substr(foundType + 5, end - foundType - 5).c_str();
+                        rtc = comparasion[i].substr(foundType + 5, end - foundType - 5);
                         TargetChooserFactory tcf(observer);
                         TargetChooser* ttc = tcf.createTargetChooser(rtc, card);
                         mod = atoi(comparasion[i].substr(end + 1).c_str());
@@ -154,7 +154,7 @@ int AbilityFactory::parseCastRestrictions(MTGCardInstance* card, Player* player,
                     }
                     if (foundComp != string::npos) {
                         end = comparasion[i].find(")", foundComp);
-                        rtc = comparasion[i].substr(foundComp + 8, end - foundComp - 8).c_str();
+                        rtc = comparasion[i].substr(foundComp + 8, end - foundComp - 8);
                         mod = atoi(comparasion[i].substr(end + 1).c_str());
                         if (i == 2) {
                             auto* newAmount = NEW WParsedInt(rtc, card);
@@ -170,7 +170,7 @@ int AbilityFactory::parseCastRestrictions(MTGCardInstance* card, Player* player,
                     }
                     if (foundSeen != string::npos) {
                         end = comparasion[i].find(")", foundSeen);
-                        rtc = comparasion[i].substr(foundSeen + 9, end - foundSeen - 9).c_str();
+                        rtc = comparasion[i].substr(foundSeen + 9, end - foundSeen - 9);
                         mod = atoi(comparasion[i].substr(end + 1).c_str());
 
                         TargetChooserFactory tcf(observer);
@@ -199,7 +199,7 @@ int AbilityFactory::parseCastRestrictions(MTGCardInstance* card, Player* player,
                         SAFE_DELETE(stc);
                     }
                 } else if (i == 2) {
-                    auto* secondA = NEW WParsedInt(comparasion[2].c_str(), nullptr, card);
+                    auto* secondA = NEW WParsedInt(comparasion[2], nullptr, card);
                     secondAmount = secondA->getValue();
                     SAFE_DELETE(secondA);
                 }
@@ -842,7 +842,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     if (found != string::npos && storedString.empty()) {
         size_t real_end = s.find("))", found);
         size_t stypesStartIndex = found + 12;
-        storedString.append(s.substr(stypesStartIndex, real_end - stypesStartIndex).c_str());
+        storedString.append(s.substr(stypesStartIndex, real_end - stypesStartIndex));
         s.erase(stypesStartIndex, real_end - stypesStartIndex);
     }
 
@@ -850,14 +850,14 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     if (found != string::npos && storedAbilityString.empty()) {
         size_t real_end = s.find("!$", found);
         size_t sIndex = found + 9;
-        storedAbilityString.append(s.substr(sIndex, real_end - sIndex).c_str());
+        storedAbilityString.append(s.substr(sIndex, real_end - sIndex));
         s.erase(sIndex, real_end - sIndex);
     } else {
         found = unchangedS.find("ability$!");  // did find it in a changed s, try unchanged.
         if (found != string::npos && storedAbilityString.empty()) {
             size_t real_end = unchangedS.find("!$", found);
             size_t sIndex = found + 9;
-            storedAbilityString.append(unchangedS.substr(sIndex, real_end - sIndex).c_str());
+            storedAbilityString.append(unchangedS.substr(sIndex, real_end - sIndex));
             unchangedS.erase(sIndex, real_end - sIndex);
         }
     }
@@ -2045,7 +2045,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
         unsigned int becomesSize = ptFound ? 2 : 1;
         if (becomesParameters.size() > becomesSize) {
             for (unsigned int i = becomesSize; i < becomesParameters.size(); i++) {
-                sabilities.append(becomesParameters[i].c_str());
+                sabilities.append(becomesParameters[i]);
                 if (i + 1 < becomesParameters.size()) sabilities.append(",");
             }
         }
@@ -2091,8 +2091,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
         if (found != string::npos && extraTransforms.empty()) {
             size_t real_end = transformsParamsString.find("))", found);
             size_t stypesStartIndex = found + 12;
-            extraTransforms.append(
-                transformsParamsString.substr(stypesStartIndex, real_end - stypesStartIndex).c_str());
+            extraTransforms.append(transformsParamsString.substr(stypesStartIndex, real_end - stypesStartIndex));
             transformsParamsString.erase(stypesStartIndex, real_end - stypesStartIndex);
         }
         vector<string> effectParameters = split(transformsParamsString, ',');
@@ -3546,7 +3545,7 @@ int ActivatedAbility::isReactingToClick(MTGCardInstance* card, ManaCost* mana) {
     }
     limitPerTurn = 0;
     if (limit.size()) {
-        auto* value  = NEW WParsedInt(limit.c_str(), nullptr, source);
+        auto* value  = NEW WParsedInt(limit, nullptr, source);
         limitPerTurn = value->getValue();
         delete value;
         // only run this check if we have a valid limit string.
@@ -3683,7 +3682,7 @@ int ActivatedAbility::activateAbility() {
 }
 
 void ActivatedAbility::activateSideEffect() {
-    auto* use = NEW WParsedInt(usesBeforeSideEffects.c_str(), nullptr, source);
+    auto* use = NEW WParsedInt(usesBeforeSideEffects, nullptr, source);
     uses = use->getValue();
     delete use;
     if (counters == uses) {

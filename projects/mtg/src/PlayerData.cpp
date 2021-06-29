@@ -47,7 +47,7 @@ void PlayerData::init() {
         }
     }
 
-    taskList = NEW TaskList(options.profileFile(PLAYER_TASKS).c_str());
+    taskList = NEW TaskList(options.profileFile(PLAYER_TASKS));
 }
 
 int PlayerData::save() {

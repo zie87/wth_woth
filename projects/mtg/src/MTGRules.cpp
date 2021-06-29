@@ -1030,7 +1030,7 @@ AAPlaneswalkerAttacked::AAPlaneswalkerAttacked(GameObserver* observer, int id, M
                                                MTGCardInstance* _target)
     : InstantAbility(observer, id, source) {
     this->target = _target;
-    menuText = _target->name.c_str();
+    menuText     = _target->name;
     attacker = card;
 }
 

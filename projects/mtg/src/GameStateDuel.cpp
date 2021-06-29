@@ -242,14 +242,14 @@ void GameStateDuel::ConstructOpponentMenu() {
                                     GameStateDuel::selectedAIDeckId, true);
         opponentMenu->Add(MENUITEM_RANDOM_AI, "Random");
         if (options[Options::EVILTWIN_MODE_UNLOCKED].number)
-            opponentMenu->Add(MENUITEM_EVIL_TWIN, "Evil Twin", _("Can you defeat yourself?").c_str());
+            opponentMenu->Add(MENUITEM_EVIL_TWIN, "Evil Twin", _("Can you defeat yourself?"));
         DeckManager* deckManager = DeckManager::GetInstance();
         vector<DeckMetaData*> opponentDeckList;
         int nbUnlockedDecks =
             options[Options::CHEATMODEAIDECK].number ? 1000 : options[Options::AIDECKS_UNLOCKED].number;
         opponentDeckList = fillDeckMenu(opponentMenu, "ai/baka", "ai_baka", game->getPlayer(0), nbUnlockedDecks);
         deckManager->updateMetaDataList(&opponentDeckList, true);
-        opponentMenu->Add(MENUITEM_CANCEL, "Cancel", _("Choose a different player deck").c_str());
+        opponentMenu->Add(MENUITEM_CANCEL, "Cancel", _("Choose a different player deck"));
         opponentDeckList.clear();
     }
 }

@@ -311,7 +311,7 @@ void SimplePad::Render() {
 
     // Draw text-entry title, if we've got one.
     if (title != "") {
-        mFont->DrawString(_(title.c_str()), mX, mY);
+        mFont->DrawString(_(title), mX, mY);
     }
     mY += kH + 12;
 

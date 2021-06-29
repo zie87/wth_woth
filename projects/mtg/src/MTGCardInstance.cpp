@@ -187,7 +187,7 @@ void MTGCardInstance::initMTGCI() {
         for (size_t i = 0; i < values.size(); ++i) {
             // Don' want to send any event to the gameObserver inside of initMCGI, so calling the parent setSubtype
             // method instead of mine
-            CardPrimitive::setSubtype(values[i].c_str());
+            CardPrimitive::setSubtype(values[i]);
         }
     }
 

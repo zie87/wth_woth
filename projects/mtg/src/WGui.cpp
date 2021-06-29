@@ -1134,7 +1134,7 @@ void WGuiAward::Render() {
     mFont->SetScale(.75);
     fH = mFont->GetHeight();
     if (text.size()) {
-        mFont->DrawString(_(text.c_str()), myX, myY, JGETEXT_LEFT);
+        mFont->DrawString(_(text), myX, myY, JGETEXT_LEFT);
         myY += fH + fM;
     }
     string s = goa->menuStr();

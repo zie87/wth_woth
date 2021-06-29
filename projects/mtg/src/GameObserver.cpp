@@ -1225,7 +1225,7 @@ bool GameObserver::parseLine(const string& s) {
             currentPlayerId = atoi(s.substr(limiter + 1).c_str()) - 1;
             return true;
         } else if (areaS.compare("phase") == 0) {
-            currentGamePhase = PhaseRing::phaseStrToInt(s.substr(limiter + 1).c_str());
+            currentGamePhase = PhaseRing::phaseStrToInt(s.substr(limiter + 1));
             return true;
         }
     }
@@ -1258,7 +1258,7 @@ bool GameObserver::load(const string& ss, bool undo
             continue;
         }
         if (s.find("rvalues:") == 0) {
-            randomGenerator.loadRandValues(s.substr(8).c_str());
+            randomGenerator.loadRandValues(s.substr(8));
             continue;
         }
         switch (state) {

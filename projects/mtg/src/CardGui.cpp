@@ -352,7 +352,7 @@ void CardGui::AlternateRender(MTGCard* card, const Pos& pos) {
 
     for (size_t i = 0; i < Carditems.size(); i++) {
         ModRulesRenderCardGuiItem* Carditem = Carditems[i];
-        if (Carditem->mFilter.length() == 0 || FilterCard(card, Carditem->mFilter.c_str())) {
+        if (Carditem->mFilter.length() == 0 || FilterCard(card, Carditem->mFilter)) {
             if (Carditem->mFont) {
                 font->SetColor(Carditem->mFontColor);
                 font->SetScale(((float)Carditem->mFontSize / 100) * pos.actZ);
@@ -464,7 +464,7 @@ void CardGui::AlternateRender(MTGCard* card, const Pos& pos) {
             } else if (Carditem->mName == "icon") {
                 auto yOffseticon    = (float)Carditem->mPosY;
                 JQuadPtr ExtraIcons = WResourceManager::Instance()->RetrieveQuad(
-                    Carditem->mFileName.c_str(), 2 + (float)(Carditem->mIconPosX - 1) * 36,
+                    Carditem->mFileName, 2 + (float)(Carditem->mIconPosX - 1) * 36,
                     (float)(Carditem->mIconPosY - 1) * 38, 32, 32, "", RETRIEVE_MANAGE);
                 ExtraIcons->SetHotSpot(16, 16);
                 renderer->RenderQuad(
@@ -548,7 +548,7 @@ void CardGui::AlternateRender(MTGCard* card, const Pos& pos) {
 
                 found = Carditem->mName.find("expansion");
                 if (found != string::npos) {
-                    formattedfield = FormattedData(formattedfield, "expansion", setlist[card->setId].c_str());
+                    formattedfield = FormattedData(formattedfield, "expansion", setlist[card->setId]);
                 }
 
                 if (!Carditem->mFont) {
@@ -614,7 +614,7 @@ void CardGui::TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad) {
     string sFormattedData = "";
     for (size_t i = 0; i < Carditems.size(); i++) {
         ModRulesRenderCardGuiItem* Carditem = Carditems[i];
-        if (Carditem->mFilter.length() == 0 || FilterCard(card, Carditem->mFilter.c_str())) {
+        if (Carditem->mFilter.length() == 0 || FilterCard(card, Carditem->mFilter)) {
             if (Carditem->mFont) {
                 font->SetColor(Carditem->mFontColor);
                 font->SetScale(((float)Carditem->mFontSize / 100) * pos.actZ);
@@ -727,7 +727,7 @@ void CardGui::TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad) {
             } else if (Carditem->mName == "icon") {
                 auto yOffseticon    = (float)Carditem->mPosY;
                 JQuadPtr ExtraIcons = WResourceManager::Instance()->RetrieveQuad(
-                    Carditem->mFileName.c_str(), 2 + (float)(Carditem->mIconPosX - 1) * 36,
+                    Carditem->mFileName, 2 + (float)(Carditem->mIconPosX - 1) * 36,
                     (float)(Carditem->mIconPosY - 1) * 38, 32, 32, "", RETRIEVE_MANAGE);
                 ExtraIcons->SetHotSpot(16, 16);
                 renderer->RenderQuad(
@@ -812,7 +812,7 @@ void CardGui::TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad) {
 
                 found = Carditem->mName.find("expansion");
                 if (found != string::npos) {
-                    formattedfield = FormattedData(formattedfield, "expansion", setlist[card->setId].c_str());
+                    formattedfield = FormattedData(formattedfield, "expansion", setlist[card->setId]);
                 }
 
                 if (!Carditem->mFont) {
@@ -863,7 +863,7 @@ void CardGui::RenderBig(MTGCard* card, const Pos& pos) {
 }
 
 string CardGui::FormattedData(string data, string replace, string value) {
-    size_t found = data.find(replace.c_str());
+    size_t found = data.find(replace);
     if (found != string::npos) {
         size_t len = replace.length();
         string teste = data.replace(found, len, value);

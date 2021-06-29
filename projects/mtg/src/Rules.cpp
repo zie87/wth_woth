@@ -199,11 +199,10 @@ Player* Rules::loadPlayerMomir(GameObserver* observer, int isAI) {
 
     Player* player = nullptr;
     if (!isAI)  // Human Player
-        player = NEW HumanPlayer(observer, options.profileFile("momir.txt", "", true).c_str(), deckFileSmall, false,
-                                 tempDeck);
+        player = NEW HumanPlayer(observer, options.profileFile("momir.txt", "", true), deckFileSmall, false, tempDeck);
     else
-        player = NEW AIMomirPlayer(observer, options.profileFile("momir.txt", "", true).c_str(), deckFileSmall, empty,
-                                   tempDeck);
+        player =
+            NEW AIMomirPlayer(observer, options.profileFile("momir.txt", "", true), deckFileSmall, empty, tempDeck);
 
     return player;
 }

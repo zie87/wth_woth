@@ -262,7 +262,7 @@ void StatsWrapper::initStatistics(string deckstats) {
     aiDeckStats.clear();
 
     if (FileExists(deckstats)) {
-        stats->load(deckstats.c_str());
+        stats->load(deckstats);
         percentVictories = stats->percentVictories();
         gamesPlayed = stats->nbGames();
 

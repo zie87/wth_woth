@@ -87,7 +87,7 @@ std::list<Phase*> PhaseRing::currentTurn() {
 
 std::list<Phase*> PhaseRing::nextTurn() {
     std::list<Phase*> temp = observer->gameTurn[observer->nextTurnsPlayer()->getId()];
-    Phase* currentIter = NULL;
+    Phase* currentIter     = nullptr;
     nextTurnList.clear();
     for (auto tempiter = temp.begin(); tempiter != temp.end(); tempiter++) {
         currentIter = *tempiter;
@@ -199,10 +199,10 @@ int PhaseRing::addCombatAfter(Player* player, int after_id, bool withMain) {
         if (currentPhase->id == after_id) {
             beforeLeaving = currentPhase;
             it++;
-            Phase* addPhase = NULL;
+            Phase* addPhase = nullptr;
             for (auto findP = ring.begin(); findP != ring.end(); findP++) {
                 addPhase = *findP;
-                Phase* toAdd = NULL;
+                Phase* toAdd = nullptr;
                 bool add = false;
                 if (addPhase->player == player) {
                     switch (addPhase->id) {
@@ -269,7 +269,7 @@ Phase* PhaseRing::getPhase(int _id) {
             return currentPhase;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 int PhaseRing::addPhaseAfter(GamePhase id, Player* player, int after_id) {
@@ -277,7 +277,7 @@ int PhaseRing::addPhaseAfter(GamePhase id, Player* player, int after_id) {
         Phase* currentPhase = *it;
         if (currentPhase->id == after_id) {
             it++;
-            Phase* addPhase = NULL;
+            Phase* addPhase = nullptr;
             for (auto findP = ring.begin(); findP != ring.end(); findP++) {
                 addPhase = *findP;
                 if (addPhase->id == id && addPhase->player == player) {

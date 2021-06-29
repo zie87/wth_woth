@@ -22,7 +22,7 @@ JParticleEmitter::JParticleEmitter(JParticleEffect* parent) {
     mSrcBlending = BLEND_SRC_ALPHA;
     mDestBlending = BLEND_ONE;
 
-    mQuad = NULL;
+    mQuad = nullptr;
 
     mQuadIndex = 0;
     mWidth = 8;
@@ -53,13 +53,13 @@ JParticle* JParticleEmitter::GetIdleParticle() {
 
     if (size < mMaxParticleCount) {
         JParticle* par = new JParticle();
-        if (par != NULL) {
+        if (par != nullptr) {
             mParticles.push_back(par);
             return par;
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void JParticleEmitter::Start() {
@@ -159,7 +159,7 @@ void JParticleEmitter::EmitParticles(int count) {
 
     for (int i = 0; i < count; i++) {
         particle = GetIdleParticle();
-        if (particle != NULL) {
+        if (particle != nullptr) {
             particle->SetQuad(mQuad);
 
             dataPtr = particle->GetDataPtr();

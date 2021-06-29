@@ -217,7 +217,7 @@ OptionThemeStyle::OptionThemeStyle(string _displayValue) : OptionSelect(Options:
 
 bool OptionThemeStyle::Visible() { return (selections.size() > 1); }
 
-void OptionThemeStyle::confirmChange(bool confirmed) { options.getStyleMan()->determineActive(NULL, NULL); }
+void OptionThemeStyle::confirmChange(bool confirmed) { options.getStyleMan()->determineActive(nullptr, nullptr); }
 
 void OptionThemeStyle::Reload() {
     selections.clear();
@@ -426,7 +426,7 @@ void OptionTheme::confirmChange(bool confirmed) {
     else {
         setData();
         options.getStyleMan()->loadRules();
-        options.getStyleMan()->determineActive(NULL, NULL);
+        options.getStyleMan()->determineActive(nullptr, nullptr);
         if (ts) ts->Reload();
 
         WResourceManager::Instance()->Refresh();  // Update images
@@ -435,7 +435,7 @@ void OptionTheme::confirmChange(bool confirmed) {
 }
 
 OptionKey::OptionKey(GameStateOptions* g, LocalKeySym from, JButton to)
-    : WGuiItem(""), from(from), to(to), grabbed(false), g(g), btnMenu(NULL) {}
+    : WGuiItem(""), from(from), to(to), grabbed(false), g(g), btnMenu(nullptr) {}
 
 void OptionKey::Update(float dt) {
     if (btnMenu) btnMenu->Update(dt);
@@ -511,9 +511,9 @@ void OptionKey::Overlay() {
 void OptionKey::ButtonPressed(int controllerId, int controlId) {
     to = btnList[controlId];
     SAFE_DELETE(btnMenu);
-    btnMenu = NULL;
+    btnMenu = nullptr;
 }
 
-bool OptionKey::Visible() { return JGE_BTN_NONE != to || LOCAL_KEY_NONE == from || btnMenu != NULL; }
+bool OptionKey::Visible() { return JGE_BTN_NONE != to || LOCAL_KEY_NONE == from || btnMenu != nullptr; }
 
-bool OptionKey::Selectable() { return JGE_BTN_NONE != to || LOCAL_KEY_NONE == from || btnMenu != NULL; }
+bool OptionKey::Selectable() { return JGE_BTN_NONE != to || LOCAL_KEY_NONE == from || btnMenu != nullptr; }

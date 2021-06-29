@@ -50,17 +50,17 @@ AIHints::~AIHints() {
 }
 
 AIHint* AIHints::getByCondition(string condition) {
-    if (!condition.size()) return NULL;
+    if (!condition.size()) return nullptr;
 
     for (size_t i = 0; i < hints.size(); ++i) {
         if (hints[i]->mCondition.compare(condition) == 0) return hints[i];
     }
-    return NULL;
+    return nullptr;
 }
 
 bool AIHints::HintSaysDontAttack(GameObserver* observer, MTGCardInstance* card) {
     TargetChooserFactory tfc(observer);
-    TargetChooser* hintTc = NULL;
+    TargetChooser* hintTc = nullptr;
     for (unsigned int i = 0; i < hints.size(); i++) {
         if (hints[i]->mCombatAttackTip.size()) {
             hintTc = tfc.createTargetChooser(hints[i]->mCombatAttackTip, card);
@@ -209,19 +209,19 @@ string AIHints::constraintsNotFulfilled(AIAction* action, AIHint* hint, ManaCost
 AIAction* AIHints::findAbilityRecursive(AIHint* hint, ManaCost* potentialMana) {
     RankingContainer ranking = findActions(hint);
 
-    AIAction* a = NULL;
+    AIAction* a = nullptr;
     if (ranking.size()) {
         a = NEW AIAction(ranking.begin()->first);
     }
 
     string s = constraintsNotFulfilled(a, hint, potentialMana);
-    if (hint->mCombatAttackTip.size() || hint->castOrder.size()) return NULL;
+    if (hint->mCombatAttackTip.size() || hint->castOrder.size()) return nullptr;
     if (s.size()) {
         SAFE_DELETE(a);
         AIHint* nextHint = getByCondition(s);
         WGE_LOG_DEBUG("I Need {}, this can be provided by {}", s, (nextHint ? nextHint->mAction : "NULL"));
         if (nextHint && nextHint != hint) return findAbilityRecursive(nextHint, potentialMana);
-        return NULL;
+        return nullptr;
     }
 
     return a;
@@ -239,5 +239,5 @@ AIAction* AIHints::suggestAbility(ManaCost* potentialMana) {
             return a;
         }
     }
-    return NULL;
+    return nullptr;
 }

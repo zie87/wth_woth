@@ -45,7 +45,7 @@ CardPrimitive::CardPrimitive(CardPrimitive* source) {
 
     power = source->power;
     toughness = source->toughness;
-    restrictions = source->restrictions ? source->restrictions->clone() : NULL;
+    restrictions  = source->restrictions ? source->restrictions->clone() : nullptr;
     suspendedTime = source->suspendedTime;
 
     magicText = source->magicText;
@@ -66,7 +66,7 @@ int CardPrimitive::init() {
     magicTexts.clear();
     spellTargetType = "";
     alias = 0;
-    restrictions = NULL;
+    restrictions    = nullptr;
     return 1;
 }
 

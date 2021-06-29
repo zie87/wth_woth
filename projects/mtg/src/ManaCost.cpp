@@ -17,7 +17,7 @@ SUPPORT_OBJECT_ANALYTICS(ManaCost)
 
 ManaCost* ManaCost::parseManaCost(string s, ManaCost* _manaCost, MTGCardInstance* c) {
     ManaCost* manaCost;
-    GameObserver* g = c ? c->getObserver() : NULL;
+    GameObserver* g = c ? c->getObserver() : nullptr;
     if (_manaCost) {
         manaCost = _manaCost;
     } else {
@@ -58,7 +58,7 @@ ManaCost* ManaCost::parseManaCost(string s, ManaCost* _manaCost, MTGCardInstance
                 } else {
                     // Parse target for extraCosts
                     TargetChooserFactory tcf(g);
-                    TargetChooser* tc = NULL;
+                    TargetChooser* tc   = nullptr;
                     size_t target_start = value.find("(");
                     size_t target_end = value.find(")");
                     if (target_start != string::npos && target_end != string::npos) {
@@ -138,7 +138,7 @@ ManaCost* ManaCost::parseManaCost(string s, ManaCost* _manaCost, MTGCardInstance
                         size_t start = value.find("(");
                         size_t end = value.rfind(")");
                         string manaType = value.substr(start + 1, end - start - 1);
-                        manaCost->addExtraCost(NEW LifeorManaCost(NULL, manaType));
+                        manaCost->addExtraCost(NEW LifeorManaCost(nullptr, manaType));
                         break;
                     }
                     case 'q':
@@ -247,7 +247,7 @@ ManaCost::ManaCost(ManaCost* manaCost) {
     morph = NEW ManaCost(manaCost->morph);
     suspend = NEW ManaCost(manaCost->suspend);
 
-    extraCosts = manaCost->extraCosts ? manaCost->extraCosts->clone() : NULL;
+    extraCosts = manaCost->extraCosts ? manaCost->extraCosts->clone() : nullptr;
     xColor = manaCost->xColor;
 }
 
@@ -273,7 +273,7 @@ ManaCost::ManaCost(const ManaCost& manaCost)
     morph = NEW ManaCost(manaCost.morph);
     suspend = NEW ManaCost(manaCost.suspend);
 
-    extraCosts = manaCost.extraCosts ? manaCost.extraCosts->clone() : NULL;
+    extraCosts = manaCost.extraCosts ? manaCost.extraCosts->clone() : nullptr;
     xColor = manaCost.xColor;
 }
 
@@ -365,14 +365,14 @@ void ManaCost::init() {
         cost.push_back(0);
     }
 
-    extraCosts = NULL;
-    kicker = NULL;
-    alternative = NULL;
-    BuyBack = NULL;
-    FlashBack = NULL;
-    Retrace = NULL;
-    morph = NULL;
-    suspend = NULL;
+    extraCosts  = nullptr;
+    kicker      = nullptr;
+    alternative = nullptr;
+    BuyBack     = nullptr;
+    FlashBack   = nullptr;
+    Retrace     = nullptr;
+    morph       = nullptr;
+    suspend     = nullptr;
     isMulti = false;
 }
 
@@ -459,16 +459,16 @@ int ManaCost::getCost(int color) {
 }
 
 ManaCostHybrid* ManaCost::getHybridCost(unsigned int i) {
-    if (hybrids.size() <= i) return NULL;
+    if (hybrids.size() <= i) return nullptr;
     return &hybrids[i];
 }
 
 ExtraCost* ManaCost::getExtraCost(unsigned int i) {
     if (extraCosts && extraCosts->costs.size()) {
-        if (extraCosts->costs.size() <= i) return NULL;
+        if (extraCosts->costs.size() <= i) return nullptr;
         return extraCosts->costs[i];
     }
-    return NULL;
+    return nullptr;
 }
 
 int ManaCost::hasColor(int color) {
@@ -555,7 +555,7 @@ int ManaCost::addExtraCost(ExtraCost* _cost) {
 
 int ManaCost::addExtraCosts(ExtraCosts* _ecost) {
     if (!_ecost) {
-        extraCosts = NULL;
+        extraCosts = nullptr;
         return 1;
     }
     if (!extraCosts) extraCosts = NEW ExtraCosts();

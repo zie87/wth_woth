@@ -39,7 +39,7 @@ bool Unlockable::tryToUnlock(GameObserver* game) {
     MTGCardInstance* dummyCard = p->game->battlefield->nb_cards ? p->game->battlefield->cards[0]
                                  : p->game->hand->nb_cards      ? p->game->hand->cards[0]
                                  : p->game->library->nb_cards   ? p->game->library->cards[0]
-                                                                : NULL;
+                                                                : nullptr;
 
     AbilityFactory af(game);
     int meetConditions = conditions.size() ? dummyCard ? af.parseCastRestrictions(dummyCard, p, conditions) : 0 : 1;
@@ -62,7 +62,7 @@ void Unlockable::load() {
     std::stringstream stream(contents);
     std::string s;
 
-    Unlockable* current = NULL;
+    Unlockable* current = nullptr;
     while (std::getline(stream, s)) {
         if (!s.size()) continue;
         if (s[s.size() - 1] == '\r') s.erase(s.size() - 1);  // Handle DOS files
@@ -114,9 +114,9 @@ void CreditBonus::Render(float x, float y, WFont* font) {
 
 Credits::Credits() {
     unlocked = -1;
-    p1 = NULL;
-    p2 = NULL;
-    observer = NULL;
+    p1       = nullptr;
+    p2       = nullptr;
+    observer = nullptr;
 }
 
 Credits::~Credits() {
@@ -138,7 +138,7 @@ void Credits::compute(GameObserver* g, GameApp* _app) {
 
     PlayerData* playerdata = NEW PlayerData(MTGCollection());
     if (p2->isAI() && g->didWin(p1)) {
-        gameLength = time(0) - g->startedAt;
+        gameLength = time(nullptr) - g->startedAt;
         value = 400;
         if (app->gameType != GAME_TYPE_CLASSIC) value = 200;
         int difficulty = options[Options::DIFFICULTY].number;
@@ -175,7 +175,7 @@ void Credits::compute(GameObserver* g, GameApp* _app) {
             bonus.push_back(b);
         }
 
-        GameOptionAward* goa = NULL;
+        GameOptionAward* goa = nullptr;
         // <Tasks handling>
         vector<Task*> finishedTasks;
         playerdata->taskList->getDoneTasks(g, _app, &finishedTasks);

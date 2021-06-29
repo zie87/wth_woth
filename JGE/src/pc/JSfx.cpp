@@ -78,10 +78,10 @@ unsigned long JSample::fileSize() {
 }
 
 //////////////////////////////////////////////////////////////////////////
-JSoundSystem* JSoundSystem::mInstance = NULL;
+JSoundSystem* JSoundSystem::mInstance = nullptr;
 
 JSoundSystem* JSoundSystem::GetInstance() {
-    if (mInstance == NULL) {
+    if (mInstance == nullptr) {
         mInstance = new JSoundSystem();
         mInstance->InitSoundSystem();
     }
@@ -92,7 +92,7 @@ void JSoundSystem::Destroy() {
     if (mInstance) {
         mInstance->DestroySoundSystem();
         delete mInstance;
-        mInstance = NULL;
+        mInstance = nullptr;
     }
 }
 
@@ -146,7 +146,7 @@ JMusic* JSoundSystem::LoadMusic(const char* fileName) {
     }
     return music;
 #else
-    return NULL;
+    return nullptr;
 #endif
 }
 
@@ -238,7 +238,7 @@ JSample* JSoundSystem::LoadSample(const char* fileName) {
     }
     return sample;
 #else
-    return NULL;
+    return nullptr;
 #endif
 }
 

@@ -11,12 +11,12 @@ ActionElement::ActionElement(int id) : JGuiObject(id) {
     waitingForAnswer = 0;
     currentPhase = MTG_PHASE_INVALID;
     newPhase = MTG_PHASE_INVALID;
-    tc = NULL;
+    tc               = nullptr;
 }
 
 ActionElement::ActionElement(const ActionElement& a) : JGuiObject(a) {
     activeState = a.activeState;
-    tc = a.tc ? a.tc->clone() : NULL;
+    tc               = a.tc ? a.tc->clone() : nullptr;
     currentPhase = a.currentPhase;
     newPhase = a.newPhase;
     modal = a.modal;

@@ -36,7 +36,7 @@ JAnimator::~JAnimator() {
 
 bool JAnimator::Load(const char* scriptFile) {
     JFileSystem* fileSystem = JFileSystem::GetInstance();
-    if (fileSystem == NULL) return false;
+    if (fileSystem == nullptr) return false;
 
     if (!fileSystem->OpenFile(scriptFile)) return false;
 
@@ -47,11 +47,11 @@ bool JAnimator::Load(const char* scriptFile) {
     TiXmlDocument doc;
     doc.Parse(xmlBuffer);
 
-    TiXmlNode* script = 0;
-    TiXmlNode* frame = 0;
-    TiXmlNode* obj = 0;
-    TiXmlNode* param = 0;
-    TiXmlElement* element = 0;
+    TiXmlNode* script     = nullptr;
+    TiXmlNode* frame      = nullptr;
+    TiXmlNode* obj        = nullptr;
+    TiXmlNode* param      = nullptr;
+    TiXmlElement* element = nullptr;
 
     float defaultTime = 0.033f;
 
@@ -86,7 +86,7 @@ bool JAnimator::Load(const char* scriptFile) {
             for (obj = frame->FirstChild(); obj; obj = obj->NextSibling()) {
                 for (param = obj->FirstChild(); param; param = param->NextSibling()) {
                     element = param->ToElement();
-                    if (element != NULL) {
+                    if (element != nullptr) {
                         if (strcmp(element->Value(), "settings") == 0) {
                             const char* quadName = element->Attribute("quad");
                             JQuad* quad = mResource->GetQuad(quadName);

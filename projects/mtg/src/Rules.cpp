@@ -25,7 +25,7 @@ Rules* Rules::getRulesByFilename(string _filename) {
     for (size_t i = 0; i < RulesList.size(); ++i) {
         if (RulesList[i]->filename == _filename) return RulesList[i];
     }
-    return NULL;
+    return nullptr;
 }
 
 int Rules::loadAllRules() {
@@ -69,15 +69,15 @@ MTGCardInstance* Rules::getCardByMTGId(GameObserver* g, int mtgid) {
             MTGGameZone* zone = zones[j];
             for (int k = 0; k < zone->nb_cards; k++) {
                 MTGCardInstance* card = zone->cards[k];
-                if (!card) return NULL;
+                if (!card) return nullptr;
                 if (card->getMTGId() == mtgid) return card;
             }
         }
     }
-    return NULL;
+    return nullptr;
 }
 
-RulesPlayerData::RulesPlayerData() : player(0) {}
+RulesPlayerData::RulesPlayerData() : player(nullptr) {}
 
 RulesPlayerData::~RulesPlayerData() { SAFE_DELETE(player); }
 
@@ -117,11 +117,12 @@ void Rules::addExtraRules(GameObserver* g) {
         g->ExtraRules[i].owner = p;
         for (size_t j = 0; j < initState.playerData[i].extraRules.size(); ++j) {
             AbilityFactory af(g);
-            MTGPlayerCards* hand = NULL;
+            MTGPlayerCards* hand   = nullptr;
             int handsize = 7;
             int difficultyRating = 0;
             int Optimizedhandcheat = options[Options::OPTIMIZE_HAND].number;
-            MTGAbility* a = af.parseMagicLine(initState.playerData[i].extraRules[j], id++, NULL, &(g->ExtraRules[i]));
+            MTGAbility* a =
+                af.parseMagicLine(initState.playerData[i].extraRules[j], id++, nullptr, &(g->ExtraRules[i]));
             if (p->playMode != Player::MODE_TEST_SUITE && g->mRules->gamemode != GAME_TYPE_MOMIR &&
                 g->mRules->gamemode != GAME_TYPE_RANDOM1 && g->mRules->gamemode != GAME_TYPE_RANDOM2 &&
                 g->mRules->gamemode != GAME_TYPE_STORY && g->mRules->gamemode != GAME_TYPE_DEMO &&
@@ -172,7 +173,7 @@ void Rules::addExtraRules(GameObserver* g) {
 
     for (size_t j = 0; j < extraRules.size(); ++j) {
         AbilityFactory af(g);
-        MTGAbility* a = af.parseMagicLine(extraRules[j], id++, NULL, &(g->ExtraRules[0]));
+        MTGAbility* a = af.parseMagicLine(extraRules[j], id++, nullptr, &(g->ExtraRules[0]));
         if (a) {
             if (a->oneShot) {
                 a->resolve();
@@ -190,13 +191,13 @@ Player* Rules::loadPlayerMomir(GameObserver* observer, int isAI) {
 
     MTGDeck* tempDeck =
         NEW MTGDeck(MTGCollection());  // Autogenerate a momir deck. Leave the "momir.txt" bits below for stats.
-    tempDeck->addRandomCards(12, 0, 0, Constants::RARITY_L, "Forest");
-    tempDeck->addRandomCards(12, 0, 0, Constants::RARITY_L, "Plains");
-    tempDeck->addRandomCards(12, 0, 0, Constants::RARITY_L, "Swamp");
-    tempDeck->addRandomCards(12, 0, 0, Constants::RARITY_L, "Mountain");
-    tempDeck->addRandomCards(12, 0, 0, Constants::RARITY_L, "Island");
+    tempDeck->addRandomCards(12, nullptr, 0, Constants::RARITY_L, "Forest");
+    tempDeck->addRandomCards(12, nullptr, 0, Constants::RARITY_L, "Plains");
+    tempDeck->addRandomCards(12, nullptr, 0, Constants::RARITY_L, "Swamp");
+    tempDeck->addRandomCards(12, nullptr, 0, Constants::RARITY_L, "Mountain");
+    tempDeck->addRandomCards(12, nullptr, 0, Constants::RARITY_L, "Island");
 
-    Player* player = NULL;
+    Player* player = nullptr;
     if (!isAI)  // Human Player
         player = NEW HumanPlayer(observer, options.profileFile("momir.txt", "", true).c_str(), deckFileSmall, false,
                                  tempDeck);
@@ -218,20 +219,20 @@ Player* Rules::loadPlayerRandom(GameObserver* observer, int isAI, int mode) {
     string lands[] = {"forest", "forest", "island", "mountain", "swamp", "plains", "forest"};
 
     MTGDeck* tempDeck = NEW MTGDeck(MTGCollection());
-    tempDeck->addRandomCards(9, 0, 0, -1, lands[color1].c_str());
-    tempDeck->addRandomCards(9, 0, 0, -1, lands[color2].c_str());
-    tempDeck->addRandomCards(1, 0, 0, 'U', "land");
-    tempDeck->addRandomCards(1, 0, 0, 'R', "land");
-    tempDeck->addRandomCards(12, 0, 0, -1, "creature", colors, nbcolors);
-    tempDeck->addRandomCards(2, 0, 0, -1, "sorcery", colors, nbcolors);
-    tempDeck->addRandomCards(2, 0, 0, -1, "enchantment", colors, nbcolors);
-    tempDeck->addRandomCards(2, 0, 0, -1, "instant", colors, nbcolors);
-    tempDeck->addRandomCards(2, 0, 0, -1, "artifact", colors, nbcolors);
+    tempDeck->addRandomCards(9, nullptr, 0, -1, lands[color1].c_str());
+    tempDeck->addRandomCards(9, nullptr, 0, -1, lands[color2].c_str());
+    tempDeck->addRandomCards(1, nullptr, 0, 'U', "land");
+    tempDeck->addRandomCards(1, nullptr, 0, 'R', "land");
+    tempDeck->addRandomCards(12, nullptr, 0, -1, "creature", colors, nbcolors);
+    tempDeck->addRandomCards(2, nullptr, 0, -1, "sorcery", colors, nbcolors);
+    tempDeck->addRandomCards(2, nullptr, 0, -1, "enchantment", colors, nbcolors);
+    tempDeck->addRandomCards(2, nullptr, 0, -1, "instant", colors, nbcolors);
+    tempDeck->addRandomCards(2, nullptr, 0, -1, "artifact", colors, nbcolors);
 
     string deckFile = "random";
     string deckFileSmall = "random";
 
-    Player* player = NULL;
+    Player* player = nullptr;
     if (!isAI)  // Human Player
         player = NEW HumanPlayer(observer, deckFile, deckFileSmall, false, tempDeck);
     else
@@ -241,7 +242,7 @@ Player* Rules::loadPlayerRandom(GameObserver* observer, int isAI, int mode) {
 }
 
 Player* Rules::initPlayer(GameObserver* g, int playerId) {
-    Player* p = g->players.size() > 1 ? g->players[playerId] : NULL;
+    Player* p = g->players.size() > 1 ? g->players[playerId] : nullptr;
     if (!p) {
         int isAI = 1;
         if (GameApp::players[playerId] == PLAYER_TYPE_HUMAN) isAI = 0;
@@ -249,13 +250,13 @@ Player* Rules::initPlayer(GameObserver* g, int playerId) {
         case GAME_TYPE_MOMIR:
             return loadPlayerMomir(g, isAI);
         case GAME_TYPE_CLASSIC:
-            return NULL;  // Error for the time being
+            return nullptr;  // Error for the time being
         case GAME_TYPE_RANDOM1:
             return loadPlayerRandom(g, isAI, GAME_TYPE_RANDOM1);
         case GAME_TYPE_RANDOM2:
             return loadPlayerRandom(g, isAI, GAME_TYPE_RANDOM2);
         default:
-            return NULL;
+            return nullptr;
         }
     }
     // TODO p may still be NULL, what do we do to handle this? Above switch has no default case to handle the case
@@ -282,7 +283,7 @@ MTGDeck* Rules::buildDeck(int playerId) {
     }
     if (!nbcards) {
         delete (deck);
-        return NULL;
+        return nullptr;
     }
     return deck;
 }
@@ -374,7 +375,7 @@ void Rules::postUpdateInit(GameObserver* observer) {
 
 void RulesPlayerData::cleanup() {
     SAFE_DELETE(player);
-    player = new Player(NULL, "", "");
+    player = new Player(nullptr, "", "");
 }
 
 void RulesState::cleanup() {

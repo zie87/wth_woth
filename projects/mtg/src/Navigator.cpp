@@ -151,7 +151,7 @@ public:
      **
      */
     PlayGuiObject* GetCurrentCard() {
-        PlayGuiObject* current = NULL;
+        PlayGuiObject* current = nullptr;
         if (mCards.size()) {
             if (mCurrentCard < mCards.size()) {
                 current = mCards[mCurrentCard];
@@ -284,7 +284,7 @@ public:
 CardZone* CreatureCardZone::EnterZone(JButton inDirection) {
     if ((inDirection == JGE_BTN_LEFT || inDirection == JGE_BTN_RIGHT) && mCards.empty()) {
         LandCardZone* landZone = dynamic_cast<LandCardZone*>(mNeighbours[JGE_BTN_DOWN]);
-        if (landZone == NULL) {
+        if (landZone == nullptr) {
             landZone = dynamic_cast<LandCardZone*>(mNeighbours[JGE_BTN_UP]);
         }
 
@@ -303,7 +303,7 @@ CardZone* CreatureCardZone::EnterZone(JButton inDirection) {
 CardZone* LandCardZone::EnterZone(JButton inDirection) {
     if ((inDirection == JGE_BTN_LEFT || inDirection == JGE_BTN_RIGHT) && mCards.empty()) {
         CreatureCardZone* creatureZone = dynamic_cast<CreatureCardZone*>(mNeighbours[JGE_BTN_DOWN]);
-        if (creatureZone == NULL) {
+        if (creatureZone == nullptr) {
             creatureZone = dynamic_cast<CreatureCardZone*>(mNeighbours[JGE_BTN_UP]);
         }
 
@@ -478,7 +478,7 @@ bool Navigator::CheckUserInput(int x, int y) {
 void Navigator::Update(float dt) {
     float boundary = mDuelLayers->RightBoundary();
     float position = boundary - CardGui::BigWidth / 2;
-    if (GetCurrentCard() != NULL) {
+    if (GetCurrentCard() != nullptr) {
         if ((GetCurrentCard()->x + CardGui::Width / 2 > position - CardGui::BigWidth / 2) &&
             (GetCurrentCard()->x - CardGui::Width / 2 < position + CardGui::BigWidth / 2)) {
             position = CardGui::BigWidth / 2 - 10;
@@ -494,13 +494,13 @@ void Navigator::Update(float dt) {
 /*
  **
  */
-PlayGuiObject* Navigator::GetCurrentCard() { return mCurrentZone ? mCurrentZone->GetCurrentCard() : NULL; }
+PlayGuiObject* Navigator::GetCurrentCard() { return mCurrentZone ? mCurrentZone->GetCurrentCard() : nullptr; }
 
 /*
  **
  */
 void Navigator::Render() {
-    if (GetCurrentCard() != NULL) {
+    if (GetCurrentCard() != nullptr) {
         GetCurrentCard()->Render();
 
         CardView* card = dynamic_cast<CardView*>(GetCurrentCard());
@@ -540,7 +540,7 @@ void Navigator::PushLimitor() {}
  **
  */
 void Navigator::Limit(LimitorFunctor<PlayGuiObject>* inLimitor, CardView::SelectorZone inZone) {
-    mLimitorEnabled = (inLimitor != NULL);
+    mLimitorEnabled = (inLimitor != nullptr);
     if (inZone == CardView::handZone) {
         mCurrentZone->LeaveZone(JGE_BTN_NONE);
 
@@ -551,7 +551,7 @@ void Navigator::Limit(LimitorFunctor<PlayGuiObject>* inLimitor, CardView::Select
             mCurrentZone = mCurrentZoneStack.top();
             mCurrentZoneStack.pop();
             assert(mCurrentZone);
-            if (mCurrentZone == NULL) {
+            if (mCurrentZone == nullptr) {
                 mCurrentZone = mCardZones[kCardZone_PlayerHand];
             }
         }
@@ -610,7 +610,7 @@ int Navigator::CardToCardZone(PlayGuiObject* inCard) {
                 } else if (card->getCard()->isLand()) {
                     result = isAI ? kCardZone_AILands : kCardZone_PlayerLands;
                 } else if (card->getCard()->isSpell()) {
-                    if (card->getCard()->target != NULL) isAI = card->getCard()->target->owner->isAI();
+                    if (card->getCard()->target != nullptr) isAI = card->getCard()->target->owner->isAI();
 
                     // nasty hack:  the lines above don't always work, as when an enchantment comes into play, its
                     // ability hasn't been activated yet, so it doesn't yet have a target.  Instead, we now look at the

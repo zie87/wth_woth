@@ -12,8 +12,8 @@
 SUPPORT_OBJECT_ANALYTICS(ExtraCost)
 
 ExtraCost::ExtraCost(const std::string& inCostRenderString, TargetChooser* _tc)
-    : tc(_tc), source(NULL), target(NULL), mCostRenderString(inCostRenderString) {
-    if (tc) tc->targetter = NULL;
+    : tc(_tc), source(nullptr), target(nullptr), mCostRenderString(inCostRenderString) {
+    if (tc) tc->targetter = nullptr;
 }
 
 ExtraCost::~ExtraCost() { SAFE_DELETE(tc); }
@@ -23,7 +23,7 @@ int ExtraCost::setSource(MTGCardInstance* _source) {
     if (tc) {
         tc->source = _source;
         // this keeps the target chooser from being unable to select a creature with shroud/protections.
-        tc->targetter = NULL;
+        tc->targetter = nullptr;
         tc->Owner = source->controller();
     } else {
         target = _source;
@@ -74,7 +74,7 @@ int LifeCost::doPay() {
     MTGCardInstance* _target = (MTGCardInstance*)target;
 
     _target->controller()->loseLife(1);
-    target = NULL;
+    target = nullptr;
     if (tc) tc->initTargets();
     return 1;
 }
@@ -117,7 +117,7 @@ int LifeorManaCost::doPay() {
         _target->controller()->loseLife(2);
     }
     SAFE_DELETE(newCost);
-    target = NULL;
+    target = nullptr;
     if (tc) tc->initTargets();
     return 1;
 }
@@ -144,7 +144,7 @@ int DiscardRandomCost::doPay() {
     if (target) {
         source->storedCard = target->createSnapShot();
         _target->controller()->game->discardRandom(_target->controller()->game->hand, source);
-        target = NULL;
+        target = nullptr;
         if (tc) tc->initTargets();
         return 1;
     }
@@ -168,7 +168,7 @@ int DiscardCost::doPay() {
         GameObserver* game = target->owner->getObserver();
         game->receiveEvent(e);
         _target->controller()->game->putInGraveyard(_target);
-        target = NULL;
+        target = nullptr;
         if (tc) tc->initTargets();
         return 1;
     }
@@ -214,7 +214,7 @@ int ToLibraryCost::doPay() {
     if (target) {
         source->storedCard = target->createSnapShot();
         _target->controller()->game->putInLibrary(target);
-        target = NULL;
+        target = nullptr;
         if (tc) tc->initTargets();
         return 1;
     }
@@ -246,7 +246,7 @@ int MillCost::doPay() {
         _target->controller()->game->putInZone(
             _target->controller()->game->library->cards[_target->controller()->game->library->nb_cards - 1],
             _target->controller()->game->library, _target->controller()->game->graveyard);
-        target = NULL;
+        target = nullptr;
         if (tc) tc->initTargets();
         return 1;
     }
@@ -267,7 +267,7 @@ int MillExileCost::doPay() {
         _target->controller()->game->putInZone(
             _target->controller()->game->library->cards[_target->controller()->game->library->nb_cards - 1],
             _target->controller()->game->library, _target->controller()->game->exile);
-        target = NULL;
+        target = nullptr;
         if (tc) tc->initTargets();
         return 1;
     }
@@ -338,7 +338,7 @@ int TapTargetCost::isPaymentSet() {
     if (target && target->isTapped()) {
         tc->removeTarget(target);
         target->isExtraCostTarget = false;
-        target = NULL;
+        target                    = nullptr;
         return 0;
     }
     if (target) return 1;
@@ -350,7 +350,7 @@ int TapTargetCost::doPay() {
     source->storedCard = target->createSnapShot();
     if (target) {
         _target->tap();
-        target = NULL;
+        target = nullptr;
         if (tc) tc->initTargets();
         return 1;
     }
@@ -370,7 +370,7 @@ int UnTapTargetCost::isPaymentSet() {
     if (target && !target->isTapped()) {
         tc->removeTarget(target);
         target->isExtraCostTarget = false;
-        target = NULL;
+        target                    = nullptr;
         return 0;
     }
     if (target) return 1;
@@ -382,7 +382,7 @@ int UnTapTargetCost::doPay() {
     source->storedCard = target->createSnapShot();
     if (target) {
         _target->untap();
-        target = NULL;
+        target = nullptr;
         if (tc) tc->initTargets();
         return 1;
     }
@@ -402,7 +402,7 @@ int ExileTargetCost::doPay() {
     if (target) {
         source->storedCard = target->createSnapShot();
         target->controller()->game->putInExile(target);
-        target = NULL;
+        target = nullptr;
         if (tc) tc->initTargets();
         return 1;
     }
@@ -422,7 +422,7 @@ int BounceTargetCost::doPay() {
     if (target) {
         source->storedCard = target->createSnapShot();
         target->controller()->game->putInHand(target);
-        target = NULL;
+        target = nullptr;
         if (tc) tc->initTargets();
         return 1;
     }
@@ -447,7 +447,7 @@ int Ninja::isPaymentSet() {
     if (target && ((target->isAttacker() && target->isBlocked()) || target->isAttacker() < 1 ||
                    target->getObserver()->getCurrentGamePhase() != MTG_PHASE_COMBATBLOCKERS)) {
         tc->removeTarget(target);
-        target = NULL;
+        target = nullptr;
         return 0;
     }
     if (target) return 1;
@@ -457,7 +457,7 @@ int Ninja::isPaymentSet() {
 int Ninja::doPay() {
     if (target) {
         target->controller()->game->putInHand(target);
-        target = NULL;
+        target = nullptr;
         if (tc) tc->initTargets();
         return 1;
     }
@@ -483,7 +483,7 @@ int SacrificeCost::doPay() {
         WEvent* e = NEW WEventCardSacrifice(beforeCard, target);
         GameObserver* game = target->owner->getObserver();
         game->receiveEvent(e);
-        target = NULL;
+        target = nullptr;
         if (tc) tc->initTargets();
         return 1;
     }
@@ -499,7 +499,7 @@ CounterCost* CounterCost::clone() const {
     if (counter) ec->counter = NEW Counter(counter->target, counter->name.c_str(), counter->power, counter->toughness);
 
     // TODO: counter can be NULL at this point, what do we set ec->counter->nb to if it is?
-    if (ec->counter != NULL) ec->counter->nb = counter->nb;
+    if (ec->counter != nullptr) ec->counter->nb = counter->nb;
 
     return ec;
 }
@@ -542,7 +542,7 @@ int CounterCost::canPay() {
     if (tc) return 1;
     if (counter->nb >= 0) return 1;  // add counters always possible
     // otherwise, move on only if target has enough counters
-    Counter* targetCounter = NULL;
+    Counter* targetCounter = nullptr;
     if (target) {
         targetCounter = target->counters->hasCounter(counter->name.c_str(), counter->power, counter->toughness);
 
@@ -563,7 +563,7 @@ int CounterCost::doPay() {
             target->counters->addCounter(counter->name.c_str(), counter->power, counter->toughness);
         }
         if (tc) tc->initTargets();
-        target = NULL;
+        target = nullptr;
         return 1;
     }
 
@@ -574,11 +574,11 @@ int CounterCost::doPay() {
         }
         hasCounters = 0;
         if (tc) tc->initTargets();
-        target = NULL;
+        target = nullptr;
         return 1;
     }
     if (tc) tc->initTargets();
-    target = NULL;
+    target = nullptr;
     return 0;
 }
 
@@ -588,8 +588,8 @@ CounterCost::~CounterCost() { SAFE_DELETE(counter); }
 // Container
 //
 ExtraCosts::ExtraCosts() {
-    action = NULL;
-    source = NULL;
+    action = nullptr;
+    source = nullptr;
 }
 
 ExtraCosts* ExtraCosts::clone() const {
@@ -611,7 +611,7 @@ void ExtraCosts::Render() {
 int ExtraCosts::setAction(MTGAbility* _action, MTGCardInstance* _card) {
     action = _action;
     source = _card;
-    source->storedCard = NULL;
+    source->storedCard = nullptr;
     for (size_t i = 0; i < costs.size(); i++) {
         costs[i]->setSource(_card);
     }
@@ -619,9 +619,9 @@ int ExtraCosts::setAction(MTGAbility* _action, MTGCardInstance* _card) {
 }
 
 int ExtraCosts::reset() {
-    action = NULL;
-    source->storedCard = NULL;
-    source = NULL;
+    action             = nullptr;
+    source->storedCard = nullptr;
+    source             = nullptr;
     // TODO set all payments to "unset"
     return 1;
 }

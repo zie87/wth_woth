@@ -75,7 +75,7 @@ CardView::~CardView() {
     if (card) {
         const Pos* r = this;
         while (card) {
-            if (r == card->view) card->view = NULL;
+            if (r == card->view) card->view = nullptr;
             card = card->next;
         }
     }
@@ -103,7 +103,7 @@ void CardGui::Render() {
     WFont* mFont = game ? game->getResourceManager()->GetWFont(Fonts::MAIN_FONT)
                         : WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
     JRenderer* renderer = JRenderer::GetInstance();
-    TargetChooser* tc = NULL;
+    TargetChooser* tc   = nullptr;
 
     if (game) tc = game->getCurrentTargetChooser();
 

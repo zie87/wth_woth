@@ -126,7 +126,7 @@ void StackAbility::Render() {
         Targetable* t = ability->getActionTc()->getNextTarget();
         if (t) _target = t;
     }
-    Damageable* target = NULL;
+    Damageable* target = nullptr;
     if (_target != ability->source && (dynamic_cast<MTGCardInstance*>(_target) || dynamic_cast<Player*>(_target))) {
         target = (Damageable*)_target;
     }
@@ -169,8 +169,8 @@ Spell::Spell(GameObserver* observer, MTGCardInstance* _source) : Interruptible(o
     mHeight = 40;
     type = ACTION_SPELL;
     cost = NEW ManaCost();
-    cost->extraCosts = NULL;
-    tc = NULL;
+    cost->extraCosts   = nullptr;
+    tc                 = nullptr;
     from = _source->getCurrentZone();
     payResult = ManaCost::MANA_UNPAID;
     source->castMethod = Constants::NOT_CAST;
@@ -181,7 +181,7 @@ Spell::Spell(GameObserver* observer, int id, MTGCardInstance* _source, TargetCho
     : Interruptible(observer, id), tc(tc), cost(_cost), payResult(payResult) {
     if (!cost) {
         cost = NEW ManaCost();
-        cost->extraCosts = NULL;
+        cost->extraCosts = nullptr;
     }
     source = _source;
     mHeight = 40;
@@ -190,7 +190,7 @@ Spell::Spell(GameObserver* observer, int id, MTGCardInstance* _source, TargetCho
 
     _source->backupTargets.clear();
     if (tc) {
-        Targetable* t = NULL;
+        Targetable* t = nullptr;
         for (size_t i = 0; i < tc->getNbTargets(); i++) {
             t = tc->getNextTarget(t);
             _source->backupTargets.push_back(t);
@@ -275,31 +275,31 @@ int Spell::resolve() {
 }
 
 MTGCardInstance* Spell::getNextCardTarget(MTGCardInstance* previous) {
-    if (!tc) return NULL;
+    if (!tc) return nullptr;
     return tc->getNextCardTarget(previous);
 }
 Player* Spell::getNextPlayerTarget(Player* previous) {
-    if (!tc) return NULL;
+    if (!tc) return nullptr;
     return tc->getNextPlayerTarget(previous);
 }
 Damageable* Spell::getNextDamageableTarget(Damageable* previous) {
-    if (!tc) return NULL;
+    if (!tc) return nullptr;
     return tc->getNextDamageableTarget(previous);
 }
 Interruptible* Spell::getNextInterruptible(Interruptible* previous, int type) {
-    if (!tc) return NULL;
+    if (!tc) return nullptr;
     return tc->getNextInterruptible(previous, type);
 }
 Spell* Spell::getNextSpellTarget(Spell* previous) {
-    if (!tc) return NULL;
+    if (!tc) return nullptr;
     return tc->getNextSpellTarget(previous);
 }
 Damage* Spell::getNextDamageTarget(Damage* previous) {
-    if (!tc) return NULL;
+    if (!tc) return nullptr;
     return tc->getNextDamageTarget(previous);
 }
 Targetable* Spell::getNextTarget(Targetable* previous) {
-    if (!tc) return NULL;
+    if (!tc) return nullptr;
     return tc->getNextTarget(previous);
 }
 
@@ -462,7 +462,7 @@ int ActionStack::addDamage(MTGCardInstance* _source, Damageable* _target, int _d
 }
 
 int ActionStack::AddNextGamePhase() {
-    if (getNext(NULL, NOT_RESOLVED)) return 0;
+    if (getNext(nullptr, NOT_RESOLVED)) return 0;
 
     NextGamePhase* next = NEW NextGamePhase(observer, mObjects.size());
     addAction(next);
@@ -472,7 +472,7 @@ int ActionStack::AddNextGamePhase() {
 }
 
 int ActionStack::AddNextCombatStep() {
-    if (getNext(NULL, NOT_RESOLVED)) return 0;
+    if (getNext(nullptr, NOT_RESOLVED)) return 0;
 
     NextGamePhase* next = NEW NextGamePhase(observer, mObjects.size());
     addAction(next);
@@ -480,7 +480,7 @@ int ActionStack::AddNextCombatStep() {
 }
 
 int ActionStack::setIsInterrupting(Player* player, bool log) {
-    askIfWishesToInterrupt = NULL;
+    askIfWishesToInterrupt = nullptr;
 
     if (!gModRules.game.canInterrupt()) {
         cancelInterruptOffer(DONT_INTERRUPT, log);
@@ -515,7 +515,7 @@ int ActionStack::addAction(Interruptible* action) {
 
 Spell* ActionStack::addSpell(MTGCardInstance* _source, TargetChooser* tc, ManaCost* mana, int payResult, int storm) {
     if (storm > 0) {
-        mana = NULL;
+        mana = nullptr;
     }
     Spell* spell = NEW Spell(observer, mObjects.size(), _source, tc, mana, payResult);
     addAction(spell);
@@ -527,13 +527,13 @@ Spell* ActionStack::addSpell(MTGCardInstance* _source, TargetChooser* tc, ManaCo
 
 Interruptible* ActionStack::getAt(int id) {
     if (id < 0) id = mObjects.size() + id;
-    if (id > (int)(mObjects.size()) - 1 || id < 0) return NULL;
+    if (id > (int)(mObjects.size()) - 1 || id < 0) return nullptr;
     return (Interruptible*)mObjects[id];
 }
 
-ActionStack::ActionStack(GameObserver* game) : GuiLayer(game), currentTutorial(0) {
+ActionStack::ActionStack(GameObserver* game) : GuiLayer(game), currentTutorial(nullptr) {
     for (int i = 0; i < 2; i++) interruptDecision[i] = NOT_DECIDED;
-    askIfWishesToInterrupt = NULL;
+    askIfWishesToInterrupt = nullptr;
     timer = -1;
     currentState = -1;
     mode = ACTIONSTACK_STANDARD;
@@ -578,7 +578,7 @@ int ActionStack::resolve() {
         action->state = RESOLVED_NOK;
     }
     if (action->type == ACTION_DAMAGE) ((Damage*)action)->target->afterDamage();
-    if (!getNext(NULL, NOT_RESOLVED)) {
+    if (!getNext(nullptr, NOT_RESOLVED)) {
         for (int i = 0; i < 2; i++) {
             if (interruptDecision[i] != 2) interruptDecision[i] = NOT_DECIDED;
         }
@@ -587,13 +587,13 @@ int ActionStack::resolve() {
             if (interruptDecision[i] != DONT_INTERRUPT_ALL) interruptDecision[i] = NOT_DECIDED;
         }
     }
-    lastActionController = NULL;
+    lastActionController = nullptr;
     return 1;
 }
 
 Interruptible* ActionStack::getPrevious(Interruptible* next, int type, int state, int display) {
     int n = getPreviousIndex(next, type, state, display);
-    if (n == -1) return NULL;
+    if (n == -1) return nullptr;
     return ((Interruptible*)mObjects[n]);
 }
 
@@ -608,7 +608,7 @@ int ActionStack::getPreviousIndex(Interruptible* next, int type, int state, int 
         }
         if (current == next) found = 1;
     }
-    if (!found) return getPreviousIndex(NULL, type, state, display);
+    if (!found) return getPreviousIndex(nullptr, type, state, display);
     return -1;
 }
 
@@ -625,19 +625,19 @@ int ActionStack::count(int type, int state, int display) {
 }
 
 Interruptible* ActionStack::getActionElementFromCard(MTGCardInstance* card) {
-    if (!card) return 0;
+    if (!card) return nullptr;
     for (size_t i = 0; i < mObjects.size(); i++) {
         Interruptible* current = (Interruptible*)mObjects[i];
         if (current->source == card) {
             return current;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 Interruptible* ActionStack::getNext(Interruptible* previous, int type, int state, int display) {
     int n = getNextIndex(previous, type, state, display);
-    if (n == -1) return NULL;
+    if (n == -1) return nullptr;
     return ((Interruptible*)mObjects[n]);
 }
 
@@ -652,7 +652,7 @@ int ActionStack::getNextIndex(Interruptible* previous, int type, int state, int 
         }
         if (current == previous) found = 1;
     }
-    if (!found) return getNextIndex(NULL, type, state, display);
+    if (!found) return getNextIndex(nullptr, type, state, display);
     return -1;
 }
 
@@ -661,7 +661,7 @@ Interruptible* ActionStack::getLatest(int state) {
         Interruptible* action = ((Interruptible*)mObjects[i]);
         if (action->state == state) return action;
     }
-    return NULL;
+    return nullptr;
 }
 
 int ActionStack::receiveEventPlus(WEvent* event) {
@@ -679,7 +679,7 @@ void ActionStack::Update(float dt) {
     // No need for Tuto when no human in game
     if (getCurrentTutorial() && (observer->players[0]->isHuman() || observer->players[1]->isHuman())) return;
 
-    askIfWishesToInterrupt = NULL;
+    askIfWishesToInterrupt = nullptr;
     // modal = 0;
 
     TargetChooser* tc = observer->getCurrentTargetChooser();
@@ -772,8 +772,8 @@ void ActionStack::Update(float dt) {
 void ActionStack::cancelInterruptOffer(InterruptDecision cancelMode, bool log) {
     int playerId = (observer->isInterrupting == observer->players[1]) ? 1 : 0;
     interruptDecision[playerId] = cancelMode;
-    askIfWishesToInterrupt = NULL;
-    observer->isInterrupting = NULL;
+    askIfWishesToInterrupt      = nullptr;
+    observer->isInterrupting    = nullptr;
     timer = -1;
     if (log) {
         std::stringstream stream;
@@ -785,7 +785,7 @@ void ActionStack::cancelInterruptOffer(InterruptDecision cancelMode, bool log) {
 void ActionStack::endOfInterruption(bool log) {
     int playerId = (observer->isInterrupting == observer->players[1]) ? 1 : 0;
     interruptDecision[playerId] = NOT_DECIDED;
-    observer->isInterrupting = NULL;
+    observer->isInterrupting    = nullptr;
     if (log) observer->logAction(playerId, "endinterruption");
 }
 
@@ -1009,7 +1009,7 @@ void ActionStack::Render() {
 
         for (size_t i = 0; i < mObjects.size(); i++) {
             Interruptible* current = (Interruptible*)mObjects[i];
-            if (mObjects[i] != NULL && current->display) {
+            if (mObjects[i] != nullptr && current->display) {
                 ((Interruptible*)mObjects[i])->x = x0 + 5;
                 if (i != mObjects.size() - 1) {
                     ((Interruptible*)mObjects[i])->y = currenty;

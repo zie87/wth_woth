@@ -19,9 +19,9 @@ SUPPORT_OBJECT_ANALYTICS(MTGCardInstance)
 MTGCardInstance MTGCardInstance::AnyCard = MTGCardInstance();
 MTGCardInstance MTGCardInstance::NoCard = MTGCardInstance();
 
-MTGCardInstance::MTGCardInstance() : CardPrimitive(), MTGCard(), Damageable(0, 0), view(NULL) { initMTGCI(); }
+MTGCardInstance::MTGCardInstance() : CardPrimitive(), MTGCard(), Damageable(nullptr, 0), view(nullptr) { initMTGCI(); }
 MTGCardInstance::MTGCardInstance(MTGCard* card, MTGPlayerCards* arg_belongs_to)
-    : CardPrimitive(card->data), MTGCard(card), Damageable(0, card->data->getToughness()), view(NULL) {
+    : CardPrimitive(card->data), MTGCard(card), Damageable(nullptr, card->data->getToughness()), view(nullptr) {
     if (arg_belongs_to)
         if (arg_belongs_to->owner) observer = arg_belongs_to->owner->getObserver();
 
@@ -32,11 +32,11 @@ MTGCardInstance::MTGCardInstance(MTGCard* card, MTGPlayerCards* arg_belongs_to)
     origpower = power;
     origtoughness = toughness;
     belongs_to = arg_belongs_to;
-    owner = NULL;
+    owner         = nullptr;
     if (arg_belongs_to) owner = arg_belongs_to->library->owner;
     lastController = owner;
-    defenser = NULL;
-    banding = NULL;
+    defenser       = nullptr;
+    banding        = nullptr;
     life = toughness;
     preventable = 0;
     thatmuch = 0;
@@ -46,7 +46,7 @@ MTGCardInstance::MTGCardInstance(MTGCard* card, MTGPlayerCards* arg_belongs_to)
 
 MTGCardInstance* MTGCardInstance::createSnapShot() {
     MTGCardInstance* snapShot = NEW MTGCardInstance(*this);
-    snapShot->previous = NULL;
+    snapShot->previous        = nullptr;
     snapShot->counters = NEW Counters(snapShot);
     controller()->game->garbage->addCard(snapShot);
     return snapShot;
@@ -94,7 +94,7 @@ void MTGCardInstance::copy(MTGCardInstance* card) {
 
 MTGCardInstance::~MTGCardInstance() {
     SAFE_DELETE(counters);
-    if (previous != NULL) {
+    if (previous != nullptr) {
         // DebugTrace("MTGCardInstance::~MTGCardInstance():  deleting " << ToHex(previous));
         SAFE_DELETE(previous);
     }
@@ -111,12 +111,12 @@ int MTGCardInstance::init() {
 
 void MTGCardInstance::initMTGCI() {
     sample = "";
-    model = NULL;
+    model                             = nullptr;
     isToken = false;
     lifeOrig = 0;
     doDamageTest = 1;
     skipDamageTestOnce = false;
-    belongs_to = NULL;
+    belongs_to                        = nullptr;
     tapped = 0;
     untapping = 0;
     frozen = 0;
@@ -152,9 +152,9 @@ void MTGCardInstance::initMTGCI() {
     chooseacolor = -1;
     chooseasubtype = "";
     coinSide = -1;
-    isAttacking = NULL;
-    storedCard = NULL;
-    storedSourceCard = NULL;
+    isAttacking                       = nullptr;
+    storedCard                        = nullptr;
+    storedSourceCard                  = nullptr;
 
     for (int i = 0; i < ManaCost::MANA_PAID_WITH_RETRACE + 1; i++) alternateCostPaid[i] = 0;
 
@@ -164,19 +164,19 @@ void MTGCardInstance::initMTGCI() {
     preventable = 0;
     thatmuch = 0;
     flanked = 0;
-    target = NULL;
-    playerTarget = NULL;
+    target             = nullptr;
+    playerTarget       = nullptr;
     type_as_damageable = DAMAGEABLE_MTGCARDINSTANCE;
-    banding = NULL;
-    owner = NULL;
+    banding            = nullptr;
+    owner              = nullptr;
     counters = NEW Counters(this);
-    previousZone = NULL;
-    previous = NULL;
-    next = NULL;
-    lastController = NULL;
+    previousZone       = nullptr;
+    previous           = nullptr;
+    next               = nullptr;
+    lastController     = nullptr;
     regenerateTokens = 0;
     blocked = false;
-    currentZone = NULL;
+    currentZone        = nullptr;
     cardsAbilities = vector<MTGAbility*>();
     data = this;  // an MTGCardInstance point to itself for data, allows to update it without killing the underlying
                   // database item
@@ -389,8 +389,8 @@ int MTGCardInstance::triggerRegenerate() {
 
 int MTGCardInstance::initAttackersDefensers() {
     setAttacker(0);
-    setDefenser(NULL);
-    banding = NULL;
+    setDefenser(nullptr);
+    banding = nullptr;
     blockers.clear();
     blocked = 0;
     didattacked = 0;
@@ -570,7 +570,7 @@ MTGCardInstance* MTGCardInstance::getNextPartner() {
             return bandingPartner;
         bandingPartner = inplay->getNextAttacker(bandingPartner);
     }
-    return NULL;
+    return nullptr;
 }
 
 int MTGCardInstance::DangerRanking() {
@@ -595,8 +595,8 @@ int MTGCardInstance::DangerRanking() {
 }
 
 int MTGCardInstance::setAttacker(int value) {
-    Targetable* previousTarget = NULL;
-    Targetable* target = NULL;
+    Targetable* previousTarget = nullptr;
+    Targetable* target         = nullptr;
     Player* p = controller()->opponent();
     if (value) target = p;
     if (attacker) previousTarget = p;
@@ -617,7 +617,7 @@ int MTGCardInstance::toggleAttacker() {
     } else {
         // untap();
         setAttacker(0);
-        isAttacking = NULL;
+        isAttacking = nullptr;
         return 1;
     }
     return 0;
@@ -713,7 +713,7 @@ MTGCardInstance* MTGCardInstance::getNextOpponent(MTGCardInstance* previous) {
             }
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 int MTGCardInstance::setDefenser(MTGCardInstance* opponent) {
@@ -723,7 +723,7 @@ int MTGCardInstance::setDefenser(MTGCardInstance* opponent) {
             defenser->removeBlocker(this);
         }
     }
-    WEvent* e = NULL;
+    WEvent* e = nullptr;
     if (defenser != opponent) e = NEW WEventCreatureBlocker(this, defenser, opponent);
     defenser = opponent;
     if (defenser) defenser->addBlocker(this);
@@ -738,7 +738,7 @@ int MTGCardInstance::toggleDefenser(MTGCardInstance* opponent) {
             didblocked = 1;
             if (opponent && opponent->controller()->isAI() &&
                 opponent->controller()->playMode != Player::MODE_TEST_SUITE) {
-                if (opponent->view != NULL) {
+                if (opponent->view != nullptr) {
                     // todo: quote wololo "change this into a cool blinking effects when opposing creature has cursor
                     // focus."
                     opponent->view->actZ += .8f;
@@ -761,7 +761,7 @@ bool MTGCardInstance::matchesCastFilter(int castFilter) {
 };
 
 int MTGCardInstance::addProtection(TargetChooser* tc) {
-    tc->targetter = NULL;
+    tc->targetter = nullptr;
     protections.push_back(tc);
     return protections.size();
 }
@@ -791,7 +791,7 @@ int MTGCardInstance::protectedAgainst(MTGCardInstance* card) {
 }
 
 int MTGCardInstance::addCantBeTarget(TargetChooser* tc) {
-    tc->targetter = NULL;
+    tc->targetter = nullptr;
     canttarget.push_back(tc);
     return canttarget.size();
 }

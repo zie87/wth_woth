@@ -40,9 +40,9 @@ void DrawGlyph(JQuad* inQuad, int inGlyph, float inY, float inAngle, unsigned in
 }  // namespace
 
 GuiPhaseBar::GuiPhaseBar(GameObserver* observer)
-    : GuiLayer(observer), PlayGuiObject(0, 0, 106, 0, false), phase(NULL), angle(0.0f), zoomFactor(ICONSCALE) {
+    : GuiLayer(observer), PlayGuiObject(0, 0, 106, 0, false), phase(nullptr), angle(0.0f), zoomFactor(ICONSCALE) {
     JQuadPtr quad = WResourceManager::Instance()->GetQuad("phasebar");
-    if (quad.get() != NULL) {
+    if (quad.get() != nullptr) {
         quad->mHeight = kHeight;
         quad->mWidth = kWidth;
     } else

@@ -16,7 +16,7 @@
 // NULL is sent in place of a MTGDeck since there is no way to create a MTGDeck without a proper deck file.
 // TestSuiteAI will be responsible for managing its own deck state.
 TestSuiteAI::TestSuiteAI(TestSuiteGame* tsGame, int playerId)
-    : AIPlayerBaka(tsGame->observer, "testsuite", "testsuite", "baka.jpg", NULL) {
+    : AIPlayerBaka(tsGame->observer, "testsuite", "testsuite", "baka.jpg", nullptr) {
     SAFE_DELETE(game);  // game might have been set in the parent with default values
     game = tsGame->buildDeck(this, playerId);
     game->setOwner(this);
@@ -40,25 +40,25 @@ MTGCardInstance* TestSuiteAI::getCard(string action) {
             MTGGameZone* zone = zones[j];
             for (int k = 0; k < zone->nb_cards; k++) {
                 MTGCardInstance* card = zone->cards[k];
-                if (!card) return NULL;
+                if (!card) return nullptr;
                 string name = card->getLCName();
                 if (name.compare(action) == 0) return card;
             }
         }
     }
     WGE_LOG_ERROR("Can't find card: {}", action);
-    return NULL;
+    return nullptr;
 }
 
 Interruptible* TestSuiteGame::getActionByMTGId(int mtgid) {
     ActionStack* as = observer->mLayers->stackLayer();
-    Interruptible* action = NULL;
+    Interruptible* action = nullptr;
     while ((action = as->getNext(action, 0, 0, 1))) {
         if (action->source && action->source->getMTGId() == mtgid) {
             return action;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 int TestSuiteAI::displayStack() {
@@ -67,7 +67,7 @@ int TestSuiteAI::displayStack() {
 }
 
 int TestSuiteAI::Act(float dt) {
-    observer->setLoser(NULL);  // Prevent draw rule from losing the game
+    observer->setLoser(nullptr);  // Prevent draw rule from losing the game
 
     // Last bits of initialization require to be done here, after the first "update" call of the game
 
@@ -173,10 +173,10 @@ int TestSuiteAI::Act(float dt) {
         Player* p = observer->players[1];
         size_t start = action.find("p1");
         if (start != string::npos) p = observer->players[0];
-        observer->cardClick(NULL, p);
+        observer->cardClick(nullptr, p);
     } else {
         int mtgid = Rules::getMTGId(action);
-        Interruptible* toInterrupt = NULL;
+        Interruptible* toInterrupt = nullptr;
         if (mtgid) {
             WGE_LOG_TRACE("TESTSUITE CARD ID: {}", mtgid);
             toInterrupt = suite->getActionByMTGId(mtgid);
@@ -323,10 +323,11 @@ void TestSuiteGame::assertGame() {
                 error++;
             }
             for (size_t k = 0; k < (size_t)endstateZones[j]->nb_cards; k++) {
-                MTGCardInstance* cardToCheck = (k < endstateZones[j]->cards.size()) ? endstateZones[j]->cards[k] : 0;
+                MTGCardInstance* cardToCheck =
+                    (k < endstateZones[j]->cards.size()) ? endstateZones[j]->cards[k] : nullptr;
                 if (cardToCheck) {  // Can be NULL if used "*" in the testcase.
                     MTGCardInstance* card = Rules::getCardByMTGId(observer, cardToCheck->getId());
-                    if (card != 0 && !zone->hasCard(card)) {
+                    if (card != nullptr && !zone->hasCard(card)) {
                         sprintf(result, "<span class=\"error\">==Card ID not the same. Didn't find %i</span><br />",
                                 card->getId());
                         Log(result);
@@ -367,10 +368,10 @@ TestSuite::~TestSuite() {
         mWorkerThread.pop_back();
     }
 
-    observer = 0;
+    observer = nullptr;
 }
 
-TestSuite::TestSuite(const char* filename) : TestSuiteGame(0), mRules(0), mProcessing(false) {
+TestSuite::TestSuite(const char* filename) : TestSuiteGame(nullptr), mRules(nullptr), mProcessing(false) {
     timerLimit = 0;
     testsuite = this;
 
@@ -433,7 +434,7 @@ int TestSuite::loadNext() {
     if (filename == "") {
         // we let GameStateDuel delete the latest gameObserver.
         mProcessing = false;
-        observer = 0;
+        observer    = nullptr;
         return 0;
     }
 
@@ -476,7 +477,7 @@ void TestSuiteState::cleanup(TestSuiteGame* tsGame) {
 
 void TestSuite::cleanup() {
     currentAction = 0;
-    observer = 0;
+    observer      = nullptr;
     initState.cleanup(this);
     endState.cleanup(this);
     actions.cleanup();
@@ -635,7 +636,7 @@ TestSuiteGame::TestSuiteGame(TestSuite* testsuite)
       gameType(GAME_TYPE_CLASSIC),
       timerLimit(0),
       currentAction(0),
-      observer(0),
+      observer(nullptr),
       testsuite(testsuite) {}
 
 TestSuiteGame::TestSuiteGame(TestSuite* testsuite, string _filename)
@@ -644,7 +645,7 @@ TestSuiteGame::TestSuiteGame(TestSuite* testsuite, string _filename)
       gameType(GAME_TYPE_CLASSIC),
       timerLimit(3),
       currentAction(0),
-      observer(0),
+      observer(nullptr),
       testsuite(testsuite) {
     filename = _filename;
     observer = new GameObserver();
@@ -713,7 +714,7 @@ void TestSuiteGame::initGame() {
 MTGPlayerCards* TestSuiteGame::buildDeck(Player* player, int playerId) {
     int list[100];
     int nbcards = 0;
-    MTGPlayerCards* deck = NULL;
+    MTGPlayerCards* deck = nullptr;
 
     if (initState.players.size() > (size_t)playerId) {
         MTGGameZone* loadedPlayerZones[] = {

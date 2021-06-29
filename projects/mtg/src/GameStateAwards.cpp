@@ -43,13 +43,13 @@ void GameStateAwards::Start() {
     mState = STATE_LISTVIEW;
     options.checkProfile();
 
-    menu = NULL;
+    menu   = nullptr;
     saveMe = options.newAward();
 
     listview = NEW WGuiList("Listview");
     listview->setX(210);
     listview->setWidth(SCREEN_WIDTH - 220);
-    detailview = NULL;
+    detailview = nullptr;
     WGuiAward* aw;
     WGuiButton* btn;
 
@@ -114,8 +114,8 @@ void GameStateAwards::Start() {
     wgh->mFlags = WGuiItem::NO_TRANSLATE;
 
     listview->Entering(JGE_BTN_NONE);
-    detailview = NULL;
-    setSrc = NULL;
+    detailview = nullptr;
+    setSrc     = nullptr;
     showMenu = false;
 }
 
@@ -237,28 +237,28 @@ bool GameStateAwards::enterStats(int option) {
         int* counts = (int*)calloc(setlist.size(), sizeof(int));
         int setid = -1;
         int dupes = 0;
-        MTGCard* many = NULL;
-        MTGCard* costly = NULL;
-        MTGCard* strong = NULL;
-        MTGCard* tough = NULL;
+        MTGCard* many   = nullptr;
+        MTGCard* costly = nullptr;
+        MTGCard* strong = nullptr;
+        MTGCard* tough  = nullptr;
 
         for (int t = 0; t < ddw->Size(); t++) {
             MTGCard* c = ddw->getCard(t);
             if (!c) continue;
             int count = ddw->count(c);
-            if (!c->data->isLand() && (many == NULL || count > dupes)) {
+            if (!c->data->isLand() && (many == nullptr || count > dupes)) {
                 many = c;
                 dupes = count;
             }
             counts[c->setId] += count;
-            if (costly == NULL ||
+            if (costly == nullptr ||
                 c->data->getManaCost()->getConvertedCost() > costly->data->getManaCost()->getConvertedCost())
                 costly = c;
 
-            if (c->data->isCreature() && (strong == NULL || c->data->getPower() > strong->data->getPower()))
+            if (c->data->isCreature() && (strong == nullptr || c->data->getPower() > strong->data->getPower()))
                 strong = c;
 
-            if (c->data->isCreature() && (tough == NULL || c->data->getToughness() > tough->data->getToughness()))
+            if (c->data->isCreature() && (tough == nullptr || c->data->getToughness() > tough->data->getToughness()))
                 tough = c;
         }
         for (int i = 0; i < setlist.size(); i++) {

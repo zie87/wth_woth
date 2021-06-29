@@ -30,10 +30,10 @@ using namespace std;
 // Static variables initialization
 //////////////////////////////////////////////////////////////////////
 
-filesystem* izfstream::pDefaultFS = NULL;
+filesystem* izfstream::pDefaultFS = nullptr;
 string filesystem::CurrentZipName = "";
 ifstream filesystem::CurrentZipFile;
-filesystem* filesystem::pCurrentFS = NULL;
+filesystem* filesystem::pCurrentFS = nullptr;
 std::vector<filesystem::pooledBuffer*> filesystem::m_Buffers;
 
 static const int STORED = 0;
@@ -102,7 +102,7 @@ zbuffer* filesystem::getValidBuffer(const std::string& filename, const std::stri
     }
 
     // No possiblility to open more files for now
-    if (m_Buffers.size() > 3) return NULL;
+    if (m_Buffers.size() > 3) return nullptr;
 
     // create a new buffer object, add it to the pool, and return that
     pooledBuffer* pb = new pooledBuffer(filename, externalFilename);
@@ -132,7 +132,7 @@ void filesystem::unuse(izfstream& File) {
     File.setstate(std::ios::badbit);
 
     if (!File.Zipped()) {
-        delete (File.rdbuf(NULL));
+        delete (File.rdbuf(nullptr));
     } else {
         zbuffer* buffer = static_cast<zbuffer*>(File.rdbuf());
         if (buffer) buffer->unuse();
@@ -178,7 +178,7 @@ void filesystem::Open(izfstream& File, const char* Filename) {
                 if ((pCurrentFS != this) || (CurrentZipName.compare(ZipPath) != 0)) {
                     CurrentZipFile.close();
                     CurrentZipName = "";
-                    pCurrentFS = NULL;
+                    pCurrentFS     = nullptr;
                 }
             }
             if (!CurrentZipName.size()) {
@@ -190,7 +190,7 @@ void filesystem::Open(izfstream& File, const char* Filename) {
 
             if (!CurrentZipFile) {
                 CurrentZipName = "";
-                pCurrentFS = NULL;
+                pCurrentFS     = nullptr;
                 return;
             }
 

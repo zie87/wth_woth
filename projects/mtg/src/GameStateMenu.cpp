@@ -54,13 +54,13 @@ enum ENUM_MENU_STATE_MINOR {
 };
 
 GameStateMenu::GameStateMenu(GameApp* parent) : GameState(parent, "menu") {
-    mGuiController = NULL;
-    subMenuController = NULL;
-    gameTypeMenu = NULL;
+    mGuiController    = nullptr;
+    subMenuController = nullptr;
+    gameTypeMenu      = nullptr;
     // bgMusic = NULL;
     timeIndex = 0;
     mVolume = 0;
-    scroller = NULL;
+    scroller              = nullptr;
     langChoices = false;
     primitivesLoadCounter = -1;
 }
@@ -68,7 +68,7 @@ GameStateMenu::GameStateMenu(GameApp* parent) : GameState(parent, "menu") {
 GameStateMenu::~GameStateMenu() {}
 
 void GameStateMenu::Create() {
-    mGuiController = NULL;
+    mGuiController = nullptr;
     mReadConf = 0;
 
     // load all the icon images. Menu icons are managed, so we can do this here.
@@ -99,7 +99,7 @@ void GameStateMenu::Create() {
     }
     scroller = NEW TextScroller(Fonts::MAIN_FONT, SCREEN_WIDTH / 2 - 90, SCREEN_HEIGHT - 17, 180);
     scrollerSet = 0;
-    splashTex = NULL;
+    splashTex   = nullptr;
 
     JFileSystem::GetInstance()->scanfolder("sets/", setFolders);
     mCurrentSetFolderIndex = 0;
@@ -115,7 +115,7 @@ void GameStateMenu::Destroy() {
 
 void GameStateMenu::Start() {
     JRenderer::GetInstance()->EnableVSync(true);
-    subMenuController = NULL;
+    subMenuController = nullptr;
     SAFE_DELETE(mGuiController);
 
     GameApp::playMusic("Track0.mp3");
@@ -438,7 +438,7 @@ void GameStateMenu::Update(float dt) {
 
             // Release splash texture
             WResourceManager::Instance()->Release(splashTex);
-            splashTex = NULL;
+            splashTex = nullptr;
 
             // check for deleted collection / first-timer
             if (JFileSystem::GetInstance()->FileExists(options.profileFile(PLAYER_COLLECTION))) {
@@ -748,7 +748,7 @@ void GameStateMenu::ButtonPressed(int controllerId, int controlId) {
             break;
         case SUBMENUITEM_CANCEL:
         case kInfoMenuID:  // Triangle button
-            if (subMenuController != NULL) {
+            if (subMenuController != nullptr) {
                 subMenuController->Close();
             }
 #ifdef NETWORK_SUPPORT

@@ -31,7 +31,7 @@ necessary but provides a nice way to distinguish The content that users should n
 
 #include <dirent.h>
 
-JFileSystem* JFileSystem::mInstance = NULL;
+JFileSystem* JFileSystem::mInstance = nullptr;
 
 JZipCache::JZipCache() {}
 
@@ -142,19 +142,19 @@ JFileSystem::JFileSystem(const std::string& _userPath, const std::string& _syste
     mUserFS = new zfs::filesystem(userPath.c_str());
     mSystemFS = (mSystemFSPath.size() && (mSystemFSPath.compare(mUserFSPath) != 0))
                     ? new zfs::filesystem(systemPath.c_str())
-                    : NULL;
+                    : nullptr;
 
     mZipAvailable = false;
     mZipCachedElementsCount = 0;
-    mPassword = NULL;
+    mPassword               = nullptr;
     mFileSize = 0;
-    mCurrentFileInZip = NULL;
+    mCurrentFileInZip       = nullptr;
 };
 
 void JFileSystem::Destroy() {
     if (mInstance) {
         delete mInstance;
-        mInstance = NULL;
+        mInstance = nullptr;
     }
 }
 
@@ -221,7 +221,7 @@ void JFileSystem::DetachZipFile() {
     if (mZipFile) {
         mZipFile.close();
     }
-    mCurrentFileInZip = NULL;
+    mCurrentFileInZip = nullptr;
     mZipAvailable = false;
 }
 
@@ -267,7 +267,7 @@ bool JFileSystem::openForWrite(std::ofstream& File, const std::string& FilePath,
 }
 
 bool JFileSystem::OpenFile(const std::string& filename) {
-    mCurrentFileInZip = NULL;
+    mCurrentFileInZip = nullptr;
 
     if (!mZipAvailable || !mZipFile) return openForRead(mFile, filename);
 
@@ -293,7 +293,7 @@ bool JFileSystem::OpenFile(const std::string& filename) {
 
 void JFileSystem::CloseFile() {
     if (mZipAvailable && mZipFile) {
-        mCurrentFileInZip = NULL;
+        mCurrentFileInZip = nullptr;
     }
 
     if (mFile) mFile.close();

@@ -81,15 +81,15 @@ int GameStateDuel::selectedAIDeckId = 0;
 
 GameStateDuel::GameStateDuel(GameApp* parent) : GameState(parent, "duel") {
     premadeDeck = false;
-    game = NULL;
-    deckmenu = NULL;
-    opponentMenu = NULL;
-    menu = NULL;
-    popupScreen = NULL;
+    game         = nullptr;
+    deckmenu     = nullptr;
+    opponentMenu = nullptr;
+    menu         = nullptr;
+    popupScreen  = nullptr;
     mGamePhase = DUEL_STATE_UNSET;
 
 #ifdef TESTSUITE
-    testSuite = NULL;
+    testSuite = nullptr;
 #endif
 
 #ifdef AI_CHANGE_TESTING
@@ -110,7 +110,7 @@ GameStateDuel::GameStateDuel(GameApp* parent) : GameState(parent, "duel") {
     }
 #endif
 
-    credits = NULL;
+    credits = nullptr;
 
 #ifdef NETWORK_SUPPORT
     RegisterNetworkPlayers();
@@ -134,7 +134,7 @@ void GameStateDuel::Start() {
     setGamePhase(DUEL_STATE_CHOOSE_DECK1);
     credits = NEW Credits();
 
-    menu = NULL;
+    menu = nullptr;
 
     int decksneeded = 0;
     for (int i = 0; i < 2; i++) {
@@ -185,7 +185,7 @@ void GameStateDuel::Start() {
 }
 
 void GameStateDuel::initRand(unsigned int seed) {
-    if (!seed) seed = static_cast<unsigned int>(time(0));
+    if (!seed) seed = static_cast<unsigned int>(time(nullptr));
     srand(seed);
 }
 
@@ -237,7 +237,7 @@ bool GameStateDuel::MusicExist(string FileName) {
 }
 
 void GameStateDuel::ConstructOpponentMenu() {
-    if (opponentMenu == NULL) {
+    if (opponentMenu == nullptr) {
         opponentMenu = NEW DeckMenu(DUEL_MENU_CHOOSE_OPPONENT, this, Fonts::OPTION_FONT, "Choose Opponent",
                                     GameStateDuel::selectedAIDeckId, true);
         opponentMenu->Add(MENUITEM_RANDOM_AI, "Random");
@@ -782,7 +782,7 @@ void GameStateDuel::ButtonPressed(int controllerId, int controlId) {
             {
                 setGamePhase(DUEL_STATE_CHOOSE_DECK1_TO_2);
             }
-            playerDeck = NULL;
+            playerDeck = nullptr;
         } else {
             game->loadPlayer(1, mParent->players[1], controlId, premadeDeck);
             deckmenu->Close();

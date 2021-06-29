@@ -30,7 +30,7 @@ DeckMetaData::DeckMetaData(const string& filename, bool isAI)
 
 void DeckMetaData::LoadDeck() {
     if (!mDeckLoaded) {
-        MTGDeck deck(mFilename.c_str(), NULL, 1);
+        MTGDeck deck(mFilename.c_str(), nullptr, 1);
         mName = trim(deck.meta_name);
         mDescription = trim(deck.meta_desc);
         mDeckId = atoi((mFilename.substr(mFilename.find("deck") + 4, mFilename.find(".txt"))).c_str());

@@ -38,13 +38,13 @@ ThisDescriptor* ThisDescriptorFactory::createThisDescriptor(GameObserver* observ
     if (found != string::npos)
         s.erase(found + 1);
     else
-        return NULL;
+        return nullptr;
 
     found = s.find_first_not_of(whitespaces);
     if (found != string::npos)
         s.erase(0, found);
     else
-        return NULL;
+        return nullptr;
 
     // set comparison mode
     // equal, greater, and less must remain above the others, otherwise the others may never be used.
@@ -106,7 +106,7 @@ ThisDescriptor* ThisDescriptorFactory::createThisDescriptor(GameObserver* observ
         size_t end = s.find("}");
         string counterString = s.substr(start + 1, end - start - 1);
         AbilityFactory abf(observer);
-        Counter* counter = abf.parseCounter(counterString, NULL);
+        Counter* counter = abf.parseCounter(counterString, nullptr);
         if (counter) {
             if (criterionFound) counter->nb = criterion;
             ThisCounter* td = NEW ThisCounter(counter);
@@ -115,7 +115,7 @@ ThisDescriptor* ThisDescriptorFactory::createThisDescriptor(GameObserver* observ
                 return td;
             }
         }
-        return NULL;
+        return nullptr;
     }
 
     // any counter
@@ -126,7 +126,7 @@ ThisDescriptor* ThisDescriptorFactory::createThisDescriptor(GameObserver* observ
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
 
     // equips and auras
@@ -137,7 +137,7 @@ ThisDescriptor* ThisDescriptorFactory::createThisDescriptor(GameObserver* observ
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
     found = s.find("auras");
     if (found != string::npos) {
@@ -146,7 +146,7 @@ ThisDescriptor* ThisDescriptorFactory::createThisDescriptor(GameObserver* observ
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
     // opponent damage count
     found = s.find("opponentdamagecount");
@@ -156,7 +156,7 @@ ThisDescriptor* ThisDescriptorFactory::createThisDescriptor(GameObserver* observ
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
     // untapped status
     found = s.find("untapped");
@@ -166,7 +166,7 @@ ThisDescriptor* ThisDescriptorFactory::createThisDescriptor(GameObserver* observ
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
     found = s.find("tapped");
     if (found != string::npos) {
@@ -175,7 +175,7 @@ ThisDescriptor* ThisDescriptorFactory::createThisDescriptor(GameObserver* observ
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
     // whenever this creature attacks do effect
     found = s.find("attacking");
@@ -185,7 +185,7 @@ ThisDescriptor* ThisDescriptorFactory::createThisDescriptor(GameObserver* observ
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
     // whenever this creature blocks do effect
     found = s.find("blocking");
@@ -195,7 +195,7 @@ ThisDescriptor* ThisDescriptorFactory::createThisDescriptor(GameObserver* observ
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
 
     // whenever this creature attacks do effect
@@ -206,7 +206,7 @@ ThisDescriptor* ThisDescriptorFactory::createThisDescriptor(GameObserver* observ
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
 
     // this creature was dealt damage this turn
@@ -217,7 +217,7 @@ ThisDescriptor* ThisDescriptorFactory::createThisDescriptor(GameObserver* observ
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
 
     // this creature has 2 of the same weapons in its children vector
@@ -228,7 +228,7 @@ ThisDescriptor* ThisDescriptorFactory::createThisDescriptor(GameObserver* observ
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
 
     // controller life
@@ -239,7 +239,7 @@ ThisDescriptor* ThisDescriptorFactory::createThisDescriptor(GameObserver* observ
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
 
     // controller life
@@ -250,7 +250,7 @@ ThisDescriptor* ThisDescriptorFactory::createThisDescriptor(GameObserver* observ
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
 
     // power
@@ -261,7 +261,7 @@ ThisDescriptor* ThisDescriptorFactory::createThisDescriptor(GameObserver* observ
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
 
     // toughness
@@ -272,7 +272,7 @@ ThisDescriptor* ThisDescriptorFactory::createThisDescriptor(GameObserver* observ
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
 
     // X
@@ -283,7 +283,7 @@ ThisDescriptor* ThisDescriptorFactory::createThisDescriptor(GameObserver* observ
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
 
     // this Variable
@@ -294,21 +294,21 @@ ThisDescriptor* ThisDescriptorFactory::createThisDescriptor(GameObserver* observ
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
 
     vector<string> splitTargetComparison = parseBetween(s, "cantargetcard(", ")", false);
     if (splitTargetComparison.size()) {
         TargetChooserFactory tf(observer);
-        TargetChooser* tcc = tf.createTargetChooser(splitTargetComparison[1], NULL);
+        TargetChooser* tcc    = tf.createTargetChooser(splitTargetComparison[1], nullptr);
         ThisTargetCompare* td = NEW ThisTargetCompare(tcc);
         if (td) {
             return td;
         }
-        return NULL;
+        return nullptr;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 ThisTargetCompare::ThisTargetCompare(TargetChooser* _tcc) { targetComp = _tcc; }
@@ -332,7 +332,7 @@ ThisCounter::ThisCounter(Counter* _counter) {
 }
 
 ThisCounter::ThisCounter(int power, int toughness, int nb, const char* name) {
-    counter = NEW Counter(NULL, name, power, toughness);
+    counter             = NEW Counter(nullptr, name, power, toughness);
     comparisonCriterion = nb;
 }
 
@@ -366,7 +366,7 @@ ThisCounter::~ThisCounter() { SAFE_DELETE(counter); }
 
 ThisCounter* ThisCounter::clone() const {
     ThisCounter* a = NEW ThisCounter(*this);
-    a->counter = NEW Counter(NULL, counter->name.c_str(), counter->power, counter->toughness);
+    a->counter     = NEW Counter(nullptr, counter->name.c_str(), counter->power, counter->toughness);
     return a;
 }
 
@@ -485,7 +485,7 @@ ThisVariable::ThisVariable(int comp, string _vWord) {
 
 int ThisVariable::match(MTGCardInstance* card) {
     int result = 0;
-    WParsedInt* res = NEW WParsedInt(vWord, NULL, card);
+    WParsedInt* res = NEW WParsedInt(vWord, nullptr, card);
     result = res->getValue();
     SAFE_DELETE(res);
     return matchValue(result);

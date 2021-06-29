@@ -47,7 +47,7 @@ SimplePad::SimplePad() {
     buf[1] = '\0';
     SimpleKey* k;
 
-    for (int x = 0; x < KPD_MAX; x++) keys[x] = NULL;
+    for (int x = 0; x < KPD_MAX; x++) keys[x] = nullptr;
 
     // Add the alphabet. We cheat a bit here.
     for (int x = 'a'; x <= 'z'; x++) {
@@ -112,7 +112,7 @@ SimplePad::~SimplePad() {
 }
 
 SimpleKey* SimplePad::Add(string display, unsigned char id) {
-    if (nbitems >= KPD_MAX) return NULL;
+    if (nbitems >= KPD_MAX) return nullptr;
 
     keys[nbitems++] = NEW SimpleKey(display, id);
     return keys[nbitems - 1];
@@ -267,7 +267,7 @@ string SimplePad::Finish() {
 
     // Return result.
     if (bCanceled) {
-        dest = NULL;
+        dest = nullptr;
         return original;
     } else {  // Strip trailing spaces.
         string whitespaces(" \t\f\v\n\r");
@@ -278,10 +278,10 @@ string SimplePad::Finish() {
             buffer = "";
     }
 
-    if (dest != NULL) {
+    if (dest != nullptr) {
         dest->clear();
         dest->insert(0, buffer);
-        dest = NULL;
+        dest = nullptr;
     }
     return buffer;
 }

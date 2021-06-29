@@ -73,13 +73,13 @@ void JParticleData::Update(float dt) {
 
 void JParticleData::SetScale(float scale) { mScale = scale; }
 
-JRenderer* JParticle::mRenderer = NULL;
+JRenderer* JParticle::mRenderer = nullptr;
 
 JParticleData* JParticle::GetField(int index) {
     if (index < FIELD_COUNT)
         return &mData[index];
     else
-        return NULL;
+        return nullptr;
 }
 
 JParticleData* JParticle::GetDataPtr() { return mData; }
@@ -94,7 +94,7 @@ JParticle::JParticle()  // JQuad* texture, float x, float y)
     mVelocity = Vector2D(0.0f, 0.0f);
 
     mActive = false;
-    mQuad = NULL;
+    mQuad   = nullptr;
 
     //	mNext = NULL;
     //	mPrev = NULL;

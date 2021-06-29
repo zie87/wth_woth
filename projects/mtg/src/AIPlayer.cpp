@@ -19,7 +19,7 @@ int AIPlayer::totalAIDecks = -1;
 const char* const MTG_LAND_TEXTS[] = {"artifact", "forest", "island", "mountain", "swamp", "plains", "other lands"};
 
 AIAction::AIAction(AIPlayer* owner, MTGCardInstance* c, MTGCardInstance* t)
-    : owner(owner), ability(NULL), player(NULL), click(c), target(t) {
+    : owner(owner), ability(nullptr), player(nullptr), click(c), target(t) {
     // useability tweak - assume that the user is probably going to want to see the full res card,
     // so prefetch it. The idea is that we do it here as we want to start the prefetch before it's time to render,
     // and waiting for it to actually go into play is too late, as we start drawing the card during the interrupt
@@ -42,7 +42,7 @@ AIAction::AIAction(AIPlayer* owner, MTGCardInstance* c, MTGCardInstance* t)
 int AIAction::Act() {
     GameObserver* g = owner->getObserver();
     if (player && !playerAbilityTarget) {
-        g->cardClick(NULL, player);
+        g->cardClick(nullptr, player);
         return 1;
     }
     if (ability) {
@@ -51,7 +51,7 @@ int AIAction::Act() {
             g->cardClick(target);
             return 1;
         } else if (playerAbilityTarget && !mAbilityTargets.size()) {
-            g->cardClick(NULL, (Player*)playerAbilityTarget);
+            g->cardClick(nullptr, (Player*)playerAbilityTarget);
             return 1;
         }
         if (mAbilityTargets.size()) {
@@ -139,7 +139,7 @@ int AIPlayer::clickMultiTarget(TargetChooser* tc, vector<Targetable*>& potential
     }
 
     randomGenerator.random_shuffle(potentialTargets.begin(), potentialTargets.end());
-    if (potentialTargets.size()) clickstream.push(NEW AIAction(this, NULL, tc->source, potentialTargets));
+    if (potentialTargets.size()) clickstream.push(NEW AIAction(this, nullptr, tc->source, potentialTargets));
     while (clickstream.size()) {
         AIAction* action = clickstream.front();
         action->Act();
@@ -177,7 +177,7 @@ AIPlayer* AIPlayerFactory::createAIPlayer(GameObserver* observer, MTGAllCards* c
         if (!deckid) {
             // random deck
             int nbdecks = MIN(AIPlayer::getTotalAIDecks(), options[Options::AIDECKS_UNLOCKED].number);
-            if (!nbdecks) return NULL;
+            if (!nbdecks) return nullptr;
             deckid = 1 + WRand() % (nbdecks);
         }
         sprintf(deckFile, "ai/baka/deck%i.txt", deckid);
@@ -244,7 +244,7 @@ AIPlayer* AIPlayerFactory::createAIPlayerTest(GameObserver* observer, MTGAllCard
     }
     if (!nbdecks) {
         if (_folder.size()) return createAIPlayerTest(observer, collection, opponent, "");
-        return NULL;
+        return nullptr;
     }
     deckid = 1 + WRand() % (nbdecks);
 

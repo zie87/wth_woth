@@ -9,11 +9,11 @@ using std::endl;
 
 ManaIcon::ManaIcon(int color, float x, float y, float destx, float desty)
     : Pos(x, y, 0.5, 0.0, 255), f(-1), destx(destx), desty(desty), mode(ALIVE), color(color) {
-    hgeParticleSystemInfo* psi = NULL;
+    hgeParticleSystemInfo* psi = nullptr;
     JQuadPtr mq = WResourceManager::Instance()->GetQuad("stars");
 
     if (!mq.get()) {
-        particleSys = NULL;
+        particleSys = nullptr;
         return;
     }
 

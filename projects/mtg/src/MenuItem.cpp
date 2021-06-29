@@ -10,7 +10,7 @@ MenuItem::MenuItem(int id, WFont* font, string text, float x, float y, JQuad* _o
     : JGuiObject(id), mFont(font), mX(x), mY(y) {
     mText = _(text);
     updatedSinceLastRender = 1;
-    mParticleSys = NULL;
+    mParticleSys               = nullptr;
     hgeParticleSystemInfo* psi = WResourceManager::Instance()->RetrievePSI(particle, particleTex);
     if (psi) {
         mParticleSys = NEW hgeParticleSystem(psi);

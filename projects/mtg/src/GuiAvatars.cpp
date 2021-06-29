@@ -7,7 +7,7 @@
 
 #define LIB_GRAVE_OFFSET 230
 
-GuiAvatars::GuiAvatars(GameObserver* observer) : GuiLayer(observer), active(NULL) {
+GuiAvatars::GuiAvatars(GameObserver* observer) : GuiLayer(observer), active(nullptr) {
     Add(self = NEW GuiAvatar(SCREEN_WIDTH, SCREEN_HEIGHT, false, observer->players[0], GuiAvatar::BOTTOM_RIGHT, this));
     self->zoom = 0.9f;
     Add(selfGraveyard = NEW GuiGraveyard(SCREEN_WIDTH - GuiAvatar::Width - GuiGameZone::Width / 2 - 11,
@@ -63,11 +63,11 @@ void GuiAvatars::Deactivate(PlayGuiObject* c) {
     if ((opponentGraveyard == c) || (opponentLibrary == c) || (opponentHand == c) || (opponent == c)) {
         opponentGraveyard->alpha = opponentLibrary->alpha = opponentHand->alpha = 0;
         opponent->zoom = 0.9f;
-        active = NULL;
+        active                                                                  = nullptr;
     } else if ((selfGraveyard == c) || (selfLibrary == c) || (self == c)) {
         selfGraveyard->alpha = selfLibrary->alpha = 0;
         self->zoom = 0.5f;
-        active = NULL;
+        active                                    = nullptr;
     }
 }
 

@@ -42,7 +42,7 @@ WSrcCards::WSrcCards(float delay) {
     mDelay = delay;
     mLastInput = 0;
     currentPos = 0;
-    filtersRoot = NULL;
+    filtersRoot = nullptr;
 }
 
 JQuadPtr WSrcCards::getImage(int offset) {
@@ -92,10 +92,10 @@ int WSrcCards::Size(bool all) {
 MTGCard* WSrcCards::getCard(int offset, bool ignore) {
     int oldpos;
     int size = (int)cards.size();
-    MTGCard* c = NULL;
+    MTGCard* c = nullptr;
     if (!ignore && filtersRoot) size = (int)validated.size();
 
-    if (!size) return NULL;
+    if (!size) return nullptr;
 
     oldpos = currentPos;
     if (offset != 0) currentPos += offset;
@@ -144,7 +144,7 @@ int WSrcCards::loadMatches(WSrcCards* src, bool all) {
     int count = 0;
     if (!src) return count;
 
-    MTGCard* c = NULL;
+    MTGCard* c = nullptr;
 
     int oldp = src->getOffset();
     src->setOffset(0);
@@ -274,7 +274,7 @@ bool WSrcCards::isEmptySet(WCardFilter* f) {
 }
 
 void WSrcCards::addFilter(WCardFilter* f) {
-    if (filtersRoot == NULL)
+    if (filtersRoot == nullptr)
         filtersRoot = f;
     else
         filtersRoot = NEW WCFilterAND(f, filtersRoot);
@@ -292,7 +292,7 @@ void WSrcCards::clearFilters() {
 }
 WCardFilter* WSrcCards::unhookFilters() {
     WCardFilter* temp = filtersRoot;
-    filtersRoot = NULL;
+    filtersRoot       = nullptr;
     clearFilters();
     return temp;
 }
@@ -318,7 +318,7 @@ WSrcUnlockedCards::WSrcUnlockedCards(float delay) : WSrcCards(delay) {
     MTGAllCards* ac = MTGCollection();
     map<int, MTGCard*>::iterator it;
 
-    char* unlocked = NULL;
+    char* unlocked = nullptr;
     unlocked = (char*)calloc(setlist.size(), sizeof(char));
     // Figure out which sets are available.
     for (int i = 0; i < setlist.size(); i++) {
@@ -330,7 +330,7 @@ WSrcUnlockedCards::WSrcUnlockedCards(float delay) : WSrcCards(delay) {
     }
     if (unlocked) {
         free(unlocked);
-        unlocked = NULL;
+        unlocked = nullptr;
     }
 
     if (cards.size()) {

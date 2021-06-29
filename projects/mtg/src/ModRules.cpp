@@ -21,7 +21,7 @@ bool ModRules::load(string filename) {
 
     for (TiXmlNode* node = doc.FirstChild(); node; node = node->NextSibling()) {
         TiXmlElement* element = node->ToElement();
-        if (element != NULL) {
+        if (element != nullptr) {
             if (strcmp(element->Value(), "menu") == 0) {
                 menu.parse(element);
             } else if (strcmp(element->Value(), "general") == 0) {
@@ -179,13 +179,13 @@ SimpleCardEffect* ModRulesCards::parseEffect(string s) {
         auto argb = split(params, ',');
         if (argb.size() < 4) {
             WGE_LOG_ERROR("not enough params in mask");
-            return NULL;
+            return nullptr;
         }
         PIXEL_TYPE mask =
             ARGB(atoi(argb[0].c_str()), atoi(argb[1].c_str()), atoi(argb[2].c_str()), atoi(argb[3].c_str()));
         return NEW SimpleCardEffectMask(mask);
     }
-    return NULL;
+    return nullptr;
 }
 
 void ModRulesCards::parse(TiXmlElement* element) {

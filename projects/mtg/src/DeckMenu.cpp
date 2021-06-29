@@ -31,7 +31,7 @@ const int kDetailedInfoButtonId = 10000;
 const PIXEL_TYPE kRedColor = ARGB(0xFF, 0xFF, 0x00, 0x00);
 }  // namespace
 
-hgeParticleSystem* DeckMenu::stars = NULL;
+hgeParticleSystem* DeckMenu::stars = nullptr;
 
 //
 //  For the additional info window, maximum characters per line is roughly 30 characters across.
@@ -43,7 +43,7 @@ DeckMenu::DeckMenu(int id, JGuiListener* listener, int fontId, const string _tit
     : JGuiController(JGE::GetInstance(), id, listener), fontId(fontId), mShowDetailsScreen(showDetailsOverride) {
     backgroundName = "DeckMenuBackdrop";
     mAlwaysShowDetailsButton = false;
-    mSelectedDeck = NULL;
+    mSelectedDeck            = nullptr;
     mY = 50;
     mWidth = 176;
     mX = 115;
@@ -97,7 +97,7 @@ DeckMenu::DeckMenu(int id, JGuiListener* listener, int fontId, const string _tit
 
     mSelectionTargetY = selectionY = kVerticalMargin;
 
-    if (NULL == stars)
+    if (nullptr == stars)
         stars = NEW hgeParticleSystem(WResourceManager::Instance()->RetrievePSI(
             "stars.psi", WResourceManager::Instance()->GetQuad("stars").get()));
     stars->FireAt(mX, mY);
@@ -161,7 +161,7 @@ void DeckMenu::RenderBackground() {
 DeckMetaData* DeckMenu::getSelectedDeck() {
     if (mSelectedDeck) return mSelectedDeck;
 
-    return NULL;
+    return nullptr;
 }
 
 void DeckMenu::enableDisplayDetailsOverride() { mAlwaysShowDetailsButton = true; }
@@ -257,7 +257,7 @@ void DeckMenu::Render() {
                             JQuad* evil = quad.get();
                             evil->SetHFlip(true);
                             renderer->RenderQuad(quad.get(), avatarX, avatarY);
-                            evil = NULL;
+                            evil = nullptr;
                         } else
                             renderer->RenderQuad(quad.get(), avatarX, avatarY);
                     }
@@ -378,5 +378,5 @@ void DeckMenu::destroy() { SAFE_DELETE(DeckMenu::stars); }
 DeckMenu::~DeckMenu() {
     WResourceManager::Instance()->Release(pspIconsTexture);
     SAFE_DELETE(mScroller);
-    dismissButton = NULL;
+    dismissButton = nullptr;
 }

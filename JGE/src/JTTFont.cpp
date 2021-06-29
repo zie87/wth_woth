@@ -37,14 +37,14 @@ JTTFont::JTTFont(int cacheImageSize) {
     mColor = ARGB(255, 255, 255, 255);
     mSize = 0;
     mAngle = 0.0;
-    mLibrary = 0;
-    mFace = 0;
+    mLibrary = nullptr;
+    mFace    = nullptr;
 
     mFontLoaded = false;
     mSharingFont = false;
     mAntialias = true;
 
-    mTexture = NULL;
+    mTexture = nullptr;
 
     switch (cacheImageSize) {
     case CACHE_IMAGE_64x64:
@@ -105,7 +105,7 @@ bool JTTFont::SetSize(int size) {
         mMaxCharCount = mColCount * mRowCount;
         if (mMaxCharCount > TTF_CACHE_SIZE) mMaxCharCount = TTF_CACHE_SIZE;
 
-        FT_Set_Transform(mFace, 0, 0);
+        FT_Set_Transform(mFace, nullptr, nullptr);
 
         // JTTFont.h says setting font size will clear the cache
         for (int i = 0; i < TTF_CACHE_SIZE; i++) mCachedCode[i] = 0;
@@ -177,12 +177,12 @@ bool JTTFont::Load(const char* filename, int size, int mode) {
 
 void JTTFont::Unload(void) {
     FT_Done_Face(mFace);
-    mFace = 0;
+    mFace       = nullptr;
     mFontLoaded = false;
 
     if (!mSharingFont) {
         FT_Done_FreeType(mLibrary);
-        mLibrary = 0;
+        mLibrary = nullptr;
         free(mFontBits);
     }
 }
@@ -199,7 +199,7 @@ int JTTFont::PreCacheChar(u16 ch, u16 cachedCode) {
 
     if (!mFontLoaded) return -1;
 
-    if (mSharingFont && mFontSource->GetFontLibrary() == NULL) return -1;
+    if (mSharingFont && mFontSource->GetFontLibrary() == nullptr) return -1;
 
     FT_GlyphSlot slot = mFace->glyph;
 

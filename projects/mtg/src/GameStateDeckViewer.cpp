@@ -38,30 +38,30 @@ void StringExplode(string str, string separator, vector<string>* results) {
 }
 
 GameStateDeckViewer::GameStateDeckViewer(GameApp* parent) : GameState(parent, "deckeditor") {
-    bgMusic = NULL;
+    bgMusic      = nullptr;
     useFilter = 0;
     isAIDeckSave = false;
     mSwitching = false;
-    welcome_menu = NULL;
-    myCollection = NULL;
-    myDeck = NULL;
-    filterMenu = NULL;
-    source = NULL;
+    welcome_menu = nullptr;
+    myCollection = nullptr;
+    myDeck       = nullptr;
+    filterMenu   = nullptr;
+    source       = nullptr;
     hudAlpha = 0;
-    subMenu = NULL;
+    subMenu      = nullptr;
     mRotation = 0;
     mSlide = 0;
     mAlpha = 255;
-    menu = NULL;
-    stw = NULL;
+    menu         = nullptr;
+    stw          = nullptr;
 
-    statsPrevButton = NEW InteractiveButton(NULL, kPrevStatsButtonId, Fonts::MAIN_FONT, "Stats", SCREEN_WIDTH_F - 50,
-                                            SCREEN_HEIGHT_F - 20, JGE_BTN_PREV);
-    toggleDeckButton = NEW InteractiveButton(NULL, kToggleDeckActionId, Fonts::MAIN_FONT, "View Deck", 10,
+    statsPrevButton  = NEW InteractiveButton(nullptr, kPrevStatsButtonId, Fonts::MAIN_FONT, "Stats",
+                                            SCREEN_WIDTH_F - 50, SCREEN_HEIGHT_F - 20, JGE_BTN_PREV);
+    toggleDeckButton = NEW InteractiveButton(nullptr, kToggleDeckActionId, Fonts::MAIN_FONT, "View Deck", 10,
                                              SCREEN_HEIGHT_F - 20, JGE_BTN_PRI);
-    sellCardButton = NEW InteractiveButton(NULL, kSellCardActionId, Fonts::MAIN_FONT, "Sell Card",
+    sellCardButton   = NEW InteractiveButton(nullptr, kSellCardActionId, Fonts::MAIN_FONT, "Sell Card",
                                            (SCREEN_WIDTH_F / 2) - 100, SCREEN_HEIGHT_F - 20, JGE_BTN_SEC);
-    filterButton = NEW InteractiveButton(NULL, kFilterButtonId, Fonts::MAIN_FONT, "filter", (SCREEN_WIDTH_F - 110),
+    filterButton = NEW InteractiveButton(nullptr, kFilterButtonId, Fonts::MAIN_FONT, "filter", (SCREEN_WIDTH_F - 110),
                                          SCREEN_HEIGHT_F - 20, JGE_BTN_CTRL);
 }
 
@@ -99,7 +99,7 @@ void GameStateDeckViewer::rotateCards(int direction) {
 }
 
 void GameStateDeckViewer::rebuildFilters() {
-    if (!filterMenu) filterMenu = NEW WGuiFilters("Filter by...", NULL);
+    if (!filterMenu) filterMenu = NEW WGuiFilters("Filter by...", nullptr);
     if (source) SAFE_DELETE(source);
     source = NEW WSrcDeckViewer(myDeck, myCollection);
     filterMenu->setSrc(source);
@@ -198,8 +198,8 @@ void GameStateDeckViewer::buildEditorMenu() {
 void GameStateDeckViewer::Start() {
     hudAlpha = 0;
     mSwitching = false;
-    subMenu = NULL;
-    myDeck = NULL;
+    subMenu            = nullptr;
+    myDeck             = nullptr;
     mStage = STAGE_WELCOME;
     mRotation = 0;
     mSlide = 0;
@@ -465,7 +465,7 @@ void GameStateDeckViewer::Update(float dt) {
         case JGE_BTN_CTRL:
             mStage = STAGE_FILTERS;
             if (!filterMenu) {
-                filterMenu = NEW WGuiFilters("Filter by...", NULL);
+                filterMenu = NEW WGuiFilters("Filter by...", nullptr);
                 if (source) SAFE_DELETE(source);
                 source = NEW WSrcDeckViewer(myDeck, myCollection);
                 filterMenu->setSrc(source);
@@ -1099,8 +1099,8 @@ void GameStateDeckViewer::renderOnScreenMenu() {
                 countPerCostAndColor = &stw->countSpellsPerCostAndColor;
                 break;
             default:
-                countPerCost = NULL;
-                countPerCostAndColor = NULL;
+                countPerCost         = nullptr;
+                countPerCostAndColor = nullptr;
                 avgCost = 0;
                 break;
             }

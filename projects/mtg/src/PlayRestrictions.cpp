@@ -6,7 +6,7 @@
 
 PlayRestriction::PlayRestriction(TargetChooser* tc) : tc(tc) {
     tc->setAllZones();  // This is to allow targetting cards without caring about the actual zone
-    tc->targetter = NULL;
+    tc->targetter = nullptr;
 };
 
 PlayRestriction::~PlayRestriction() { SAFE_DELETE(tc); };
@@ -39,7 +39,7 @@ MaxPerTurnRestriction* PlayRestrictions::getMaxPerTurnRestrictionByTargetChooser
     }
 
     delete _tc;
-    return NULL;
+    return nullptr;
 }
 
 void PlayRestrictions::addRestriction(PlayRestriction* restriction) {

@@ -52,7 +52,7 @@ bool GuiHand::isInHand(CardView* card) {
 GuiHandOpponent::GuiHandOpponent(GameObserver* observer, MTGHand* hand) : GuiHand(observer, hand) {
     vector<MTGCardInstance*>::iterator ite;
     for (ite = hand->cards.begin(); ite != hand->cards.end(); ite++) {
-        WEventZoneChange event(*ite, NULL, hand);
+        WEventZoneChange event(*ite, nullptr, hand);
         receiveEventPlus(&event);
     }
 }
@@ -82,7 +82,7 @@ GuiHandSelf::GuiHandSelf(GameObserver* observer, MTGHand* hand)
 
     vector<MTGCardInstance*>::iterator ite;
     for (ite = hand->cards.begin(); ite != hand->cards.end(); ite++) {
-        WEventZoneChange event(*ite, NULL, hand);
+        WEventZoneChange event(*ite, nullptr, hand);
         receiveEventPlus(&event);
     }
 }
@@ -138,7 +138,7 @@ bool GuiHandSelf::CheckUserInput(JButton key) {
     if (trigger == key) {
         state = (Open == state ? Closed : Open);
         if (Open == state) observer->getCardSelector()->Push();
-        observer->getCardSelector()->Limit(Open == state ? limitor : NULL, CardView::handZone);
+        observer->getCardSelector()->Limit(Open == state ? limitor : nullptr, CardView::handZone);
         if (Closed == state) observer->getCardSelector()->Pop();
         if (OptionHandDirection::HORIZONTAL == options[Options::HANDDIRECTION].number)
             backpos.y = Open == state ? OpenY : ClosedY;

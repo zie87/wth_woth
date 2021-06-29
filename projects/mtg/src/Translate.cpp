@@ -3,7 +3,7 @@
 #include "Translate.h"
 #include "utils.h"
 
-Translator* Translator::mInstance = NULL;
+Translator* Translator::mInstance = nullptr;
 
 Translator* Translator::GetInstance() {
     if (!mInstance) mInstance = NEW Translator();

@@ -14,7 +14,7 @@ PlayerData::PlayerData(MTGAllCards* allcards) {
 }
 
 void PlayerData::init() {
-    collection = NULL;
+    collection = nullptr;
 
     // CREDITS
     credits = 3000;  // Default value

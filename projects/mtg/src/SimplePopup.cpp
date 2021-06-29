@@ -30,7 +30,7 @@ SimplePopup::SimplePopup(int id, JGuiListener* listener, const int fontId, const
     mTextFont = WResourceManager::Instance()->GetWFont(fontId);
     this->mCount = 1;  // a hack to ensure the menus do book keeping correctly.  Since we aren't adding items to the
                        // menu, this is required
-    mStatsWrapper = NULL;
+    mStatsWrapper = nullptr;
 
     JGuiController::Add(NEW InteractiveButton(this, kDismissButtonId, Fonts::MAIN_FONT, "Detailed Info", cancelX,
                                               cancelY, JGE_BTN_CANCEL),
@@ -158,7 +158,7 @@ void SimplePopup::drawHorzPole(string imageName, bool flipX = false, bool flipY 
     WGE_LOG_TRACE("Drawing a horizontal border!");
     JRenderer* r = JRenderer::GetInstance();
     JQuadPtr horizontalBarImage = WResourceManager::Instance()->RetrieveTempQuad(imageName, TEXTURE_SUB_5551);
-    if (horizontalBarImage != NULL) {
+    if (horizontalBarImage != nullptr) {
         horizontalBarImage->SetHFlip(flipX);
         horizontalBarImage->SetVFlip(flipY);
 
@@ -174,7 +174,7 @@ void SimplePopup::drawVertPole(string imageName, bool flipX = false, bool flipY 
     WGE_LOG_TRACE("Drawing a Vertical border!");
     JRenderer* r = JRenderer::GetInstance();
     JQuadPtr verticalBarImage = WResourceManager::Instance()->RetrieveTempQuad(imageName, TEXTURE_SUB_5551);
-    if (verticalBarImage != NULL) {
+    if (verticalBarImage != nullptr) {
         verticalBarImage->SetHFlip(flipX);
         verticalBarImage->SetVFlip(flipY);
 
@@ -191,6 +191,6 @@ void SimplePopup::Close() {
 }
 
 SimplePopup::~SimplePopup(void) {
-    mTextFont = NULL;
-    mDeckInformation = NULL;
+    mTextFont        = nullptr;
+    mDeckInformation = nullptr;
 }

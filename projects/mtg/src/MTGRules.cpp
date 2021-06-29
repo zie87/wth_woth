@@ -9,7 +9,7 @@
 
 #include <wge/log.hpp>
 
-PermanentAbility::PermanentAbility(GameObserver* observer, int _id) : MTGAbility(observer, _id, NULL) {}
+PermanentAbility::PermanentAbility(GameObserver* observer, int _id) : MTGAbility(observer, _id, nullptr) {}
 
 MTGEventBonus::MTGEventBonus(GameObserver* observer, int _id) : PermanentAbility(observer, _id) {
     textAlpha = 0;
@@ -330,18 +330,18 @@ int MTGPutInPlayRule::reactToClick(MTGCardInstance* card) {
     delete previousManaPool;
     if (card->isLand()) {
         MTGCardInstance* copy = player->game->putInZone(card, player->game->hand, player->game->temp);
-        Spell* spell = NEW Spell(game, 0, copy, NULL, NULL, payResult);
+        Spell* spell          = NEW Spell(game, 0, copy, nullptr, nullptr, payResult);
         spell->resolve();
         delete spellCost;
         delete spell;
     } else {
-        Spell* spell = NULL;
+        Spell* spell          = nullptr;
         MTGCardInstance* copy = player->game->putInZone(card, player->game->hand, player->game->stack);
         if (game->targetChooser) {
             spell = game->mLayers->stackLayer()->addSpell(copy, game->targetChooser, spellCost, payResult, 0);
-            game->targetChooser = NULL;
+            game->targetChooser = nullptr;
         } else {
-            spell = game->mLayers->stackLayer()->addSpell(copy, NULL, spellCost, payResult, 0);
+            spell = game->mLayers->stackLayer()->addSpell(copy, nullptr, spellCost, payResult, 0);
         }
 
         if (card->has(Constants::STORM)) {
@@ -349,7 +349,7 @@ int MTGPutInPlayRule::reactToClick(MTGCardInstance* card) {
                         player->opponent()->game->stack->seenThisTurn("*", Constants::CAST_ALL);
             ManaCost* spellCost = player->getManaPool();
             for (int i = storm; i > 1; i--) {
-                spell = game->mLayers->stackLayer()->addSpell(copy, NULL, spellCost, payResult, 1);
+                spell = game->mLayers->stackLayer()->addSpell(copy, nullptr, spellCost, payResult, 1);
             }
         }  // end of storm
         if (!card->has(Constants::STORM)) {
@@ -394,7 +394,7 @@ int MTGKickerRule::isReactingToClick(MTGCardInstance* card, ManaCost* mana) {
 }
 
 int MTGKickerRule::reactToClick(MTGCardInstance* card) {
-    if (!isReactingToClick(card, NULL)) return 0;
+    if (!isReactingToClick(card, nullptr)) return 0;
 
     Player* player = game->currentlyActing();
     ManaCost* withKickerCost =
@@ -432,19 +432,20 @@ int MTGKickerRule::reactToClick(MTGCardInstance* card) {
     delete previousManaPool;
     if (card->isLand()) {
         MTGCardInstance* copy = player->game->putInZone(card, player->game->hand, player->game->temp);
-        Spell* spell = NEW Spell(game, 0, copy, NULL, NULL, ManaCost::MANA_PAID_WITH_KICKER);
+        Spell* spell          = NEW Spell(game, 0, copy, nullptr, nullptr, ManaCost::MANA_PAID_WITH_KICKER);
         spell->resolve();
         delete spellCost;
         delete spell;
     } else {
-        Spell* spell = NULL;
+        Spell* spell          = nullptr;
         MTGCardInstance* copy = player->game->putInZone(card, player->game->hand, player->game->stack);
         if (game->targetChooser) {
             spell = game->mLayers->stackLayer()->addSpell(copy, game->targetChooser, spellCost,
                                                           ManaCost::MANA_PAID_WITH_KICKER, 0);
-            game->targetChooser = NULL;
+            game->targetChooser = nullptr;
         } else {
-            spell = game->mLayers->stackLayer()->addSpell(copy, NULL, spellCost, ManaCost::MANA_PAID_WITH_KICKER, 0);
+            spell =
+                game->mLayers->stackLayer()->addSpell(copy, nullptr, spellCost, ManaCost::MANA_PAID_WITH_KICKER, 0);
         }
 
         if (card->has(Constants::STORM)) {
@@ -452,7 +453,7 @@ int MTGKickerRule::reactToClick(MTGCardInstance* card) {
                         player->opponent()->game->stack->seenThisTurn("*", Constants::CAST_ALL);
             ManaCost* stormSpellCost = player->getManaPool();
             for (int i = storm; i > 1; i--) {
-                spell = game->mLayers->stackLayer()->addSpell(copy, NULL, stormSpellCost,
+                spell = game->mLayers->stackLayer()->addSpell(copy, nullptr, stormSpellCost,
                                                               ManaCost::MANA_PAID_WITH_KICKER, 1);
             }
         }  // end of storm
@@ -561,22 +562,22 @@ int MTGAlternativeCostRule::reactToClick(MTGCardInstance* card, ManaCost* altern
 
     if (card->isLand()) {
         MTGCardInstance* copy = player->game->putInZone(card, card->currentZone, player->game->temp);
-        Spell* spell = NEW Spell(game, 0, copy, NULL, NULL, alternateCostType);
+        Spell* spell                               = NEW Spell(game, 0, copy, nullptr, nullptr, alternateCostType);
         copy->alternateCostPaid[alternateCostType] = 1;
         spell->resolve();
         SAFE_DELETE(spell);
-        game->mLayers->stackLayer()->addSpell(copy, NULL, NULL, alternateCostType, 1);
+        game->mLayers->stackLayer()->addSpell(copy, nullptr, nullptr, alternateCostType, 1);
     } else {
         MTGCardInstance* copy = player->game->putInZone(card, card->currentZone, player->game->stack);
         copy->alternateCostPaid[alternateCostType] = 1;
         game->mLayers->stackLayer()->addSpell(copy, game->targetChooser, spellCost, alternateCostType, 0);
-        game->targetChooser = NULL;
+        game->targetChooser = nullptr;
 
         if (card->has(Constants::STORM)) {
             int storm = player->game->stack->seenThisTurn("*", Constants::CAST_ALL) +
                         player->opponent()->game->stack->seenThisTurn("*", Constants::CAST_ALL);
             for (int i = storm; i > 1; i--) {
-                game->mLayers->stackLayer()->addSpell(copy, NULL, playerMana, alternateCostType, 1);
+                game->mLayers->stackLayer()->addSpell(copy, nullptr, playerMana, alternateCostType, 1);
             }
         }  // end of storm
         else {
@@ -867,8 +868,8 @@ int MTGMorphCostRule::reactToClick(MTGCardInstance* card) {
     card->morphed = true;
     card->isMorphed = true;
     MTGCardInstance* copy = player->game->putInZone(card, card->currentZone, player->game->stack);
-    Spell* spell = NULL;
-    spell = game->mLayers->stackLayer()->addSpell(copy, NULL, spellCost, payResult, 0);
+    Spell* spell             = nullptr;
+    spell                    = game->mLayers->stackLayer()->addSpell(copy, nullptr, spellCost, payResult, 0);
     spell->source->morphed = true;
     spell->source->isMorphed = true;
     spell->source->name = "Morph";
@@ -949,7 +950,7 @@ int MTGAttackRule::reactToClick(MTGCardInstance* card) {
         game->getCardSelector()->PushLimitor();
         game->getCardSelector()->Limit(this, CardView::playZone);
         game->getCardSelector()->CheckUserInput(JGE_BTN_RIGHT);
-        game->getCardSelector()->Limit(NULL, CardView::playZone);
+        game->getCardSelector()->Limit(nullptr, CardView::playZone);
         game->getCardSelector()->PopLimitor();
     }
     card->toggleAttacker();
@@ -987,12 +988,12 @@ int MTGPlaneswalkerAttackRule::reactToClick(MTGCardInstance* card) {
         game->getCardSelector()->PushLimitor();
         game->getCardSelector()->Limit(this, CardView::playZone);
         game->getCardSelector()->CheckUserInput(JGE_BTN_RIGHT);
-        game->getCardSelector()->Limit(NULL, CardView::playZone);
+        game->getCardSelector()->Limit(nullptr, CardView::playZone);
         game->getCardSelector()->PopLimitor();
     }
 
     vector<MTGAbility*> selection;
-    MTGCardInstance* check = NULL;
+    MTGCardInstance* check = nullptr;
     int checkWalkers = card->controller()->opponent()->game->battlefield->cards.size();
     for (int i = 0; i < checkWalkers; ++i) {
         check = card->controller()->opponent()->game->battlefield->cards[i];
@@ -1080,7 +1081,7 @@ int MTGCombatTriggersRule::receiveEvent(WEvent* e) {
         //---------------
     }
     if (dynamic_cast<WEventAttackersChosen*>(e)) {
-        MTGCardInstance* lonelyAttacker = NULL;
+        MTGCardInstance* lonelyAttacker = nullptr;
         int nbattackers = 0;
         Player* p = game->currentPlayer;
         MTGGameZone* z = p->game->inPlay;
@@ -1095,7 +1096,7 @@ int MTGCombatTriggersRule::receiveEvent(WEvent* e) {
         if (nbattackers == 1) {
             lonelyAttacker->eventattackedAlone();
         } else
-            lonelyAttacker = NULL;
+            lonelyAttacker = nullptr;
     }
     if (dynamic_cast<WEventBlockersChosen*>(e)) {
         MTGGameZone* opponentZone = game->currentPlayer->opponent()->game->inPlay;
@@ -1143,7 +1144,7 @@ int OtherAbilitiesEventReceiver::receiveEvent(WEvent* e) {
                 if (event->to == game->players[i]->game->inPlay) return 0;
             }
             AbilityFactory af(game);
-            af.magicText(game->mLayers->actionLayer()->getMaxId(), NULL, event->card, 1, 0, event->to);
+            af.magicText(game->mLayers->actionLayer()->getMaxId(), nullptr, event->card, 1, nullptr, event->to);
             return 1;
         }
     }
@@ -1156,9 +1157,9 @@ OtherAbilitiesEventReceiver* OtherAbilitiesEventReceiver::clone() const {
 
 MTGBlockRule::MTGBlockRule(GameObserver* observer, int _id) : PermanentAbility(observer, _id) {
     aType = MTGAbility::MTG_BLOCK_RULE;
-    tcb = NULL;
-    blocker = NULL;
-    blockAbility = NULL;
+    tcb          = nullptr;
+    blocker      = nullptr;
+    blockAbility = nullptr;
 }
 
 int MTGBlockRule::isReactingToClick(MTGCardInstance* card, ManaCost* mana) {
@@ -1185,8 +1186,8 @@ int MTGBlockRule::reactToClick(MTGCardInstance* card) {
             SAFE_DELETE(blockAbility);
             TargetChooserFactory tf(card->getObserver());
             tcb = tf.createTargetChooser("blockable", card);
-            tcb->targetter = NULL;
-            blocker = NEW AABlock(card->getObserver(), -1, card, NULL);
+            tcb->targetter             = nullptr;
+            blocker                    = NEW AABlock(card->getObserver(), -1, card, nullptr);
             blocker->oneShot = true;
             blocker->forceDestroy = 1;
             blocker->canBeInterrupted = false;
@@ -1196,12 +1197,12 @@ int MTGBlockRule::reactToClick(MTGCardInstance* card) {
             blockAbility->canBeInterrupted = false;
             return blockAbility->reactToTargetClick(card);
         } else
-            card->toggleDefenser(NULL);
+            card->toggleDefenser(nullptr);
     } else
         while (!result) {
             currentOpponent = game->currentPlayer->game->inPlay->getNextAttacker(currentOpponent);
             canDefend = card->toggleDefenser(currentOpponent);
-            result = (canDefend || currentOpponent == NULL);
+            result          = (canDefend || currentOpponent == nullptr);
         }
     return 1;
 }
@@ -1288,7 +1289,7 @@ int MTGMomirRule::reactToClick(MTGCardInstance* card_to_discard, int cardId) {
 }
 
 MTGCardInstance* MTGMomirRule::genCreature(int id) {
-    if (!id) return NULL;
+    if (!id) return nullptr;
     Player* p = game->currentlyActing();
     MTGCard* card = collection->getCardById(id);
     return NEW MTGCardInstance(card, p->game);
@@ -1388,7 +1389,7 @@ int MTGStoneHewerRule::receiveEvent(WEvent* event) {
 }
 
 MTGCardInstance* MTGStoneHewerRule::genEquip(int id) {
-    if (!id) return NULL;
+    if (!id) return nullptr;
     Player* p = game->currentlyActing();
     MTGCard* card = collection->getCardById(id);
     return NEW MTGCardInstance(card, p->game);
@@ -1424,7 +1425,7 @@ MTGHermitRule::MTGHermitRule(GameObserver* observer, int _id) : PermanentAbility
 int MTGHermitRule::receiveEvent(WEvent* event) {
     WEventPhaseChange* e = dynamic_cast<WEventPhaseChange*>(event);
     if (e && e->from->id == MTG_PHASE_UNTAP) {
-        MTGCardInstance* lcard = NULL;
+        MTGCardInstance* lcard         = nullptr;
         vector<MTGCardInstance*> lands = vector<MTGCardInstance*>();
         for (int i = 0; i < game->currentPlayer->game->library->nb_cards - 1; i++) {
             MTGCardInstance* temp = game->currentPlayer->game->library->cards[i];
@@ -1606,7 +1607,7 @@ int MTGVampireRule::receiveEvent(WEvent* event) {
         victims[card].erase(std::unique(victims[card].begin(), victims[card].end()), victims[card].end());
 
         for (unsigned int w = 0; w < victims[card].size(); w++) {
-            if (victims[card].at(w) == NULL) continue;
+            if (victims[card].at(w) == nullptr) continue;
             Player* p = card->controller();
             if (z->from == p->game->inPlay && z->to == p->game->graveyard) {
                 if (card == z->card->previous) {
@@ -1854,7 +1855,7 @@ int ParentChildRule::receiveEvent(WEvent* event) {
 
             for (size_t w = 0; w < card->childrenCards.size(); w++) {
                 MTGCardInstance* child = card->childrenCards[w];
-                if (child == NULL) continue;
+                if (child == nullptr) continue;
                 if (child->parentCards.size() < 2)
                     child->controller()->game->putInGraveyard(child);
                 else  // allows a card to declare 2 homes, as long as it has a home it can stay inplay.

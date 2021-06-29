@@ -137,7 +137,7 @@ void Task::LoadAIDeckNames() {
                 found = 1;
                 nbDecks++;
                 // TODO: Creating MTGDeck only for getting decks name. Find an easier way.
-                MTGDeck* mtgd = NEW MTGDeck(stream.str().c_str(), NULL, 1);
+                MTGDeck* mtgd = NEW MTGDeck(stream.str().c_str(), nullptr, 1);
                 sAIDeckNames.push_back(mtgd->meta_name);
                 delete mtgd;
             }
@@ -193,7 +193,7 @@ Task* Task::createFromStr(const string params, bool rand) {
 
     if (!result) {
         WGE_LOG_ERROR("Failed to create task");
-        return NULL;
+        return nullptr;
     }
 
     result->persistentAttribs = exploded;
@@ -218,8 +218,8 @@ TaskList::TaskList(string _fileName) {
         fileName = options.profileFile(PLAYER_TASKS).c_str();
     }
     load(fileName);
-    for (int i = 0; i < 9; i++) mBg[i] = NULL;
-    mBgTex = NULL;  // We only load the background if we use the task screen.
+    for (int i = 0; i < 9; i++) mBg[i] = nullptr;
+    mBgTex = nullptr;  // We only load the background if we use the task screen.
 }
 
 int TaskList::save(string _fileName) {

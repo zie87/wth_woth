@@ -24,7 +24,7 @@ hgeDistortionMesh::hgeDistortionMesh(int cols, int rows) {
     // quad.tex=0;
     // quad.blend=BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_ZWRITE;
 
-    quad = NULL;
+    quad = nullptr;
 
     disp_array = new Vertex[rows * cols];
 

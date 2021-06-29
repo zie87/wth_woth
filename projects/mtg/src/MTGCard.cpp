@@ -34,7 +34,7 @@ MTGCard::~MTGCard() {}
 int MTGCard::init() {
     setId = 0;
     mtgid = 0;
-    data = NULL;
+    data   = nullptr;
     rarity = Constants::RARITY_C;
     return 1;
 }

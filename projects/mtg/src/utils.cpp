@@ -135,7 +135,7 @@ u32 ramAvailable(void) {
     u32 size, count, x;
 
     // Init variables
-    ram = NULL;
+    ram   = nullptr;
     size = 0;
     count = 0;
 

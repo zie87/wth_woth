@@ -9,7 +9,7 @@
 
 #include <wge/log.hpp>
 
-DeckStats* DeckStats::mInstance = NULL;
+DeckStats* DeckStats::mInstance = nullptr;
 
 DeckStat::DeckStat(int nbgames, int victories, string manaColorIndex)
     : nbgames(nbgames), victories(victories), manaColorIndex(manaColorIndex) {}
@@ -44,7 +44,7 @@ DeckStat* DeckStats::getDeckStat(string opponentsFile) {
     map<string, DeckStat*> stats = masterDeckStats[currentDeck];
     map<string, DeckStat*>::iterator it = stats.find(opponentsFile);
     if (it == stats.end()) {
-        return NULL;
+        return nullptr;
     } else {
         return it->second;
     }
@@ -281,7 +281,7 @@ void StatsWrapper::initStatistics(string deckstats) {
             sprintf(smallDeckName, "%s_deck%i", "ai_baka", nbDecks);
             DeckStat* deckStat = stats->getDeckStat(string(smallDeckName));
 
-            if ((deckStat != NULL) && (deckStat->nbgames > 0)) {
+            if ((deckStat != nullptr) && (deckStat->nbgames > 0)) {
                 aiDeckNames.push_back(deckFilename);
                 aiDeckStats.push_back(deckStat);
             }
@@ -327,7 +327,7 @@ void StatsWrapper::updateStats(DeckDataWrapper* myDeck) {
     this->totalManaCost = 0;
     this->totalCreatureCost = 0;
     this->totalSpellCost = 0;
-    MTGCard* current = NULL;
+    MTGCard* current        = nullptr;
 
     // Clearing arrays
     for (int i = 0; i <= Constants::STATS_MAX_MANA_COST; i++) {
@@ -438,7 +438,7 @@ void StatsWrapper::updateStats(DeckDataWrapper* myDeck) {
         int i;
         i = 0;
 
-        while ((hybridCost = currentCost->getHybridCost(i++)) != NULL) {
+        while ((hybridCost = currentCost->getHybridCost(i++)) != nullptr) {
             this->totalCostPerColor[hybridCost->color1] += hybridCost->value1 * currentCount;
             this->totalCostPerColor[hybridCost->color2] += hybridCost->value2 * currentCount;
         }

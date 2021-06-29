@@ -159,4 +159,4 @@ std::ostream& DeckMenuItem::toString(std::ostream& out) const {
                << " ; mX,mY : " << mX << "," << mY;
 }
 
-DeckMenuItem::~DeckMenuItem() { mMetaData = NULL; }
+DeckMenuItem::~DeckMenuItem() { mMetaData = nullptr; }

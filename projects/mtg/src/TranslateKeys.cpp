@@ -19,9 +19,9 @@ const KeyRep& translateKey(LocalKeySym key) {
         if ((res = fattable.find(key)) != fattable.end()) return res->second;
     }
 
-    char* str = NULL;
+    char* str = nullptr;
 
-    #if !defined(QT_CONFIG) && !defined(SDL_CONFIG)
+#if !defined(QT_CONFIG) && !defined(SDL_CONFIG)
     str = XKeysymToString(key);
     #elif defined(SDL_CONFIG)
     str = (char*)SDL_GetKeyName(key);
@@ -32,7 +32,7 @@ const KeyRep& translateKey(LocalKeySym key) {
                 (long unsigned int)key);  // TODO: Wagic is not supposed to know that a key actually is an unsingned
                                           // long, so this part should probably be platform specific (move to JGE ?)
     }
-    const KeyRep k = std::make_pair(str, static_cast<JQuad*>(NULL));
+    const KeyRep k = std::make_pair(str, static_cast<JQuad*>(nullptr));
     fattable[key] = k;
     return fattable[key];
 }
@@ -209,24 +209,24 @@ const KeyRep& translateKey(JButton key) {
     map<const JButton, KeyRep>::iterator res;
     if ((res = slimtable.find(key)) == slimtable.end()) {
         if (slimtable.end() == slimtable.find(JGE_BTN_CTRL)) {
-            slimtable[JGE_BTN_NONE] = make_pair(_("Delete this binding"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_CTRL] = make_pair(_("Select"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_MENU] = make_pair(_("Start"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_UP] = make_pair(_("Up"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_RIGHT] = make_pair(_("Right"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_DOWN] = make_pair(_("Down"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_LEFT] = make_pair(_("Left"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_PREV] = make_pair(_("Left trigger"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_NEXT] = make_pair(_("Right trigger"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_CANCEL] = make_pair(_("Triangle"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_OK] = make_pair(_("Circle"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_SEC] = make_pair(_("Cross"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_PRI] = make_pair(_("Square"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_FULLSCREEN] = make_pair(_("Fullscreen"), static_cast<JQuad*>(NULL));
+            slimtable[JGE_BTN_NONE]       = make_pair(_("Delete this binding"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_CTRL]       = make_pair(_("Select"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_MENU]       = make_pair(_("Start"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_UP]         = make_pair(_("Up"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_RIGHT]      = make_pair(_("Right"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_DOWN]       = make_pair(_("Down"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_LEFT]       = make_pair(_("Left"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_PREV]       = make_pair(_("Left trigger"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_NEXT]       = make_pair(_("Right trigger"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_CANCEL]     = make_pair(_("Triangle"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_OK]         = make_pair(_("Circle"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_SEC]        = make_pair(_("Cross"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_PRI]        = make_pair(_("Square"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_FULLSCREEN] = make_pair(_("Fullscreen"), static_cast<JQuad*>(nullptr));
         } else {
             char* str = NEW char[11];
             sprintf(str, "%d", key);
-            slimtable[key] = std::make_pair(str, static_cast<JQuad*>(static_cast<JQuad*>(NULL)));
+            slimtable[key] = std::make_pair(str, static_cast<JQuad*>(nullptr));
         }
         res = slimtable.find(key);
     }

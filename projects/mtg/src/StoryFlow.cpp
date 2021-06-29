@@ -25,7 +25,7 @@ float StoryDialog::currentY = 2;
 float StoryDialog::previousY = 2;
 bool StoryReward::rewardSoundPlayed = false;
 bool StoryReward::rewardsEnabled = true;
-MTGDeck* StoryReward::collection = NULL;
+MTGDeck* StoryReward::collection    = nullptr;
 
 StoryDialogElement::StoryDialogElement(float x, float y, int id) : JGuiObject(id), mX(x), mY(y) {}
 
@@ -105,7 +105,7 @@ void StoryReward::Update(float dt) {
     }
     case STORY_REWARD_CARD: {
         int cardId = 0;
-        MTGCard* card = NULL;
+        MTGCard* card = nullptr;
         if (value.size()) {
             card = MTGCollection()->getCardByName(value);
             if (card) {
@@ -256,8 +256,8 @@ void StoryDuel::init() {
 }
 
 StoryDuel::StoryDuel(TiXmlElement* root, StoryFlow* mParent) : StoryPage(mParent) {
-    game = NULL;
-    rules = NULL;
+    game   = nullptr;
+    rules  = nullptr;
     pageId = root->Attribute("id");
     for (TiXmlNode* node = root->FirstChild(); node; node = node->NextSibling()) {
         TiXmlElement* element = node->ToElement();
@@ -321,7 +321,7 @@ int StoryPage::loadElement(TiXmlElement* element) {
 }
 
 StoryDialog::StoryDialog(TiXmlElement* root, StoryFlow* mParent)
-    : StoryPage(mParent), JGuiListener(), JGuiController(JGE::GetInstance(), 1, NULL) {
+    : StoryPage(mParent), JGuiListener(), JGuiController(JGE::GetInstance(), 1, nullptr) {
     currentY = 0;
 
     for (TiXmlNode* node = root->FirstChild(); node; node = node->NextSibling()) {
@@ -429,8 +429,8 @@ StoryFlow::StoryFlow(string folder) : folder(folder) {
 
 StoryPage* StoryFlow::loadPage(TiXmlElement* element) {
     TiXmlNode* typeNode = element->FirstChild("type");
-    if (!typeNode) return NULL;
-    StoryPage* result = NULL;
+    if (!typeNode) return nullptr;
+    StoryPage* result = nullptr;
     const char* type = typeNode->ToElement()->GetText();
     if (strcmp(type, "duel") == 0) {
         result = NEW StoryDuel(element, this);
@@ -481,7 +481,7 @@ bool StoryFlow::parse(string path) {
 
     for (TiXmlNode* node = doc.FirstChild(); node; node = node->NextSibling()) {
         TiXmlElement* element = node->ToElement();
-        if (element != NULL) {
+        if (element != nullptr) {
             if (strcmp(element->Value(), "page") == 0) {
                 string id = element->Attribute("id");
 

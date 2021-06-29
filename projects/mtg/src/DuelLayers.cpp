@@ -102,7 +102,7 @@ DuelLayers::~DuelLayers() {
     for (int i = 0; i < _nbitems; ++i) {
         if (objects[i] != mCardSelector) {
             SAFE_DELETE(objects[i]);
-            objects[i] = NULL;
+            objects[i] = nullptr;
         }
     }
 

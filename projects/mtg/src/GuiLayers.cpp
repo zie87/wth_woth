@@ -19,7 +19,7 @@ void GuiLayer::Add(JGuiObject* object) {
 
     MTGAbility* a = dynamic_cast<MTGAbility*>(object);
 
-    if (a != NULL) {
+    if (a != nullptr) {
         AManaProducer* manaObject = dynamic_cast<AManaProducer*>(af.getCoreAbility(a));
         if (manaObject) {
             manaObjects.push_back(object);
@@ -31,7 +31,7 @@ int GuiLayer::Remove(JGuiObject* object) {
     AbilityFactory af(observer);
     MTGAbility* a = dynamic_cast<MTGAbility*>(object);
 
-    if (a != NULL) {
+    if (a != nullptr) {
         AManaProducer* manaObject = dynamic_cast<AManaProducer*>(af.getCoreAbility(a));
         if (manaObject) {
             for (size_t i = 0; i < manaObjects.size(); i++)
@@ -54,12 +54,12 @@ int GuiLayer::getMaxId() { return (int)(mObjects.size()); }
 
 void GuiLayer::Render() {
     for (size_t i = 0; i < mObjects.size(); i++)
-        if (mObjects[i] != NULL) mObjects[i]->Render();
+        if (mObjects[i] != nullptr) mObjects[i]->Render();
 }
 
 void GuiLayer::Update(float dt) {
     for (size_t i = 0; i < mObjects.size(); i++)
-        if (mObjects[i] != NULL) mObjects[i]->Update(dt);
+        if (mObjects[i] != nullptr) mObjects[i]->Update(dt);
 }
 
 void GuiLayer::resetObjects() {
@@ -72,7 +72,7 @@ void GuiLayer::resetObjects() {
             // For now, if we get here, clear out the MTGCardInstance pointer of a CardView before calling delete.
             CardView* cardView = dynamic_cast<CardView*>(mObjects[i]);
             if (cardView) {
-                cardView->card = NULL;
+                cardView->card = nullptr;
             }
             delete mObjects[i];
         }

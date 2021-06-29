@@ -117,7 +117,7 @@ AIStat* AIStats::find(MTGCard* source) {
         AIStat* stat = *it;
         if (stat->source == id) return stat;
     }
-    return NULL;
+    return nullptr;
 }
 
 void AIStats::load(char* filename) {

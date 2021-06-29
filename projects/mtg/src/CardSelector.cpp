@@ -41,16 +41,16 @@ CardSelector::SelectorMemory::SelectorMemory(PlayGuiObject* object) : object(obj
     }
 }
 CardSelector::SelectorMemory::SelectorMemory() {
-    object = NULL;
+    object = nullptr;
     x = y = 0;
 }
 
 CardSelector::CardSelector(GameObserver* observer, DuelLayers* duel)
-    : CardSelectorBase(observer), active(NULL), duel(duel), limitor(NULL), bigpos(300, 145, 1.0, 0.0, 220) {}
+    : CardSelectorBase(observer), active(nullptr), duel(duel), limitor(nullptr), bigpos(300, 145, 1.0, 0.0, 220) {}
 
 void CardSelector::Add(CardSelector::Target* target) {
-    if (NULL == active)
-        if (NULL == limitor || limitor->select(active)) active = target;
+    if (nullptr == active)
+        if (nullptr == limitor || limitor->select(active)) active = target;
     CardView* c = dynamic_cast<CardView*>(target);
     if (c) c->zoom = 1.0f;
     c = dynamic_cast<CardView*>(active);
@@ -68,17 +68,17 @@ void CardSelector::Remove(CardSelector::Target* card) {
                 c = dynamic_cast<CardView*>(active);
                 if (c) c->zoom = 1.4f;
             }
-            if (active == *it) active = NULL;
+            if (active == *it) active = nullptr;
             cards.erase(it);
             return;
         }
 }
 
 CardSelector::Target* CardSelector::fetchMemory(SelectorMemory& memory) {
-    if (NULL == memory.object) return NULL;
+    if (nullptr == memory.object) return nullptr;
     for (vector<Target*>::iterator it = cards.begin(); it != cards.end(); ++it)
         if (*it == memory.object) {
-            if ((NULL == limitor) || (limitor->select(memory.object)))
+            if ((nullptr == limitor) || (limitor->select(memory.object)))
                 return memory.object;
             else
                 break;
@@ -119,7 +119,7 @@ void CardSelector::Pop() {
 bool CardSelector::CheckUserInput(JButton key) {
     if (!active) {
         for (vector<Target*>::iterator it = cards.begin(); it != cards.end(); ++it)
-            if ((NULL == limitor) || (limitor->select(*it))) {
+            if ((nullptr == limitor) || (limitor->select(*it))) {
                 active = *it;
                 active->Entering();
                 return true;
@@ -269,7 +269,7 @@ void CardSelector::Limit(LimitorFunctor<PlayGuiObject>* limitor, CardView::Selec
         }
 
         if (limitor && !limitor->select(active)) {
-            active = NULL;
+            active = nullptr;
             for (vector<PlayGuiObject*>::iterator it = cards.begin(); it != cards.end(); ++it)
                 if (limitor->select(*it)) {
                     active = *it;
@@ -293,7 +293,7 @@ void CardSelector::Limit(LimitorFunctor<PlayGuiObject>* limitor, CardView::Selec
 }
 
 void CardSelector::PushLimitor() {
-    if (NULL == limitor) return;
+    if (nullptr == limitor) return;
     CardView::SelectorZone owner;
     if (CardView* q = dynamic_cast<CardView*>(active))
         owner = q->owner;

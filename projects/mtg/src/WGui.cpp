@@ -414,7 +414,7 @@ bool WGuiList::CheckUserInput(JButton key) {
 }
 
 string WDecoEnum::lookupVal(int value) {
-    if (edef == NULL) {
+    if (edef == nullptr) {
         int id = getId();
         if (id != INVALID_ID) {
             GameOptionEnum* goEnum = dynamic_cast<GameOptionEnum*>(options.get(getId()));
@@ -461,7 +461,7 @@ WDecoConfirm::WDecoConfirm(JGuiListener* _listener, WGuiBase* _it) : WGuiDeco(_i
     listener = _listener;
     confirm = "Confirm";
     cancel = "Cancel";
-    confirmMenu = NULL;
+    confirmMenu = nullptr;
     bModal = false;
     mState = OP_CONFIRMED;
 }
@@ -803,7 +803,7 @@ void WGuiMenu::ButtonPressed(int controllerId, int controlId) {
 
 WGuiBase* WGuiMenu::Current() {
     if (currentItem >= 0 && currentItem < (int)items.size()) return items[currentItem];
-    return NULL;
+    return nullptr;
 }
 void WGuiMenu::Add(WGuiBase* it) {
     if (it) items.push_back(it);
@@ -918,7 +918,7 @@ bool WGuiMenu::nextItem() {
     int nbitems = (int)items.size();
     if (nbitems < 2) return false;
 
-    WGuiBase* now = NULL;
+    WGuiBase* now = nullptr;
     if (currentItem < nbitems && currentItem > -1) now = items[currentItem];
 
     if (potential < nbitems - 1)
@@ -941,7 +941,7 @@ bool WGuiMenu::nextItem() {
 
 bool WGuiMenu::prevItem() {
     int potential = currentItem;
-    WGuiBase* now = NULL;
+    WGuiBase* now = nullptr;
     int nbitems = (int)items.size();
     if (nbitems < 2) return false;
 
@@ -1213,10 +1213,10 @@ WGuiCardImage::WGuiCardImage(WDataSource* wds, bool _thumb) : WGuiImage(wds) { b
 
 void WGuiCardImage::Render() {
     JRenderer* renderer = JRenderer::GetInstance();
-    MTGCard* c = NULL;
+    MTGCard* c          = nullptr;
     Pos p(x + margin, y + margin, 1, 0, 255);
 
-    if (!source || (c = source->getCard(mOffset.getPos())) == NULL) {  // No card, use card back.
+    if (!source || (c = source->getCard(mOffset.getPos())) == nullptr) {  // No card, use card back.
         JQuadPtr q;
         if (bThumb) {
             q = WResourceManager::Instance()->GetQuad(kGenericCardThumbnailID);
@@ -1239,7 +1239,7 @@ void WGuiCardImage::Render() {
             }
             if (!q.get()) {
                 q = CardGui::AlternateThumbQuad(c);
-                if (q.get() == NULL) return;  // TODO Some kind of error image.
+                if (q.get() == nullptr) return;  // TODO Some kind of error image.
             }
             renderer->RenderQuad(q.get(), p.x, p.y);
         } else {  // Normal card.
@@ -1254,7 +1254,7 @@ void WGuiCardImage::Render() {
 // WGuiCardDistort
 WGuiCardDistort::WGuiCardDistort(WDataSource* wds, bool _thumb, WDataSource* _distort) : WGuiCardImage(wds, _thumb) {
     mesh = NEW hgeDistortionMesh(2, 2);
-    distortSrc = NULL;
+    distortSrc = nullptr;
 }
 WGuiCardDistort::~WGuiCardDistort() { SAFE_DELETE(mesh); }
 
@@ -1445,7 +1445,7 @@ void WGuiFilters::ButtonPressed(int controllerId, int controlId) {
         }
         return;
     } else {
-        if (list != NULL) list->ButtonPressed(controllerId, controlId);
+        if (list != nullptr) list->ButtonPressed(controllerId, controlId);
     }
 }
 
@@ -1456,7 +1456,7 @@ void WGuiFilters::buildList() {
     WGuiButton* mid = NEW WGuiButton(NEW WGuiItem("Clear"), -102, -66, this);
     WGuiSplit* sub = NEW WGuiSplit(mid, r);
     WGuiSplit* wgs = NEW WGuiSplit(l, sub);
-    subMenu = NULL;
+    subMenu         = nullptr;
     list->Add(NEW WGuiHeader(displayValue));
     list->Add(wgs);
     list->Entering(JGE_BTN_NONE);
@@ -1864,7 +1864,7 @@ string WGuiFilterItem::getCode() {
 WGuiKeyBinder::WGuiKeyBinder(string name, GameStateOptions* parent)
     : WGuiList(name),
       parent(parent),
-      confirmMenu(NULL),
+      confirmMenu(nullptr),
       modal(false),
       confirmed(CONFIRM_NEED),
       confirmingKey(LOCAL_KEY_NONE),
@@ -2001,7 +2001,7 @@ void WGuiKeyBinder::ButtonPressed(int controllerId, int controlId) {
     else
         confirmed = CONFIRM_CANCEL;
     SAFE_DELETE(confirmMenu);
-    confirmMenu = NULL;
+    confirmMenu = nullptr;
 }
 
 void WGuiKeyBinder::Render() {

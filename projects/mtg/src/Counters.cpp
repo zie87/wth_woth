@@ -34,7 +34,7 @@ int Counter::cancelCounter(int power, int toughness) {
         GameObserver* g = this->target->getObserver();
         this->removed();
         this->nb--;
-        WEvent* t = NEW WEventCounters(NULL, "", power * -1, toughness * -1, false, true);
+        WEvent* t = NEW WEventCounters(nullptr, "", power * -1, toughness * -1, false, true);
         dynamic_cast<WEventCounters*>(t)->targetCard = this->target;
         g->receiveEvent(t);
         this->target->counters->removeCounter(power, toughness);
@@ -126,8 +126,8 @@ int Counters::removeCounter(const char* _name, int _power, int _toughness) {
                 MTGCardInstance* copy = target->controller()->game->putInZone(target, target->currentZone,
                                                                               target->controller()->game->stack);
 
-                game->mLayers->stackLayer()->addSpell(copy, game->targetChooser, NULL, 1, 0);
-                game->targetChooser = NULL;
+                game->mLayers->stackLayer()->addSpell(copy, game->targetChooser, nullptr, 1, 0);
+                game->targetChooser = nullptr;
             }
             return mCount;
         }
@@ -143,7 +143,7 @@ Counter* Counters::hasCounter(const char* _name, int _power, int _toughness) {
             if (counters[i]->nb > 0) return counters[i];
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 Counter* Counters::hasCounter(int _power, int _toughness) { return hasCounter("", _power, _toughness); }
@@ -154,5 +154,5 @@ Counter* Counters::getNext(Counter* previous) {
         if (found && counters[i]->nb > 0) return counters[i];
         if (counters[i] == previous) found = 1;
     }
-    return NULL;
+    return nullptr;
 }

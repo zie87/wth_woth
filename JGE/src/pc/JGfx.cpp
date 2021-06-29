@@ -273,7 +273,7 @@ static glslFunctions g_glslfuncts;
 
 JQuad::JQuad(JTexture* tex, float x, float y, float width, float height)
     : mTex(tex), mX(x), mY(y), mWidth(width), mHeight(height) {
-    JASSERT(tex != NULL);
+    JASSERT(tex != nullptr);
     JRenderer::GetInstance()->TransferTextureToGLContext(*tex);
 
     mHotSpotX = 0.0f;
@@ -317,7 +317,7 @@ void JQuad::SetHotSpot(float x, float y) {
 
 //////////////////////////////////////////////////////////////////////////
 
-JTexture::JTexture() : mBuffer(NULL) { mTexId = -1; }
+JTexture::JTexture() : mBuffer(nullptr) { mTexId = -1; }
 
 JTexture::~JTexture() {
     checkGlError();
@@ -326,7 +326,7 @@ JTexture::~JTexture() {
 
     if (mBuffer) {
         delete[] mBuffer;
-        mBuffer = NULL;
+        mBuffer = nullptr;
     }
 }
 
@@ -339,16 +339,16 @@ void JTexture::UpdateBits(int x, int y, int width, int height, PIXEL_TYPE* bits)
 
 //////////////////////////////////////////////////////////////////////////
 
-JRenderer* JRenderer::mInstance = NULL;
+JRenderer* JRenderer::mInstance = nullptr;
 bool JRenderer::m3DEnabled      = false;
 
 void JRenderer::Set3DFlag(bool flag) { m3DEnabled = flag; }
 
 JRenderer* JRenderer::GetInstance() {
-    if (mInstance == NULL) {
+    if (mInstance == nullptr) {
         mInstance = new JRenderer();
 
-        JASSERT(mInstance != NULL);
+        JASSERT(mInstance != nullptr);
 
         mInstance->InitRenderer();
     }
@@ -360,7 +360,7 @@ void JRenderer::Destroy() {
     if (mInstance) {
         mInstance->DestroyRenderer();
         delete mInstance;
-        mInstance = NULL;
+        mInstance = nullptr;
     }
 }
 
@@ -536,7 +536,7 @@ GLuint esLoadShader(GLenum type, const char* shaderSrc) {
     if (shader == 0) return 0;
 
     // Load the shader source
-    glShaderSource(shader, 1, &shaderSrc, NULL);
+    glShaderSource(shader, 1, &shaderSrc, nullptr);
 
     // Compile the shader
     glCompileShader(shader);
@@ -552,7 +552,7 @@ GLuint esLoadShader(GLenum type, const char* shaderSrc) {
         if (infoLen > 1) {
             char* infoLog = (char*)malloc(sizeof(char) * infoLen);
 
-            glGetShaderInfoLog(shader, infoLen, NULL, infoLog);
+            glGetShaderInfoLog(shader, infoLen, nullptr, infoLog);
             printf("Error compiling shader:\n%s\n", infoLog);
 
             free(infoLog);
@@ -612,7 +612,7 @@ GLuint esLoadProgram(const char* vertShaderSrc, const char* fragShaderSrc) {
         if (infoLen > 1) {
             char* infoLog = (char*)malloc(sizeof(char) * infoLen);
 
-            glGetProgramInfoLog(programObject, infoLen, NULL, infoLog);
+            glGetProgramInfoLog(programObject, infoLen, nullptr, infoLog);
             printf("Error linking program:\n%s\n", infoLog);
 
             free(infoLog);
@@ -636,7 +636,7 @@ GLuint esLoadProgram(const char* vertShaderSrc, const char* fragShaderSrc) {
 void JRenderer::InitRenderer() {
     checkGlError();
     mCurrentTextureFilter = TEX_FILTER_NONE;
-    mImageFilter          = NULL;
+    mImageFilter          = nullptr;
 
     mCurrTexBlendSrc  = BLEND_SRC_ALPHA;
     mCurrTexBlendDest = BLEND_ONE_MINUS_SRC_ALPHA;
@@ -1522,7 +1522,7 @@ JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureForm
 #endif
 
 void JRenderer::TransferTextureToGLContext(JTexture& inTexture) {
-    if (inTexture.mBuffer != NULL) {
+    if (inTexture.mBuffer != nullptr) {
         GLuint texid;
         checkGlError();
         glGenTextures(1, &texid);
@@ -1569,7 +1569,7 @@ void JRenderer::TransferTextureToGLContext(JTexture& inTexture) {
             }
         }
         delete[] inTexture.mBuffer;
-        inTexture.mBuffer = NULL;
+        inTexture.mBuffer = nullptr;
 
         checkGlError();
     }
@@ -1608,7 +1608,7 @@ JTexture* JRenderer::CreateTexture(int width, int height, int mode __attribute__
 
         } else {
             delete tex;
-            tex = NULL;
+            tex = nullptr;
         }
     }
 

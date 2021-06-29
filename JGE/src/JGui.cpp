@@ -11,7 +11,7 @@
 #include "JGE.h"
 #include "JGui.h"
 
-JGE* JGuiObject::mEngine = NULL;
+JGE* JGuiObject::mEngine = nullptr;
 
 JGuiObject::JGuiObject(int id) : mId(id) { mEngine = JGE::GetInstance(); }
 
@@ -32,8 +32,8 @@ void JGuiObject::Update(float dt __attribute__((unused))) {}
 std::ostream& operator<<(std::ostream& out, const JGuiObject& j) { return j.toString(out); }
 
 JGuiController::JGuiController(JGE* jge, int id, JGuiListener* listener) : mEngine(jge), mId(id), mListener(listener) {
-    mBg = NULL;
-    mShadingBg = NULL;
+    mBg        = nullptr;
+    mShadingBg = nullptr;
 
     mCount = 0;
     mCurr = 0;
@@ -52,29 +52,29 @@ JGuiController::JGuiController(JGE* jge, int id, JGuiListener* listener) : mEngi
 
 JGuiController::~JGuiController() {
     for (int i = 0; i < mCount; i++)
-        if (mObjects[i] != NULL) delete mObjects[i];
+        if (mObjects[i] != nullptr) delete mObjects[i];
     for (size_t i = 0; i < mButtons.size(); i++)
-        if (mButtons[i] != NULL) delete mButtons[i];
+        if (mButtons[i] != nullptr) delete mButtons[i];
 }
 
 void JGuiController::Render() {
     for (int i = 0; i < mCount; i++)
-        if (mObjects[i] != NULL) mObjects[i]->Render();
+        if (mObjects[i] != nullptr) mObjects[i]->Render();
 }
 
 bool JGuiController::CheckUserInput(JButton key) {
     if (!mCount) return false;
     if (key == mActionButton) {
-        if (!mObjects.empty() && mObjects[mCurr] != NULL && mObjects[mCurr]->ButtonPressed()) {
-            if (mListener != NULL) mListener->ButtonPressed(mId, mObjects[mCurr]->GetId());
+        if (!mObjects.empty() && mObjects[mCurr] != nullptr && mObjects[mCurr]->ButtonPressed()) {
+            if (mListener != nullptr) mListener->ButtonPressed(mId, mObjects[mCurr]->GetId());
             return true;
         }
     } else if (key == mCancelButton) {
-        if (mListener != NULL) {
+        if (mListener != nullptr) {
             mListener->ButtonPressed(mId, kCancelMenuID);
         }
     } else if (JGE_BTN_CANCEL == key) {
-        if (mListener != NULL) mListener->ButtonPressed(mId, kInfoMenuID);
+        if (mListener != nullptr) mListener->ButtonPressed(mId, kInfoMenuID);
         return true;
     } else if ((JGE_BTN_LEFT == key) ||
                (JGE_BTN_UP == key))  // || mEngine->GetAnalogY() < 64 || mEngine->GetAnalogX() < 64)
@@ -88,7 +88,7 @@ bool JGuiController::CheckUserInput(JButton key) {
                 n = 0;
         }
 
-        if (n != mCurr && mObjects[mCurr] != NULL && mObjects[mCurr]->Leaving(JGE_BTN_UP)) {
+        if (n != mCurr && mObjects[mCurr] != nullptr && mObjects[mCurr]->Leaving(JGE_BTN_UP)) {
             mCurr = n;
             mObjects[mCurr]->Entering();
         }
@@ -105,7 +105,7 @@ bool JGuiController::CheckUserInput(JButton key) {
                 n = mCount - 1;
         }
 
-        if (n != mCurr && mObjects[mCurr] != NULL && mObjects[mCurr]->Leaving(JGE_BTN_DOWN)) {
+        if (n != mCurr && mObjects[mCurr] != nullptr && mObjects[mCurr]->Leaving(JGE_BTN_DOWN)) {
             mCurr = n;
             mObjects[mCurr]->Entering();
         }
@@ -137,12 +137,12 @@ bool JGuiController::CheckUserInput(JButton key) {
                     }
                 }
 
-                if (n != mCurr && mObjects[mCurr] != NULL && mObjects[mCurr]->Leaving(JGE_BTN_DOWN)) {
+                if (n != mCurr && mObjects[mCurr] != nullptr && mObjects[mCurr]->Leaving(JGE_BTN_DOWN)) {
                     mCurr = n;
                     mObjects[mCurr]->Entering();
                 }
                 // if the same object was selected process click
-                else if (n == mCurr && mObjects[mCurr] != NULL && mObjects[mCurr]->Leaving(JGE_BTN_OK)) {
+                else if (n == mCurr && mObjects[mCurr] != nullptr && mObjects[mCurr]->Leaving(JGE_BTN_OK)) {
                     mObjects[mCurr]->Entering();
                 }
                 mEngine->LeftClickedProcessed();
@@ -157,7 +157,7 @@ bool JGuiController::CheckUserInput(JButton key) {
 
 void JGuiController::Update(float dt) {
     for (int i = 0; i < mCount; i++)
-        if (mObjects[i] != NULL) mObjects[i]->Update(dt);
+        if (mObjects[i] != nullptr) mObjects[i]->Update(dt);
 
     for (size_t i = 0; i < mButtons.size(); i++) mButtons[i]->Update(dt);
 
@@ -195,14 +195,14 @@ void JGuiController::RemoveAt(int i, bool isButton) {
 
 void JGuiController::Remove(int id) {
     for (int i = 0; i < mCount; i++) {
-        if (mObjects[i] != NULL && mObjects[i]->GetId() == id) {
+        if (mObjects[i] != nullptr && mObjects[i]->GetId() == id) {
             RemoveAt(i);
             return;
         }
     }
 
     for (size_t i = 0; i < mButtons.size(); i++) {
-        if (mButtons[i] != NULL && mButtons[i]->GetId() == id) {
+        if (mButtons[i] != nullptr && mButtons[i]->GetId() == id) {
             RemoveAt(i, true);
             return;
         }
@@ -211,14 +211,14 @@ void JGuiController::Remove(int id) {
 
 void JGuiController::Remove(JGuiObject* ctrl) {
     for (int i = 0; i < mCount; i++) {
-        if (mObjects[i] != NULL && mObjects[i] == ctrl) {
+        if (mObjects[i] != nullptr && mObjects[i] == ctrl) {
             RemoveAt(i);
             return;
         }
     }
 
     for (size_t i = 0; i < mButtons.size(); i++) {
-        if (mButtons[i] != NULL && mButtons[i] == ctrl) {
+        if (mButtons[i] != nullptr && mButtons[i] == ctrl) {
             RemoveAt(i, true);
             return;
         }

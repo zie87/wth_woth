@@ -293,9 +293,9 @@ int GuiPlay::receiveEventPlus(WEvent* e) {
             return 1;
         }
     } else if (WEventCreatureAttacker* event = dynamic_cast<WEventCreatureAttacker*>(e)) {
-        if (NULL != event->after)
+        if (nullptr != event->after)
             battleField.addAttacker(event->card);
-        else if (NULL != event->before)
+        else if (nullptr != event->before)
             battleField.removeAttacker(event->card);
         Replace();
     } else if (dynamic_cast<WEventCreatureBlocker*>(e)) {
@@ -307,7 +307,7 @@ int GuiPlay::receiveEventPlus(WEvent* e) {
             else
                 gModRules.cards.activateEffect->undoEffect(cv);
             // cv->t = event->after ? M_PI / 2 : 0;
-        } else if (event->card->view != NULL) {
+        } else if (event->card->view != nullptr) {
             if (event->after)
                 gModRules.cards.activateEffect->doEffect(event->card->view);
             else

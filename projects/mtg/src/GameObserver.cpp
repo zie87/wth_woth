@@ -38,16 +38,16 @@ void GameObserver::cleanup() {
     }
     players.clear();
 
-    currentPlayer         = NULL;
-    currentActionPlayer   = NULL;
-    isInterrupting        = NULL;
+    currentPlayer         = nullptr;
+    currentActionPlayer   = nullptr;
+    isInterrupting        = nullptr;
     currentPlayerId       = 0;
     currentGamePhase      = MTG_PHASE_INVALID;
-    targetChooser         = NULL;
-    cardWaitingForTargets = NULL;
-    mExtraPayment         = NULL;
-    gameOver              = NULL;
-    phaseRing             = NULL;
+    targetChooser         = nullptr;
+    cardWaitingForTargets = nullptr;
+    mExtraPayment         = nullptr;
+    gameOver              = nullptr;
+    phaseRing             = nullptr;
     replacementEffects    = NEW ReplacementEffects();
     combatStep            = BLOCKERS;
     connectRule           = false;
@@ -70,7 +70,7 @@ GameObserver::~GameObserver() {
     }
     players.clear();
     delete[] ExtraRules;
-    ExtraRules = 0;
+    ExtraRules = nullptr;
 
     WGE_LOG_TRACE("== GameObserver Destroyed ==");
 
@@ -87,22 +87,22 @@ GameObserver::GameObserver(WResourceManager* output, JGE* input)
     ExtraRules = new MTGCardInstance[2]();
 
     mGameType             = GAME_TYPE_CLASSIC;
-    currentPlayer         = NULL;
-    currentActionPlayer   = NULL;
-    isInterrupting        = NULL;
+    currentPlayer         = nullptr;
+    currentActionPlayer   = nullptr;
+    isInterrupting        = nullptr;
     currentPlayerId       = 0;
     currentGamePhase      = MTG_PHASE_INVALID;
-    targetChooser         = NULL;
-    cardWaitingForTargets = NULL;
-    mExtraPayment         = NULL;
-    gameOver              = NULL;
-    phaseRing             = NULL;
+    targetChooser         = nullptr;
+    cardWaitingForTargets = nullptr;
+    mExtraPayment         = nullptr;
+    gameOver              = nullptr;
+    phaseRing             = nullptr;
     replacementEffects    = NEW ReplacementEffects();
     combatStep            = BLOCKERS;
-    mRules                = NULL;
+    mRules                = nullptr;
     connectRule           = false;
     mLoading              = false;
-    mLayers               = NULL;
+    mLayers               = nullptr;
     mTrash                = new Trash();
     mDeckManager          = new DeckManager();
 }
@@ -166,7 +166,7 @@ void GameObserver::nextGamePhase() {
     phaseRing->forward();
 
     // Go directly to end of combat if no attackers
-    if (cPhaseOld->id == MTG_PHASE_COMBATATTACKERS && !(currentPlayer->game->inPlay->getNextAttacker(NULL))) {
+    if (cPhaseOld->id == MTG_PHASE_COMBATATTACKERS && !(currentPlayer->game->inPlay->getNextAttacker(nullptr))) {
         phaseRing->forward();
         phaseRing->forward();
     }
@@ -266,16 +266,16 @@ void GameObserver::userRequestNextGamePhase(bool allowInterrupt, bool log) {
 
     if (getCurrentTargetChooser() && getCurrentTargetChooser()->maxtargets == 1000) {
         getCurrentTargetChooser()->done = true;
-        if (getCurrentTargetChooser()->source) cardClick(getCurrentTargetChooser()->source, 0, false);
+        if (getCurrentTargetChooser()->source) cardClick(getCurrentTargetChooser()->source, nullptr, false);
     }
-    if (allowInterrupt && mLayers->stackLayer()->getNext(NULL, 0, NOT_RESOLVED)) return;
+    if (allowInterrupt && mLayers->stackLayer()->getNext(nullptr, 0, NOT_RESOLVED)) return;
     if (getCurrentTargetChooser()) return;
     // if (mLayers->actionLayer()->isWaitingForAnswer())
     //	return;
     // Wil 12/5/10: additional check, not quite understanding why TargetChooser doesn't seem active at this point.
     // If we deem that an extra cost payment needs to be made, don't allow the next game phase to proceed.
     // Here's what I find weird - if the extra cost is something like a sacrifice, doesn't that imply a TargetChooser?
-    if (WaitForExtraPayment(NULL)) return;
+    if (WaitForExtraPayment(nullptr)) return;
 
     Phase* cPhaseOld = phaseRing->getCurrentPhase();
     if (allowInterrupt && ((cPhaseOld->id == MTG_PHASE_COMBATBLOCKERS && combatStep == ORDER) ||
@@ -359,7 +359,7 @@ void GameObserver::startGame(GameType gtype, Rules* rules) {
         }
     }
 
-    startedAt = time(0);
+    startedAt = time(nullptr);
 
     // Difficult mode special stuff
     if (!players[0]->isAI() && players[1]->isAI()) {
@@ -367,7 +367,7 @@ void GameObserver::startGame(GameType gtype, Rules* rules) {
         if (options[Options::DIFFICULTY_MODE_UNLOCKED].number && difficulty) {
             Player* p = players[1];
             for (int level = 0; level < difficulty; level++) {
-                MTGCardInstance* card = NULL;
+                MTGCardInstance* card = nullptr;
                 MTGGameZone* z        = p->game->library;
                 for (int j = 0; j < z->nb_cards; j++) {
                     MTGCardInstance* _card = z->cards[j];
@@ -443,8 +443,8 @@ bool GameObserver::operator==(const GameObserver& aGame) {
                 error++;
             }
             for (size_t k = 0; k < (size_t)thisZones[j]->nb_cards; k++) {
-                MTGCardInstance* cardToCheck = (k < thisZones[j]->cards.size()) ? thisZones[j]->cards[k] : 0;
-                MTGCardInstance* card        = (k < aZones[j]->cards.size()) ? aZones[j]->cards[k] : 0;
+                MTGCardInstance* cardToCheck = (k < thisZones[j]->cards.size()) ? thisZones[j]->cards[k] : nullptr;
+                MTGCardInstance* card        = (k < aZones[j]->cards.size()) ? aZones[j]->cards[k] : nullptr;
                 if (!card || !cardToCheck || cardToCheck->getId() != card->getId()) {
                     error++;
                 }
@@ -527,7 +527,7 @@ void GameObserver::gameStateBasedEffects() {
             // reset extracost shadows//
             ///////////////////////////
             card->isExtraCostTarget = false;
-            if (mExtraPayment != NULL) {
+            if (mExtraPayment != nullptr) {
                 for (unsigned int ec = 0; ec < mExtraPayment->costs.size(); ec++) {
                     if (mExtraPayment->costs[ec]->target) mExtraPayment->costs[ec]->target->isExtraCostTarget = true;
                 }
@@ -573,8 +573,8 @@ void GameObserver::gameStateBasedEffects() {
             }
 
             if (card->childrenCards.size()) {
-                MTGCardInstance* check   = NULL;
-                MTGCardInstance* matched = NULL;
+                MTGCardInstance* check   = nullptr;
+                MTGCardInstance* matched = nullptr;
                 sort(card->childrenCards.begin(), card->childrenCards.end());
                 for (size_t wC = 0; wC < card->childrenCards.size(); wC++) {
                     check = card->childrenCards[wC];
@@ -656,7 +656,7 @@ void GameObserver::gameStateBasedEffects() {
                 if (c->wasDealtDamage && c->isInPlay(this)) c->wasDealtDamage = false;
                 c->damageToController = false;
                 c->damageToOpponent   = false;
-                c->isAttacking        = NULL;
+                c->isAttacking        = nullptr;
             }
             for (int t = 0; t < nbcards; t++) {
                 MTGCardInstance* c = z->cards[t];
@@ -710,7 +710,7 @@ void GameObserver::gameStateBasedEffects() {
     // phase based state effects------//
     ///////////////////////////////////
     if (combatStep == TRIGGERS) {
-        if (!mLayers->stackLayer()->getNext(NULL, 0, NOT_RESOLVED) && !targetChooser &&
+        if (!mLayers->stackLayer()->getNext(nullptr, 0, NOT_RESOLVED) && !targetChooser &&
             !mLayers->actionLayer()->isWaitingForAnswer())
             mLayers->stackLayer()->AddNextCombatStep();
     }
@@ -796,7 +796,7 @@ void GameObserver::Affinity() {
                         }
                     }
                     TargetChooserFactory tf(this);
-                    TargetChooser* tcn = tf.createTargetChooser(newAff->tcString, card, NULL);
+                    TargetChooser* tcn = tf.createTargetChooser(newAff->tcString, card, nullptr);
 
                     for (int w = 0; w < 2; ++w) {
                         Player* p            = this->players[w];
@@ -844,7 +844,7 @@ void GameObserver::Affinity() {
                 int reduce = 0;
                 if (card->has(Constants::AFFINITYGREENCREATURES)) {
                     TargetChooserFactory tf(this);
-                    TargetChooser* tc = tf.createTargetChooser("creature[green]", NULL);
+                    TargetChooser* tc = tf.createTargetChooser("creature[green]", nullptr);
                     reduce            = card->controller()->game->battlefield->countByCanTarget(tc);
                     SAFE_DELETE(tc);
                 } else {
@@ -899,7 +899,7 @@ void GameObserver::ButtonPressed(PlayGuiObject* target) {
         }
     // end opponenthand
     else if (GuiAvatar* avatar = dynamic_cast<GuiAvatar*>(target)) {
-        cardClick(NULL, avatar->player);
+        cardClick(nullptr, avatar->player);
     } else if (dynamic_cast<GuiPhaseBar*>(target)) {
         mLayers->getPhaseHandler()->NextGamePhase();
     }
@@ -910,10 +910,10 @@ void GameObserver::stackObjectClicked(Interruptible* action) {
     stream << "stack[" << mLayers->stackLayer()->getIndexOf(action) << "]";
     logAction(currentlyActing(), stream.str());
 
-    if (targetChooser != NULL) {
+    if (targetChooser != nullptr) {
         int result = targetChooser->toggleTarget(action);
         if (result == TARGET_OK_FULL) {
-            cardClick(cardWaitingForTargets, 0, false);
+            cardClick(cardWaitingForTargets, nullptr, false);
         } else {
             return;
         }
@@ -931,7 +931,7 @@ bool GameObserver::WaitForExtraPayment(MTGCardInstance* card) {
         }
         if (mExtraPayment->isPaymentSet()) {
             mLayers->actionLayer()->reactToClick(mExtraPayment->action, mExtraPayment->source);
-            mExtraPayment = NULL;
+            mExtraPayment = nullptr;
         }
         result = true;
     }
@@ -981,11 +981,11 @@ int GameObserver::cardClickLog(bool log, Player* clickedPlayer, MTGGameZone* zon
 }
 
 int GameObserver::cardClick(MTGCardInstance* card, Targetable* object, bool log) {
-    Player* clickedPlayer   = NULL;
+    Player* clickedPlayer   = nullptr;
     int toReturn            = 0;
-    MTGGameZone* zone       = NULL;
+    MTGGameZone* zone       = nullptr;
     size_t index            = 0;
-    MTGCardInstance* backup = NULL;
+    MTGCardInstance* backup = nullptr;
 
     if (!card) {
         clickedPlayer = ((Player*)object);
@@ -1173,10 +1173,10 @@ Player* GameObserver::currentlyActing() {
 
 // TODO CORRECT THIS MESS
 int GameObserver::targetListIsSet(MTGCardInstance* card) {
-    if (targetChooser == NULL) {
+    if (targetChooser == nullptr) {
         TargetChooserFactory tcf(this);
         targetChooser = tcf.createTargetChooser(card);
-        if (targetChooser == NULL) {
+        if (targetChooser == nullptr) {
             return 1;
         }
     }
@@ -1313,7 +1313,7 @@ bool GameObserver::load(const string& ss, bool undo
                 mLayers->init(this);
                 currentPlayer = players[currentPlayerId];
                 phaseRing     = NEW PhaseRing(this);
-                startedAt     = time(0);
+                startedAt     = time(nullptr);
 
                 // take a snapshot before processing the actions
                 resetStartupGame();
@@ -1380,7 +1380,7 @@ bool GameObserver::processActions(bool undo
         Player* p = players[1];
         if (s.find("p1") != string::npos) p = players[0];
 
-        MTGGameZone* zone = NULL;
+        MTGGameZone* zone = nullptr;
         if (s.find(string(p->game->hand->getName()) + "[") != string::npos)
             zone = p->game->hand;
         else if (s.find(string(p->game->battlefield->getName()) + "[") != string::npos)
@@ -1412,12 +1412,12 @@ bool GameObserver::processActions(bool undo
         } else if (s.find("combatok") != string::npos) {
             mLayers->combatLayer()->clickOK();
         } else if (s == "p1" || s == "p2") {
-            cardClick(NULL, p);
+            cardClick(nullptr, p);
         } else if (s.find("choice") != string::npos) {
             int choice = atoi(s.substr(s.find("choice ") + 7).c_str());
             mLayers->actionLayer()->doReactTo(choice);
         } else if (s == "p1" || s == "p2") {
-            cardClick(NULL, p);
+            cardClick(nullptr, p);
         } else if (s.find("mulligan") != string::npos) {
             Mulligan(p);
         } else if (s.find("shufflelib") != string::npos) {
@@ -1458,7 +1458,7 @@ void GameObserver::logAction(Player* player, const string& s) {
 
 void GameObserver::logAction(MTGCardInstance* card, MTGGameZone* zone, size_t index, int result) {
     std::stringstream stream;
-    if (zone == NULL) zone = card->currentZone;
+    if (zone == nullptr) zone = card->currentZone;
     stream << "p" << ((card->controller() == players[0]) ? "1." : "2.") << zone->getName() << "[" << index << "] "
            << result << card->getLCName();
     logAction(stream.str());
@@ -1498,7 +1498,7 @@ void GameObserver::createPlayer(const string& playerMode
         if (players.size())
             players.push_back(playerCreator.createAIPlayer(this, MTGCollection(), players[0]));
         else
-            players.push_back(playerCreator.createAIPlayer(this, MTGCollection(), 0));
+            players.push_back(playerCreator.createAIPlayer(this, MTGCollection(), nullptr));
         break;
     case Player::MODE_HUMAN:
         players.push_back(new HumanPlayer(this, "", ""));
@@ -1526,10 +1526,10 @@ void GameObserver::loadPlayer(int playerId, Player* player) {
     // see http://code.google.com/p/wagic/issues/detail?id=772
     if (players.size() > (size_t)playerId) {
         SAFE_DELETE(players[playerId]);
-        players[playerId] = NULL;
+        players[playerId] = nullptr;
     } else {
         while (players.size() <= (size_t)playerId) {
-            players.push_back(NULL);
+            players.push_back(nullptr);
         }
     }
 
@@ -1561,7 +1561,7 @@ void GameObserver::loadPlayer(int playerId, PlayerType playerType, int decknb, b
             }
         } else {  // AI Player, chooses deck
             AIPlayerFactory playerCreator;
-            Player* opponent = NULL;
+            Player* opponent = nullptr;
             if (playerId == 1) opponent = players[0];
 
             loadPlayer(playerId, playerCreator.createAIPlayer(this, MTGCollection(), opponent, decknb));
@@ -1569,7 +1569,7 @@ void GameObserver::loadPlayer(int playerId, PlayerType playerType, int decknb, b
     } else {
         // Random deck
         AIPlayerFactory playerCreator;
-        Player* opponent = NULL;
+        Player* opponent = nullptr;
 
         // Reset the random logging.
         randomGenerator.loadRandValues("");

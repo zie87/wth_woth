@@ -32,17 +32,17 @@ struct Right : public Exp {
     }
 };
 
-JTexture* GuiCombat::ok_tex = NULL;
+JTexture* GuiCombat::ok_tex = nullptr;
 
 GuiCombat::GuiCombat(GameObserver* go)
     : GuiLayer(go),
-      active(NULL),
-      activeAtk(NULL),
+      active(nullptr),
+      activeAtk(nullptr),
       ok(SCREEN_WIDTH - MARGIN, 210, 1, 0, 255),
       enemy_avatar(SCREEN_WIDTH - MARGIN, TOP_LINE, 2, 0, 255),
       cursor_pos(NONE),
       step(DAMAGE) {
-    if (NULL == ok_tex && go->getResourceManager()) {
+    if (nullptr == ok_tex && go->getResourceManager()) {
         ok_tex = go->getResourceManager()->RetrieveTexture("Ok.png", RETRIEVE_LOCK);
         // send a message out to listeners that we created the GO button and it's location
     }
@@ -51,7 +51,7 @@ GuiCombat::GuiCombat(GameObserver* go)
 GuiCombat::~GuiCombat() {
     if (ok_tex && observer->getResourceManager()) {
         observer->getResourceManager()->Release(ok_tex);
-        ok_tex = NULL;
+        ok_tex = nullptr;
     }
 
     for (inner_iterator it = attackers.begin(); it != attackers.end(); ++it) delete (*it);
@@ -147,7 +147,7 @@ void GuiCombat::removeOne(DefenserDamaged* blocker, CombatStep step) {
 
 bool GuiCombat::clickOK() {
     observer->logAction(observer->currentlyActing(), "combatok");
-    active = activeAtk = NULL;
+    active = activeAtk = nullptr;
     cursor_pos = NONE;
     switch (step) {
     case BLOCKERS:
@@ -188,7 +188,7 @@ void GuiCombat::shiftLeft() {
         break;
     case ATK: {
         DamagerDamaged* old = active;
-        active = closest<Left>(attackers, NULL, static_cast<AttackerDamaged*>(active));
+        active              = closest<Left>(attackers, nullptr, static_cast<AttackerDamaged*>(active));
         activeAtk = static_cast<AttackerDamaged*>(active);
         if (old != active) {
             if (old) old->zoom = kZoom_none;
@@ -197,7 +197,7 @@ void GuiCombat::shiftLeft() {
     } break;
     case BLK: {
         DamagerDamaged* old = active;
-        active = closest<Left>(activeAtk->blockers, NULL, static_cast<DefenserDamaged*>(active));
+        active              = closest<Left>(activeAtk->blockers, nullptr, static_cast<DefenserDamaged*>(active));
         if (old != active) {
             if (old) old->zoom = kZoom_none;
             if (active) active->zoom = kZoom_level1;
@@ -213,7 +213,7 @@ void GuiCombat::shiftRight(DamagerDamaged* oldActive) {
         break;
     case BLK: {
         DamagerDamaged* old = active;
-        active = closest<Right>(activeAtk->blockers, NULL, static_cast<DefenserDamaged*>(active));
+        active              = closest<Right>(activeAtk->blockers, nullptr, static_cast<DefenserDamaged*>(active));
         if (old != active) {
             if (old) old->zoom = kZoom_none;
             if (active) active->zoom = kZoom_level1;
@@ -221,9 +221,9 @@ void GuiCombat::shiftRight(DamagerDamaged* oldActive) {
     } break;
     case ATK: {
         DamagerDamaged* old = active;
-        active = closest<Right>(attackers, NULL, static_cast<AttackerDamaged*>(active));
+        active              = closest<Right>(attackers, nullptr, static_cast<AttackerDamaged*>(active));
         if (active == oldActive) {
-            active = activeAtk = NULL;
+            active = activeAtk = nullptr;
             cursor_pos = OK;
         } else {
             if (old != active) {
@@ -260,7 +260,7 @@ bool GuiCombat::CheckUserInput(JButton key) {
         // position selected card
         if (BLK == cursor_pos) {
             DamagerDamaged* selectedCard =
-                closest<True>(activeAtk->blockers, NULL, static_cast<float>(x), static_cast<float>(y));
+                closest<True>(activeAtk->blockers, nullptr, static_cast<float>(x), static_cast<float>(y));
             // find the index into the vector where the current selected card is.
             int c1 = 0, c2 = 0;
             int i = 0;
@@ -332,17 +332,17 @@ bool GuiCombat::CheckUserInput(JButton key) {
         addOne(active, step);
         break;
     case JGE_BTN_PRI:
-        active = activeAtk = NULL;
+        active = activeAtk = nullptr;
         cursor_pos = OK;
         break;
     case JGE_BTN_NEXT:
         if (!options[Options::REVERSETRIGGERS].number) return false;
-        active = activeAtk = NULL;
+        active = activeAtk = nullptr;
         cursor_pos = OK;
         break;
     case JGE_BTN_PREV:
         if (options[Options::REVERSETRIGGERS].number) return false;
-        active = activeAtk = NULL;
+        active = activeAtk = nullptr;
         cursor_pos = OK;
         break;
     default:;
@@ -449,20 +449,20 @@ int GuiCombat::resolve()  // Returns the number of damage objects dealt this tur
 
 int GuiCombat::receiveEventPlus(WEvent* e) {
     if (WEventCreatureAttacker* event = dynamic_cast<WEventCreatureAttacker*>(e)) {
-        if (NULL == event->after) return 0;
+        if (nullptr == event->after) return 0;
         Pos pos(0, 0, 0, 0, 255);
-        if (event->card->view != NULL) pos = *event->card->view;
+        if (event->card->view != nullptr) pos = *event->card->view;
 
-        AttackerDamaged* t = NEW AttackerDamaged(event->card, pos, true, NULL);
+        AttackerDamaged* t = NEW AttackerDamaged(event->card, pos, true, nullptr);
         attackers.push_back(t);
         return 1;
     } else if (WEventCreatureBlocker* event = dynamic_cast<WEventCreatureBlocker*>(e)) {
         for (inner_iterator it = attackers.begin(); it != attackers.end(); ++it)
             if ((*it)->card == event->after) {
                 Pos pos(0, 0, 0, 0, 255);
-                if (event->card->view != NULL) pos = *event->card->view;
+                if (event->card->view != nullptr) pos = *event->card->view;
 
-                DefenserDamaged* t = NEW DefenserDamaged(event->card, pos, true, NULL);
+                DefenserDamaged* t = NEW DefenserDamaged(event->card, pos, true, nullptr);
                 t->y = t->actY = TOP_LINE;
                 t->actT = t->t = 0;
                 t->actZ = t->zoom = kZoom_level2;
@@ -496,7 +496,7 @@ int GuiCombat::receiveEventMinus(WEvent* e) {
             for (inner_iterator it = attackers.begin(); it != attackers.end(); ++it)
                 if ((*it)->card == event->card->previous || (*it)->card == event->card) {
                     AttackerDamaged* d = *it;
-                    if (activeAtk == *it) activeAtk = NULL;
+                    if (activeAtk == *it) activeAtk = nullptr;
                     attackers.erase(it);
                     observer->mTrash->trash(d);
                     return 1;
@@ -512,7 +512,7 @@ int GuiCombat::receiveEventMinus(WEvent* e) {
             return 0;
         }
     if (WEventCreatureAttacker* event = dynamic_cast<WEventCreatureAttacker*>(e)) {
-        if (NULL == event->before) return 0;
+        if (nullptr == event->before) return 0;
         for (inner_iterator it = attackers.begin(); it != attackers.end(); ++it)
             if ((*it)->card == event->card) {
                 AttackerDamaged* d = *it;
@@ -556,7 +556,7 @@ int GuiCombat::receiveEventMinus(WEvent* e) {
                 (*it)->show = (1 < (*it)->blockers.size());
                 autoaffectDamage(*it, DAMAGE);
             }
-            active = activeAtk = NULL;
+            active = activeAtk = nullptr;
             for (inner_iterator it = attackers.begin(); it != attackers.end(); ++it)
                 if ((*it)->show) {
                     (*it)->y = 210;
@@ -568,7 +568,7 @@ int GuiCombat::receiveEventMinus(WEvent* e) {
             if (active) {
                 active->zoom = kZoom_level3;
                 activeAtk = static_cast<AttackerDamaged*>(active);
-                remaskBlkViews(NULL, static_cast<AttackerDamaged*>(active));
+                remaskBlkViews(nullptr, static_cast<AttackerDamaged*>(active));
                 cursor_pos = ATK;
                 step = ORDER;
             } else
@@ -606,7 +606,7 @@ int GuiCombat::receiveEventMinus(WEvent* e) {
                      ((*it)->card->has(Constants::FIRSTSTRIKE) ^ (DAMAGE == step))) &&
                     (((*it)->card->has(Constants::TRAMPLE) ? (size_t)0 : (size_t)1) < (*it)->blockers.size());
             repos<AttackerDamaged>(attackers.begin(), attackers.end(), 0);
-            active = activeAtk = NULL;
+            active = activeAtk = nullptr;
             for (inner_iterator it = attackers.begin(); it != attackers.end(); ++it)
                 if ((*it)->show) {
                     active = *it;
@@ -615,7 +615,7 @@ int GuiCombat::receiveEventMinus(WEvent* e) {
             if (active) {
                 active->zoom = kZoom_level3;
                 activeAtk = static_cast<AttackerDamaged*>(active);
-                remaskBlkViews(NULL, static_cast<AttackerDamaged*>(active));
+                remaskBlkViews(nullptr, static_cast<AttackerDamaged*>(active));
                 cursor_pos = ATK;
             } else
                 observer->nextCombatStep();

@@ -52,7 +52,7 @@ JSocket::JSocket(std::string ipAddr) : state(NOT_AVAILABLE), mfd(-1) {
 #elif LINUX
     hostentptr = gethostbyname(ipAddr.c_str());
 #endif
-    if (hostentptr == NULL) {
+    if (hostentptr == nullptr) {
         WGE_LOG_ERROR("ERROR, no such host");
         return;
     }
@@ -180,7 +180,7 @@ JSocket* JSocket::Accept() {
     socklen_t Longueur_Adresse;
 #endif  // WINDOWS
 
-    JSocket* socket = NULL;
+    JSocket* socket = nullptr;
 
     while (mfd) {
         fd_set set;
@@ -190,7 +190,7 @@ JSocket* JSocket::Accept() {
         tv.tv_sec  = 0;
         tv.tv_usec = 1000 * 100;
 
-        int result = select(mfd + 1, &set, NULL, NULL, &tv);
+        int result = select(mfd + 1, &set, nullptr, nullptr, &tv);
         if (result > 0 && FD_ISSET(mfd, &set)) {
             Longueur_Adresse = sizeof(Adresse_Socket_Cliente);
             int val          = accept(mfd, (struct sockaddr*)&Adresse_Socket_Cliente, &Longueur_Adresse);
@@ -216,7 +216,7 @@ int JSocket::Read(char* buff, int size) {
         tv.tv_sec  = 0;
         tv.tv_usec = 1000 * 100;
 
-        int result = select(mfd + 1, &set, NULL, NULL, &tv);
+        int result = select(mfd + 1, &set, nullptr, nullptr, &tv);
         if (result > 0 && FD_ISSET(mfd, &set)) {
 #ifdef WIN32
             int readbytes = recv(mfd, buff, size, 0);
@@ -245,7 +245,7 @@ int JSocket::Write(char* buff, int size) {
         tv.tv_sec  = 0;
         tv.tv_usec = 1000 * 100;
 
-        int result = select(mfd + 1, NULL, &set, NULL, &tv);
+        int result = select(mfd + 1, nullptr, &set, nullptr, &tv);
         if (result > 0 && FD_ISSET(mfd, &set)) {
             int len = send(mfd, buff, size, 0);
             if (len < 0) {

@@ -8,7 +8,7 @@
 
 AIMomirPlayer::AIMomirPlayer(GameObserver* observer, string file, string fileSmall, string avatarFile, MTGDeck* deck)
     : AIPlayerBaka(observer, file, fileSmall, avatarFile, deck) {
-    momirAbility = NULL;
+    momirAbility = nullptr;
     agressivity = 100;
 }
 
@@ -86,7 +86,7 @@ int AIMomirPlayer::computeActions() {
         return 1;
     } else if (p == this && observer->mLayers->stackLayer()->count(0, NOT_RESOLVED) == 0) {  // standard actions
         CardDescriptor cd;
-        MTGCardInstance* card = NULL;
+        MTGCardInstance* card = nullptr;
 
         switch (currentGamePhase) {
         case MTG_PHASE_FIRSTMAIN: {

@@ -26,10 +26,10 @@ JQuadPtr SimpleMenu::spadeR;
 JQuadPtr SimpleMenu::spadeL;
 JQuadPtr SimpleMenu::jewel;
 JQuadPtr SimpleMenu::side;
-JTexture* SimpleMenu::spadeRTex = NULL;
-JTexture* SimpleMenu::spadeLTex = NULL;
-JTexture* SimpleMenu::jewelTex = NULL;
-JTexture* SimpleMenu::sideTex = NULL;
+JTexture* SimpleMenu::spadeRTex = nullptr;
+JTexture* SimpleMenu::spadeLTex = nullptr;
+JTexture* SimpleMenu::jewelTex  = nullptr;
+JTexture* SimpleMenu::sideTex   = nullptr;
 
 SimpleMenu::SimpleMenu(JGE* jge, int id, JGuiListener* listener, int fontId, float x, float y, const char* _title,
                        int _maxItems, bool centerHorizontal, bool centerVertical)
@@ -242,12 +242,12 @@ bool SimpleMenu::CheckUserInput(JButton key) {
             if (n >= mCount) n = mCount - 1;
 
             // check to see if the user clicked
-            if (n != mCurr && mObjects[mCurr] != NULL && mObjects[mCurr]->Leaving(JGE_BTN_DOWN)) {
+            if (n != mCurr && mObjects[mCurr] != nullptr && mObjects[mCurr]->Leaving(JGE_BTN_DOWN)) {
                 mCurr = n;
                 mObjects[mCurr]->Entering();
             }
             // if the same object was selected process click
-            else if (n == mCurr && mObjects[mCurr] != NULL && mObjects[mCurr]->Leaving(JGE_BTN_OK)) {
+            else if (n == mCurr && mObjects[mCurr] != nullptr && mObjects[mCurr]->Leaving(JGE_BTN_OK)) {
                 mObjects[mCurr]->Entering();
             }
 

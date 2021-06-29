@@ -8,13 +8,13 @@
 #include "GameObserver.h"
 
 CardDisplay::CardDisplay(GameObserver* game) : PlayGuiObjectController(game), mId(0) {
-    tc = NULL;
-    listener = NULL;
+    tc                 = nullptr;
+    listener           = nullptr;
     nb_displayed_items = 7;
     start_item = 0;
     x = 0;
     y = 0;
-    zone = NULL;
+    zone               = nullptr;
 }
 
 CardDisplay::CardDisplay(int id, GameObserver* game, int _x, int _y, JGuiListener* _listener, TargetChooser* _tc,
@@ -26,7 +26,7 @@ CardDisplay::CardDisplay(int id, GameObserver* game, int _x, int _y, JGuiListene
     start_item = 0;
     if (x + nb_displayed_items * 30 + 25 > SCREEN_WIDTH) x = SCREEN_WIDTH - (nb_displayed_items * 30 + 25);
     if (y + 55 > SCREEN_HEIGHT) y = SCREEN_HEIGHT - 55;
-    zone = NULL;
+    zone = nullptr;
 }
 
 void CardDisplay::AddCard(MTGCardInstance* _card) {
@@ -116,7 +116,7 @@ bool CardDisplay::CheckUserInput(JButton key) {
                 rotateLeft();
             }
         }
-        if (n != mCurr && mObjects[mCurr] != NULL && mObjects[mCurr]->Leaving(JGE_BTN_LEFT)) {
+        if (n != mCurr && mObjects[mCurr] != nullptr && mObjects[mCurr]->Leaving(JGE_BTN_LEFT)) {
             mCurr = n;
             mObjects[mCurr]->Entering();
         }
@@ -131,7 +131,7 @@ bool CardDisplay::CheckUserInput(JButton key) {
         if (n >= start_item + nb_displayed_items) {
             rotateRight();
         }
-        if (n != mCurr && mObjects[mCurr] != NULL && mObjects[mCurr]->Leaving(JGE_BTN_RIGHT)) {
+        if (n != mCurr && mObjects[mCurr] != nullptr && mObjects[mCurr]->Leaving(JGE_BTN_RIGHT)) {
             mCurr = n;
             mObjects[mCurr]->Entering();
         }
@@ -172,7 +172,7 @@ bool CardDisplay::CheckUserInput(JButton key) {
                     rotateRight();
                 }
 
-                if (n != mCurr && mObjects[mCurr] != NULL && mObjects[mCurr]->Leaving(key)) {
+                if (n != mCurr && mObjects[mCurr] != nullptr && mObjects[mCurr]->Leaving(key)) {
                     mCurr = n;
                     mObjects[mCurr]->Entering();
                     result = true;
@@ -207,7 +207,7 @@ void CardDisplay::Render() {
     }
 
     // TODO: CardSelector should handle the graveyard and the library in the future...
-    if (mObjects.size() && mObjects[mCurr] != NULL) {
+    if (mObjects.size() && mObjects[mCurr] != nullptr) {
         mObjects[mCurr]->Render();
         CardGui* cardg = ((CardGui*)mObjects[mCurr]);
         Pos pos = Pos(CardGui::BigWidth / 2, CardGui::BigHeight / 2 - 10, 1.0, 0.0, 220);

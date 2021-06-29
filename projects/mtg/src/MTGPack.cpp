@@ -37,7 +37,7 @@ int MTGPackSlot::add(WSrcCards* ocean, MTGDeck* to, int carryover) {
     if (!entries.size()) return copies;
     int fails = 0;
     int amt = copies + carryover;
-    WSrcCards* myPool = NULL;
+    WSrcCards* myPool = nullptr;
     if (pool.size()) myPool = MTGPack::getPool(pool);
     if (!myPool) myPool = ocean;
 
@@ -52,7 +52,7 @@ int MTGPackSlot::add(WSrcCards* ocean, MTGDeck* to, int carryover) {
 }
 
 WSrcCards* MTGPack::getPool(string poolstr) {
-    WSrcCards* mySrc = NULL;
+    WSrcCards* mySrc    = nullptr;
     size_t s = poolstr.find("all");
     WCFilterFactory* ff = WCFilterFactory::GetInstance();
 
@@ -127,7 +127,7 @@ void MTGPack::load(string filename) {
     if (tag != "pack") return;
     // After validating, handle actual loading.
     TiXmlElement* pSlot;
-    const char* holder = NULL;
+    const char* holder = nullptr;
     holder = pPack->Attribute("price");
     if (holder)
         price = atoi(holder);
@@ -157,7 +157,7 @@ void MTGPack::load(string filename) {
         sort = "";
     std::transform(sort.begin(), sort.end(), sort.begin(), ::tolower);
 
-    for (pSlot = pPack->FirstChildElement(); pSlot != NULL; pSlot = pSlot->NextSiblingElement()) {
+    for (pSlot = pPack->FirstChildElement(); pSlot != nullptr; pSlot = pSlot->NextSiblingElement()) {
         TiXmlElement* pEntry;
         // Load slot.
         tag = pSlot->Value();
@@ -173,7 +173,7 @@ void MTGPack::load(string filename) {
         holder = pSlot->Attribute("pool");
         if (holder) s->pool = holder;
 
-        for (pEntry = pSlot->FirstChildElement(); pEntry != NULL; pEntry = pEntry->NextSiblingElement()) {
+        for (pEntry = pSlot->FirstChildElement(); pEntry != nullptr; pEntry = pEntry->NextSiblingElement()) {
             tag = pEntry->Value();
             std::transform(tag.begin(), tag.end(), tag.begin(), ::tolower);
             if (tag == "card") {  // Load specific card
@@ -226,7 +226,7 @@ MTGPacks::~MTGPacks() {
 MTGPack* MTGPacks::randomPack(int key) {
     if (!key) key = rand();
     size_t s = packs.size();
-    if (!s) return NULL;
+    if (!s) return nullptr;
     return packs[key % s];
 }
 void MTGPacks::loadAll() {

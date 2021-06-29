@@ -43,7 +43,7 @@ bool JParticleEffect::Load(const char* filename) {
     mEmitterCount = 0;
 
     JFileSystem* fileSystem = JFileSystem::GetInstance();
-    if (fileSystem == NULL) return false;
+    if (fileSystem == nullptr) return false;
 
     if (!fileSystem->OpenFile(filename)) return false;
 
@@ -55,12 +55,12 @@ bool JParticleEffect::Load(const char* filename) {
 
     doc.Parse(xmlBuffer);
 
-    TiXmlNode* effect = 0;
-    TiXmlNode* emitter = 0;
-    TiXmlNode* param = 0;
-    TiXmlNode* key = 0;
+    TiXmlNode* effect  = nullptr;
+    TiXmlNode* emitter = nullptr;
+    TiXmlNode* param   = nullptr;
+    TiXmlNode* key     = nullptr;
 
-    TiXmlElement* element = 0;
+    TiXmlElement* element = nullptr;
 
     float keyTime;
     float value;
@@ -137,7 +137,7 @@ bool JParticleEffect::Load(const char* filename) {
 
                     std::string quadName = element->Attribute("image");
                     JQuad* quad = mResourceManager->GetQuad(quadName);
-                    if (quad != NULL) mParticleEmitters[mEmitterCount]->SetQuad(quad);
+                    if (quad != nullptr) mParticleEmitters[mEmitterCount]->SetQuad(quad);
 
                     // 					if (element->QueryIntAttribute("image", &int_value) ==
                     // TIXML_SUCCESS)

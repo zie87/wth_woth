@@ -71,7 +71,7 @@ Targetable* TargetsList::getNextTarget(Targetable* previous) {
 
     if (nextIndex < targets.size()) return targets[nextIndex];
 
-    return NULL;
+    return nullptr;
 }
 
 MTGCardInstance* TargetsList::getNextCardTarget(MTGCardInstance* previous) {
@@ -80,7 +80,7 @@ MTGCardInstance* TargetsList::getNextCardTarget(MTGCardInstance* previous) {
         if (MTGCardInstance* c = dynamic_cast<MTGCardInstance*>(targets[i])) return c;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 Player* TargetsList::getNextPlayerTarget(Player* previous) {
@@ -89,7 +89,7 @@ Player* TargetsList::getNextPlayerTarget(Player* previous) {
         if (Player* p = dynamic_cast<Player*>(targets[i])) return p;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 Interruptible* TargetsList::getNextInterruptible(Interruptible* previous, int type) {
@@ -102,7 +102,7 @@ Interruptible* TargetsList::getNextInterruptible(Interruptible* previous, int ty
             }
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 Spell* TargetsList::getNextSpellTarget(Spell* previous) {
@@ -125,5 +125,5 @@ Damageable* TargetsList::getNextDamageableTarget(Damageable* previous) {
             return cTarget;
         }
     }
-    return NULL;
+    return nullptr;
 }

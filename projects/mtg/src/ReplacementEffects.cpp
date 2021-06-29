@@ -26,13 +26,13 @@ WEvent* REDamagePrevention::replace(WEvent* event) {
             d->damage = 0;
             delete event;
             if (oneShot) damage = 0;
-            return NULL;
+            return nullptr;
         }
         if (damage >= d->damage) {
             damage -= d->damage;
             d->damage = 0;
             delete event;
-            return NULL;
+            return nullptr;
         }
         d->damage -= damage;
         damage = 0;
@@ -58,11 +58,11 @@ WEvent* RECountersPrevention::replace(WEvent* event) {
     if ((MTGCardInstance*)e->targetCard) {
         if ((MTGCardInstance*)e->targetCard == cardSource && counter) {
             if (e->power == counter->power && e->toughness == counter->toughness && e->name == counter->name)
-                return event = NULL;
+                return event = nullptr;
         } else if ((MTGCardInstance*)e->targetCard == cardSource)
-            return event = NULL;
+            return event = nullptr;
         else if (TargetingCards && TargetingCards->canTarget((MTGCardInstance*)e->targetCard))
-            return event = NULL;
+            return event = nullptr;
     }
     return event;
 }
@@ -74,7 +74,7 @@ WEvent* ReplacementEffects::replace(WEvent* e) {
     for (auto it = modifiers.begin(); it != modifiers.end(); it++) {
         ReplacementEffect* re = *it;
         WEvent* newEvent = re->replace(e);
-        if (!newEvent) return NULL;
+        if (!newEvent) return nullptr;
         if (newEvent != e) return replace(newEvent);
     }
     return e;

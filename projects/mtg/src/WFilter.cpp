@@ -5,7 +5,7 @@
 #include "Translate.h"
 
 // WCFilterFactory
-WCFilterFactory* WCFilterFactory::me = NULL;
+WCFilterFactory* WCFilterFactory::me = nullptr;
 
 WCFilterFactory* WCFilterFactory::GetInstance() {
     if (!me) me = NEW WCFilterFactory();

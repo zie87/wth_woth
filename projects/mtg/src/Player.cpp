@@ -15,11 +15,11 @@
 
 Player::Player(GameObserver* observer, string file, string fileSmall, MTGDeck* deck)
     : Damageable(observer, 20), mAvatarName(""), offerInterruptOnPhase(MTG_PHASE_DRAW) {
-    if (deck == NULL && file != "testsuite" && file != "remote" && file != "")
+    if (deck == nullptr && file != "testsuite" && file != "remote" && file != "")
         deck = NEW MTGDeck(file.c_str(), MTGCollection());
 
     premade = false;
-    game = NULL;
+    game               = nullptr;
     deckFile = file;
     deckFileSmall = fileSmall;
     handsize = 0;
@@ -28,12 +28,12 @@ Player::Player(GameObserver* observer, string file, string fileSmall, MTGDeck* d
     poisonCount = 0;
     damageCount = 0;
     preventable = 0;
-    mAvatarTex = NULL;
+    mAvatarTex         = nullptr;
     type_as_damageable = DAMAGEABLE_PLAYER;
     playMode = MODE_HUMAN;
     skippingTurn = 0;
     extraTurn = 0;
-    if (deck != NULL) {
+    if (deck != nullptr) {
         game = NEW MTGPlayerCards(deck);
         // This automatically sets the observer pointer on all the deck cards
         game->setOwner(this);
@@ -58,7 +58,7 @@ Player::~Player() {
     SAFE_DELETE(manaPool);
     SAFE_DELETE(game);
     if (mAvatarTex && observer->getResourceManager()) observer->getResourceManager()->Release(mAvatarTex);
-    mAvatarTex = NULL;
+    mAvatarTex = nullptr;
     SAFE_DELETE(mDeck);
 }
 
@@ -68,7 +68,7 @@ bool Player::loadAvatar(string file, string resName) {
 
     if (mAvatarTex) {
         rm->Release(mAvatarTex);
-        mAvatarTex = NULL;
+        mAvatarTex = nullptr;
     }
     mAvatarTex = rm->RetrieveTexture(file, RETRIEVE_LOCK, TEXTURE_SUB_AVATAR);
     if (mAvatarTex) {
@@ -100,7 +100,7 @@ JQuadPtr Player::getIcon() {
 }
 
 Player* Player::opponent() {
-    if (!observer || (observer->players.size() < 2)) return NULL;
+    if (!observer || (observer->players.size() < 2)) return nullptr;
     return this == observer->players[0] ? observer->players[1] : observer->players[0];
 }
 

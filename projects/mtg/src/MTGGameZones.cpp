@@ -19,7 +19,7 @@
 // Players Game
 //------------------------------
 
-MTGPlayerCards::MTGPlayerCards() : owner(0) { init(); }
+MTGPlayerCards::MTGPlayerCards() : owner(nullptr) { init(); }
 
 MTGPlayerCards::MTGPlayerCards(Player* player, int* idList, int idListSize) : owner(player) {
     init();
@@ -34,7 +34,7 @@ MTGPlayerCards::MTGPlayerCards(Player* player, int* idList, int idListSize) : ow
     }
 }
 
-MTGPlayerCards::MTGPlayerCards(MTGDeck* deck) : owner(0) {
+MTGPlayerCards::MTGPlayerCards(MTGDeck* deck) : owner(nullptr) {
     init();
     initDeck(deck);
 }
@@ -108,7 +108,7 @@ void MTGPlayerCards::OptimizedHand(Player* who, int amount, int lands, int creat
 
     if (!game->players[0]->isAI() && game->players[1]->isAI()) {
         Player* p = who;
-        MTGCardInstance* card = NULL;
+        MTGCardInstance* card = nullptr;
         MTGGameZone* z = p->game->library;
 
         int optimizedland = 0;
@@ -256,7 +256,7 @@ MTGCardInstance* MTGPlayerCards::putInHand(MTGCardInstance* card) {
 // Moves a card from one zone to another
 // If the card is not actually in the expected "from" zone, does nothing and returns null
 MTGCardInstance* MTGPlayerCards::putInZone(MTGCardInstance* card, MTGGameZone* from, MTGGameZone* to) {
-    MTGCardInstance* copy = NULL;
+    MTGCardInstance* copy = nullptr;
     GameObserver* g = owner->getObserver();
     if (!from || !to) return card;  // Error check
 
@@ -267,7 +267,7 @@ MTGCardInstance* MTGPlayerCards::putInZone(MTGCardInstance* card, MTGGameZone* f
         doCopy = 0;
     }
 
-    if (!(copy = from->removeCard(card, doCopy))) return NULL;  // ERROR
+    if (!(copy = from->removeCard(card, doCopy))) return nullptr;  // ERROR
 
     if (options[Options::SFXVOLUME].number > 0) {
         if (to == g->players[0]->game->graveyard || to == g->players[1]->game->graveyard) {
@@ -307,8 +307,8 @@ MTGCardInstance* MTGPlayerCards::putInZone(MTGCardInstance* card, MTGGameZone* f
             from = previous->previousZone;
             copy->previous = previous2;
             if (previous2) previous2->next = copy;
-            previous->previous = NULL;
-            previous->next = NULL;
+            previous->previous = nullptr;
+            previous->next     = nullptr;
             SAFE_DELETE(previous);
         }
     }
@@ -344,7 +344,7 @@ int MTGPlayerCards::isInZone(MTGCardInstance* card, MTGGameZone* zone) {
 // Zones specific code
 //--------------------------------------
 
-MTGGameZone::MTGGameZone() : nb_cards(0), lastCardDrawn(NULL), needShuffle(false) {}
+MTGGameZone::MTGGameZone() : nb_cards(0), lastCardDrawn(nullptr), needShuffle(false) {}
 
 MTGGameZone::~MTGGameZone() {
     for (size_t i = 0; i < cards.size(); i++) {
@@ -354,7 +354,7 @@ MTGGameZone::~MTGGameZone() {
     }
     cards.clear();
     cardsMap.clear();
-    owner = NULL;
+    owner = nullptr;
 }
 
 void MTGGameZone::beforeBeginPhase() {
@@ -380,14 +380,14 @@ MTGCardInstance* MTGGameZone::removeCard(MTGCardInstance* card, int createCopy) 
     cardsMap.erase(card);
     for (i = 0; i < (nb_cards); i++) {
         if (cards[i] == card) {
-            card->currentZone = NULL;
+            card->currentZone = nullptr;
             nb_cards--;
             cards.erase(cards.begin() + i);
             MTGCardInstance* copy = card;
             // if (card->isToken) //TODO better than this ?
             //  return card;
             // card->lastController = card->controller();
-            if (!card) return NULL;
+            if (!card) return nullptr;
             if (createCopy) {
                 copy = card->clone();
                 copy->previous = card;
@@ -409,12 +409,12 @@ MTGCardInstance* MTGGameZone::removeCard(MTGCardInstance* card, int createCopy) 
             return copy;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 MTGCardInstance* MTGGameZone::hasCard(MTGCardInstance* card) {
     if (card->currentZone == this) return card;
-    return NULL;
+    return nullptr;
 }
 
 size_t MTGGameZone::getIndex(MTGCardInstance* card) {
@@ -453,7 +453,7 @@ MTGCardInstance* MTGGameZone::findByName(string name) {
             return cards[i];
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 bool MTGGameZone::hasType(const char* value) {
@@ -541,7 +541,7 @@ bool MTGGameZone::hasAbility(int ability) {
 int MTGGameZone::seenThisTurn(TargetChooser* tc, int castMethod, bool lastTurn) {
     // The following 2 lines modify the passed TargetChooser. Call this function with care :/
     tc->setAllZones();  // This is to allow targetting cards without caring about the actual zone
-    tc->targetter = NULL;
+    tc->targetter = nullptr;
 
     int count = 0;
     if (lastTurn) {
@@ -562,7 +562,7 @@ int MTGGameZone::seenThisTurn(TargetChooser* tc, int castMethod, bool lastTurn) 
 
 int MTGGameZone::seenThisTurn(string targetChooserDefinition, int castMethod) {
     TargetChooserFactory tcf(owner->getObserver());
-    TargetChooser* tc = tcf.createTargetChooser(targetChooserDefinition, NULL);
+    TargetChooser* tc = tcf.createTargetChooser(targetChooserDefinition, nullptr);
     int result = seenThisTurn(tc, castMethod, false);
     SAFE_DELETE(tc);
     return result;
@@ -570,7 +570,7 @@ int MTGGameZone::seenThisTurn(string targetChooserDefinition, int castMethod) {
 
 int MTGGameZone::seenLastTurn(string targetChooserDefinition, int castMethod) {
     TargetChooserFactory tcf(owner->getObserver());
-    TargetChooser* tc = tcf.createTargetChooser(targetChooserDefinition, NULL);
+    TargetChooser* tc = tcf.createTargetChooser(targetChooserDefinition, nullptr);
     int result = seenThisTurn(tc, castMethod, true);
     SAFE_DELETE(tc);
     return result;
@@ -599,7 +599,7 @@ void MTGGameZone::debugPrint() {
 //------------------------------
 MTGCardInstance* MTGInPlay::getNextAttacker(MTGCardInstance* previous) {
     int foundprevious = 0;
-    if (previous == NULL) {
+    if (previous == nullptr) {
         foundprevious = 1;
     }
     for (int i = 0; i < nb_cards; i++) {
@@ -610,7 +610,7 @@ MTGCardInstance* MTGInPlay::getNextAttacker(MTGCardInstance* previous) {
             return current;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void MTGInPlay::untapAll() {
@@ -667,7 +667,7 @@ MTGGameZone* MTGGameZone::intToZone(int zoneId, Player* p, Player* p2) {
     case STACK:
         return p->game->stack;
     }
-    if (!p2) return NULL;
+    if (!p2) return nullptr;
     switch (zoneId) {
     case TARGET_CONTROLLER_GRAVEYARD:
         return p2->game->graveyard;
@@ -688,7 +688,7 @@ MTGGameZone* MTGGameZone::intToZone(int zoneId, Player* p, Player* p2) {
         return p2->game->stack;
 
     default:
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -784,7 +784,7 @@ MTGGameZone* MTGGameZone::intToZone(GameObserver* g, int zoneId, MTGCardInstance
         else
             return source->controller()->game->stack;
     default:
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -969,7 +969,7 @@ bool MTGGameZone::parseLine(const string& ss) {
 
     while (s.size()) {
         size_t limiter = s.find(",");
-        MTGCard* card = 0;
+        MTGCard* card  = nullptr;
         string toFind;
         if (limiter != string::npos) {
             toFind = trim(s.substr(0, limiter));

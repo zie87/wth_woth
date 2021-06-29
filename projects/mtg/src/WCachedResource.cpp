@@ -52,7 +52,7 @@ void WResource::hit() { lastTime = WResourceManager::Instance()->nowTime(); }
 WCachedResource::~WCachedResource() { WGE_LOG_TRACE("Destroying WCachedResource: {}", mFilename); }
 
 // WCachedTexture
-WCachedTexture::WCachedTexture() { texture = NULL; }
+WCachedTexture::WCachedTexture() { texture = nullptr; }
 
 WCachedTexture::~WCachedTexture() {
     if (texture) SAFE_DELETE(texture);
@@ -115,12 +115,12 @@ unsigned long WCachedTexture::size() {
     return texture->mTexHeight * texture->mTexWidth * pixel_size;
 }
 
-bool WCachedTexture::isGood() { return (texture != NULL); }
+bool WCachedTexture::isGood() { return (texture != nullptr); }
 
 void WCachedTexture::Refresh() {
     int error = 0;
     JTexture* old = texture;
-    texture = NULL;
+    texture       = nullptr;
 
     if (!Attempt(mFilename, loadedMode, error)) SAFE_DELETE(texture);
 
@@ -184,7 +184,7 @@ bool WCachedTexture::Attempt(const string& filename, int submode, int& error) {
 }
 
 // WCachedSample
-WCachedSample::WCachedSample() { sample = NULL; }
+WCachedSample::WCachedSample() { sample = nullptr; }
 
 WCachedSample::~WCachedSample() { SAFE_DELETE(sample); }
 
@@ -271,12 +271,12 @@ bool WCachedParticles::Attempt(const string& filename, int submode, int& error) 
     fileSys->ReadFile(&(particles->nEmission), sizeof(hgeParticleSystemInfo) - sizeof(void*));
     fileSys->CloseFile();
 
-    particles->sprite = NULL;
+    particles->sprite = nullptr;
     error = CACHE_ERROR_NONE;
     return true;
 }
 
 hgeParticleSystemInfo* WCachedParticles::Actual() { return particles; }
 
-WCachedParticles::WCachedParticles() { particles = NULL; }
+WCachedParticles::WCachedParticles() { particles = nullptr; }
 WCachedParticles::~WCachedParticles() { SAFE_DELETE(particles); }

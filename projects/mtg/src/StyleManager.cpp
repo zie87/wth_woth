@@ -44,21 +44,21 @@ void StyleManager::loadRules() {
 
     TiXmlHandle hDoc(&xmlfile);
     TiXmlElement* pRule;
-    for (pRule = hDoc.FirstChildElement().Element(); pRule != NULL; pRule = pRule->NextSiblingElement()) {
+    for (pRule = hDoc.FirstChildElement().Element(); pRule != nullptr; pRule = pRule->NextSiblingElement()) {
         // root should be "pack"
         string tag = pRule->Value();
         std::transform(tag.begin(), tag.end(), tag.begin(), ::tolower);
         if (tag == "activebg") {
             // After validating, handle actual loading.
             TiXmlElement* pSlot;
-            const char* holder = NULL;
+            const char* holder = nullptr;
             holder = pRule->Attribute("source");
             if (holder)
                 playerSrc = atoi(holder);
             else
                 playerSrc = -1;
 
-            for (pSlot = pRule->FirstChildElement(); pSlot != NULL; pSlot = pSlot->NextSiblingElement()) {
+            for (pSlot = pRule->FirstChildElement(); pSlot != nullptr; pSlot = pSlot->NextSiblingElement()) {
                 // Load slot.
                 tag = pSlot->Value();
                 std::transform(tag.begin(), tag.end(), tag.begin(), ::tolower);
@@ -73,13 +73,13 @@ void StyleManager::loadRules() {
             }
         } else if (tag == "style") {
             TiXmlElement* pSlot;
-            const char* holder = NULL;
+            const char* holder = nullptr;
             holder = pRule->Attribute("name");
             if (!holder) continue;
             string sname = holder;
             WStyle* s = NEW WStyle();
 
-            for (pSlot = pRule->FirstChildElement(); pSlot != NULL; pSlot = pSlot->NextSiblingElement()) {
+            for (pSlot = pRule->FirstChildElement(); pSlot != nullptr; pSlot = pSlot->NextSiblingElement()) {
                 tag = pSlot->Value();
                 std::transform(tag.begin(), tag.end(), tag.begin(), ::tolower);
                 if (tag.size() && pSlot->GetText()) s->mapping[tag] = pSlot->GetText();
@@ -94,7 +94,7 @@ void StyleManager::loadRules() {
 
 WStyle* StyleManager::get() {
     if (styles.find(activeStyle) != styles.end()) return styles[activeStyle];
-    return NULL;
+    return nullptr;
 }
 
 void StyleManager::determineActive(MTGDeck* p1, MTGDeck* p2) {

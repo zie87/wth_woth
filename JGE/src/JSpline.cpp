@@ -34,7 +34,7 @@ JSpline::~JSpline() {
 bool JSpline::Load(const char* filename, float xscale, float yscale) {
     JFileSystem* fileSystem = JFileSystem::GetInstance();
 
-    if (fileSystem == NULL) return false;
+    if (fileSystem == nullptr) return false;
     if (!fileSystem->OpenFile(filename)) return false;
 
     int size = fileSystem->GetFileSize();
@@ -49,7 +49,7 @@ bool JSpline::Load(const char* filename, float xscale, float yscale) {
     mMidPoints.clear();
     mPixels.clear();
 
-    TiXmlNode* node = 0;
+    TiXmlNode* node = nullptr;
     // TiXmlElement* todoElement = 0;
     TiXmlElement* element;
 

@@ -31,7 +31,7 @@ JGameObject::JGameObject(JTexture* tex, float x, float y, float width, float hei
     mHitPoint = 1;
 
     mCollided = false;
-    mCollisionTarget = NULL;
+    mCollisionTarget = nullptr;
     mFlashing = false;
 
     // mActive = false;

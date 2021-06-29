@@ -1,7 +1,7 @@
 ---
-Checks:             '-*'
+Checks:             '-*,modernize-use-nullptr'
 WarningsAsErrors:   ''
-HeaderFilterRegex:  '^((?!/build/|/extern/)).)*$'
+HeaderFilterRegex:  '^((?!/build/|/extern/|/tinyxml/)).)*$'
 FormatStyle:        file
 
 

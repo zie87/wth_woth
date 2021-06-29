@@ -22,8 +22,8 @@ Token::Token(string _name, MTGCardInstance* source, int _power, int _toughness) 
     owner = source->owner;
     belongs_to = source->controller()->game;
     attacker = 0;
-    defenser = NULL;
-    banding = NULL;
+    defenser   = nullptr;
+    banding    = nullptr;
 }
 
 Token::Token(int id) : MTGCardInstance() {

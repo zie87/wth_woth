@@ -14,13 +14,13 @@
 #include "JGBKFont.h"
 #include "JFileSystem.h"
 
-JRenderer* JGBKFont::mRenderer = NULL;
+JRenderer* JGBKFont::mRenderer = nullptr;
 
 JGBKFont::JGBKFont() {
     mRenderer = JRenderer::GetInstance();
 
-    mChnFont = NULL;
-    mEngFont = NULL;
+    mChnFont = nullptr;
+    mEngFont = nullptr;
 
     mCurr = 0;
 
@@ -32,11 +32,11 @@ JGBKFont::JGBKFont() {
     mRotation = 0.0f;
 
     mCount = 0;
-    mTexture = NULL;
-    mSprites = NULL;
-    mGBCode = NULL;
+    mTexture = nullptr;
+    mSprites = nullptr;
+    mGBCode  = nullptr;
 
-    mCharBuffer = NULL;
+    mCharBuffer = nullptr;
 }
 
 JGBKFont::~JGBKFont() {

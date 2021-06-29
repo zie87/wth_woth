@@ -380,15 +380,15 @@ GameOption* GameOptions::get(string optionName) {
 
 GameOption* GameOptions::get(int optionID) {
     // Invalid options!
-    if (optionID < 0) return NULL;
+    if (optionID < 0) return nullptr;
 
     // Option doesn't exist, so build it
     int x = (int)values.size();
     values.reserve(optionID);
 
     while (x <= optionID) {
-        GameOption* go = NULL;
-        GameOptionEnum* goEnum = NULL;
+        GameOption* go         = nullptr;
+        GameOptionEnum* goEnum = nullptr;
         switch (x) {
         // Enum options
         case Options::HANDDIRECTION:
@@ -464,17 +464,17 @@ GameOptions::~GameOptions() {
 GameSettings options;
 
 GameSettings::GameSettings() {
-    styleMan = NULL;
-    globalOptions = NULL;
-    theGame = NULL;
-    profileOptions = NULL;
+    styleMan       = nullptr;
+    globalOptions  = nullptr;
+    theGame        = nullptr;
+    profileOptions = nullptr;
     // reloadProfile should be before using options.
 }
 
 WStyle* GameSettings::getStyle() {
     if (!styleMan) {
         styleMan = new StyleManager();
-        styleMan->determineActive(NULL, NULL);
+        styleMan->determineActive(nullptr, nullptr);
     }
     return styleMan->get();
 }
@@ -634,7 +634,7 @@ void GameSettings::checkProfile() {
     }
 
     // Validation of collection, etc, only happens if the game is up.
-    if (theGame == NULL || MTGCollection() == NULL) return;
+    if (theGame == nullptr || MTGCollection() == nullptr) return;
 
     string pcFile = profileFile(PLAYER_COLLECTION, "", false);
     if (!pcFile.size() || !fileExists(pcFile.c_str())) {
@@ -667,11 +667,11 @@ void GameSettings::checkProfile() {
         // Give the player their first deck
         createUsersFirstDeck(setId);
     }
-    getStyleMan()->determineActive(NULL, NULL);
+    getStyleMan()->determineActive(nullptr, nullptr);
 }
 
 void GameSettings::createUsersFirstDeck(int setId) {
-    if (theGame == NULL || MTGCollection() == NULL) return;
+    if (theGame == nullptr || MTGCollection() == nullptr) return;
 
     MTGDeck* mCollection = NEW MTGDeck(options.profileFile(PLAYER_COLLECTION, "", false).c_str(), MTGCollection());
     if (mCollection->totalCards() > 0) return;
@@ -679,20 +679,20 @@ void GameSettings::createUsersFirstDeck(int setId) {
     // 10 lands of each
     int sets[] = {setId};
     if (!mCollection->addRandomCards(10, sets, 1, Constants::RARITY_L, "Forest"))
-        mCollection->addRandomCards(10, 0, 0, Constants::RARITY_L, "Forest");
+        mCollection->addRandomCards(10, nullptr, 0, Constants::RARITY_L, "Forest");
     if (!mCollection->addRandomCards(10, sets, 1, Constants::RARITY_L, "Plains"))
-        mCollection->addRandomCards(10, 0, 0, Constants::RARITY_L, "Plains");
+        mCollection->addRandomCards(10, nullptr, 0, Constants::RARITY_L, "Plains");
     if (!mCollection->addRandomCards(10, sets, 1, Constants::RARITY_L, "Swamp"))
-        mCollection->addRandomCards(10, 0, 0, Constants::RARITY_L, "Swamp");
+        mCollection->addRandomCards(10, nullptr, 0, Constants::RARITY_L, "Swamp");
     if (!mCollection->addRandomCards(10, sets, 1, Constants::RARITY_L, "Mountain"))
-        mCollection->addRandomCards(10, 0, 0, Constants::RARITY_L, "Mountain");
+        mCollection->addRandomCards(10, nullptr, 0, Constants::RARITY_L, "Mountain");
     if (!mCollection->addRandomCards(10, sets, 1, Constants::RARITY_L, "Island"))
-        mCollection->addRandomCards(10, 0, 0, Constants::RARITY_L, "Island");
+        mCollection->addRandomCards(10, nullptr, 0, Constants::RARITY_L, "Island");
 
     // Starter Deck
-    mCollection->addRandomCards(3, sets, 1, Constants::RARITY_R, NULL);
-    mCollection->addRandomCards(9, sets, 1, Constants::RARITY_U, NULL);
-    mCollection->addRandomCards(48, sets, 1, Constants::RARITY_C, NULL);
+    mCollection->addRandomCards(3, sets, 1, Constants::RARITY_R, nullptr);
+    mCollection->addRandomCards(9, sets, 1, Constants::RARITY_U, nullptr);
+    mCollection->addRandomCards(48, sets, 1, Constants::RARITY_C, nullptr);
 
     // Boosters
     for (int i = 0; i < 2; i++) {
@@ -705,12 +705,12 @@ void GameSettings::createUsersFirstDeck(int setId) {
 }
 
 void GameSettings::keypadTitle(string set) {
-    if (keypad != NULL) keypad->title = set;
+    if (keypad != nullptr) keypad->title = set;
 }
 
 SimplePad* GameSettings::keypadStart(string input, string* _dest, bool _cancel, bool _numpad, float _x, float _y) {
-    if (keypad == NULL) keypad = NEW SimplePad();
-        // show keyboard
+    if (keypad == nullptr) keypad = NEW SimplePad();
+    // show keyboard
 
     keypad->bShowCancel = _cancel;
     keypad->bShowNumpad = _numpad;
@@ -721,7 +721,7 @@ SimplePad* GameSettings::keypadStart(string input, string* _dest, bool _cancel, 
 }
 
 string GameSettings::keypadFinish() {
-    if (keypad == NULL) return "";
+    if (keypad == nullptr) return "";
     return keypad->Finish();
 }
 
@@ -865,14 +865,14 @@ OptionKicker::OptionKicker() {
 
 // GameOptionAward
 GameOptionAward::GameOptionAward() {
-    achieved = time(NULL);
+    achieved = time(nullptr);
     number = 0;
     viewed = false;
 }
 bool GameOptionAward::read(string input) {
     // This is quick and dirty.
 
-    achieved = time(NULL);
+    achieved = time(nullptr);
     tm* at = localtime(&achieved);
     viewed = false;
 
@@ -916,7 +916,7 @@ bool GameOptionAward::read(string input) {
     at->tm_isdst = -1;
 
     achieved = mktime(at);
-    if (achieved == -1) achieved = time(NULL);
+    if (achieved == -1) achieved = time(nullptr);
     return true;
 }
 
@@ -939,7 +939,7 @@ bool GameOptionAward::write(std::ofstream* file, string name) {
 bool GameOptionAward::giveAward() {
     if (number) return false;
 
-    achieved = time(NULL);
+    achieved = time(nullptr);
     viewed = false;
     number = 1;
     options.save();  // TODO - Consider efficiency of this placement.

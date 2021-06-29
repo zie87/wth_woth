@@ -16,7 +16,7 @@ const int kReloadID = 5;
 }  // namespace
 
 GameStateOptions::GameStateOptions(GameApp* parent)
-    : GameState(parent, "options"), mReload(false), grabber(NULL), optionsMenu(NULL), optionsTabs(NULL) {}
+    : GameState(parent, "options"), mReload(false), grabber(nullptr), optionsMenu(nullptr), optionsTabs(nullptr) {}
 GameStateOptions::~GameStateOptions() {}
 
 void GameStateOptions::Start() {
@@ -282,5 +282,5 @@ void GameStateOptions::ButtonPressed(int controllerId, int controlId) {
 
 void GameStateOptions::GrabKeyboard(KeybGrabber* g) { grabber = g; }
 void GameStateOptions::UngrabKeyboard(const KeybGrabber* g) {
-    if (g == grabber) grabber = NULL;
+    if (g == grabber) grabber = nullptr;
 }

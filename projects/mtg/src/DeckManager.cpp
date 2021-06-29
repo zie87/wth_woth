@@ -28,7 +28,7 @@ struct DeckIDMatch {
 };
 
 DeckMetaData* DeckManager::getDeckMetaDataById(int deckId, bool isAI) {
-    DeckMetaData* deck = NULL;
+    DeckMetaData* deck                   = nullptr;
     std::vector<DeckMetaData*>& deckList = isAI ? aiDeckOrderList : playerDeckOrderList;
 
     std::vector<DeckMetaData*>::iterator pos = find_if(deckList.begin(), deckList.end(), DeckIDMatch(deckId));
@@ -61,7 +61,7 @@ struct DeckFilenameMatch {
 };
 
 DeckMetaData* DeckManager::getDeckMetaDataByFilename(const string& filename, bool isAI) {
-    DeckMetaData* deck = NULL;
+    DeckMetaData* deck                   = nullptr;
     std::vector<DeckMetaData*>& deckList = isAI ? aiDeckOrderList : playerDeckOrderList;
 
     std::vector<DeckMetaData*>::iterator pos = find_if(deckList.begin(), deckList.end(), DeckFilenameMatch(filename));
@@ -126,7 +126,7 @@ void DeckManager::DeleteMetaData(const string& filename, bool isAI) {
 
 StatsWrapper* DeckManager::getExtendedStatsForDeckId(int deckId, MTGAllCards* collection, bool isAI) {
     DeckMetaData* selectedDeck = getDeckMetaDataById(deckId, isAI);
-    if (selectedDeck == NULL) {
+    if (selectedDeck == nullptr) {
         std::ostringstream deckName;
         deckName << options.profileFile() << "/deck" << deckId << ".txt";
         std::map<std::string, StatsWrapper*>* statsMap = isAI ? &aiDeckStatsMap : &playerDeckStatsMap;
@@ -138,7 +138,7 @@ StatsWrapper* DeckManager::getExtendedStatsForDeckId(int deckId, MTGAllCards* co
 }
 
 StatsWrapper* DeckManager::getExtendedDeckStats(DeckMetaData* selectedDeck, MTGAllCards* collection, bool isAI) {
-    StatsWrapper* stats = NULL;
+    StatsWrapper* stats = nullptr;
 
     string deckName = selectedDeck ? selectedDeck->getFilename() : "";
     int deckId = selectedDeck ? selectedDeck->getDeckId() : 0;
@@ -155,7 +155,7 @@ StatsWrapper* DeckManager::getExtendedDeckStats(DeckMetaData* selectedDeck, MTGA
     return stats;
 }
 
-DeckManager* DeckManager::mInstance = NULL;
+DeckManager* DeckManager::mInstance = nullptr;
 
 void DeckManager::EndInstance() { SAFE_DELETE(mInstance); }
 

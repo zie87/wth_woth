@@ -83,7 +83,7 @@ vector<DeckMetaData*> GameState::BuildDeckList(const string& path, const string&
 
             nbDecks++;
         }
-        meta = NULL;
+        meta = nullptr;
     }
 
     std::sort(retList.begin(), retList.end(), sortByName);

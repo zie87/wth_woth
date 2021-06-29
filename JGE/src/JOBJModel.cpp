@@ -14,8 +14,8 @@
 #include "../include/JOBJModel.h"
 
 JOBJModel::JOBJModel() {
-    mPolygons = NULL;
-    mTexture = NULL;
+    mPolygons = nullptr;
+    mTexture  = nullptr;
 }
 
 JOBJModel::~JOBJModel() {
@@ -87,11 +87,11 @@ bool JOBJModel::Load(const char* modelName, const char* textureName) {
                 face.mVertCount = 0;
 
                 char* p = strchr(tmpLine, ' ');
-                char* pNext = NULL;
+                char* pNext = nullptr;
 
                 int vertIdx, texIdx, norIdx;
 
-                while (p != NULL) {
+                while (p != nullptr) {
                     while (((*p) == ' ') || ((*p) == '\n') || ((*p) == '\t')) ++p;
                     strcpy(s1, p);
                     count = sscanf(s1, "%d/%d/%d", &vertIdx, &texIdx, &norIdx);
@@ -166,7 +166,7 @@ bool JOBJModel::Load(const char* modelName, const char* textureName) {
         */
     }
 
-    if (textureName != NULL) mTexture = JRenderer::GetInstance()->LoadTexture(textureName);
+    if (textureName != nullptr) mTexture = JRenderer::GetInstance()->LoadTexture(textureName);
 
     return true;
 }

@@ -15,7 +15,7 @@
 Player* OrderedAIAction::getPlayerTarget() {
     if (playerAbilityTarget) return (Player*)playerAbilityTarget;
 
-    return NULL;
+    return nullptr;
 }
 
 int OrderedAIAction::getEfficiency(AADamager* aad) {
@@ -61,12 +61,12 @@ int OrderedAIAction::getEfficiency() {
     Player* p = g->currentlyActing();
     if (s->has(ability)) return 0;
     MTGAbility* a = AbilityFactory::getCoreAbility(ability);
-    MTGAbility* transAbility = NULL;
+    MTGAbility* transAbility = nullptr;
     if (ATransformerInstant* atia = dynamic_cast<ATransformerInstant*>(a)) {
         if (atia->newAbilityFound) {
             AbilityFactory af(g);
             transAbility =
-                af.parseMagicLine(atia->newAbilitiesList[atia->newAbilitiesList.size() - 1], 0, NULL, atia->source);
+                af.parseMagicLine(atia->newAbilitiesList[atia->newAbilitiesList.size() - 1], 0, nullptr, atia->source);
             transAbility->target = ability->target;
             a = transAbility;
         }
@@ -174,7 +174,7 @@ int OrderedAIAction::getEfficiency() {
     }
     case MTGAbility::STANDARD_LEVELUP: {
         efficiency = 0;
-        Counter* targetCounter = NULL;
+        Counter* targetCounter = nullptr;
         int currentlevel = 0;
 
         if (!coreAbilityCardTarget) break;
@@ -418,7 +418,7 @@ int OrderedAIAction::getEfficiency() {
     default:
         if (target) {
             AbilityFactory af(g);
-            int suggestion = af.abilityEfficiency(a, p, MODE_ABILITY, NULL, target);
+            int suggestion = af.abilityEfficiency(a, p, MODE_ABILITY, nullptr, target);
             if (AADynamic* ady = dynamic_cast<AADynamic*>(a)) {
                 if (ady) {
                     // not going into massive detail with this ability, its far to complex, just going to give it a
@@ -499,7 +499,7 @@ int OrderedAIAction::getEfficiency() {
     MayAbility* may = dynamic_cast<MayAbility*>(ability);
     if (!efficiency && may) {
         AIPlayer* chk = (AIPlayer*)p;
-        if (may->ability->getActionTc() && chk->chooseTarget(may->ability->getActionTc(), NULL, NULL, true))
+        if (may->ability->getActionTc() && chk->chooseTarget(may->ability->getActionTc(), nullptr, nullptr, true))
             efficiency = 50 + (owner->getRandomGenerator()->random() % 50);
     }
     if (p->game->hand->nb_cards == 0)
@@ -548,7 +548,7 @@ MTGCardInstance* AIPlayerBaka::chooseCard(TargetChooser* tc, MTGCardInstance* so
         // switch player->zones to the other player and check there if we haven't found one yet.
         playerZones = source->controller()->opponent()->game;
     }
-    return NULL;
+    return nullptr;
 }
 
 bool AIPlayerBaka::payTheManaCost(ManaCost* cost, MTGCardInstance* target, vector<MTGAbility*> gotPayments) {
@@ -805,7 +805,7 @@ vector<MTGAbility*> AIPlayerBaka::canPayMana(MTGCardInstance* target, ManaCost* 
     hyb = 0;
     hybridCost = cost->getHybridCost(0);
     if (hybridCost) {
-        while ((hybridCost = cost->getHybridCost(hyb)) != NULL) {
+        while ((hybridCost = cost->getHybridCost(hyb)) != nullptr) {
             // here we try to find one of the colors in the hybrid cost, it is done 1 at a time unfortunately
             //{rw}{ub} would be 2 runs of this.90% of the time ai finds it's hybrid in pMana check.
             bool foundColor1 = false;
@@ -989,7 +989,7 @@ int AIPlayerBaka::canHandleCost(MTGAbility* ability) { return CanHandleCost(abil
 
 int AIPlayerBaka::createAbilityTargets(MTGAbility* a, MTGCardInstance* c, RankingContainer& ranking) {
     if (!a->getActionTc()) {
-        OrderedAIAction aiAction(this, a, c, NULL);
+        OrderedAIAction aiAction(this, a, c, nullptr);
         ranking[aiAction] = 1;
         return 1;
     }
@@ -1027,7 +1027,7 @@ int AIPlayerBaka::createAbilityTargets(MTGAbility* a, MTGCardInstance* c, Rankin
             return 0;
         }
         while (potentialTargets.size()) {
-            OrderedAIAction* check = NULL;
+            OrderedAIAction* check = nullptr;
 
             MTGCardInstance* cTargeting = dynamic_cast<MTGCardInstance*>(potentialTargets[0]);
             if (cTargeting) check = NEW OrderedAIAction(this, a, c, cTargeting);
@@ -1116,7 +1116,7 @@ int AIPlayerBaka::selectAbility() {
                     totalPotentialMana->getConvertedCost() < a->getCost()->getConvertedCost() + 1)
                     continue;
                 // don't even bother to play an ability with {x} if you can't even afford x=1.
-                ManaCost* fullPayment = NULL;
+                ManaCost* fullPayment = nullptr;
                 if (abilityPayment.size()) {
                     fullPayment = NEW ManaCost();
                     for (int ch = 0; ch < int(abilityPayment.size()); ch++) {
@@ -1173,7 +1173,7 @@ int AIPlayerBaka::interruptIfICan() {
 int AIPlayerBaka::effectBadOrGood(MTGCardInstance* card, int mode, TargetChooser* tc) {
     int id = card->getMTGId();
     AbilityFactory af(observer);
-    int autoGuess = af.magicText(id, NULL, card, mode, tc);
+    int autoGuess = af.magicText(id, nullptr, card, mode, tc);
     if (autoGuess) return autoGuess;
     return BAKA_EFFECT_DONTKNOW;
 }
@@ -1208,8 +1208,8 @@ int AIPlayerBaka::chooseTarget(TargetChooser* _tc, Player* forceTarget, MTGCardI
         int cardEffect = effectBadOrGood(tc->source, MODE_TARGET, tc);
         if (tc->belongsToAbility.size()) {
             AbilityFactory af(observer);
-            MTGAbility* withoutGuessing = af.parseMagicLine(tc->belongsToAbility, 0, NULL, tc->source);
-            cardEffect = af.abilityEfficiency(withoutGuessing, this, MODE_TARGET, tc, NULL);
+            MTGAbility* withoutGuessing = af.parseMagicLine(tc->belongsToAbility, 0, nullptr, tc->source);
+            cardEffect                  = af.abilityEfficiency(withoutGuessing, this, MODE_TARGET, tc, nullptr);
             delete withoutGuessing;
         }
         if (cardEffect != BAKA_EFFECT_GOOD) {
@@ -1244,7 +1244,8 @@ int AIPlayerBaka::chooseTarget(TargetChooser* _tc, Player* forceTarget, MTGCardI
                     for (int l = 0; l < multiplier; l++) {
                         if (tc->maxtargets != 1 && tc->belongsToAbility.size()) {
                             AbilityFactory af(observer);
-                            MTGAbility* withoutGuessing = af.parseMagicLine(tc->belongsToAbility, 0, NULL, tc->source);
+                            MTGAbility* withoutGuessing =
+                                af.parseMagicLine(tc->belongsToAbility, 0, nullptr, tc->source);
                             OrderedAIAction* effCheck =
                                 NEW OrderedAIAction(this, withoutGuessing, (MTGCardInstance*)tc->source, card);
                             if (effCheck->getEfficiency()) {
@@ -1282,7 +1283,7 @@ int AIPlayerBaka::chooseTarget(TargetChooser* _tc, Player* forceTarget, MTGCardI
     // usually that's because we played a card that has bad side effects (ex: when X comes into play, return target
     // land you own to your hand) so we try again to choose a target in the other player's field...
     int cancel = observer->cancelCurrentAction();
-    if (!cancel && !forceTarget) return chooseTarget(tc, target->opponent(), NULL, checkOnly);
+    if (!cancel && !forceTarget) return chooseTarget(tc, target->opponent(), nullptr, checkOnly);
 
     WGE_LOG_ERROR("AI needs to choose a target but can't decide!!!");
     return 1;
@@ -1292,7 +1293,7 @@ int AIPlayerBaka::chooseTarget(TargetChooser* _tc, Player* forceTarget, MTGCardI
 int AIPlayerBaka::getEfficiency(MTGAbility* ability) {
     if (!ability) return -1;
 
-    OrderedAIAction* check = NULL;
+    OrderedAIAction* check = nullptr;
 
     if (MTGCardInstance* cTarget = dynamic_cast<MTGCardInstance*>(ability->target))
         check = NEW OrderedAIAction(this, ability, ability->source, cTarget);
@@ -1315,7 +1316,7 @@ int AIPlayerBaka::selectMenuOption() {
         int checkedLast = 0;
 
         if (object->abilitiesMenu->isMultipleChoice && object->currentActionCard) {
-            MenuAbility* currentMenu = NULL;
+            MenuAbility* currentMenu = nullptr;
             for (size_t m = object->mObjects.size() - 1; m > 0; m--) {
                 MenuAbility* ability = dynamic_cast<MenuAbility*>(object->mObjects[m]);
                 if (ability && ability->triggered) {
@@ -1349,12 +1350,12 @@ int AIPlayerBaka::selectMenuOption() {
 
 MTGCardInstance* AIPlayerBaka::FindCardToPlay(ManaCost* pMana, const char* type) {
     int maxCost = -1;
-    MTGCardInstance* nextCardToPlay = NULL;
-    MTGCardInstance* card = NULL;
+    MTGCardInstance* nextCardToPlay = nullptr;
+    MTGCardInstance* card           = nullptr;
     CardDescriptor cd;
     cd.init();
     cd.setType(type);
-    card = NULL;
+    card        = nullptr;
     gotPayments = vector<MTGAbility*>();
     while ((card = cd.nextmatch(game->hand, card))) {
         if (!CanHandleCost(card->getManaCost(), card)) continue;
@@ -1382,7 +1383,7 @@ MTGCardInstance* AIPlayerBaka::FindCardToPlay(ManaCost* pMana, const char* type)
             TargetChooser* tc = tcf.createTargetChooser(card);
             int shouldPlayPercentage = 0;
             if (tc) {
-                int hasTarget = chooseTarget(tc, NULL, NULL, true);
+                int hasTarget = chooseTarget(tc, nullptr, nullptr, true);
                 if ((tc->maxtargets > hasTarget && tc->maxtargets > 1 && !tc->targetMin &&
                      tc->maxtargets != TargetChooser::UNLITMITED_TARGETS) ||                // target=<3>creature
                     (tc->maxtargets == TargetChooser::UNLITMITED_TARGETS && hasTarget < 1)  // target=creatures
@@ -1518,7 +1519,7 @@ int AIPlayerBaka::computeActions() {
 
     Interruptible* action = observer->mLayers->stackLayer()->getAt(-1);
     Spell* spell = dynamic_cast<Spell*>(action);
-    Player* lastStackActionController = spell ? spell->source->controller() : NULL;
+    Player* lastStackActionController = spell ? spell->source->controller() : nullptr;
     if (observer->isInterrupting == this &&
         this == currentP
         // and i am the currentlyActivePlayer
@@ -1540,7 +1541,7 @@ int AIPlayerBaka::computeActions() {
             if (!nextCardToPlay) {
                 nextCardToPlay = FindCardToPlay(icurrentMana, "instant");
                 if (game->playRestrictions->canPutIntoZone(nextCardToPlay, game->stack) == PlayRestriction::CANT_PLAY)
-                    nextCardToPlay = NULL;
+                    nextCardToPlay = nullptr;
             }
             SAFE_DELETE(icurrentMana);
         }
@@ -1558,10 +1559,10 @@ int AIPlayerBaka::computeActions() {
 #ifndef AI_CHANGE_TESTING
             findingCard = false;
 #endif  // AI_CHANGE_TESTING
-            nextCardToPlay = NULL;
+            nextCardToPlay = nullptr;
             return 1;
         }
-        nextCardToPlay = NULL;
+        nextCardToPlay = nullptr;
 #ifndef AI_CHANGE_TESTING
         findingCard = false;
 #endif  // AI_CHANGE_TESTING
@@ -1588,7 +1589,7 @@ int AIPlayerBaka::computeActions() {
                     nextCardToPlay = FindCardToPlay(currentMana, findType[j].c_str());
                     if (game->playRestrictions->canPutIntoZone(nextCardToPlay, game->stack) ==
                         PlayRestriction::CANT_PLAY)
-                        nextCardToPlay = NULL;
+                        nextCardToPlay = nullptr;
                 }
             } else {
                 const char* types[] = {"planeswalker", "creature", "enchantment", "artifact", "sorcery", "instant"};
@@ -1602,7 +1603,7 @@ int AIPlayerBaka::computeActions() {
                     nextCardToPlay = FindCardToPlay(currentMana, types[count]);
                     if (game->playRestrictions->canPutIntoZone(nextCardToPlay, game->stack) ==
                         PlayRestriction::CANT_PLAY)
-                        nextCardToPlay = NULL;
+                        nextCardToPlay = nullptr;
                     count++;
                 }
             }
@@ -1614,12 +1615,12 @@ int AIPlayerBaka::computeActions() {
                     // this does not teach it to use manaproducer more effectively, it simply allow it to
                     // use the manaproducers it does understand better on sunburst by force.
                     vector<MTGAbility*> checking = canPaySunBurst(nextCardToPlay->getManaCost());
-                    if (payTheManaCost(nextCardToPlay->getManaCost(), NULL, checking)) {
+                    if (payTheManaCost(nextCardToPlay->getManaCost(), nullptr, checking)) {
                         AIAction* a = NEW AIAction(this, nextCardToPlay);
                         clickstream.push(a);
                         return 1;
                     }
-                    nextCardToPlay = NULL;
+                    nextCardToPlay = nullptr;
                     gotPayments.clear();  // if any.
                     return 1;
                 }
@@ -1678,7 +1679,7 @@ int AIPlayerBaka::getCreaturesInfo(Player* player, int neededInfo, int untapMode
     cd.init();
     cd.setType("Creature");
     cd.unsecureSetTapped(untapMode);
-    MTGCardInstance* card = NULL;
+    MTGCardInstance* card = nullptr;
     while ((card = cd.nextmatch(player->game->inPlay, card))) {
         if (!canAttack || card->canAttack()) {
             if (neededInfo == INFO_NBCREATURES) {
@@ -1710,7 +1711,7 @@ int AIPlayerBaka::chooseAttackers() {
         CardDescriptor cd;
         cd.init();
         cd.setType("creature");
-        MTGCardInstance* card = NULL;
+        MTGCardInstance* card = nullptr;
         while ((card = cd.nextmatch(game->inPlay, card))) {
             if (hints && hints->HintSaysDontAttack(observer, card)) continue;
             observer->cardClick(card, MTGAbility::MTG_ATTACK_RULE);
@@ -1738,7 +1739,7 @@ int AIPlayerBaka::chooseBlockers() {
     CardDescriptor cdAttackers;
     cdAttackers.init();
     cdAttackers.setType("Creature");
-    MTGCardInstance* card = NULL;
+    MTGCardInstance* card = nullptr;
     while ((card = cdAttackers.nextmatch(opponent()->game->inPlay, card))) {
         if (card->isAttacker()) opponentsToughness[card] = card->toughness;
     }
@@ -1748,7 +1749,7 @@ int AIPlayerBaka::chooseBlockers() {
     cd.init();
     cd.setType("Creature");
     cd.unsecureSetTapped(-1);
-    card = NULL;
+    card = nullptr;
 
     // We first try to block the major threats, those that are marked in the Top 3 of our stats
     while ((card = cd.nextmatch(game->inPlay, card))) {
@@ -1776,7 +1777,7 @@ int AIPlayerBaka::chooseBlockers() {
 
     // If blocking one of the major threats is not enough to kill it,
     // We change strategy, first we unassign its blockers that where assigned above
-    card = NULL;
+    card = nullptr;
     while ((card = cd.nextmatch(game->inPlay, card))) {
         if (card->defenser && opponentsToughness[card->defenser] > 0) {
             while (card->defenser) {
@@ -1786,7 +1787,7 @@ int AIPlayerBaka::chooseBlockers() {
     }
 
     // Assign the "free" potential blockers to attacking creatures that are not blocked enough
-    card = NULL;
+    card = nullptr;
     while ((card = cd.nextmatch(game->inPlay, card))) {
         if (!card->defenser) {
             observer->cardClick(card, MTGAbility::MTG_BLOCK_RULE);
@@ -1867,11 +1868,11 @@ int AIPlayerBaka::receiveEvent(WEvent* event) {
 
 AIPlayerBaka::AIPlayerBaka(GameObserver* observer, string file, string fileSmall, string avatarFile, MTGDeck* deck)
     : AIPlayer(observer, file, fileSmall, deck) {
-    nextCardToPlay = NULL;
-    stats = NULL;
+    nextCardToPlay = nullptr;
+    stats          = nullptr;
 
     // Initialize "AIHints" system
-    hints = NULL;
+    hints = nullptr;
     if (mDeck && mDeck->meta_AIHints.size()) {
         hints = NEW AIHints(this);
         for (size_t i = 0; i < mDeck->meta_AIHints.size(); ++i) hints->add(mDeck->meta_AIHints[i]);

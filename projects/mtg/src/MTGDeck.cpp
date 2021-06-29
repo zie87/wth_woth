@@ -273,8 +273,8 @@ void MTGAllCards::initCounters() {
 }
 
 void MTGAllCards::init() {
-    tempCard = NULL;
-    tempPrimitive = NULL;
+    tempCard      = nullptr;
+    tempPrimitive = nullptr;
     total_cards = 0;
     initCounters();
 }
@@ -340,8 +340,8 @@ int MTGAllCards::load(const char* config_file, const char* set_name, int autoloa
                     if (tempPrimitive) tempCard->setPrimitive(tempPrimitive);
                     addCardToCollection(tempCard, set_id);
                 }
-                tempCard = NULL;
-                tempPrimitive = NULL;
+                tempCard      = nullptr;
+                tempPrimitive = nullptr;
             } else {
                 if (!processConfLine(s, tempCard, tempPrimitive))
                     WGE_LOG_ERROR("BAD Line: [{}]: \"{}\"", lineNumber, s);
@@ -353,7 +353,7 @@ int MTGAllCards::load(const char* config_file, const char* set_name, int autoloa
     return total_cards;
 }
 
-MTGAllCards* MTGAllCards::instance = NULL;
+MTGAllCards* MTGAllCards::instance = nullptr;
 
 MTGAllCards::MTGAllCards() { init(); }
 
@@ -374,7 +374,7 @@ void MTGAllCards::loadInstance() {
 void MTGAllCards::unloadAll() {
     if (instance) {
         delete instance;
-        instance = NULL;
+        instance = nullptr;
     }
 }
 
@@ -459,7 +459,7 @@ CardPrimitive* MTGAllCards::addPrimitive(CardPrimitive* primitive, MTGCard* card
     if (!maxGrade) maxGrade = Constants::GRADE_BORDERLINE;  // Default setting for grade is borderline?
     if (currentGrade > maxGrade) {
         SAFE_DELETE(primitive);
-        return NULL;
+        return nullptr;
     }
     string key;
     if (card) {
@@ -473,7 +473,7 @@ CardPrimitive* MTGAllCards::addPrimitive(CardPrimitive* primitive, MTGCard* card
         // Todo move the deletion somewhere else ?
         WGE_LOG_WARN("primitives conflict: {}", key);
         SAFE_DELETE(primitive);
-        return NULL;
+        return nullptr;
     }
     // translate cards text
     Translator* t = Translator::GetInstance();
@@ -496,11 +496,11 @@ MTGCard* MTGAllCards::getCardById(int id) {
     if (it != collection.end()) {
         return (it->second);
     }
-    return 0;
+    return nullptr;
 }
 
 MTGCard* MTGAllCards::_(int index) {
-    if (index >= total_cards) return NULL;
+    if (index >= total_cards) return nullptr;
     return getCardById(ids[index]);
 }
 
@@ -535,8 +535,8 @@ void MTGAllCards::prefetchCardNameCache() {
 
 MTGCard* MTGAllCards::getCardByName(string nameDescriptor) {
     std::lock_guard<wge::mutex> lock(instance->mMutex);
-    if (!nameDescriptor.size()) return NULL;
-    if (nameDescriptor[0] == '#') return NULL;
+    if (!nameDescriptor.size()) return nullptr;
+    if (nameDescriptor[0] == '#') return nullptr;
 
     std::transform(nameDescriptor.begin(), nameDescriptor.end(), nameDescriptor.begin(), ::tolower);
 
@@ -578,8 +578,8 @@ MTGCard* MTGAllCards::getCardByName(string nameDescriptor) {
             return c;
         }
     }
-    mtgCardByNameCache[nameDescriptor] = NULL;
-    return NULL;
+    mtgCardByNameCache[nameDescriptor] = nullptr;
+    return nullptr;
 }
 
 // MTGDeck
@@ -884,7 +884,7 @@ void MTGDeck::printDetailedDeckText(std::ofstream& file) {
         int cardId = it->first;
         int nbCards = it->second;
         MTGCard* card = this->getCardById(cardId);
-        if (card == NULL) {
+        if (card == nullptr) {
             continue;
         }
         MTGSetInfo* setInfo = setlist.getInfo(card->setId);
@@ -917,7 +917,7 @@ void MTGDeck::printDetailedDeckText(std::ofstream& file) {
         for (int i = 0; i < nbCards; i++) currentCard << cardId << std::endl;
 
         currentCard << std::endl;
-        setInfo = NULL;
+        setInfo = nullptr;
         if (card->data->isLand())
             lands << currentCard.str();
         else if (card->data->isCreature())
@@ -961,7 +961,7 @@ MTGSets::~MTGSets() {
 }
 
 MTGSetInfo* MTGSets::getInfo(int setID) {
-    if (setID < 0 || setID >= (int)setinfo.size()) return NULL;
+    if (setID < 0 || setID >= (int)setinfo.size()) return nullptr;
 
     return setinfo[setID];
 }
@@ -996,7 +996,7 @@ MTGSetInfo* MTGSets::randomSet(int blockId, int atleast) {
         if (iter == 2) atleast = -1;
     }
     free(unlocked);
-    return NULL;
+    return nullptr;
 }
 
 int blockSize(int blockId);

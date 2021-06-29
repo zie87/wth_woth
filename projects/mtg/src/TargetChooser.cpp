@@ -12,7 +12,7 @@
 #include <wge/log.hpp>
 
 TargetChooser* TargetChooserFactory::createTargetChooser(string s, MTGCardInstance* card, MTGAbility* ability) {
-    if (!s.size()) return NULL;
+    if (!s.size()) return nullptr;
 
     int zones[10];
     int nbzones = 0;
@@ -149,10 +149,10 @@ TargetChooser* TargetChooserFactory::createTargetChooser(string s, MTGCardInstan
         zones[1] = MTGGameZone::OPPONENT_BATTLEFIELD;
     }
 
-    TargetChooser* tc = NULL;
+    TargetChooser* tc  = nullptr;
     int maxtargets = 1;
     bool targetMin = false;
-    CardDescriptor* cd = NULL;
+    CardDescriptor* cd = nullptr;
     // max targets allowed
     size_t limit = s1.find('<');
     if (limit != string::npos) {
@@ -172,7 +172,7 @@ TargetChooser* TargetChooserFactory::createTargetChooser(string s, MTGCardInstan
                 maxtargets = TargetChooser::UNLITMITED_TARGETS;
                 targetMin = false;
             } else {
-                WParsedInt* howmuch = NEW WParsedInt(howmany, NULL, card);
+                WParsedInt* howmuch = NEW WParsedInt(howmany, nullptr, card);
                 maxtargets = howmuch->getValue();
                 delete howmuch;
             }
@@ -182,7 +182,7 @@ TargetChooser* TargetChooserFactory::createTargetChooser(string s, MTGCardInstan
     }
 
     if (s1.find("children") != string::npos || s1.find("parents") != string::npos) {
-        TargetChooser* deeperTc = NULL;
+        TargetChooser* deeperTc = nullptr;
         if (s1.find("[") != string::npos) {
             AbilityFactory af(observer);
             vector<string> deepTc = parseBetween(s1, "[", "]");
@@ -239,7 +239,7 @@ TargetChooser* TargetChooserFactory::createTargetChooser(string s, MTGCardInstan
                     if (operatorPosition != string::npos) {
                         string numberCD =
                             attribute.substr(operatorPosition + 1, attribute.size() - operatorPosition - 1);
-                        WParsedInt* val = NEW WParsedInt(numberCD, NULL, card);
+                        WParsedInt* val     = NEW WParsedInt(numberCD, nullptr, card);
                         comparisonCriterion = val->getValue();
                         delete val;
                         switch (attribute[operatorPosition - 1]) {
@@ -499,7 +499,7 @@ TargetChooser* TargetChooserFactory::createTargetChooser(string s, MTGCardInstan
                 tc = NEW DescriptorTargetChooser(observer, cd, zones, nbzones, card, maxtargets, other, targetMin);
             } else {
                 delete (cd);
-                return NULL;
+                return nullptr;
             }
         } else {
             if (!tc) {
@@ -523,7 +523,7 @@ TargetChooser* TargetChooserFactory::createTargetChooser(string s, MTGCardInstan
 }
 
 TargetChooser* TargetChooserFactory::createTargetChooser(MTGCardInstance* card) {
-    if (!card) return NULL;
+    if (!card) return nullptr;
     int id = card->getId();
     string s = card->spellTargetType;
     if (card->alias) {
@@ -567,7 +567,7 @@ TargetChooser* TargetChooserFactory::createTargetChooser(MTGCardInstance* card) 
         return NEW DamageTargetChooser(observer, card, -1, 1, RESOLVED_OK);
     }
     default: {
-        return NULL;
+        return nullptr;
     }
     }
 }
@@ -586,7 +586,7 @@ TargetChooser::TargetChooser(GameObserver* observer, MTGCardInstance* card, int 
     if (source)
         Owner = source->controller();
     else
-        Owner = 0;
+        Owner = nullptr;
 }
 
 // Default targetter : every card can be targetted, unless it is protected from the targetter card
@@ -897,7 +897,7 @@ bool DescriptorTargetChooser::equals(TargetChooser* tc) {
 TargetZoneChooser::TargetZoneChooser(GameObserver* observer, MTGCardInstance* card, int _maxtargets, bool other,
                                      bool targetMin)
     : TargetChooser(observer, card, _maxtargets, other, targetMin) {
-    init(NULL, 0);
+    init(nullptr, 0);
 }
 
 TargetZoneChooser::TargetZoneChooser(GameObserver* observer, int* _zones, int _nbzones, MTGCardInstance* card,
@@ -1151,7 +1151,7 @@ bool DamageTargetChooser::equals(TargetChooser* tc) {
 
 TriggerTargetChooser::TriggerTargetChooser(GameObserver* observer, int _triggerTarget) : TargetChooser(observer) {
     triggerTarget = _triggerTarget;
-    target = NULL;
+    target        = nullptr;
 }
 
 bool TriggerTargetChooser::targetsZone(MTGGameZone* z) { return true; }

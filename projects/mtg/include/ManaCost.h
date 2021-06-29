@@ -81,11 +81,11 @@ public:
     //
     int addExtraCost(ExtraCost* _cost);
     int addExtraCosts(ExtraCosts* _cost);
-    int setExtraCostsAction(MTGAbility* action, MTGCardInstance* card);
-    int isExtraPaymentSet();
-    int canPayExtra();
-    int doPayExtra();
-    ExtraCost* getExtraCost(unsigned int i);
+    int setExtraCostsAction(MTGAbility* action, MTGCardInstance* card) const;
+    int isExtraPaymentSet() const;
+    int canPayExtra() const;
+    int doPayExtra() const;
+    ExtraCost* getExtraCost(unsigned int i) const;
 
     int addHybrid(int c1, int v1, int c2, int v2);
     int tryToPayHybrids(std::vector<ManaCostHybrid>& _hybrids, int _nbhybrids, std::vector<int8_t>& diff);

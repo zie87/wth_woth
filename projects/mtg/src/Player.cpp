@@ -84,7 +84,7 @@ const string Player::getDisplayName() const {
     return "Player 2";
 }
 
-MTGInPlay* Player::inPlay() { return game->inPlay; }
+MTGInPlay* Player::inPlay() const { return game->inPlay; }
 
 int Player::getId() {
     for (int i = 0; i < 2; i++) {
@@ -153,7 +153,7 @@ int Player::damaged() { return damageCount; }
 
 int Player::prevented() { return preventable; }
 
-void Player::takeMulligan() {
+void Player::takeMulligan() const {
     MTGPlayerCards* currentPlayerZones = game;
     int cardsinhand = currentPlayerZones->hand->nb_cards;
     for (int i = 0; i < cardsinhand; i++)  // Discard hand
@@ -167,12 +167,12 @@ void Player::takeMulligan() {
 }
 
 // Cleanup phase at the end of a turn
-void Player::cleanupPhase() {
+void Player::cleanupPhase() const {
     game->inPlay->cleanupPhase();
     game->graveyard->cleanupPhase();
 }
 
-std::string Player::GetCurrentDeckStatsFile() {
+std::string Player::GetCurrentDeckStatsFile() const {
     std::ostringstream filename;
     filename << "stats/" << deckFileSmall << ".txt";
     return options.profileFile(filename.str());

@@ -22,7 +22,7 @@ vector<DeckMetaData*>* DeckManager::getAIDeckOrderList() { return &aiDeckOrderLi
 struct DeckIDMatch {
     DeckIDMatch(int id) : mID(id) {}
 
-    bool operator()(DeckMetaData* inPtr) { return inPtr->getDeckId() == mID; }
+    bool operator()(DeckMetaData* inPtr) const { return inPtr->getDeckId() == mID; }
 
     int mID;
 };
@@ -55,7 +55,7 @@ DeckMetaData* DeckManager::getDeckMetaDataById(int deckId, bool isAI) {
 struct DeckFilenameMatch {
     DeckFilenameMatch(const std::string& filename) : mFilename(filename) {}
 
-    bool operator()(DeckMetaData* inPtr) { return inPtr->getFilename() == mFilename; }
+    bool operator()(DeckMetaData* inPtr) const { return inPtr->getFilename() == mFilename; }
 
     std::string mFilename;
 };

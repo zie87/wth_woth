@@ -89,7 +89,7 @@ public:
     void Entering();
     bool Leaving(JButton key);
     bool ButtonPressed();
-    bool hasFocus();
+    bool hasFocus() const;
     virtual std::ostream& toString(std::ostream& out) const;
     float getHeight();
 };

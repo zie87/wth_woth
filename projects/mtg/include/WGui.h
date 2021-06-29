@@ -191,7 +191,7 @@ public:
     WGuiItem(string _display, u8 _mF = 0);
     virtual ~WGuiItem(){};
 
-    std::string _(string input);  // Override global with our flag checker.
+    std::string _(string input) const;  // Override global with our flag checker.
 
     virtual void setData(){};
 

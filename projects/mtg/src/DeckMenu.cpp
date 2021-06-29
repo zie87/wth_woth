@@ -353,7 +353,7 @@ void DeckMenu::Add(int id, const char* text, string desc, bool forceFocus, DeckM
     }
 }
 
-void DeckMenu::updateScroller() {
+void DeckMenu::updateScroller() const {
     // add all the items from the Tasks db.
     TaskList taskList;
     mScroller->Reset();

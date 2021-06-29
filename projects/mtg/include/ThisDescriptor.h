@@ -15,7 +15,7 @@ public:
     int comparisonMode;
     int comparisonCriterion;
     virtual int match(MTGCardInstance* card) = 0;
-    int matchValue(int value);
+    int matchValue(int value) const;
     virtual ~ThisDescriptor();
     virtual ThisDescriptor* clone() const = 0;
 };

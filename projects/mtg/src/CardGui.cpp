@@ -83,7 +83,7 @@ CardView::~CardView() {
 
 void CardGui::Update(float dt) { PlayGuiObject::Update(dt); }
 
-void CardGui::DrawCard(const Pos& inPosition, int inMode) { DrawCard(card, inPosition, inMode); }
+void CardGui::DrawCard(const Pos& inPosition, int inMode) const { DrawCard(card, inPosition, inMode); }
 
 void CardGui::DrawCard(MTGCard* inCard, const Pos& inPosition, int inMode) {
     switch (inMode) {

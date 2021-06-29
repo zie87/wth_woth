@@ -31,8 +31,8 @@ public:
     void count(MTGCard* c);
 
     int totalCards();
-    std::string getName();
-    std::string getBlock();
+    std::string getName() const;
+    std::string getBlock() const;
     void processConfLine(std::string  line);
 
     enum {
@@ -186,7 +186,7 @@ public:
     std::string meta_unlockRequirements;
 
     int meta_id;
-    int totalCards();
+    int totalCards() const;
     int totalPrice();
     MTGDeck(MTGAllCards* _allcards);
     MTGDeck(const char* config_file, MTGAllCards* _allcards, int meta_only = 0, int difficultySetting = 0);
@@ -203,7 +203,7 @@ public:
     int save();
     int save(const std::string& destFileName, bool useExpandedDescriptions, const std::string& deckTitle,
              const std::string& deckDesc);
-    MTGCard* getCardById(int id);
+    MTGCard* getCardById(int id) const;
 };
 
 #endif

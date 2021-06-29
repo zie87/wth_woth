@@ -393,7 +393,7 @@ Rules::Rules(string _bg) {
     postUpdateInitDone = false;
 }
 
-bool Rules::canChooseDeck() {
+bool Rules::canChooseDeck() const {
     return (gamemode == GAME_TYPE_CLASSIC || gamemode == GAME_TYPE_STONEHEWER || gamemode == GAME_TYPE_HERMIT);
 }
 

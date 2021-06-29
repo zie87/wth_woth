@@ -112,7 +112,7 @@ WGuiItem::WGuiItem(string _display, u8 _mF) {
     y = 0;
 }
 
-string WGuiItem::_(string input) {
+string WGuiItem::_(string input) const {
     if (mFlags & WGuiItem::NO_TRANSLATE) return input;
     return ::_(input);
 }

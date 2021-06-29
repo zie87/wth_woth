@@ -51,7 +51,7 @@ public:
     ModRulesMenuItem(std::string actionIdStr, std::string displayName);
     // most actionIds are associated to a game state. e.g. MENUITEM_DECKEDITOR <--> GAME_STATE_DECK_VIEWER
     // This function returns the game state that matches the actionId, if any
-    int getMatchingGameState();
+    int getMatchingGameState() const;
     static int getMatchingGameState(int actionId);
 };
 

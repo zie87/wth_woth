@@ -39,7 +39,7 @@ public:
     ~IconButton();
     std::ostream& toString(std::ostream& out) const;
 
-    bool hasFocus();
+    bool hasFocus() const;
 
     virtual void Render();
     virtual void Update(float dt);

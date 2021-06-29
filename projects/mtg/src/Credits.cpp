@@ -106,7 +106,7 @@ CreditBonus::CreditBonus(int _value, string _text) {
     text = _text;
 }
 
-void CreditBonus::Render(float x, float y, WFont* font) {
+void CreditBonus::Render(float x, float y, WFont* font) const {
     char buffer[512];
     sprintf(buffer, "%s: %i", text.c_str(), value);
     font->DrawString(buffer, x, y);
@@ -356,13 +356,13 @@ int Credits::isDifficultyUnlocked(DeckStats* stats) {
     return 0;
 }
 
-int Credits::isEvilTwinUnlocked() {
+int Credits::isEvilTwinUnlocked() const {
     if (options[Options::EVILTWIN_MODE_UNLOCKED].number) return 0;
     if (p1->game->inPlay->nb_cards && (p1->game->inPlay->nb_cards == p2->game->inPlay->nb_cards)) return 1;
     return 0;
 }
 
-int Credits::isRandomDeckUnlocked() {
+int Credits::isRandomDeckUnlocked() const {
     if (0 == options[Options::DIFFICULTY].number) return 0;
     if (options[Options::RANDOMDECK_MODE_UNLOCKED].number) return 0;
     if (p1->life >= 20) return 1;

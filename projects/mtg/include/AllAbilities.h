@@ -714,8 +714,8 @@ public:
     void Update(float dt);
     bool CheckUserInput(JButton key);
     void Render();
-    std::string getOptionName();
-    int alreadyShown();
+    std::string getOptionName() const;
+    int alreadyShown() const;
 
     ATutorialMessage* clone() const;
     ~ATutorialMessage();

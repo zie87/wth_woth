@@ -26,7 +26,7 @@ public:
     virtual void lock();                      // Lock it.
     virtual void unlock(bool force = false);  // Unlock it. Forcing a lock will also remove "permanent" status.
 
-    bool isPermanent();  // Is the resource permanent?
+    bool isPermanent() const;  // Is the resource permanent?
     void deadbolt();     // Make it permanent.
     void hit();          // Update resource's last used time.
 

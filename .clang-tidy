@@ -1,5 +1,5 @@
 ---
-Checks:             '-*,modernize-use-nullptr,modernize-use-auto,llvm-namespace-comment,performance-inefficient-algorithm,performance-inefficient-string-concatenation,performance-inefficient-vector-operation,readability-redundant-string-cstr,readability-redundant-string-init'
+Checks:             '-*,modernize-use-nullptr,modernize-use-auto,llvm-namespace-comment,performance-inefficient-algorithm,performance-inefficient-string-concatenation,performance-inefficient-vector-operation,readability-redundant-string-cstr,readability-redundant-string-init,readability-make-member-function-const'
 WarningsAsErrors:   ''
 HeaderFilterRegex:  '^((?!/build/|/extern/|/tinyxml/)).)*$'
 FormatStyle:        file

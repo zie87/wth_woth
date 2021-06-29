@@ -298,7 +298,7 @@ int MTGCardInstance::destroy() {
     return 0;
 }
 
-MTGGameZone* MTGCardInstance::getCurrentZone() { return currentZone; }
+MTGGameZone* MTGCardInstance::getCurrentZone() const { return currentZone; }
 
 int MTGCardInstance::has(int basicAbility) { return basicAbilities[basicAbility]; }
 
@@ -356,7 +356,7 @@ void MTGCardInstance::untap() {
 
 void MTGCardInstance::setUntapping() { untapping = 1; }
 
-int MTGCardInstance::isUntapping() { return untapping; }
+int MTGCardInstance::isUntapping() const { return untapping; }
 
 // Tries to Untap the card
 void MTGCardInstance::attemptUntap() {
@@ -367,7 +367,7 @@ void MTGCardInstance::attemptUntap() {
 }
 
 // Tells if the card is tapped or not
-int MTGCardInstance::isTapped() { return tapped; }
+int MTGCardInstance::isTapped() const { return tapped; }
 
 int MTGCardInstance::regenerate() {
     if (has(Constants::CANTREGEN)) return 0;
@@ -445,7 +445,7 @@ MTGCardInstance* MTGCardInstance::changeController(Player* newController) {
     return copy;
 }
 
-Player* MTGCardInstance::controller() { return lastController; }
+Player* MTGCardInstance::controller() const { return lastController; }
 
 int MTGCardInstance::canAttack() {
     if (tapped) return 0;
@@ -623,9 +623,9 @@ int MTGCardInstance::toggleAttacker() {
     return 0;
 }
 
-int MTGCardInstance::isAttacker() { return attacker; }
+int MTGCardInstance::isAttacker() const { return attacker; }
 
-MTGCardInstance* MTGCardInstance::isDefenser() { return defenser; }
+MTGCardInstance* MTGCardInstance::isDefenser() const { return defenser; }
 
 int MTGCardInstance::nbOpponents() {
     int result = 0;
@@ -752,7 +752,7 @@ int MTGCardInstance::toggleDefenser(MTGCardInstance* opponent) {
     return 0;
 }
 
-bool MTGCardInstance::matchesCastFilter(int castFilter) {
+bool MTGCardInstance::matchesCastFilter(int castFilter) const {
     if (castFilter == Constants::CAST_DONT_CARE) return true;                           // everything
     if (castFilter == Constants::CAST_ALL) return (castMethod != Constants::NOT_CAST);  // everything except "not cast"
     if (castFilter == Constants::CAST_ALTERNATE && castMethod > Constants::CAST_NORMALLY)

@@ -28,7 +28,7 @@ public:
     int modal;
     bool hasFocus;
     virtual void resetObjects();
-    int getMaxId();
+    int getMaxId() const;
     GuiLayer(GameObserver* observer);
     virtual ~GuiLayer();
     virtual void Update(float dt);

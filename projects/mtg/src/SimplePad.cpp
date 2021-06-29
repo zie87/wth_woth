@@ -400,7 +400,7 @@ void SimplePad::Render() {
         }
 }
 
-unsigned int SimplePad::cursorPos() {
+unsigned int SimplePad::cursorPos() const {
     if (cursor > buffer.size()) return buffer.size();
 
     return cursor;

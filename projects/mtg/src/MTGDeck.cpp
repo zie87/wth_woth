@@ -674,11 +674,11 @@ MTGDeck::MTGDeck(const char* config_file, MTGAllCards* _allcards, int meta_only,
     }
 }
 
-int MTGDeck::totalCards() { return total_cards; }
+int MTGDeck::totalCards() const { return total_cards; }
 
 string MTGDeck::getFilename() { return filename; }
 
-MTGCard* MTGDeck::getCardById(int mtgId) { return database->getCardById(mtgId); }
+MTGCard* MTGDeck::getCardById(int mtgId) const { return database->getCardById(mtgId); }
 
 int MTGDeck::addRandomCards(int howmany, int* setIds, int nbSets, int rarity, const char* _subtype, int* colors,
                             int nbcolors) {
@@ -1107,12 +1107,12 @@ void MTGSetInfo::count(MTGCard* c) {
 
 int MTGSetInfo::totalCards() { return counts[MTGSetInfo::TOTAL_CARDS]; }
 
-string MTGSetInfo::getName() {
+string MTGSetInfo::getName() const {
     if (name.size()) return name;  // Pretty name is translated when rendering.
     return id;                     // Ugly name as well.
 }
 
-string MTGSetInfo::getBlock() {
+string MTGSetInfo::getBlock() const {
     if (block < 0 || block >= (int)setlist.blocks.size()) return "None";
 
     return setlist.blocks[block];

@@ -18,12 +18,12 @@ int Counter::init(MTGCardInstance* _target, const char* _name, int _power, int _
     return 1;
 }
 
-bool Counter::sameAs(const char* _name, int _power, int _toughness) {
+bool Counter::sameAs(const char* _name, int _power, int _toughness) const {
     if (power == 0 && toughness == 0) return (name.compare(_name) == 0);
     return (power == _power && toughness == _toughness);
 }
 
-bool Counter::cancels(int _power, int _toughness) {
+bool Counter::cancels(int _power, int _toughness) const {
     if (power == 0 && toughness == 0) return false;
     return (power == -_power && toughness == -_toughness);
 }
@@ -42,7 +42,7 @@ int Counter::cancelCounter(int power, int toughness) {
     return 1;
 }
 
-int Counter::added() {
+int Counter::added() const {
     if (power != 0 || toughness != 0) {
         target->power += power;
         target->addToToughness(toughness);
@@ -50,7 +50,7 @@ int Counter::added() {
     return 1;
 }
 
-int Counter::removed() {
+int Counter::removed() const {
     if (power != 0 || toughness != 0) {
         target->power -= power;
         target->addToToughness(-toughness);

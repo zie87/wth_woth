@@ -52,7 +52,7 @@ public:
     AIAction(AIPlayer* owner, MTGAbility* a, Player* p, MTGCardInstance* c)  // player targeting through abilities.
         : owner(owner), ability(a), click(c), target(NULL), playerAbilityTarget(p){};
     int Act();
-    int clickMultiAct(vector<Targetable*>& actionTargets);
+    int clickMultiAct(vector<Targetable*>& actionTargets) const;
 };
 
 class AIPlayer : public Player {

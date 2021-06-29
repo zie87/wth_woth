@@ -67,7 +67,7 @@ int AIAction::Act() {
     return 0;
 }
 
-int AIAction::clickMultiAct(vector<Targetable*>& actionTargets) {
+int AIAction::clickMultiAct(vector<Targetable*>& actionTargets) const {
     GameObserver* g = owner->getObserver();
     TargetChooser* tc = g->getCurrentTargetChooser();
     if (!tc) return 0;

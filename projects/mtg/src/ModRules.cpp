@@ -54,7 +54,7 @@ ModRulesMenuItem::ModRulesMenuItem(string actionIdStr, std::string displayName) 
     mDisplayName = displayName;
 }
 
-int ModRulesMenuItem::getMatchingGameState() { return getMatchingGameState(mActionId); }
+int ModRulesMenuItem::getMatchingGameState() const { return getMatchingGameState(mActionId); }
 
 int ModRulesMenuItem::getMatchingGameState(int actionId) {
     switch (actionId) {

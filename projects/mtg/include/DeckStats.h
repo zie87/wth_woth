@@ -17,7 +17,7 @@ public:
     int nbgames;
     int victories;
     std::string manaColorIndex;
-    int percentVictories();
+    int percentVictories() const;
 };
 
 class DeckStats {

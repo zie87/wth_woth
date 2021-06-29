@@ -25,7 +25,7 @@ ActionElement::ActionElement(const ActionElement& a) : JGuiObject(a) {
 
 ActionElement::~ActionElement() { SAFE_DELETE(tc); }
 
-int ActionElement::getActivity() { return activeState; }
+int ActionElement::getActivity() const { return activeState; }
 
 int ActionElement::isReactingToTargetClick(Targetable* object) {
     if (auto* cObject = dynamic_cast<MTGCardInstance*>(object)) return isReactingToClick(cObject);

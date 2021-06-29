@@ -55,7 +55,7 @@ void IconButton::init(IconButtonsController* parent, JQuad* quad, float x, float
 
 void IconButton::SetColor(PIXEL_TYPE color) { mColor = color; }
 
-bool IconButton::hasFocus() { return mHasFocus; }
+bool IconButton::hasFocus() const { return mHasFocus; }
 
 void IconButton::Render() {
     JRenderer* r = JRenderer::GetInstance();

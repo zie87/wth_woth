@@ -108,9 +108,9 @@ void Task::randomize() {
     reward = computeReward();
 }
 
-bool Task::isExpired() { return (expiresIn <= 0); }
+bool Task::isExpired() const { return (expiresIn <= 0); }
 
-int Task::getExpiration() { return expiresIn; }
+int Task::getExpiration() const { return expiresIn; }
 
 void Task::setExpiration(int _expiresIn) { expiresIn = _expiresIn; }
 
@@ -354,7 +354,7 @@ void TaskList::getDoneTasks(GameObserver* observer, GameApp* _app, vector<Task*>
     }
 }
 
-int TaskList::getTaskCount() { return tasks.size(); }
+int TaskList::getTaskCount() const { return tasks.size(); }
 
 void TaskList::Update(float dt) {
     mElapsed += dt;

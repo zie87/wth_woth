@@ -511,7 +511,7 @@ GameSettings::~GameSettings() {
     SAFE_DELETE(styleMan);
 }
 
-bool GameSettings::newAward() {
+bool GameSettings::newAward() const {
     if (!profileOptions) return false;
 
     for (int x = Options::BEGIN_AWARDS; x < Options::SET_UNLOCKS + setlist.size(); x++) {
@@ -524,14 +524,14 @@ bool GameSettings::newAward() {
 
 GameOption GameSettings::invalid_option = GameOption(0);
 
-GameOption& GameSettings::operator[](int optionID) {
+GameOption& GameSettings::operator[](int optionID) const {
     GameOption* go = get(optionID);
     if (!go) return invalid_option;
 
     return *go;
 }
 
-GameOption& GameSettings::operator[](string optionName) {
+GameOption& GameSettings::operator[](string optionName) const {
     int id = Options::getID(optionName);
     if (id != INVALID_OPTION) return operator[](id);
 
@@ -544,7 +544,7 @@ GameOption& GameSettings::operator[](string optionName) {
     return *go;
 }
 
-GameOption* GameSettings::get(int optionID) {
+GameOption* GameSettings::get(int optionID) const {
     if (optionID < 0)
         return &invalid_option;
     else if (globalOptions && optionID <= Options::LAST_GLOBAL)

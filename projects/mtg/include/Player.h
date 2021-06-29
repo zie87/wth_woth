@@ -54,11 +54,11 @@ public:
     int damaged();
     int prevented();
     void unTapPhase();
-    MTGInPlay* inPlay();
+    MTGInPlay* inPlay() const;
     ManaPool* getManaPool();
-    void takeMulligan();
+    void takeMulligan() const;
 
-    void cleanupPhase();
+    void cleanupPhase() const;
     virtual int Act(float dt) { return 0; }
 
     virtual int isAI() { return 0; }
@@ -76,7 +76,7 @@ public:
     /**
     ** Returns the path to the stats file of currently selected deck.
     */
-    std::string GetCurrentDeckStatsFile();
+    std::string GetCurrentDeckStatsFile() const;
     virtual bool parseLine(const string& s);
     friend std::ostream& operator<<(std::ostream&, const Player&);
     bool operator<(Player& aPlayer);

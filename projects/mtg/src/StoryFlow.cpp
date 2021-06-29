@@ -217,7 +217,7 @@ bool StoryChoice::Leaving(JButton key) {
 
 bool StoryChoice::ButtonPressed() { return true; }
 
-bool StoryChoice::hasFocus() { return mHasFocus; }
+bool StoryChoice::hasFocus() const { return mHasFocus; }
 
 std::ostream& StoryChoice::toString(std::ostream& out) const {
     return out << "StoryChoice ::: mHasFocus : " << mHasFocus;

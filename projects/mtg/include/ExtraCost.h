@@ -50,7 +50,7 @@ public:
     int doPay();
     int reset();
     int setAction(MTGAbility* _action, MTGCardInstance* _source);
-    void Dump();
+    void Dump() const;
     ExtraCosts* clone() const;
 };
 

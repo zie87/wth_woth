@@ -675,7 +675,7 @@ ExtraCosts::~ExtraCosts() {
     }
 }
 
-void ExtraCosts::Dump() {
+void ExtraCosts::Dump() const {
     WGE_LOG_TRACE("===== Dumping ExtraCosts =====");
     WGE_LOG_TRACE("NbElements: {}", costs.size());
 }

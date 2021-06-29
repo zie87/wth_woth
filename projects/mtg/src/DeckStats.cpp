@@ -14,7 +14,7 @@ DeckStats* DeckStats::mInstance = nullptr;
 DeckStat::DeckStat(int nbgames, int victories, string manaColorIndex)
     : nbgames(nbgames), victories(victories), manaColorIndex(manaColorIndex) {}
 
-int DeckStat::percentVictories() {
+int DeckStat::percentVictories() const {
     if (nbgames == 0) return 50;
     return (100 * victories / nbgames);
 }

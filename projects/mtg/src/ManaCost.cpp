@@ -463,7 +463,7 @@ ManaCostHybrid* ManaCost::getHybridCost(unsigned int i) {
     return &hybrids[i];
 }
 
-ExtraCost* ManaCost::getExtraCost(unsigned int i) {
+ExtraCost* ManaCost::getExtraCost(unsigned int i) const {
     if (extraCosts && extraCosts->costs.size()) {
         if (extraCosts->costs.size() <= i) return nullptr;
         return extraCosts->costs[i];
@@ -563,22 +563,22 @@ int ManaCost::addExtraCosts(ExtraCosts* _ecost) {
     return 1;
 }
 
-int ManaCost::isExtraPaymentSet() {
+int ManaCost::isExtraPaymentSet() const {
     if (!extraCosts) return 1;
     return extraCosts->isPaymentSet();
 }
 
-int ManaCost::canPayExtra() {
+int ManaCost::canPayExtra() const {
     if (!extraCosts) return 1;
     return extraCosts->canPay();
 }
 
-int ManaCost::doPayExtra() {
+int ManaCost::doPayExtra() const {
     if (!extraCosts) return 0;
     return extraCosts->doPay();  // TODO reset ?
 }
 
-int ManaCost::setExtraCostsAction(MTGAbility* action, MTGCardInstance* card) {
+int ManaCost::setExtraCostsAction(MTGAbility* action, MTGCardInstance* card) const {
     if (extraCosts) extraCosts->setAction(action, card);
     return 1;
 }

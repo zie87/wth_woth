@@ -21,7 +21,7 @@ WResource::WResource() {
 
 bool WResource::isLocked() { return (locks != WRES_UNLOCKED); }
 
-bool WResource::isPermanent() { return (locks == WRES_PERMANENT); }
+bool WResource::isPermanent() const { return (locks == WRES_PERMANENT); }
 
 void WResource::deadbolt() {
     if (locks <= WRES_MAX_LOCK) locks = WRES_PERMANENT;

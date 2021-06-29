@@ -213,14 +213,14 @@ Spell::Spell(GameObserver* observer, int id, MTGCardInstance* _source, TargetCho
     }
 }
 
-int Spell::computeX(MTGCardInstance* card) {
+int Spell::computeX(MTGCardInstance* card) const {
     ManaCost* c = cost->Diff(card->getManaCost());
     int x = c->getCost(Constants::NB_Colors);
     delete c;
     return x;
 }
 
-bool Spell::FullfilledAlternateCost(const int& costType) {
+bool Spell::FullfilledAlternateCost(const int& costType) const {
     bool hasFullfilledAlternateCost = false;
 
     switch (costType) {
@@ -274,36 +274,36 @@ int Spell::resolve() {
     return 1;
 }
 
-MTGCardInstance* Spell::getNextCardTarget(MTGCardInstance* previous) {
+MTGCardInstance* Spell::getNextCardTarget(MTGCardInstance* previous) const {
     if (!tc) return nullptr;
     return tc->getNextCardTarget(previous);
 }
-Player* Spell::getNextPlayerTarget(Player* previous) {
+Player* Spell::getNextPlayerTarget(Player* previous) const {
     if (!tc) return nullptr;
     return tc->getNextPlayerTarget(previous);
 }
-Damageable* Spell::getNextDamageableTarget(Damageable* previous) {
+Damageable* Spell::getNextDamageableTarget(Damageable* previous) const {
     if (!tc) return nullptr;
     return tc->getNextDamageableTarget(previous);
 }
-Interruptible* Spell::getNextInterruptible(Interruptible* previous, int type) {
+Interruptible* Spell::getNextInterruptible(Interruptible* previous, int type) const {
     if (!tc) return nullptr;
     return tc->getNextInterruptible(previous, type);
 }
-Spell* Spell::getNextSpellTarget(Spell* previous) {
+Spell* Spell::getNextSpellTarget(Spell* previous) const {
     if (!tc) return nullptr;
     return tc->getNextSpellTarget(previous);
 }
-Damage* Spell::getNextDamageTarget(Damage* previous) {
+Damage* Spell::getNextDamageTarget(Damage* previous) const {
     if (!tc) return nullptr;
     return tc->getNextDamageTarget(previous);
 }
-Targetable* Spell::getNextTarget(Targetable* previous) {
+Targetable* Spell::getNextTarget(Targetable* previous) const {
     if (!tc) return nullptr;
     return tc->getNextTarget(previous);
 }
 
-int Spell::getNbTargets() {
+int Spell::getNbTargets() const {
     if (!tc) return 0;
     return (int)(tc->getNbTargets());
 }
@@ -789,7 +789,7 @@ void ActionStack::endOfInterruption(bool log) {
     if (log) observer->logAction(playerId, "endinterruption");
 }
 
-JButton ActionStack::handleInterruptRequest(JButton inputKey, int& x, int& y) {
+JButton ActionStack::handleInterruptRequest(JButton inputKey, int& x, int& y) const {
     if (gModRules.game.canInterrupt() && y >= 10 && y < (kIconVerticalOffset + 16)) {
         if (x >= interruptBtnXOffset && x < noBtnXOffset) return JGE_BTN_SEC;
 

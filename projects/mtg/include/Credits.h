@@ -31,15 +31,15 @@ public:
     int value;
     std::string text;
     CreditBonus(int _value, std::string _text);
-    void Render(float x, float y, WFont* font);
+    void Render(float x, float y, WFont* font) const;
 };
 
 class Credits {
 private:
     time_t gameLength;
     int isDifficultyUnlocked(DeckStats* stats);
-    int isEvilTwinUnlocked();
-    int isRandomDeckUnlocked();
+    int isEvilTwinUnlocked() const;
+    int isRandomDeckUnlocked() const;
     int IsMoreAIDecksUnlocked(DeckStats* stats);
     std::string unlockedTextureName;
     JQuadPtr GetUnlockedQuad(std::string texturename);

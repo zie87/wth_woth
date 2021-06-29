@@ -119,7 +119,7 @@ void CardPrimitive::removeColor(int _color) {
     colors &= mask;
 }
 
-int CardPrimitive::getColor() {
+int CardPrimitive::getColor() const {
     if (colors) {
         for (int i = 1; i < Constants::NB_Colors; i++)
             if (hasColor(i)) return i;
@@ -128,9 +128,9 @@ int CardPrimitive::getColor() {
     return 0;
 }
 
-bool CardPrimitive::hasColor(int inColor) { return (colors & ConvertColorToBitMask(inColor)) > 0; }
+bool CardPrimitive::hasColor(int inColor) const { return (colors & ConvertColorToBitMask(inColor)) > 0; }
 
-int CardPrimitive::countColors() {
+int CardPrimitive::countColors() const {
     uint8_t mask =
         kColorBitMask_Green | kColorBitMask_Blue | kColorBitMask_Red | kColorBitMask_Black | kColorBitMask_White;
     mask &= colors;
@@ -267,11 +267,11 @@ int CardPrimitive::has(int basicAbility) { return basicAbilities[basicAbility]; 
 //---------------------------------------------
 void CardPrimitive::setPower(int _power) { power = _power; }
 
-int CardPrimitive::getPower() { return power; }
+int CardPrimitive::getPower() const { return power; }
 
 void CardPrimitive::setToughness(int _toughness) { toughness = _toughness; }
 
-int CardPrimitive::getToughness() { return toughness; }
+int CardPrimitive::getToughness() const { return toughness; }
 
 uint8_t CardPrimitive::ConvertColorToBitMask(int inColor) {
     uint8_t value = 0;

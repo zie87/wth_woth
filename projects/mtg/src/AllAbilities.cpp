@@ -3898,14 +3898,14 @@ ATutorialMessage::ATutorialMessage(GameObserver* observer, MTGCardInstance* sour
     if (mDontShow) forceDestroy = 1;
 }
 
-string ATutorialMessage::getOptionName() {
+string ATutorialMessage::getOptionName() const {
     std::stringstream out;
     out << "tuto_";
     out << hash_djb2(mMessage.c_str());
     return out.str();
 }
 
-int ATutorialMessage::alreadyShown() { return options[getOptionName()].number; }
+int ATutorialMessage::alreadyShown() const { return options[getOptionName()].number; }
 
 bool ATutorialMessage::CheckUserInput(JButton key) {
     if (mUserCloseRequest) return false;

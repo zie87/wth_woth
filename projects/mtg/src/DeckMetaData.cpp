@@ -91,7 +91,7 @@ void DeckMetaData::LoadStats() {
 }
 
 // since we only have 100 stock avatar images, we need to recycle the images for deck numbers > 99
-int DeckMetaData::getAvatarId() { return mDeckId % 100; }
+int DeckMetaData::getAvatarId() const { return mDeckId % 100; }
 
 // Accessors
 
@@ -99,7 +99,7 @@ string DeckMetaData::getFilename() { return mFilename; }
 
 string DeckMetaData::getName() { return mName; }
 
-int DeckMetaData::getDeckId() { return mDeckId; }
+int DeckMetaData::getDeckId() const { return mDeckId; }
 
 vector<int> DeckMetaData::getUnlockRequirements() { return mUnlockRequirements; }
 
@@ -107,15 +107,15 @@ string DeckMetaData::getAvatarFilename() { return mAvatarFilename; }
 
 string DeckMetaData::getColorIndex() { return mColorIndex; }
 
-int DeckMetaData::getGamesPlayed() { return mGamesPlayed; }
+int DeckMetaData::getGamesPlayed() const { return mGamesPlayed; }
 
-int DeckMetaData::getVictories() { return mVictories; }
+int DeckMetaData::getVictories() const { return mVictories; }
 
-int DeckMetaData::getVictoryPercentage() { return mPercentVictories; }
+int DeckMetaData::getVictoryPercentage() const { return mPercentVictories; }
 
-int DeckMetaData::getDifficulty() { return mDifficulty; }
+int DeckMetaData::getDifficulty() const { return mDifficulty; }
 
-string DeckMetaData::getDifficultyString() {
+string DeckMetaData::getDifficultyString() const {
     string difficultyString = "Normal";
     switch (mDifficulty) {
     case HARD:

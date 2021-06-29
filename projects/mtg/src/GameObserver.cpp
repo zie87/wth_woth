@@ -107,11 +107,11 @@ GameObserver::GameObserver(WResourceManager* output, JGE* input)
     mDeckManager          = new DeckManager();
 }
 
-GamePhase GameObserver::getCurrentGamePhase() { return currentGamePhase; }
+GamePhase GameObserver::getCurrentGamePhase() const { return currentGamePhase; }
 
-const char* GameObserver::getCurrentGamePhaseName() { return phaseRing->phaseName(currentGamePhase); }
+const char* GameObserver::getCurrentGamePhaseName() const { return phaseRing->phaseName(currentGamePhase); }
 
-const char* GameObserver::getNextGamePhaseName() {
+const char* GameObserver::getNextGamePhaseName() const {
     return phaseRing->phaseName((currentGamePhase + 1) % MTG_PHASE_CLEANUP);
 }
 
@@ -404,11 +404,11 @@ void GameObserver::startGame(GameType gtype, Rules* rules) {
     }
 }
 
-void GameObserver::addObserver(MTGAbility* observer) { mLayers->actionLayer()->Add(observer); }
+void GameObserver::addObserver(MTGAbility* observer) const { mLayers->actionLayer()->Add(observer); }
 
 // Returns true if the Ability was correctly removed from the game, false otherwise
 // Main (valid) reason of returning false is an attempt at removing an Ability that has already been removed
-bool GameObserver::removeObserver(ActionElement* observer) {
+bool GameObserver::removeObserver(ActionElement* observer) const {
     if (!observer) return false;
     return mLayers->actionLayer()->moveToGarbage(observer);
 }
@@ -455,7 +455,7 @@ bool GameObserver::operator==(const GameObserver& aGame) {
     return (error == 0);
 }
 
-void GameObserver::dumpAssert(bool val) {
+void GameObserver::dumpAssert(bool val) const {
     if (!val) {
         std::cerr << *this << std::endl;
         assert(0);
@@ -1112,7 +1112,7 @@ int GameObserver::untap(MTGCardInstance* card) {
     return 1;
 }
 
-TargetChooser* GameObserver::getCurrentTargetChooser() {
+TargetChooser* GameObserver::getCurrentTargetChooser() const {
     if (mLayers) {
         TargetChooser* _tc = mLayers->actionLayer()->getCurrentTargetChooser();
         if (_tc) return _tc;
@@ -1147,7 +1147,7 @@ void GameObserver::cleanupPhase() {
     opponent()->cleanupPhase();
 }
 
-void GameObserver::untapPhase() { currentPlayer->inPlay()->untapAll(); }
+void GameObserver::untapPhase() const { currentPlayer->inPlay()->untapAll(); }
 
 int GameObserver::receiveEvent(WEvent* e) {
     if (!e) return 0;
@@ -1166,7 +1166,7 @@ int GameObserver::receiveEvent(WEvent* e) {
     return result;
 }
 
-Player* GameObserver::currentlyActing() {
+Player* GameObserver::currentlyActing() const {
     if (isInterrupting) return isInterrupting;
     return currentActionPlayer;
 }

@@ -100,7 +100,7 @@ void ResourceManagerImpl::DebugRender() {
 #endif
 }
 
-unsigned long ResourceManagerImpl::Size() {
+unsigned long ResourceManagerImpl::Size() const {
     unsigned long res = 0;
     res += textureWCache.totalSize;
     res += sampleWCache.totalSize;
@@ -108,7 +108,7 @@ unsigned long ResourceManagerImpl::Size() {
     return res;
 }
 
-unsigned long ResourceManagerImpl::SizeCached() {
+unsigned long ResourceManagerImpl::SizeCached() const {
     unsigned long res = 0;
     res += textureWCache.cacheSize;
     res += sampleWCache.cacheSize;
@@ -116,7 +116,7 @@ unsigned long ResourceManagerImpl::SizeCached() {
     return res;
 }
 
-unsigned long ResourceManagerImpl::SizeManaged() {
+unsigned long ResourceManagerImpl::SizeManaged() const {
     unsigned long res = 0;
     if (textureWCache.totalSize > textureWCache.cacheSize) res += textureWCache.totalSize - textureWCache.cacheSize;
 
@@ -138,7 +138,7 @@ unsigned int ResourceManagerImpl::Count() {
     return count;
 }
 
-unsigned int ResourceManagerImpl::CountCached() {
+unsigned int ResourceManagerImpl::CountCached() const {
     unsigned int count = 0;
     count += textureWCache.cacheItems;
     count += sampleWCache.cacheItems;

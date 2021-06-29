@@ -29,7 +29,7 @@ public:
     GamePhase newPhase;
     int modal;
     int waitingForAnswer;
-    int getActivity();
+    int getActivity() const;
     virtual void Update(float dt){};
     virtual void Render(){};
     virtual int testDestroy() { return 0; };

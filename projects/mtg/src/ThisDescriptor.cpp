@@ -11,7 +11,7 @@ ThisDescriptor::~ThisDescriptor() {
 }
 
 // Returns the amount by which a value passes the comparison.
-int ThisDescriptor::matchValue(int value) {
+int ThisDescriptor::matchValue(int value) const {
     switch (comparisonMode) {
     case COMPARISON_AT_MOST:
         return (comparisonCriterion - value + 1);

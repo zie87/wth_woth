@@ -50,7 +50,7 @@ int GuiLayer::Remove(JGuiObject* object) {
     return 0;
 }
 
-int GuiLayer::getMaxId() { return (int)(mObjects.size()); }
+int GuiLayer::getMaxId() const { return (int)(mObjects.size()); }
 
 void GuiLayer::Render() {
     for (size_t i = 0; i < mObjects.size(); i++)

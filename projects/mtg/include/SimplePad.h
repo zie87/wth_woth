@@ -67,7 +67,7 @@ public:
 
     string buffer;
     string title;
-    unsigned int cursorPos();
+    unsigned int cursorPos() const;
     bool isActive() { return bActive; };
     void Render();
     void Update(float dt);

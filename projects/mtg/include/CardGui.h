@@ -47,7 +47,7 @@ public:
     virtual void Render();
     virtual void Update(float dt);
 
-    void DrawCard(const Pos& inPosition, int inMode = DrawMode::kNormal);
+    void DrawCard(const Pos& inPosition, int inMode = DrawMode::kNormal) const;
     static void DrawCard(MTGCard* inCard, const Pos& inPosition, int inMode = DrawMode::kNormal);
 
     static JQuadPtr AlternateThumbQuad(MTGCard* card);

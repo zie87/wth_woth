@@ -20,7 +20,7 @@ private:
 
     // statistical information
     int mGamesPlayed, mVictories, mPercentVictories, mDifficulty;
-    int getAvatarId();
+    int getAvatarId() const;
 
     DeckMetaData();
 
@@ -38,12 +38,12 @@ public:
     std::string getStatsSummary();
     std::vector<int> getUnlockRequirements();
 
-    int getDeckId();
-    int getGamesPlayed();
-    int getVictories();
-    int getVictoryPercentage();
-    int getDifficulty();
-    std::string getDifficultyString();
+    int getDeckId() const;
+    int getGamesPlayed() const;
+    int getVictories() const;
+    int getVictoryPercentage() const;
+    int getDifficulty() const;
+    std::string getDifficultyString() const;
 
     // setters
     void setColorIndex(const std::string& colorIndex);

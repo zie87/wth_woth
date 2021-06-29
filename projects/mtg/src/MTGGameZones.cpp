@@ -93,7 +93,7 @@ void MTGPlayerCards::setOwner(Player* player) {
     temp->setOwner(player);
 }
 
-void MTGPlayerCards::initGame(int shuffle, int draw) {
+void MTGPlayerCards::initGame(int shuffle, int draw) const {
     if (shuffle) library->shuffle();
     if (draw) {
         for (int i = 0; i < 7; i++) {
@@ -178,7 +178,7 @@ void MTGPlayerCards::OptimizedHand(Player* who, int amount, int lands, int creat
     //----------------------------
 }
 
-void MTGPlayerCards::drawFromLibrary() {
+void MTGPlayerCards::drawFromLibrary() const {
     if (!library->nb_cards) {
         if (inPlay->hasAbility(Constants::CANTLOSE) || inPlay->hasAbility(Constants::CANTMILLLOSE) ||
             owner->opponent()->game->inPlay->hasAbility(Constants::CANTWIN)) {
@@ -231,31 +231,31 @@ void MTGPlayerCards::init() {
     playRestrictions = NEW PlayRestrictions();
 }
 
-void MTGPlayerCards::showHand() { hand->debugPrint(); }
+void MTGPlayerCards::showHand() const { hand->debugPrint(); }
 
 // Moves a card to its owner's graveyard
-MTGCardInstance* MTGPlayerCards::putInGraveyard(MTGCardInstance* card) {
+MTGCardInstance* MTGPlayerCards::putInGraveyard(MTGCardInstance* card) const {
     return putInZone(card, card->currentZone, card->owner->game->graveyard);
 }
 
 // Moves a card to its owner's exile
-MTGCardInstance* MTGPlayerCards::putInExile(MTGCardInstance* card) {
+MTGCardInstance* MTGPlayerCards::putInExile(MTGCardInstance* card) const {
     return putInZone(card, card->currentZone, card->owner->game->exile);
 }
 
 // Moves a card to its owner's library
-MTGCardInstance* MTGPlayerCards::putInLibrary(MTGCardInstance* card) {
+MTGCardInstance* MTGPlayerCards::putInLibrary(MTGCardInstance* card) const {
     return putInZone(card, card->currentZone, card->owner->game->library);
 }
 
 // Moves a card to its *owner's* (not controller!) hand
-MTGCardInstance* MTGPlayerCards::putInHand(MTGCardInstance* card) {
+MTGCardInstance* MTGPlayerCards::putInHand(MTGCardInstance* card) const {
     return putInZone(card, card->currentZone, card->owner->game->hand);
 }
 
 // Moves a card from one zone to another
 // If the card is not actually in the expected "from" zone, does nothing and returns null
-MTGCardInstance* MTGPlayerCards::putInZone(MTGCardInstance* card, MTGGameZone* from, MTGGameZone* to) {
+MTGCardInstance* MTGPlayerCards::putInZone(MTGCardInstance* card, MTGGameZone* from, MTGGameZone* to) const {
     MTGCardInstance* copy = nullptr;
     GameObserver* g = owner->getObserver();
     if (!from || !to) return card;  // Error check
@@ -319,7 +319,7 @@ MTGCardInstance* MTGPlayerCards::putInZone(MTGCardInstance* card, MTGGameZone* f
     return ret;
 }
 
-void MTGPlayerCards::discardRandom(MTGGameZone* from, MTGCardInstance* source) {
+void MTGPlayerCards::discardRandom(MTGGameZone* from, MTGCardInstance* source) const {
     if (!from->nb_cards) return;
     int r = owner->getObserver()->getRandomGenerator()->random() % (from->nb_cards);
     WEvent* e = NEW WEventCardDiscard(from->cards[r]);
@@ -328,7 +328,7 @@ void MTGPlayerCards::discardRandom(MTGGameZone* from, MTGCardInstance* source) {
     putInZone(from->cards[r], from, graveyard);
 }
 
-int MTGPlayerCards::isInPlay(MTGCardInstance* card) {
+int MTGPlayerCards::isInPlay(MTGCardInstance* card) const {
     if (inPlay->hasCard(card)) {
         return 1;
     }
@@ -1025,7 +1025,7 @@ std::ostream& operator<<(std::ostream& out, const MTGPlayerCards& z) {
     return out;
 }
 
-bool MTGPlayerCards::parseLine(const string& s) {
+bool MTGPlayerCards::parseLine(const string& s) const {
     size_t limiter = s.find("=");
     if (limiter == string::npos) limiter = s.find(":");
     string areaS;

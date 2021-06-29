@@ -43,7 +43,7 @@ public:
     int getMTGId() const;
     int getId() const;
     char getRarity() const;
-    const std::string getImageName();
+    const std::string getImageName() const;
 };
 
 #endif

@@ -68,6 +68,7 @@ void WSrcCards::bakeFilters() {
     vector<MTGCard*> temp;
 
     setOffset(0);
+    temp.reserve(Size());
     for (int t = 0; t < Size(); t++) {
         temp.push_back(getCard(t));
     }

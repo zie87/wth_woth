@@ -777,6 +777,7 @@ int ManaPool::add(ManaCost* _cost, MTGCardInstance* source) {
 
 int ManaPool::pay(ManaCost* _cost) {
     vector<int> current;
+    current.reserve(Constants::NB_Colors);
     for (int i = 0; i < Constants::NB_Colors; i++) {
         current.push_back(cost[i]);
     }

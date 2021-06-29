@@ -2,7 +2,8 @@
 
 #include <wge/types.hpp>
 #include <wge/memory.hpp>
-#include <wge/math/utils.hpp>
+#include <wge/math.hpp>
+#include <wge/utils/utility.hpp>
 #include <wge/utils/warnings.hpp>
 #include <wge/video/utils.hpp>
 
@@ -328,7 +329,6 @@ texture_data read_jpg_data(jpeg_decompress_struct& cinfo, pixel_format format, b
     jpeg_start_decompress(&cinfo);
 
     if (cinfo.output_components != 3 && cinfo.output_components != 4) {
-        jpeg_destroy_decompress(&cinfo);
         return {};
     }
 
@@ -357,8 +357,6 @@ texture_data read_jpg_data(jpeg_decompress_struct& cinfo, pixel_format format, b
     {
         auto scanline = std::make_unique<wge::byte_t[]>(cinfo.output_width * 3);
         if (!scanline) {
-            jpeg_destroy_decompress(&cinfo);
-
             if (swizzle && (work_buf != nullptr)) {
                 delete[] work_buf;
             }
@@ -393,14 +391,11 @@ texture_data image_loader::load_jpeg(const wge::byte_t* const buffer, wge::size_
     struct jpeg_error_mgr jerr;
     cinfo.err = jpeg_std_error(&jerr);
     jpeg_create_decompress(&cinfo);
+    wge_defer { jpeg_destroy_decompress(&cinfo); };
 
     make_jpeg_info(cinfo, buffer, buffer_size);
 
-    auto data = read_jpg_data(cinfo, format, use_vram, swizzle);
-
-    jpeg_destroy_decompress(&cinfo);
-
-    return data;
+    return read_jpg_data(cinfo, format, use_vram, swizzle);
 }
 
 texture_data image_loader::load_jpeg(std::istream& stream, pixel_format format, bool use_vram, bool swizzle) noexcept {
@@ -408,14 +403,11 @@ texture_data image_loader::load_jpeg(std::istream& stream, pixel_format format, 
     struct jpeg_error_mgr jerr;
     cinfo.err = jpeg_std_error(&jerr);
     jpeg_create_decompress(&cinfo);
+    wge_defer { jpeg_destroy_decompress(&cinfo); };
 
     make_jpeg_info(cinfo, stream);
 
-    auto data = read_jpg_data(cinfo, format, use_vram, swizzle);
-
-    jpeg_destroy_decompress(&cinfo);
-
-    return data;
+    return read_jpg_data(cinfo, format, use_vram, swizzle);
 }
 
 }  // namespace video
@@ -504,8 +496,6 @@ texture_data read_png_data(png_structp& png_ptr, png_infop& info_ptr, bool use_v
     {
         auto scanline = std::make_unique<wge::byte_t[]>(width * 4);
         if (!scanline) {
-            png_destroy_read_struct(&png_ptr, nullptr, nullptr);
-
             if (swizzle && (work_buf != nullptr)) {
                 delete[] work_buf;
             }

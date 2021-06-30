@@ -53,7 +53,7 @@ jobs:
       working-directory: ${{runner.workspace}}/build
       run: ctest ${{matrix.build_type}}
 
-        #    - name: Run Testsuite
-        #      if: ${{ matrix.build_type == 'Debug' }}
-        #      working-directory: ${{runner.workspace}}/build
-        #      run: ./projects/mtg/tests/testsuite/woth_testsuite
+    - name: Run Testsuite
+      if: ${{ matrix.build_type == 'Debug' }}
+      working-directory: ${{runner.workspace}}/build
+      run: ./projects/mtg/tests/testsuite/woth_testsuite

@@ -164,11 +164,22 @@ if(NOT DISABLE_UI)
 
     elseif(DEFINED WOTH_SDL_BUILD)
         target_sources(wth_woth PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/main_sdl2.cpp)
-        install(TARGETS wth_woth RUNTIME DESTINATION bin)
     endif()
 endif()
 
+if(DEFINED WIN32)
+    install(TARGETS wth_woth RUNTIME DESTINATION .)
+    install(
+        DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/" RUNTIME
+        DESTINATION .
+        FILES_MATCHING
+        PATTERN "*.dll"
+    )
+    install(FILES "${CMAKE_SOURCE_DIR}/extern/fmod/lib/fmod.dll" RUNTIME DESTINATION .)
+endif()
+
 if(DEFINED UNIX)
+    install(TARGETS wth_woth RUNTIME DESTINATION bin)
     # install(FILES "res/augustus.desktop" DESTINATION "share/applications" RENAME "com.github.keriew.augustus.desktop")
     # install(FILES "res/augustus.metainfo.xml" DESTINATION "share/metainfo" RENAME
     # "com.github.keriew.augustus.metainfo.xml") install(FILES "res/augustus_32.png" DESTINATION

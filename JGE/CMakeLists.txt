@@ -17,22 +17,6 @@ if(DEFINED WOTH_SDL_BUILD)
     endif()
 endif()
 
-if(DEFINED WIN32)
-    set(DEPENDENCIES_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/include/")
-    set(DEPENDENCIES_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/lib/")
-    set(DEPENDENCIES_SHARED_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/dll/")
-
-    add_library(fmod INTERFACE)
-    target_include_directories(fmod INTERFACE "${DEPENDENCIES_INCLUDE_DIR}")
-    find_library(
-        FMOD_LIBRARY
-        NAMES fmodvc
-        HINTS "${DEPENDENCIES_LIBRARY_DIR}"
-    )
-    target_link_libraries(fmod INTERFACE ${FMOD_LIBRARY})
-    add_library(WotH::fmod ALIAS fmod)
-endif()
-
 # ######################################################################################################################
 # HGE
 # ######################################################################################################################

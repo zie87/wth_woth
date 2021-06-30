@@ -86,6 +86,8 @@ endif()
 
 add_library(WotH::options ALIAS woth_options)
 
+add_subdirectory(extern EXCLUDE_FROM_ALL)
+
 enable_testing()
 add_subdirectory(wge)
 add_subdirectory(JGE)

@@ -18,57 +18,43 @@
 
 #include "JTypes.h"
 
-#if defined USE_PHONON
-    #include <phonon/AudioOutput>
-    #include <phonon/MediaObject>
-#else
-    #ifdef WIN32
-        #include <windows.h>
-        #define WITH_FMOD
-    #elif defined(PSP)
-        #include <pspgu.h>
-        #include <pspkernel.h>
-        #include <pspdisplay.h>
-        #include <pspdebug.h>
-        #include <pspctrl.h>
-        #include <time.h>
-        #include <string.h>
-        #include <pspaudiolib.h>
-        #include <psprtc.h>
+#ifdef WIN32
+#include <windows.h>
+#define WITH_FMOD
+#elif defined(PSP)
+#include <pspgu.h>
+#include <pspkernel.h>
+#include <pspdisplay.h>
+#include <pspdebug.h>
+#include <pspctrl.h>
+#include <time.h>
+#include <string.h>
+#include <pspaudiolib.h>
+#include <psprtc.h>
 
-        #include "JAudio.h"
-        #include "JMP3.h"
-    #endif
-    #ifdef WITH_FMOD
-        #include "../Dependencies/include/fmod.h"
-    #endif
+#include "JAudio.h"
+#include "JMP3.h"
+#endif
+
+#ifdef WITH_FMOD
+#include "../Dependencies/include/fmod.h"
 #endif
 
 //------------------------------------------------------------------------------------------------
 
-#ifdef USE_PHONON
-class JMusic : public QObject {
-    Q_OBJECT
-#else
 class JMusic {
-#endif
 public:
     JMusic();
     ~JMusic();
     void Update();
     int getPlayTime();
 
-#ifdef USE_PHONON
-    Phonon::AudioOutput* mOutput;
-    Phonon::MediaObject* mMediaObject;
-public slots:
-    void seekAtTheBegining();
-#elif defined(PSP)
+#if defined(PSP)
     JMP3* mTrack;
 #elif defined WITH_FMOD
-FSOUND_SAMPLE* mTrack;  // MP3 needed to be of "sample" type for FMOD, FMUSIC_MODULE is for MODs
+    FSOUND_SAMPLE* mTrack;  // MP3 needed to be of "sample" type for FMOD, FMUSIC_MODULE is for MODs
 #else
-void* mTrack;
+    void* mTrack;
 #endif  // WITH_FMOD
 };
 
@@ -84,10 +70,6 @@ public:
     WAVDATA* mSample;
 #elif defined(WITH_FMOD)
     FSOUND_SAMPLE* mSample;
-#elif defined(USE_PHONON)
-    Phonon::AudioOutput* mOutput;
-    Phonon::MediaObject* mMediaObject;
-    void* mSample;
 #else
     void* mSample;
 #endif

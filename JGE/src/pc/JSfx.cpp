@@ -9,22 +9,16 @@
 //-------------------------------------------------------------------------------------
 
 #ifdef WITH_FMOD
-    #include "../../Dependencies/include/fmod.h"
+#include "../../Dependencies/include/fmod.h"
 #else
-    #define FSOUND_FREE 0
+#define FSOUND_FREE 0
 #endif
 
 #include "JSoundSystem.h"
 #include "JFileSystem.h"
 
 //////////////////////////////////////////////////////////////////////////
-JMusic::JMusic()
-#ifdef USE_PHONON
-    : mOutput(0),
-      mMediaObject(0)
-#endif
-{
-}
+JMusic::JMusic() {}
 
 void JMusic::Update() {}
 
@@ -38,33 +32,17 @@ int JMusic::getPlayTime() {
 }
 
 JMusic::~JMusic() {
-#ifdef USE_PHONON
-    if (mOutput) delete mOutput;
-    if (mMediaObject) delete mMediaObject;
-#elif defined WITH_FMOD
+#if defined WITH_FMOD
     JSoundSystem::GetInstance()->StopMusic(this);
     if (mTrack) FSOUND_Sample_Free(mTrack);
 #endif
 }
 
-#ifdef USE_PHONON
-void JMusic::seekAtTheBegining() { mMediaObject->seek(0); }
-#endif
-
 //////////////////////////////////////////////////////////////////////////
-JSample::JSample()
-#ifdef USE_PHONON
-    : mOutput(0),
-      mMediaObject(0)
-#endif
-{
-}
+JSample::JSample() {}
 
 JSample::~JSample() {
-#ifdef USE_PHONON
-    if (mOutput) delete mOutput;
-    if (mMediaObject) delete mMediaObject;
-#elif (defined WITH_FMOD)
+#if (defined WITH_FMOD)
     if (mSample) FSOUND_Sample_Free(mSample);
 #endif
 }
@@ -97,7 +75,7 @@ void JSoundSystem::Destroy() {
 }
 
 JSoundSystem::JSoundSystem() {
-    mVolume = 0;
+    mVolume       = 0;
     mSampleVolume = 0;
 #ifdef WITH_FMOD
     mChannel = FSOUND_FREE;
@@ -119,23 +97,12 @@ void JSoundSystem::DestroySoundSystem() {
 }
 
 JMusic* JSoundSystem::LoadMusic(const char* fileName) {
-#ifdef USE_PHONON
-    JMusic* music = new JMusic();
-    if (music) {
-        music->mOutput = new Phonon::AudioOutput(Phonon::GameCategory, 0);
-        music->mMediaObject = new Phonon::MediaObject(0);
-        std::string fullpath = JFileSystem::GetInstance()->GetResourceFile(fileName);
-        music->mMediaObject->setCurrentSource(QString(fullpath.c_str()));
-        Phonon::Path mediapath = Phonon::createPath(music->mMediaObject, music->mOutput);
-        Q_ASSERT(mediapath.isValid());
-    }
-    return music;
-#elif (defined WITH_FMOD)
+#if (defined WITH_FMOD)
     JMusic* music = new JMusic();
     if (music) {
         JFileSystem* fileSystem = JFileSystem::GetInstance();
         if (fileSystem->OpenFile(fileName)) {
-            int size = fileSystem->GetFileSize();
+            int size     = fileSystem->GetFileSize();
             char* buffer = new char[size];
             fileSystem->ReadFile(buffer, size);
             music->mTrack = FSOUND_Sample_Load(FSOUND_UNMANAGED, buffer, FSOUND_LOADMEMORY, 0, size);
@@ -151,16 +118,7 @@ JMusic* JSoundSystem::LoadMusic(const char* fileName) {
 }
 
 void JSoundSystem::PlayMusic(JMusic* music, bool looping) {
-#ifdef USE_PHONON
-    if (music && music->mMediaObject && music->mOutput) {
-        if (looping) {
-            music->mMediaObject->connect(music->mMediaObject, SIGNAL(aboutToFinish()), music,
-                                         SLOT(seekAtTheBegining()));
-        }
-        music->mOutput->setVolume((qreal)mVolume * 0.01);
-        music->mMediaObject->play();
-    }
-#elif (defined WITH_FMOD)
+#if (defined WITH_FMOD)
     if (music && music->mTrack) {
         mChannel = FSOUND_PlaySound(mChannel, music->mTrack);
         SetMusicVolume(mVolume);
@@ -174,11 +132,7 @@ void JSoundSystem::PlayMusic(JMusic* music, bool looping) {
 }
 
 void JSoundSystem::StopMusic(JMusic* music) {
-#ifdef USE_PHONON
-    if (music && music->mMediaObject && music->mOutput) {
-        music->mMediaObject->stop();
-    }
-#elif (defined WITH_FMOD)
+#if (defined WITH_FMOD)
     FSOUND_StopSound(mChannel);
 #endif
 }
@@ -210,23 +164,12 @@ void JSoundSystem::SetSfxVolume(int volume) {
 }
 
 JSample* JSoundSystem::LoadSample(const char* fileName) {
-#if (defined USE_PHONON)
-    JSample* sample = new JSample();
-    if (sample) {
-        sample->mOutput = new Phonon::AudioOutput(Phonon::GameCategory, 0);
-        sample->mMediaObject = new Phonon::MediaObject(0);
-        std::string fullpath = JFileSystem::GetInstance()->GetResourceFile(fileName);
-        sample->mMediaObject->setCurrentSource(QString(fullpath.c_str()));
-        Phonon::Path mediapath = Phonon::createPath(sample->mMediaObject, sample->mOutput);
-        Q_ASSERT(mediapath.isValid());
-    }
-    return sample;
-#elif (defined WITH_FMOD)
+#if (defined WITH_FMOD)
     JSample* sample = new JSample();
     if (sample) {
         JFileSystem* fileSystem = JFileSystem::GetInstance();
         if (fileSystem->OpenFile(fileName)) {
-            int size = fileSystem->GetFileSize();
+            int size     = fileSystem->GetFileSize();
             char* buffer = new char[size];
             fileSystem->ReadFile(buffer, size);
             sample->mSample = FSOUND_Sample_Load(FSOUND_UNMANAGED, buffer, FSOUND_LOADMEMORY, 0, size);
@@ -243,12 +186,7 @@ JSample* JSoundSystem::LoadSample(const char* fileName) {
 }
 
 void JSoundSystem::PlaySample(JSample* sample) {
-#ifdef USE_PHONON
-    if (sample && sample->mMediaObject && sample->mOutput) {
-        sample->mOutput->setVolume((qreal)mSampleVolume * 0.01);
-        sample->mMediaObject->play();
-    }
-#elif (defined WITH_FMOD)
+#if (defined WITH_FMOD)
     if (sample && sample->mSample) {
         int channel = FSOUND_PlaySound(FSOUND_FREE, sample->mSample);
         FSOUND_SetVolumeAbsolute(channel, static_cast<int>(mSampleVolume * 2.55));

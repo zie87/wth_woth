@@ -51,8 +51,7 @@ jobs:
 
     - name: Start Testsuite
       working-directory: ${{runner.workspace}}/build
-      run : |
-        ./projects/mtg/tests/woth_testsuite
+      run : ./projects/mtg/tests/testsuite/woth_testsuite
 
     - name: lcov creation
       working-directory: ${{runner.workspace}}

@@ -267,7 +267,6 @@ void JGECreateDefaultBindings() {
         g_engine->BindKey(gDefaultBindings[i].keysym, gDefaultBindings[i].keycode);
 }
 
-int JGEGetTime() { return (int)SDL_GetTicks(); }
 
 bool JGEToggleFullscreen() {
     // cycle between the display modes

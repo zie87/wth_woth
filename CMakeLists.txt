@@ -22,6 +22,8 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
+option(DISABLE_UI "disable ui application (only for tests)" OFF)
+
 # Generate compile_commands.json to make it easier to work with clang based tools
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -41,6 +43,15 @@ enable_sanitizers(woth_options)
 
 include(StaticAnalyzers)
 
+if(NOT DISABLE_UI)
+    if(DEFINED PSP)
+        set(WOTH_PSP_BUILD ON)
+    else()
+        target_compile_definitions(woth_options INTERFACE "SDL_CONFIG")
+        set(WOTH_SDL_BUILD ON)
+    endif()
+endif()
+
 if(DEFINED PSP)
     target_link_libraries(woth_options INTERFACE psp::interface)
     target_compile_definitions(woth_options INTERFACE "WOTH_PLATFORM_PSP")
@@ -49,12 +60,9 @@ if(DEFINED PSP)
     target_compile_definitions(woth_options INTERFACE "PSPFW3XX")
     
     include(PspTools) 
-    set(WOTH_PSP_BUILD ON)
 elseif(DEFINED UNIX)
     target_compile_definitions(woth_options INTERFACE "WOTH_PLATFORM_UNIX")
     target_compile_definitions(woth_options INTERFACE "LINUX")
-
-    target_compile_definitions(woth_options INTERFACE "SDL_CONFIG")
 elseif(DEFINED WIN32)
     target_compile_options(woth_options INTERFACE "/wd4005")
 

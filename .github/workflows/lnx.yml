@@ -33,6 +33,8 @@ jobs:
       run: |
         ${{matrix.install}}
         cmake -E make_directory ${{runner.workspace}}/build
+        ln -sf $GITHUB_WORKSPACE/projects/mtg/Res ${{runner.workspace}}/build
+
     - name: Configure
       working-directory: ${{runner.workspace}}/build
       env:
@@ -42,9 +44,16 @@ jobs:
         cmake -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
               -DCMAKE_CXX_STANDARD=${{matrix.std}} \
               $GITHUB_WORKSPACE
+
     - name: Build
       working-directory: ${{runner.workspace}}/build
       run: cmake --build . --config ${{matrix.build_type}} -- -j $(nproc)
-    - name: Tests
+
+    - name: Run Unittests
       working-directory: ${{runner.workspace}}/build
       run: ctest ${{matrix.build_type}}
+
+    - name: Run Testsuite
+      if: ${{ matrix.build_type == 'Debug' }}
+      working-directory: ${{runner.workspace}}/build
+      run: ./projects/mtg/tests/testsuite/woth_testsuite

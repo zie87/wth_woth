@@ -267,12 +267,6 @@ void JGECreateDefaultBindings() {
         g_engine->BindKey(gDefaultBindings[i].keysym, gDefaultBindings[i].keycode);
 }
 
-int JGEGetTime() {
-    u64 curr;
-    sceRtcGetCurrentTick(&curr);
-    return (int)((curr * 1000) / gTickFrequency);
-}
-
 static SceCtrlData gCtrlPad;
 
 u8 JGEGetAnalogX() { return gCtrlPad.Lx; }

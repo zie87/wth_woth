@@ -13,6 +13,9 @@
 #include "GameApp.h"
 #include "corewrapper.h"
 
+
+#define WAGIC_RESOURCE_NAME     "core_0186.zip"
+
 QWidget* g_glwidget = NULL;
 
 static const struct {
@@ -42,7 +45,6 @@ bool JGEToggleFullscreen() {
     return true;
 }
 
-int JGEGetTime() { return (int)WagicCore::g_startTimer.elapsed(); }
 
 int main(int argc, char* argv[]) {
     QScopedPointer<QApplication> app

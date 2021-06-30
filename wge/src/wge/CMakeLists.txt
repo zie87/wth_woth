@@ -21,6 +21,7 @@ if(DEFINED WOTH_PSP_BUILD)
             ${CMAKE_CURRENT_SOURCE_DIR}/thread/thread_psp.cpp
     )
 elseif(DEFINED WOTH_SDL_BUILD)
+    find_package(SDL2 REQUIRED)
     target_sources(wge PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/time_sdl.cpp)
     target_link_libraries(wge PUBLIC SDL2::SDL2)
 else()

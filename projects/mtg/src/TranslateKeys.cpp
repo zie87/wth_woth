@@ -4,7 +4,7 @@
 #include "WResourceManager.h"
 #include "TranslateKeys.h"
 #ifdef SDL_CONFIG
-    #include <SDL.h>
+#include <SDL.h>
 #endif
 using std::map;
 using std::string;
@@ -21,11 +21,9 @@ const KeyRep& translateKey(LocalKeySym key) {
 
     char* str = nullptr;
 
-#if !defined(QT_CONFIG) && !defined(SDL_CONFIG)
-    str = XKeysymToString(key);
-    #elif defined(SDL_CONFIG)
+#if defined(SDL_CONFIG)
     str = (char*)SDL_GetKeyName(key);
-    #endif
+#endif
     if (!str) {
         str = NEW char[11];
         sprintf(str, "%lu",
@@ -33,7 +31,7 @@ const KeyRep& translateKey(LocalKeySym key) {
                                           // long, so this part should probably be platform specific (move to JGE ?)
     }
     const KeyRep k = std::make_pair(str, static_cast<JQuad*>(nullptr));
-    fattable[key] = k;
+    fattable[key]  = k;
     return fattable[key];
 }
 #elif defined(WIN32)
@@ -85,19 +83,19 @@ const KeyRep& translateKey(LocalKeySym key) {
     std::map<const LocalKeySym, KeyRep>::iterator res;
     if ((res = fattable.find(key)) == fattable.end()) {
         if (fattable.end() == fattable.find(PSP_CTRL_SELECT)) {
-            fattable[PSP_CTRL_SELECT] = make_pair(_("Select"), static_cast<JQuad*>(NULL));
-            fattable[PSP_CTRL_START] = make_pair(_("Start"), static_cast<JQuad*>(NULL));
-            fattable[PSP_CTRL_UP] = make_pair(_("Up"), static_cast<JQuad*>(NULL));
-            fattable[PSP_CTRL_RIGHT] = make_pair(_("Right"), static_cast<JQuad*>(NULL));
-            fattable[PSP_CTRL_DOWN] = make_pair(_("Down"), static_cast<JQuad*>(NULL));
-            fattable[PSP_CTRL_LEFT] = make_pair(_("Left"), static_cast<JQuad*>(NULL));
+            fattable[PSP_CTRL_SELECT]   = make_pair(_("Select"), static_cast<JQuad*>(NULL));
+            fattable[PSP_CTRL_START]    = make_pair(_("Start"), static_cast<JQuad*>(NULL));
+            fattable[PSP_CTRL_UP]       = make_pair(_("Up"), static_cast<JQuad*>(NULL));
+            fattable[PSP_CTRL_RIGHT]    = make_pair(_("Right"), static_cast<JQuad*>(NULL));
+            fattable[PSP_CTRL_DOWN]     = make_pair(_("Down"), static_cast<JQuad*>(NULL));
+            fattable[PSP_CTRL_LEFT]     = make_pair(_("Left"), static_cast<JQuad*>(NULL));
             fattable[PSP_CTRL_LTRIGGER] = make_pair(_("Left trigger"), static_cast<JQuad*>(NULL));
             fattable[PSP_CTRL_RTRIGGER] = make_pair(_("Right trigger"), static_cast<JQuad*>(NULL));
             fattable[PSP_CTRL_TRIANGLE] = make_pair(_("Triangle"), static_cast<JQuad*>(NULL));
-            fattable[PSP_CTRL_CIRCLE] = make_pair(_("Circle"), static_cast<JQuad*>(NULL));
-            fattable[PSP_CTRL_CROSS] = make_pair(_("Cross"), static_cast<JQuad*>(NULL));
-            fattable[PSP_CTRL_SQUARE] = make_pair(_("Square"), static_cast<JQuad*>(NULL));
-            fattable[PSP_CTRL_HOLD] = make_pair(_("Hold"), static_cast<JQuad*>(NULL));
+            fattable[PSP_CTRL_CIRCLE]   = make_pair(_("Circle"), static_cast<JQuad*>(NULL));
+            fattable[PSP_CTRL_CROSS]    = make_pair(_("Cross"), static_cast<JQuad*>(NULL));
+            fattable[PSP_CTRL_SQUARE]   = make_pair(_("Square"), static_cast<JQuad*>(NULL));
+            fattable[PSP_CTRL_HOLD]     = make_pair(_("Hold"), static_cast<JQuad*>(NULL));
         } else {
             char* str = NEW char[11];
             sprintf(str, "%d", (int)key);

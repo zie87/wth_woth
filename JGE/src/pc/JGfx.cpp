@@ -25,12 +25,6 @@
 #include "JFileSystem.h"
 #include "JAssert.h"
 
-#if (defined WIN32) && (!defined QT_CONFIG)
-#ifndef __attribute__
-#define __attribute__((a))
-#endif
-#endif
-
 #ifdef _DEBUG
 #define checkGlError()                                                                          \
     {                                                                                           \
@@ -1435,7 +1429,7 @@ void JRenderer::PlotArray(float* x, float* y, int count, PIXEL_TYPE color) {
 void JRenderer::ScreenShot([[maybe_unused]] const char* filename) {}
 
 #if (defined QT_CONFIG)
-JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureFormat __attribute__((unused))) {
+JTexture* JRenderer::LoadTexture(const char* filename, int mode, [[maybe_unused]] int TextureFormat) {
     JTexture* tex           = NULL;
     int rawsize             = 0;
     wge::byte_t* rawdata    = NULL;
@@ -1484,7 +1478,7 @@ JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureForm
     return tex;
 }
 #else
-JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureFormat __attribute__((unused))) {
+JTexture* JRenderer::LoadTexture(const char* filename, int mode, [[maybe_unused]] int TextureFormat) {
     auto* fileSystem = JFileSystem::GetInstance();
     if (!fileSystem->OpenFile(filename)) {
         printf("Texture %s failed to open\n", filename);
@@ -1575,7 +1569,7 @@ void JRenderer::TransferTextureToGLContext(JTexture& inTexture) {
     }
 }
 
-JTexture* JRenderer::CreateTexture(int width, int height, int mode __attribute__((unused))) {
+JTexture* JRenderer::CreateTexture(int width, int height, [[maybe_unused]] int mode) {
     checkGlError();
     auto* tex = new JTexture();
 
@@ -1615,7 +1609,7 @@ JTexture* JRenderer::CreateTexture(int width, int height, int mode __attribute__
     return tex;
 }
 
-void JRenderer::EnableVSync(bool flag __attribute__((unused))) {
+void JRenderer::EnableVSync([[maybe_unused]] bool flag) {
     //	if (flag)
     //		hge->System_SetState(HGE_FPS, 60);	// HGEFPS_VSYNC
     //	else
@@ -1931,9 +1925,9 @@ void JRenderer::DrawPolygon(float* x, float* y, int count, PIXEL_TYPE color) {
     int i;
 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
-    int number         = count + 1;
-    auto* vVertices    = new GLfloat[3 * number];
-    auto* colors       = new GLubyte[4 * number];
+    int number      = count + 1;
+    auto* vVertices = new GLfloat[3 * number];
+    auto* colors    = new GLubyte[4 * number];
 
     for (i = 0; i < number; i++) {
         colors[4 * i + 0] = col.r;
@@ -2510,9 +2504,9 @@ void JRenderer::DrawRoundRect(float x, float y, float w, float h, float radius, 
     int i;
 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
-    int number         = 360;
-    auto* vVertices    = new GLfloat[3 * number];
-    auto* colors       = new GLubyte[4 * number];
+    int number      = 360;
+    auto* vVertices = new GLfloat[3 * number];
+    auto* colors    = new GLubyte[4 * number];
 
     for (i = 0; i < number; i++) {
         colors[4 * i + 0] = col.r;
@@ -2665,9 +2659,9 @@ void JRenderer::FillRoundRect(float x, float y, float w, float h, float radius, 
 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
     int i, offset;
-    int number         = 2 + 360;
-    auto* vVertices    = new GLfloat[3 * number];
-    auto* colors       = new GLubyte[4 * number];
+    int number      = 2 + 360;
+    auto* vVertices = new GLfloat[3 * number];
+    auto* colors    = new GLubyte[4 * number];
 
     for (i = 0; i < number; i++) {
         colors[4 * i + 0] = col.r;

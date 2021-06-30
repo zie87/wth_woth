@@ -94,6 +94,7 @@ public:
     int cardClick(MTGCardInstance* card, int abilityType);
     int cardClick(MTGCardInstance* card, Targetable* _object = NULL, bool log = true);
     GamePhase getCurrentGamePhase() const;
+    void setCurrentGamePhase(GamePhase phase) { currentGamePhase = phase; };
     const char* getCurrentGamePhaseName() const;
     const char* getNextGamePhaseName() const;
     void nextCombatStep();

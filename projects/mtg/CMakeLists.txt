@@ -1,7 +1,7 @@
 
-add_executable(wth_woth)
+add_library(wth STATIC)
 
-target_sources(wth_woth
+target_sources(wth
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/InteractiveButton.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/AbilityParser.cpp
@@ -117,41 +117,53 @@ target_sources(wth_woth
     )
 
 if(NOT DEFINED WIN32)
-    target_compile_options(wth_woth PRIVATE "-DUSE_PRECOMPILED_HEADERS=1")
-    target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-ggdb3>")
+    target_compile_options(wth PUBLIC "-DUSE_PRECOMPILED_HEADERS=1")
+    target_compile_options(wth PUBLIC "$<$<CONFIG:DEBUG>:-ggdb3>")
 endif()
 
-target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-D_DEBUG>")
-target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-DDEBUG>")
-target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-DDEBUG_CACHE>")
+target_compile_options(wth PUBLIC "$<$<CONFIG:DEBUG>:-D_DEBUG>")
+target_compile_options(wth PUBLIC "$<$<CONFIG:DEBUG>:-DDEBUG>")
+target_compile_options(wth PUBLIC "$<$<CONFIG:DEBUG>:-DDEBUG_CACHE>")
 
-target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-DTESTSUITE>")
-target_compile_options(wth_woth PRIVATE "$<$<CONFIG:DEBUG>:-DAI_CHANGE_TESTING>")
+target_compile_options(wth PUBLIC "$<$<CONFIG:DEBUG>:-DTESTSUITE>")
+target_compile_options(wth PUBLIC "$<$<CONFIG:DEBUG>:-DAI_CHANGE_TESTING>")
 
 
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/include/Version.hpp.in 
                 ${PROJECT_BINARY_DIR}/include/generated/Version.hpp)
 
-target_include_directories(wth_woth 
-    PRIVATE
+target_include_directories(wth 
+    PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${PROJECT_BINARY_DIR}/include/generated/
 )
 
-target_link_libraries(wth_woth
+target_link_libraries(wth
     PUBLIC
         WotH::wge
         WotH::jge
     PRIVATE
-        woth_options
+        WotH::options
 )
 
+add_library(WotH::wth ALIAS wth)
 
-if(DEFINED PSP)
-create_pbp_file(TARGET wth_woth
-                TITLE "Wagic, the Homebrew?!" 
-                ICON_PATH ${CMAKE_CURRENT_SOURCE_DIR}/icon.png
-                BACKGROUND_PATH ${CMAKE_CURRENT_SOURCE_DIR}/pic1.png
-                PREVIEW_PATH ${CMAKE_CURRENT_SOURCE_DIR}/pic0.png
-)
+
+if(NOT DISABLE_UI)
+    add_executable(wth_woth)
+    target_link_libraries(wth_woth PRIVATE WotH::wth WotH::options)
+
+    if(DEFINED WOTH_PSP_BUILD)
+        target_sources(wth_woth PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/main_psp.cpp)
+        create_pbp_file(TARGET wth_woth
+                        TITLE "Wagic, the Homebrew?!" 
+                        ICON_PATH ${CMAKE_CURRENT_SOURCE_DIR}/icon.png
+                        BACKGROUND_PATH ${CMAKE_CURRENT_SOURCE_DIR}/pic1.png
+                        PREVIEW_PATH ${CMAKE_CURRENT_SOURCE_DIR}/pic0.png
+        )
+    elseif(DEFINED WOTH_SDL_BUILD)
+        target_sources(wth_woth PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/main_sdl2.cpp)
+    endif()
 endif()
+
+add_subdirectory(tests)

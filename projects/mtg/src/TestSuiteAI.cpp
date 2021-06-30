@@ -21,9 +21,9 @@ TestSuiteAI::TestSuiteAI(TestSuiteGame* tsGame, int playerId)
     game = tsGame->buildDeck(this, playerId);
     game->setOwner(this);
 
-    suite = tsGame;
-    timer = 0;
-    playMode = MODE_TEST_SUITE;
+    suite          = tsGame;
+    timer          = 0;
+    playMode       = MODE_TEST_SUITE;
     this->deckName = "Test Suite AI";
 }
 
@@ -34,7 +34,7 @@ MTGCardInstance* TestSuiteAI::getCard(string action) {
     // This mostly handles tokens
     std::transform(action.begin(), action.end(), action.begin(), ::tolower);
     for (int i = 0; i < 2; i++) {
-        Player* p = observer->players[i];
+        Player* p            = observer->players[i];
         MTGGameZone* zones[] = {p->game->library, p->game->hand, p->game->inPlay, p->game->graveyard};
         for (int j = 0; j < 4; j++) {
             MTGGameZone* zone = zones[j];
@@ -51,7 +51,7 @@ MTGCardInstance* TestSuiteAI::getCard(string action) {
 }
 
 Interruptible* TestSuiteGame::getActionByMTGId(int mtgid) {
-    ActionStack* as = observer->mLayers->stackLayer();
+    ActionStack* as       = observer->mLayers->stackLayer();
     Interruptible* action = nullptr;
     while ((action = as->getNext(action, 0, 0, 1))) {
         if (action->source && action->source->getMTGId() == mtgid) {
@@ -93,8 +93,7 @@ int TestSuiteAI::Act(float dt) {
     timer = 0;
 
     string action = suite->getNextAction();
-    observer->mLayers->stackLayer()->Dump();
-    WGE_LOG_TRACE("TESTSUITE command: {}", action);
+    WGE_LOG_TRACE("command: {}", action);
 
     if (observer->mLayers->stackLayer()->askIfWishesToInterrupt == this) {
         if (action != "no" && action != "yes") {
@@ -116,24 +115,24 @@ int TestSuiteAI::Act(float dt) {
         if (observer->getCurrentGamePhase() != MTG_PHASE_CLEANUP) suite->currentAction--;
         observer->userRequestNextGamePhase();
     } else if (action == "human") {
-        WGE_LOG_TRACE("TESTSUITE You have control");
+        WGE_LOG_TRACE("You have control");
         playMode = MODE_HUMAN;
         return 1;
     } else if (action == "ai") {
-        WGE_LOG_TRACE("TESTSUITE Switching to AI");
+        WGE_LOG_TRACE("Switching to AI");
         playMode = MODE_AI;
         return 1;
     } else if (action == "next" || action.find("goto") != string::npos) {
         if (action.find("goto ") != string::npos) {
-            size_t found = action.find("goto ");
-            string phase = action.substr(found + 5);
+            size_t found  = action.find("goto ");
+            string phase  = action.substr(found + 5);
             int phaseToGo = 0;
             for (int i = 0; i < NB_MTG_PHASES; i++) {
                 if (phase.find(Constants::MTGPhaseCodeNames[i]) != string::npos) {
                     phaseToGo = i;
                 }
             }
-            if (observer->currentGamePhase != phaseToGo)
+            if (observer->getCurrentGamePhase() != phaseToGo)
                 suite->currentAction--;
             else {
                 return 1;
@@ -159,23 +158,23 @@ int TestSuiteAI::Act(float dt) {
         if (observer->mLayers->stackLayer()->askIfWishesToInterrupt == this)
             observer->mLayers->stackLayer()->cancelInterruptOffer();
     } else if (action.find("choice ") != string::npos) {
-        WGE_LOG_TRACE("TESTSUITE choice !!!");
+        WGE_LOG_TRACE("choice !!!");
         int choice = atoi(action.substr(action.find("choice ") + 7).c_str());
         observer->mLayers->actionLayer()->doReactTo(choice);
     } else if (action.find(" -momir- ") != string::npos) {
-        int start = action.find(" -momir- ");
+        int start       = action.find(" -momir- ");
         int cardId      = Rules::getMTGId(action.substr(start + 9));
         int cardIdHand  = Rules::getMTGId(action.substr(0, start));
         MTGMomirRule* a = ((MTGMomirRule*)observer->mLayers->actionLayer()->getAbility(MTGAbility::MOMIR));
         a->reactToClick(Rules::getCardByMTGId(observer, cardIdHand), cardId);
         observer->mLayers->actionLayer()->stuffHappened = 1;
     } else if (action.find("p1") != string::npos || action.find("p2") != string::npos) {
-        Player* p = observer->players[1];
+        Player* p    = observer->players[1];
         size_t start = action.find("p1");
         if (start != string::npos) p = observer->players[0];
         observer->cardClick(nullptr, p);
     } else {
-        int mtgid = Rules::getMTGId(action);
+        int mtgid                  = Rules::getMTGId(action);
         Interruptible* toInterrupt = nullptr;
         if (mtgid) {
             WGE_LOG_TRACE("TESTSUITE CARD ID: {}", mtgid);
@@ -261,10 +260,10 @@ void TestSuiteGame::assertGame() {
     sprintf(result, "<h3>%s</h3>", filename.c_str());
     Log(result);
 
-    int error = 0;
+    int error  = 0;
     bool wasAI = false;
 
-    if (observer->currentGamePhase != endState.phase) {
+    if (observer->getCurrentGamePhase() != endState.phase) {
         sprintf(result, "<span class=\"error\">==phase problem. Expected [ %s ](%i), got [ %s ](%i)==</span><br />",
                 Constants::MTGPhaseNames[endState.phase], endState.phase,
                 Constants::MTGPhaseNames[observer->currentGamePhase], observer->currentGamePhase);
@@ -276,8 +275,8 @@ void TestSuiteGame::assertGame() {
         if (p->playMode == Player::MODE_AI) wasAI = true;
 
         if (p->life != endState.players[i]->life) {
-            sprintf(result, "<span class=\"error\">==life problem for player %i. Expected %i, got %i==</span><br />",
-                    i, endState.players[i]->life, p->life);
+            sprintf(result, "<span class=\"error\">==life problem for player %i. Expected %i, got %i==</span><br />", i,
+                    endState.players[i]->life, p->life);
             Log(result);
             error++;
         }
@@ -309,7 +308,7 @@ void TestSuiteGame::assertGame() {
             }
             error++;
         }
-        MTGGameZone* playerZones[] = {p->game->graveyard, p->game->library, p->game->hand, p->game->inPlay};
+        MTGGameZone* playerZones[]   = {p->game->graveyard, p->game->library, p->game->hand, p->game->inPlay};
         MTGGameZone* endstateZones[] = {endState.players[i]->game->graveyard, endState.players[i]->game->library,
                                         endState.players[i]->game->hand, endState.players[i]->game->inPlay};
         for (int j = 0; j < 4; j++) {
@@ -373,21 +372,21 @@ TestSuite::~TestSuite() {
 
 TestSuite::TestSuite(const char* filename) : TestSuiteGame(nullptr), mRules(nullptr), mProcessing(false) {
     timerLimit = 0;
-    testsuite = this;
+    testsuite  = this;
 
     std::string s;
-    nbfiles = 0;
-    currentfile = 0;
-    nbFailed = 0;
-    nbTests = 0;
-    nbAIFailed = 0;
-    nbAITests = 0;
-    int comment = 0;
-    seed = 0;
+    nbfiles      = 0;
+    currentfile  = 0;
+    nbFailed     = 0;
+    nbTests      = 0;
+    nbAIFailed   = 0;
+    nbAITests    = 0;
+    int comment  = 0;
+    seed         = 0;
     forceAbility = false;
-    aiMaxCalls = -1;
-    startTime = JGEGetTime();
-    endTime = startTime;
+    aiMaxCalls   = -1;
+    startTime    = JGEGetTime();
+    endTime      = startTime;
     std::string contents;
     if (JFileSystem::GetInstance()->readIntoString(filename, contents)) {
         std::stringstream stream(contents);
@@ -424,10 +423,10 @@ TestSuite::TestSuite(const char* filename) : TestSuiteGame(nullptr), mRules(null
 }
 
 int TestSuite::loadNext() {
-    endTime = JGEGetTime();
+    endTime           = JGEGetTime();
     summoningSickness = 0;
-    seed = 0;
-    aiMaxCalls = -1;
+    seed              = 0;
+    aiMaxCalls        = -1;
     if (!nbfiles) return 0;
 
     filename = getNextFile();
@@ -451,7 +450,9 @@ int TestSuite::loadNext() {
             mWorkerThread.pop_back();
         }
 
-        const auto thread_count = wge::thread::hardware_concurrency();
+        //FIXME: more threads creating a lot of false positives!
+        constexpr unsigned int max_number_of_threads = 2U;
+        const auto thread_count = std::min(max_number_of_threads, wge::thread::hardware_concurrency());
         for (size_t i = 0; i < (thread_count - 1); i++) mWorkerThread.push_back(new wge::thread(ThreadProc, this));
     }
 
@@ -485,8 +486,8 @@ void TestSuite::cleanup() {
 
 bool TestSuiteGame::load() {
     summoningSickness = 0;
-    forceAbility = false;
-    gameType = GAME_TYPE_CLASSIC;
+    forceAbility      = false;
+    gameType          = GAME_TYPE_CLASSIC;
 
     std::string s;
 
@@ -607,23 +608,23 @@ void TestSuite::ThreadProc(void* inParam) {
                 theGame.observer->loadTestSuitePlayer(0, &theGame);
                 theGame.observer->loadTestSuitePlayer(1, &theGame);
 
-                theGame.observer->startGame(theGame.gameType, instance->mRules);
+                theGame.observer->startGame(theGame.gameType, Rules::getRulesByFilename("testsuite.txt"));
                 theGame.initGame();
 
-                while (!theGame.observer->didWin()) theGame.observer->Update(counter++);
-                /*
-                                if(theGame.observer->gameType() != GAME_TYPE_MOMIR)
-                                {
-                                    stringstream stream;
-                                    stream << *(theGame.observer);
-                                    theGame.observer->load(stream.str(), false, &theGame);
-                                    theGame.assertGame();
-                                }
-                */
+                while (!theGame.observer->didWin()) {
+                    theGame.observer->Update(counter++);
+                }
             }
         }
     }
     WGE_LOG_TRACE("Leaving");
+}
+
+wge::size_t TestSuite::run() {
+    mProcessing = true;
+    ThreadProc(this);
+
+    return nbFailed + nbAIFailed;
 }
 
 wge::mutex TestSuiteGame::mMutex;
@@ -670,12 +671,12 @@ void TestSuiteGame::initGame() {
     for (int i = 0; i < 2; i++) {
         auto* p                = (AIPlayerBaka*)(observer->players[i]);
         p->forceBestAbilityUse = forceAbility;
-        p->life = initState.players[i]->life;
-        p->poisonCount = initState.players[i]->poisonCount;
+        p->life                = initState.players[i]->life;
+        p->poisonCount         = initState.players[i]->poisonCount;
         std::stringstream stream;
         initState.players[i]->getRandomGenerator()->saveLoadedRandValues(stream);
         p->getRandomGenerator()->loadRandValues(stream.str());
-        MTGGameZone* playerZones[] = {p->game->graveyard, p->game->library, p->game->hand, p->game->inPlay};
+        MTGGameZone* playerZones[]       = {p->game->graveyard, p->game->library, p->game->hand, p->game->inPlay};
         MTGGameZone* loadedPlayerZones[] = {initState.players[i]->game->graveyard, initState.players[i]->game->library,
                                             initState.players[i]->game->hand, initState.players[i]->game->inPlay};
         for (int j = 0; j < 4; j++) {
@@ -713,7 +714,7 @@ void TestSuiteGame::initGame() {
 
 MTGPlayerCards* TestSuiteGame::buildDeck(Player* player, int playerId) {
     int list[100];
-    int nbcards = 0;
+    int nbcards          = 0;
     MTGPlayerCards* deck = nullptr;
 
     if (initState.players.size() > (size_t)playerId) {
@@ -723,7 +724,7 @@ MTGPlayerCards* TestSuiteGame::buildDeck(Player* player, int playerId) {
 
         for (int j = 0; j < 4; j++) {
             for (size_t k = 0; k < loadedPlayerZones[j]->cards.size(); k++) {
-                int cardid = loadedPlayerZones[j]->cards[k]->getId();
+                int cardid    = loadedPlayerZones[j]->cards[k]->getId();
                 list[nbcards] = cardid;
                 nbcards++;
             }

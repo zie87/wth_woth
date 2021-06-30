@@ -25,11 +25,13 @@ jobs:
       run: |
         sudo apt update && sudo apt install git lcov libsdl2-dev libpng-dev libjpeg-dev libz-dev
         cmake -E make_directory ${{runner.workspace}}/build
+        ln -sf $GITHUB_WORKSPACE/projects/mtg/Res ${{runner.workspace}}/build
 
     - name: Configure
       working-directory: ${{runner.workspace}}/build
       run: |
         cmake -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
+              -DSTANDALONE_TESTSUITE=ON \
               -DENABLE_COVERAGE=ON \
               $GITHUB_WORKSPACE
 
@@ -43,9 +45,13 @@ jobs:
         lcov --zerocounters --directory ${{runner.workspace}}/build
         lcov --capture --initial --directory . --output-file cov_base.info
 
-    - name: Tests
+    - name: Start Unittests
       working-directory: ${{runner.workspace}}/build
       run: ctest ${{matrix.build_type}}
+
+    - name: Start Testsuite
+      working-directory: ${{runner.workspace}}/build
+      run : ./projects/mtg/tests/testsuite/woth_testsuite
 
     - name: lcov creation
       working-directory: ${{runner.workspace}}

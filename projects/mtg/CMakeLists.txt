@@ -160,6 +160,7 @@ if(NOT DISABLE_UI)
         )
 
         install(FILES "${CMAKE_CURRENT_BINARY_DIR}/EBOOT.PBP" "${CMAKE_CURRENT_BINARY_DIR}/PARAM.SFO" DESTINATION .)
+        install(FILES ${CMAKE_SOURCE_DIR}/extern/psp_exception_handler/prx/exception.prx  DESTINATION .)
         install(DIRECTORY ${WOTH_RESOURCES_DIR} DESTINATION .)
 
     elseif(DEFINED WOTH_SDL_BUILD)
@@ -168,11 +169,11 @@ if(NOT DISABLE_UI)
 endif()
 
 if(DEFINED WIN32)
-    install(TARGETS wth_woth RUNTIME DESTINATION .)
+    install(TARGETS wth_woth DESTINATION .)
     install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} 
-            RUNTIME DESTINATION . FILES_MATCHING PATTERN "*.dll"
+            DESTINATION . FILES_MATCHING PATTERN "*.dll"
     )
-    install(FILES "${CMAKE_SOURCE_DIR}/extern/fmod/lib/fmod.dll" RUNTIME DESTINATION .)
+    install(FILES "${CMAKE_SOURCE_DIR}/extern/fmod/lib/fmod.dll" DESTINATION .)
 endif()
 
 if(DEFINED UNIX)

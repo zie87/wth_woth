@@ -112,13 +112,6 @@ void JRenderer::RenderQuad(JQuad* quad, VertexColor* pt) {
         pt[i].y               = SCREEN_HEIGHT_F - pt[i].y;
         quad->mColor[i].color = pt[i].color;
     }
-
-    Vector2D uv[4];
-    uv[0] = Vector2D(quad->mTX0, quad->mTY1);
-    uv[1] = Vector2D(quad->mTX1, quad->mTY1);
-    uv[2] = Vector2D(quad->mTX1, quad->mTY0);
-    uv[3] = Vector2D(quad->mTX0, quad->mTY0);
-
     BindTexture(quad->mTex);
 }
 
@@ -140,15 +133,9 @@ void JRenderer::ScreenShot(const char* filename __attribute__((unused))) {}
 
 void JRenderer::TransferTextureToGLContext(JTexture& inTexture) {}
 
-JTexture* JRenderer::CreateTexture(int width, int height, int mode __attribute__((unused))) {
-    JTexture* tex = new JTexture();
-    return tex;
-}
+JTexture* JRenderer::CreateTexture(int width, int height, int mode __attribute__((unused))) { return new JTexture(); }
 
-JTexture* JRenderer::LoadTexture(const char* filename, int mode, int textureFormat) {
-    JTexture* tex = new JTexture();
-    return tex;
-}
+JTexture* JRenderer::LoadTexture(const char* filename, int mode, int textureFormat) { return new JTexture(); }
 
 void JRenderer::EnableVSync(bool flag __attribute__((unused))) {}
 

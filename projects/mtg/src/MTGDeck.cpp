@@ -50,7 +50,7 @@ int MTGAllCards::processConfLine(string& s, MTGCard* card, CardPrimitive* primit
     if (i == string::npos || 0 == i) return 0;
 
     char* key = const_cast<char*>(s.c_str());  // I know what I'm doing, let me do it
-    key[i] = 0;
+    key[i]    = 0;
     char* val = key + i + 1;
 
     switch (key[0]) {
@@ -96,7 +96,7 @@ int MTGAllCards::processConfLine(string& s, MTGCard* card, CardPrimitive* primit
             string value = val;
             std::transform(value.begin(), value.end(), value.begin(), ::tolower);
             vector<string> values = split(value, ',');
-            int removeAllOthers = 1;
+            int removeAllOthers   = 1;
             for (size_t values_i = 0; values_i < values.size(); ++values_i) {
                 primitive->setColor(values[values_i], removeAllOthers);
                 removeAllOthers = 0;
@@ -136,14 +136,14 @@ int MTGAllCards::processConfLine(string& s, MTGCard* card, CardPrimitive* primit
         if (ManaCost* cost = primitive->getManaCost()) {
             string value = val;
             std::transform(value.begin(), value.end(), value.begin(), ::tolower);
-            size_t multikick = value.find("multi");
+            size_t multikick   = value.find("multi");
             bool isMultikicker = false;
             if (multikick != string::npos) {
                 size_t endK = value.find("{", multikick);
                 value.erase(multikick, endK - multikick);
                 isMultikicker = true;
             }
-            cost->kicker = ManaCost::parseManaCost(value);
+            cost->kicker          = ManaCost::parseManaCost(value);
             cost->kicker->isMulti = isMultikicker;
         }
         break;
@@ -176,7 +176,7 @@ int MTGAllCards::processConfLine(string& s, MTGCard* card, CardPrimitive* primit
                 string theName;
                 if (name != string::npos) {
                     size_t endName = value.find(")", name);
-                    theName = value.substr(name + 5, endName - name - 5);
+                    theName        = value.substr(name + 5, endName - name - 5);
                     value.erase(name, endName - name + 1);
                 }
                 cost->alternative = ManaCost::parseManaCost(value);
@@ -218,14 +218,14 @@ int MTGAllCards::processConfLine(string& s, MTGCard* card, CardPrimitive* primit
     case 's':  // subtype, suspend
     {
         if (s.find("suspend") != string::npos) {
-            size_t time = s.find("suspend(");
-            size_t end = s.find(")=");
+            size_t time     = s.find("suspend(");
+            size_t end      = s.find(")=");
             int suspendTime = atoi(s.substr(time + 8, end - 2).c_str());
             if (!primitive) primitive = NEW CardPrimitive();
             if (ManaCost* cost = primitive->getManaCost()) {
                 string value = val;
                 std::transform(value.begin(), value.end(), value.begin(), ::tolower);
-                cost->suspend = ManaCost::parseManaCost(value);
+                cost->suspend            = ManaCost::parseManaCost(value);
                 primitive->suspendedTime = suspendTime;
             }
 
@@ -262,7 +262,7 @@ int MTGAllCards::processConfLine(string& s, MTGCard* card, CardPrimitive* primit
     }
 
     tempPrimitive = primitive;
-    tempCard = card;
+    tempCard      = card;
 
     return i;
 }
@@ -275,59 +275,50 @@ void MTGAllCards::initCounters() {
 void MTGAllCards::init() {
     tempCard      = nullptr;
     tempPrimitive = nullptr;
-    total_cards = 0;
+    total_cards   = 0;
     initCounters();
 }
 
-void MTGAllCards::loadFolder(const std::string& infolder, const std::string& filename )
-{
+void MTGAllCards::loadFolder(const std::string& infolder, const std::string& filename) {
     string folder = infolder;
 
     // Make sure the base paths finish with a '/' or a '\'
-    if (! folder.empty()) {
-                string::iterator c = folder.end();//userPath.at(userPath.size()-1);
-                c--;
-        if ((*c != '/') && (*c != '\\'))
-            folder += '/';
+    if (!folder.empty()) {
+        string::iterator c = folder.end();  // userPath.at(userPath.size()-1);
+        --c;
+        if ((*c != '/') && (*c != '\\')) folder += '/';
     }
 
     vector<string> files = JFileSystem::GetInstance()->scanfolder(folder);
 
-    if (!files.size())
-    {
+    if (!files.size()) {
         return;
     }
 
-    for (size_t i = 0; i < files.size(); ++i)
-    {
+    for (size_t i = 0; i < files.size(); ++i) {
         string afile = folder;
         afile.append(files[i]);
 
-        if(files[i] == "." || files[i] == "..")
-            continue;
+        if (files[i] == "." || files[i] == "..") continue;
 
-        if(JFileSystem::GetInstance()->DirExists(afile))
-            loadFolder(afile, filename);
+        if (JFileSystem::GetInstance()->DirExists(afile)) loadFolder(afile, filename);
 
-        if (!JFileSystem::GetInstance()->FileExists(afile))
-            continue;
+        if (!JFileSystem::GetInstance()->FileExists(afile)) continue;
 
-        if(filename.size())
-        {
-          if(filename == files[i])
-          {
-            load(afile.c_str(), folder.c_str());
-          }
+        if (filename.size()) {
+            if (filename == files[i]) {
+                load(afile.c_str(), folder.c_str());
+            }
         } else {
-          load(afile.c_str());
+            load(afile.c_str());
         }
     }
 }
 
 int MTGAllCards::load(const char* config_file, const char* set_name, int autoload) {
-    conf_read_mode = 0;
+    conf_read_mode   = 0;
     const int set_id = set_name ? setlist.Add(set_name) : MTGSets::INTERNAL_SET;
-    MTGSetInfo* si = setlist.getInfo(set_id);
+    MTGSetInfo* si   = setlist.getInfo(set_id);
 
     int lineNumber = 0;
     std::string contents;
@@ -362,7 +353,7 @@ int MTGAllCards::load(const char* config_file, const char* set_name, int autoloa
                 // Global grade for file, to avoid reading the entire file if unnnecessary
                 if (s[0] == 'g' && s.size() > 8) {
                     int fileGrade = getGrade(s[8]);
-                    int maxGrade = options[Options::MAX_GRADE].number;
+                    int maxGrade  = options[Options::MAX_GRADE].number;
                     if (!maxGrade) maxGrade = Constants::GRADE_BORDERLINE;  // Default setting for grade is borderline?
                     if (fileGrade > maxGrade) {
                         file.close();
@@ -461,7 +452,7 @@ int MTGAllCards::countByColor(int color) {
         map<int, MTGCard*>::iterator it;
         for (it = collection.begin(); it != collection.end(); it++) {
             MTGCard* c = it->second;
-            int j = c->data->getColor();
+            int j      = c->data->getColor();
 
             colorsCount[j]++;
         }
@@ -473,11 +464,11 @@ int MTGAllCards::totalCards() { return (total_cards); }
 
 bool MTGAllCards::addCardToCollection(MTGCard* card, int setId) {
     card->setId = setId;
-    int newId = card->getId();
+    int newId   = card->getId();
     if (collection.find(newId) != collection.end()) {
 #if defined(_DEBUG)
         string cardName = card->data ? card->data->name : card->getImageName();
-        string setName = setId != -1 ? setlist.getInfo(setId)->getName() : "";
+        string setName  = setId != -1 ? setlist.getInfo(setId)->getName() : "";
         WGE_LOG_WARN("card id collision! {} -> \"{}\" (\"{}\")", newId, cardName, setName);
 #endif
         SAFE_DELETE(card);
@@ -492,7 +483,7 @@ bool MTGAllCards::addCardToCollection(MTGCard* card, int setId) {
     ids.push_back(newId);
 
     collection[newId] = card;  // Push card into collection.
-    MTGSetInfo* si = setlist.getInfo(setId);
+    MTGSetInfo* si    = setlist.getInfo(setId);
     if (si) si->count(card);  // Count card in set info
     ++total_cards;
     return true;
@@ -560,12 +551,12 @@ void MTGAllCards::prefetchCardNameCache() {
         mtgCardByNameCache[cardName] = c;
 
         // Name + set
-        int setId = c->setId;
+        int setId           = c->setId;
         MTGSetInfo* setInfo = setlist.getInfo(setId);
         if (setInfo) {
             string setName = setInfo->getName();
             std::transform(setName.begin(), setName.end(), setName.begin(), ::tolower);
-            cardName = cardName + " (" + setName + ")";
+            cardName                     = cardName + " (" + setName + ")";
             mtgCardByNameCache[cardName] = c;
         }
 
@@ -592,16 +583,16 @@ MTGCard* MTGAllCards::getCardByName(string nameDescriptor) {
 
     int cardnb = atoi(nameDescriptor.c_str());
     if (cardnb) {
-        MTGCard* result = getCardById(cardnb);
+        MTGCard* result                    = getCardById(cardnb);
         mtgCardByNameCache[nameDescriptor] = result;
         return result;
     }
 
-    int setId = -1;
+    int setId    = -1;
     size_t found = nameDescriptor.find(" (");
-    string name = nameDescriptor;
+    string name  = nameDescriptor;
     if (found != string::npos) {
-        size_t end = nameDescriptor.find(")");
+        size_t end     = nameDescriptor.find(")");
         string setName = nameDescriptor.substr(found + 2, end - found - 2);
         trim(setName);
         name = nameDescriptor.substr(0, found);
@@ -629,13 +620,13 @@ MTGCard* MTGAllCards::getCardByName(string nameDescriptor) {
 // MTGDeck
 MTGDeck::MTGDeck(MTGAllCards* _allcards) {
     total_cards = 0;
-    database = _allcards;
-    filename = "";
-    meta_name = "";
+    database    = _allcards;
+    filename    = "";
+    meta_name   = "";
 }
 
 int MTGDeck::totalPrice() {
-    int total = 0;
+    int total       = 0;
     auto* pricelist = NEW PriceList("settings/prices.dat", MTGCollection());
     map<int, int>::iterator it;
     for (it = cards.begin(); it != cards.end(); it++) {
@@ -647,13 +638,13 @@ int MTGDeck::totalPrice() {
 }
 
 MTGDeck::MTGDeck(const char* config_file, MTGAllCards* _allcards, int meta_only, int difficultyRating) {
-    total_cards = 0;
-    database = _allcards;
-    filename = config_file;
+    total_cards  = 0;
+    database     = _allcards;
+    filename     = config_file;
     size_t slash = filename.find_last_of("/");
-    size_t dot = filename.find(".");
-    meta_name = filename.substr(slash + 1, dot - slash - 1);
-    meta_id = atoi(meta_name.substr(4).c_str());
+    size_t dot   = filename.find(".");
+    meta_name    = filename.substr(slash + 1, dot - slash - 1);
+    meta_id      = atoi(meta_name.substr(4).c_str());
     std::string contents;
     if (JFileSystem::GetInstance()->readIntoString(config_file, contents)) {
         std::stringstream stream(contents);
@@ -688,17 +679,17 @@ MTGDeck::MTGDeck(const char* config_file, MTGAllCards* _allcards, int meta_only,
             }
             if (meta_only) break;
             int numberOfCopies = 1;
-            size_t found = s.find(" *");
+            size_t found       = s.find(" *");
             if (found != string::npos) {
                 numberOfCopies = atoi(s.substr(found + 2).c_str());
-                s = s.substr(0, found);
+                s              = s.substr(0, found);
             }
             size_t diff = s.find("toggledifficulty:");
             if (diff != string::npos) {
-                string cards = s.substr(diff + 17);
+                string cards     = s.substr(diff + 17);
                 size_t separator = cards.find("|");
-                string cardeasy = cards.substr(0, separator);
-                string cardhard = cards.substr(separator + 1);
+                string cardeasy  = cards.substr(0, separator);
+                string cardhard  = cards.substr(separator + 1);
                 if (difficultyRating == HARD) {
                     s = cardhard;
                 } else {
@@ -751,7 +742,7 @@ int MTGDeck::addRandomCards(int howmany, int* setIds, int nbSets, int rarity, co
     int subtotal = 0;
     for (int i = 0; i < collectionTotal; i++) {
         MTGCard* card = database->_(i);
-        int r = card->getRarity();
+        int r         = card->getRarity();
         if (r != Constants::RARITY_T && (rarity == -1 || r == rarity) &&  // remove tokens
             card->setId != MTGSets::INTERNAL_SET &&  // remove cards that are defined in primitives. Those are
                                                      // workarounds (usually tokens) and should only be used internally
@@ -828,7 +819,7 @@ int MTGDeck::complete() {
     bool StypeIsNothing;
     size_t databaseSize = database->ids.size();
     for (size_t it = 0; it < databaseSize; it++) {
-        id = database->ids[it];
+        id             = database->ids[it];
         StypeIsNothing = false;
         if (database->getCardById(id)->data->hasType("nothing")) {
             StypeIsNothing = true;
@@ -885,11 +876,11 @@ int MTGDeck::save(const string& destFileName, bool useExpandedDescriptions, cons
 
         if (meta_desc.size()) {
             size_t found = 0;
-            string desc = deckDesc;
-            found = desc.find_first_of("\n");
+            string desc  = deckDesc;
+            found        = desc.find_first_of("\n");
             while (found != string::npos) {
                 file << "#DESC:" << desc.substr(0, found + 1);
-                desc = desc.substr(found + 1);
+                desc  = desc.substr(found + 1);
                 found = desc.find_first_of("\n");
             }
             file << "#DESC:" << desc << "\n";
@@ -925,14 +916,14 @@ void MTGDeck::printDetailedDeckText(std::ofstream& file) {
     std::ostringstream currentCard, creatures, lands, spells, types;
     std::map<int, int>::iterator it;
     for (it = cards.begin(); it != cards.end(); it++) {
-        int cardId = it->first;
-        int nbCards = it->second;
+        int cardId    = it->first;
+        int nbCards   = it->second;
         MTGCard* card = this->getCardById(cardId);
         if (card == nullptr) {
             continue;
         }
-        MTGSetInfo* setInfo = setlist.getInfo(card->setId);
-        std::string setName = setInfo->id;
+        MTGSetInfo* setInfo  = setlist.getInfo(card->setId);
+        std::string setName  = setInfo->id;
         std::string cardName = card->data->getName();
 
         currentCard << "#" << nbCards << " x " << cardName << " (" << setName << "), ";
@@ -1109,9 +1100,9 @@ MTGSetInfo::~MTGSetInfo() { SAFE_DELETE(mPack); }
 
 MTGSetInfo::MTGSetInfo(string _id) {
     string whitespaces(" \t\f\v\n\r");
-    id = _id;
+    id    = _id;
     block = -1;
-    year = -1;
+    year  = -1;
 
     for (int i = 0; i < MTGSetInfo::MAX_COUNT; i++) counts[i] = 0;
 
@@ -1121,7 +1112,7 @@ MTGSetInfo::MTGSetInfo(string _id) {
     if (!mPack->isValid()) {
         SAFE_DELETE(mPack);
     }
-    bZipped = false;
+    bZipped      = false;
     bThemeZipped = false;
 }
 

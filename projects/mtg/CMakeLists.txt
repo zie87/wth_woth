@@ -169,11 +169,8 @@ endif()
 
 if(DEFINED WIN32)
     install(TARGETS wth_woth RUNTIME DESTINATION .)
-    install(
-        DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/" RUNTIME
-        DESTINATION .
-        FILES_MATCHING
-        PATTERN "*.dll"
+    install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} 
+            RUNTIME DESTINATION . FILES_MATCHING PATTERN "*.dll"
     )
     install(FILES "${CMAKE_SOURCE_DIR}/extern/fmod/lib/fmod.dll" RUNTIME DESTINATION .)
 endif()

@@ -64,7 +64,7 @@ target_sources(
             ${CMAKE_CURRENT_SOURCE_DIR}/src/JLBFont.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/JGameObject.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/JSpline.cpp
-            src/JAnimator.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/JAnimator.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/JResourceManager.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/JFileSystem.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/JNetwork.cpp

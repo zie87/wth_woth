@@ -12,6 +12,7 @@ version_from_git(
     TIMESTAMP "%Y%m%d%H%M%S"
 )
 
+
 project(wth_woth LANGUAGES C CXX VERSION ${VERSION})
 
 # Set a default build type if none was specified
@@ -21,6 +22,10 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
+
+set(WOTH_PROJECT_NAME "${CMAKE_PROJECT_NAME}")
+set(WOTH_PROJECT_DESCRIPTION "Wagic, the Homebrew?!")
+
 
 option(DISABLE_UI "disable ui application (only for tests)" OFF)
 
@@ -59,10 +64,12 @@ if(DEFINED PSP)
     target_compile_definitions(woth_options INTERFACE "DEVHOOK")
     target_compile_definitions(woth_options INTERFACE "PSPFW3XX")
     
-    include(PspTools) 
+    include(PspTools)
+    set(WOTH_SYSTEM_NAME "psp")
 elseif(DEFINED UNIX)
     target_compile_definitions(woth_options INTERFACE "WOTH_PLATFORM_UNIX")
     target_compile_definitions(woth_options INTERFACE "LINUX")
+    set(WOTH_SYSTEM_NAME "linux")
 elseif(DEFINED WIN32)
     target_compile_options(woth_options INTERFACE "/wd4005")
 
@@ -71,9 +78,14 @@ elseif(DEFINED WIN32)
     target_compile_definitions(woth_options INTERFACE "NOMINMAX")
     target_compile_definitions(woth_options INTERFACE "__STDC_LIMIT_MACROS")
     target_compile_definitions(woth_options INTERFACE "_CRT_SECURE_NO_WARNINGS")
+    set(WOTH_SYSTEM_NAME "win32")
 else() 
     message(FATAL_ERROR "Platform can not be detected!")
 endif()
+
+set(WOTH_INSTALL_BINDIR .)
+set(WOTH_INSTALL_LIBDIR .)
+set(WOTH_INSTALL_DATADIR .)
 
 add_library(WotH::options ALIAS woth_options)
 
@@ -81,3 +93,16 @@ enable_testing()
 add_subdirectory(wge)
 add_subdirectory(JGE)
 add_subdirectory(projects)
+
+set(CPACK_PACKAGE_NAME ${WOTH_PROJECT_NAME})
+set(CPACK_PACKAGE_DESCRIPTION ${WOTH_PROJECT_DESCRIPTION})
+set(CPACK_PACKAGE_VERSION_MAJOR ${CMAKE_PROJECT_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${CMAKE_PROJECT_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${CMAKE_PROJECT_VERSION_PATCH})
+set(CPACK_PACKAGE_VERSION ${CMAKE_PROJECT_VERSION})
+set(CPACK_SYSTEM_NAME ${WOTH_SYSTEM_NAME})
+set(CPACK_PACKAGE_VENDOR "zie87")
+set(CPACK_PACKAGE_CONTACT "zie.develop@gmail.com")
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_${CPACK_SYSTEM_NAME}")
+set(CPACK_GENERATOR "ZIP")
+include (CPack)

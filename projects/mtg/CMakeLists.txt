@@ -161,9 +161,22 @@ if(NOT DISABLE_UI)
                         BACKGROUND_PATH ${CMAKE_CURRENT_SOURCE_DIR}/pic1.png
                         PREVIEW_PATH ${CMAKE_CURRENT_SOURCE_DIR}/pic0.png
         )
+
+        install(FILES "${CMAKE_CURRENT_BINARY_DIR}/EBOOT.PBP" 
+                      "${CMAKE_CURRENT_BINARY_DIR}/PARAM.SFO" 
+                      DESTINATION ${WOTH_INSTALL_BINDIR})
+
     elseif(DEFINED WOTH_SDL_BUILD)
         target_sources(wth_woth PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/main_sdl2.cpp)
+
+    install(TARGETS wth_woth 
+            ARCHIVE  DESTINATION ${WOTH_INSTALL_LIBDIR}
+            LIBRARY  DESTINATION ${WOTH_INSTALL_LIBDIR}
+            RUNTIME  DESTINATION ${WOTH_INSTALL_BINDIR})
     endif()
 endif()
+
+set(WOTH_RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Res" )
+install(DIRECTORY ${WOTH_RESOURCES_DIR} DESTINATION ${WOTH_INSTALL_DATADIR})
 
 add_subdirectory(tests)

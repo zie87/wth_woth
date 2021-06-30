@@ -185,7 +185,7 @@ if(NOT DISABLE_UI)
             FILES "${CMAKE_CURRENT_BINARY_DIR}/wth_woth_data.zip"
             DESTINATION "${WOTH_PSP_INSTALL_PATH}/Res"
             RENAME "${WOTH_CORE_ARCHIVE_NAME}.zip"
-        ) # Install our zip (as data000.zip)
+        )
 
     elseif(DEFINED WOTH_SDL_BUILD)
         target_sources(wth_woth PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/main_sdl2.cpp)
@@ -194,10 +194,16 @@ endif()
 
 if(DEFINED WIN32)
     install(TARGETS wth_woth DESTINATION .)
-    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} DESTINATION . TYPE SHARED_LIBRARY FILES_MATCHING PATTERN "*.dll" )
+    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Debug  ${CMAKE_CURRENT_BINARY_DIR}/Release 
+        DESTINATION . COMPONENT DLLS FILES_MATCHING PATTERN "*.dll" )
 
     install(FILES "${CMAKE_SOURCE_DIR}/extern/fmod/lib/fmod.dll" DESTINATION .)
-    install(DIRECTORY ${WOTH_RESOURCES_DIR} DESTINATION "Res")
+    install(DIRECTORY ${WOTH_RESOURCES_DIR} DESTINATION .)
+    install(
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/wth_woth_data.zip"
+        DESTINATION "${WOTH_PSP_INSTALL_PATH}/Res"
+        RENAME "${WOTH_CORE_ARCHIVE_NAME}.zip"
+    )
 endif()
 
 if(DEFINED UNIX)

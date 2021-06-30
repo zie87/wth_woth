@@ -83,6 +83,7 @@ jobs:
       run: |
         cd build
         ctest ${{ matrix.build_type }} --rerun-failed --output-on-failure
+        cd ..
 
     - name: Build Package
       shell: bash
@@ -92,5 +93,5 @@ jobs:
     - name: upload package
       uses: actions/upload-artifact@v2
       with:
-        name: win_${{ matrix.config }}
+        name: win_${{ matrix.build_type }}
         path: build/wth_woth_*_win32.zip

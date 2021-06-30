@@ -194,25 +194,7 @@ endif()
 
 if(DEFINED WIN32)
     install(TARGETS wth_woth DESTINATION .)
-    # install( DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} DESTINATION . FILES_MATCHING PATTERN "*.dll" )
-    install(
-        CODE [[
-        file(GET_RUNTIME_DEPENDENCIES EXECUTABLES $<TARGET_FILE:wth_woth>)
-        foreach(_file ${_r_deps})
-            file(
-                INSTALL
-                DESTINATION .
-                TYPE SHARED_LIBRARY
-                FOLLLOW_SYMLINK_CHAIN
-                FILES "${_file}"
-            )
-        endforeach()
-        list(LENGTH _u_deps _u_length)
-        if("${_u_length}" GREATER 0)
-            message(WARNING "Unresolved dependencies detected!")
-        endif()
-        ]]
-    )
+    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} DESTINATION . TYPE SHARED_LIBRARY FILES_MATCHING PATTERN "*.dll" )
 
     install(FILES "${CMAKE_SOURCE_DIR}/extern/fmod/lib/fmod.dll" DESTINATION .)
     install(DIRECTORY ${WOTH_RESOURCES_DIR} DESTINATION "Res")

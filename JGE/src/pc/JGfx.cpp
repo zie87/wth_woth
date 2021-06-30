@@ -9,14 +9,13 @@
 //-------------------------------------------------------------------------------------
 
 #include <wge/math.hpp>
+#include <wge/log.hpp>
 #include <wge/video/image_loader.hpp>
 
 #define GL_GLEXT_PROTOTYPES
 
-#if (!defined QT_CONFIG)
 #ifdef WIN32
 #pragma warning(disable : 4786)
-#endif
 #endif
 
 #include "JGE.h"
@@ -1428,74 +1427,24 @@ void JRenderer::PlotArray(float* x, float* y, int count, PIXEL_TYPE color) {
 
 void JRenderer::ScreenShot([[maybe_unused]] const char* filename) {}
 
-#if (defined QT_CONFIG)
-JTexture* JRenderer::LoadTexture(const char* filename, int mode, [[maybe_unused]] int TextureFormat) {
-    JTexture* tex           = NULL;
-    int rawsize             = 0;
-    wge::byte_t* rawdata    = NULL;
-    JFileSystem* fileSystem = JFileSystem::GetInstance();
-
-    do {
-        if (!fileSystem->OpenFile(filename)) break;
-
-        rawsize = fileSystem->GetFileSize();
-        rawdata = new wge::byte_t[rawsize];
-
-        if (!rawdata) {
-            fileSystem->CloseFile();
-            break;
-        }
-
-        fileSystem->ReadFile(rawdata, rawsize);
-        fileSystem->CloseFile();
-
-        QImage tmpImage = QImage::fromData(rawdata, rawsize);
-        if (tmpImage.isNull()) break;
-
-        tex = new JTexture();
-        if (tex) {
-            tmpImage = tmpImage.convertToFormat(QImage::Format_ARGB32_Premultiplied);
-            tmpImage = tmpImage.rgbSwapped();
-
-            if (mImageFilter != NULL)
-                mImageFilter->ProcessImage((PIXEL_TYPE*)tmpImage.bits(), tmpImage.width(), tmpImage.height());
-
-            tex->mFilter    = TEX_FILTER_LINEAR;
-            tex->mWidth     = tmpImage.width();
-            tex->mHeight    = tmpImage.height();
-            tex->mTexWidth  = wge::math::nearest_superior_power_of_2(tmpImage.width());
-            tex->mTexHeight = wge::math::nearest_superior_power_of_2(tmpImage.height());
-            tex->mBuffer    = new wge::byte_t[tex->mTexWidth * tex->mTexHeight * 4];
-
-            for (int i = 0; i < tex->mHeight; i++) {
-                memcpy(tex->mBuffer + (i * 4 * tex->mTexWidth), tmpImage.constScanLine(i), tmpImage.bytesPerLine());
-            }
-        }
-    } while (false);
-
-    if (rawdata) delete[] rawdata;
-
-    return tex;
-}
-#else
 JTexture* JRenderer::LoadTexture(const char* filename, int mode, [[maybe_unused]] int TextureFormat) {
     auto* fileSystem = JFileSystem::GetInstance();
     if (!fileSystem->OpenFile(filename)) {
-        printf("Texture %s failed to open\n", filename);
+        WGE_LOG_ERROR("failed to open {}", filename);
         return nullptr;
     }
 
-    printf("load texture %s\n", filename);
+    WGE_LOG_TRACE("load texture {}", filename);
     auto& filestream = fileSystem->current_file();
-    auto data = wge::video::image_loader::load_image(filestream);
+    auto data        = wge::video::image_loader::load_image(filestream);
     fileSystem->CloseFile();
 
     if (!data.pixels) {
-        printf("Texture %s failed to load\n", filename);
+        WGE_LOG_ERROR("texture {} failed to load", filename);
         return nullptr;
     }
 
-    printf("load texture %s successful\n", filename);
+    WGE_LOG_TRACE("load texture {} successful", filename);
     if (mImageFilter != nullptr) {
         mImageFilter->ProcessImage(reinterpret_cast<wge::pixel_t*>(data.pixels.get()), data.width, data.height);
     }
@@ -1503,17 +1452,16 @@ JTexture* JRenderer::LoadTexture(const char* filename, int mode, [[maybe_unused]
     auto* tex = new JTexture();
 
     if (tex) {
-        tex->mFilter = TEX_FILTER_LINEAR;
-        tex->mWidth = data.width;
-        tex->mHeight = data.height;
-        tex->mTexWidth = data.texture_width;
+        tex->mFilter    = TEX_FILTER_LINEAR;
+        tex->mWidth     = data.width;
+        tex->mHeight    = data.height;
+        tex->mTexWidth  = data.texture_width;
         tex->mTexHeight = data.texture_height;
 
         tex->mBuffer = data.pixels.release();
     }
     return tex;
 }
-#endif
 
 void JRenderer::TransferTextureToGLContext(JTexture& inTexture) {
     if (inTexture.mBuffer != nullptr) {
@@ -1873,7 +1821,7 @@ void JRenderer::FillPolygon(float* x, float* y, int count, PIXEL_TYPE color) {
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
 
-    GLubyte* colors = new GLubyte[count * 4];
+    GLubyte* colors    = new GLubyte[count * 4];
     GLfloat* vVertices = new GLfloat[count * 3];
 
     for (i = 0; i < count; i++) {
@@ -1971,9 +1919,9 @@ void JRenderer::DrawPolygon(float* x, float* y, int count, PIXEL_TYPE color) {
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
 
-    int number = count + 1;
+    int number         = count + 1;
     GLfloat* vVertices = new GLfloat[3 * number];
-    GLubyte* colors = new GLubyte[4 * number];
+    GLubyte* colors    = new GLubyte[4 * number];
 
     for (i = 0; i < number; i++) {
         colors[4 * i + 0] = col.r;
@@ -2319,7 +2267,7 @@ void JRenderer::DrawPolygon(float x, float y, float size, int count, float start
     glEnableClientState(GL_COLOR_ARRAY);
 
     GLfloat* vVertices = new GLfloat[3 * count];
-    GLubyte* colors = new GLubyte[4 * count];
+    GLubyte* colors    = new GLubyte[4 * count];
 
     for (i = 0; i < count; i++) {
         colors[4 * i + 0] = col.r;
@@ -2432,7 +2380,7 @@ void JRenderer::FillPolygon(float x, float y, float size, int count, float start
     glEnableClientState(GL_COLOR_ARRAY);
 
     GLfloat* vVertices = new GLfloat[3 * (count + 2)];
-    GLubyte* colors = new GLubyte[4 * (count + 2)];
+    GLubyte* colors    = new GLubyte[4 * (count + 2)];
 
     for (i = 0; i < count + 2; i++) {
         colors[4 * i + 0] = col.r;
@@ -2564,9 +2512,9 @@ void JRenderer::DrawRoundRect(float x, float y, float w, float h, float radius, 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
 
-    int number = 360;
+    int number         = 360;
     GLfloat* vVertices = new GLfloat[3 * number];
-    GLubyte* colors = new GLubyte[4 * number];
+    GLubyte* colors    = new GLubyte[4 * number];
 
     for (i = 0; i < number; i++) {
         colors[4 * i + 0] = col.r;
@@ -2730,9 +2678,9 @@ void JRenderer::FillRoundRect(float x, float y, float w, float h, float radius, 
     glEnableClientState(GL_COLOR_ARRAY);
 
     int i, offset;
-    int number = 2 + 360;
+    int number         = 2 + 360;
     GLfloat* vVertices = new GLfloat[3 * number];
-    GLubyte* colors = new GLubyte[4 * number];
+    GLubyte* colors    = new GLubyte[4 * number];
 
     for (i = 0; i < number; i++) {
         colors[4 * i + 0] = col.r;
@@ -2744,7 +2692,7 @@ void JRenderer::FillRoundRect(float x, float y, float w, float h, float radius, 
     vVertices[0] = x - 5;
     vVertices[1] = SCREEN_HEIGHT_F - y;
     vVertices[2] = 0.0f;
-    offset = 1;
+    offset       = 1;
     for (i = 0; i < 90; i++) {
         vVertices[3 * (offset + i) + 0] = x + radius * COSF(i);
         vVertices[3 * (offset + i) + 1] = SCREEN_HEIGHT_F - y + radius * SINF(i);

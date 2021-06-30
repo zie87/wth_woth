@@ -431,12 +431,9 @@ void GameStateDuel::Update(float dt) {
                     Start();
 
                     if (mWorkerThread.empty()) {  // "I don't like to wait" mode
-                        size_t thread_count = 1;
+                        const auto thread_count = wge::thread::hardware_concurrency();
                         startTime = JGEGetTime();
 
-    #ifdef QT_CONFIG
-                        thread_count = QThread::idealThreadCount();
-    #endif
                         for (size_t i = 0; i < (thread_count); i++)
                             mWorkerThread.push_back(wge::thread(ThreadProc, this));
                     }

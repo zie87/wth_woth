@@ -22,29 +22,11 @@
 
 #include "JTypes.h"
 
-#define DEBUG_PRINT
-
-#if defined(QT_CONFIG)
-#include <Qt>
-typedef u32 LocalKeySym;
-#define LOCAL_KEY_NONE Qt::Key_unknown
-
-#elif defined(SDL_CONFIG)
+#if defined(SDL_CONFIG)
 #include <SDL.h>
 typedef SDL_Keycode LocalKeySym;
 #define LOCAL_KEY_NONE SDLK_UNKNOWN
-
-#elif defined(WIN32)
-#include <windows.h>
-typedef WPARAM LocalKeySym;
-#define LOCAL_KEY_NONE ((WPARAM)-1)
-
-#elif defined(LINUX)
-#include <X11/XKBlib.h>
-#include <X11/keysym.h>
-typedef KeySym LocalKeySym;
-#define LOCAL_KEY_NONE XK_VoidSymbol
-#else
+#elif defined(WOTH_PLATFORM_PSP) 
 typedef u32 LocalKeySym;
 #define LOCAL_KEY_NONE ((u32)-1)
 #endif
@@ -57,7 +39,7 @@ u8 JGEGetAnalogX();
 u8 JGEGetAnalogY();
 bool JGEToggleFullscreen();
 
-#if defined(PSP)
+#if defined(WOTH_PLATFORM_PSP)
 
 // hack to fix a typedef definition of u32 inside of newlib's stdint.h
 // this used to be defined as an unsigned long, but as of minpspw 11.1, it's

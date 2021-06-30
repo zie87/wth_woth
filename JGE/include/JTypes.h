@@ -13,7 +13,7 @@
 
 #include <wge/types.hpp>
 
-#if defined(PSP)
+#if defined(WOTH_PLATFORM_PSP)
 
 #include <pspgu.h>
 #include <pspgum.h>
@@ -47,7 +47,7 @@ enum {
     JGE_ERR_GENERIC        = -5,
 };
 
-#ifdef PSP
+#if defined(WOTH_PLATFORM_PSP)
 #include <fastmath.h>
 #else
 #include <math.h>
@@ -104,13 +104,9 @@ typedef uint32_t DWORD;
 typedef bool BOOL;
 #endif
 
-#ifndef QT_CONFIG
-#if defined(WIN32) || defined(LINUX)
+#if defined(WOTH_PLATFORM_WIN32) || defined(WOTH_PLATFORM_UNIX)
 #include <GL/gl.h>
 #include <GL/glu.h>
-#endif
-#else
-#include <QtOpenGL>
 #endif
 
 #if (defined FORCE_GLES)
@@ -123,7 +119,7 @@ typedef bool BOOL;
 #endif
 #endif
 
-#if defined(PSP)
+#if defined(WOTH_PLATFORM_PSP)
 
 #ifndef ABGR8888
 #define ABGR8888

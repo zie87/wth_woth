@@ -89,15 +89,8 @@ JFileSystem::JFileSystem(const std::string& _userPath, const std::string& _syste
 
 {
     std::string systemPath = _systemPath;
-    std::string userPath = _userPath;
+    std::string userPath   = _userPath;
 
-#if defined(QT_CONFIG)
-    QDir dir(QDir::homePath());
-    dir.cd(USERDIR);
-
-    userPath = QDir::toNativeSeparators(dir.absolutePath()).toStdString();
-    systemPath = "";
-#else
     // Find the Res.txt file and matching Res folders for backwards compatibility
     std::ifstream mfile("Res.txt");
     std::string resPath;
@@ -111,15 +104,14 @@ JFileSystem::JFileSystem(const std::string& _userPath, const std::string& _syste
             testfile.append("graphics/simon.dat");
             std::ifstream file(testfile.c_str());
             if (file) {
-                userPath = resPath;
+                userPath   = resPath;
                 systemPath = "";
-                found = true;
+                found      = true;
                 file.close();
             }
         }
         mfile.close();
     }
-#endif
 
     // Make sure the base paths finish with a '/' or a '\'
     if (!userPath.empty()) {
@@ -143,10 +135,10 @@ JFileSystem::JFileSystem(const std::string& _userPath, const std::string& _syste
     mSystemFS =
         (mSystemFSPath.size() && (mSystemFSPath != mUserFSPath)) ? new zfs::filesystem(systemPath.c_str()) : nullptr;
 
-    mZipAvailable = false;
+    mZipAvailable           = false;
     mZipCachedElementsCount = 0;
     mPassword               = nullptr;
-    mFileSize = 0;
+    mFileSize               = 0;
     mCurrentFileInZip       = nullptr;
 };
 
@@ -199,7 +191,7 @@ bool JFileSystem::AttachZipFile(const std::string& zipfile, char* password /* = 
     }
 
     mZipFileName = zipfile;
-    mPassword = password;
+    mPassword    = password;
 
     openForRead(mZipFile, mZipFileName);
 
@@ -221,7 +213,7 @@ void JFileSystem::DetachZipFile() {
         mZipFile.close();
     }
     mCurrentFileInZip = nullptr;
-    mZipAvailable = false;
+    mZipAvailable     = false;
 }
 
 bool JFileSystem::openForRead(zfs::izfstream& File, const std::string& FilePath) {
@@ -281,7 +273,7 @@ bool JFileSystem::OpenFile(const std::string& filename) {
     }
 
     mCurrentFileInZip = &(it2->second);
-    mFileSize = it2->second.m_Size;
+    mFileSize         = it2->second.m_Size;
     return true;
 }
 
@@ -406,7 +398,7 @@ int JFileSystem::GetFileSize() {
 
 bool JFileSystem::Rename(std::string _from, std::string _to) {
     std::string from = mUserFSPath + _from;
-    std::string to = mUserFSPath + _to;
+    std::string to   = mUserFSPath + _to;
     std::remove(to.c_str());
     return rename(from.c_str(), to.c_str()) != 0;
 }
@@ -456,7 +448,7 @@ std::string JFileSystem::GetResourceFile(std::string filename) {
     if (openForWrite(dest, filename, std::ios_base::binary)) {
         // allocate memory:
         size_t length = temp.getUncompSize();
-        char* buffer = new char[length];
+        char* buffer  = new char[length];
 
         // read data as a block:
         temp.read(buffer, length);

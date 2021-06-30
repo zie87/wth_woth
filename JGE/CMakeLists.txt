@@ -6,9 +6,8 @@ find_package(ZLIB REQUIRED)
 find_package(PNG REQUIRED)
 find_package(Freetype REQUIRED)
 
-if(DEFINED UNIX OR DEFINED WIN32)
+if(DEFINED WOTH_SDL_BUILD)
     find_package(SDL2 REQUIRED)
-    find_package(OpenGL COMPONENTS OpenGL REQUIRED)
 
     # on ubuntu target is not defined
     if(NOT TARGET SDL2::SDL2)
@@ -57,10 +56,10 @@ target_link_libraries(hgetools
     PUBLIC
         WotH::wge
     PRIVATE
-        woth_options
+        WotH::options
 )
 
-if(DEFINED UNIX OR DEFINED WIN32)
+if(DEFINED WOTH_SDL_BUILD)
     target_link_libraries(hgetools PRIVATE SDL2::SDL2)
 endif()
 
@@ -104,7 +103,14 @@ target_sources(jge300
         ${CMAKE_CURRENT_SOURCE_DIR}/src/JOBJModel.cpp
     )
 
-if(DEFINED PSP)
+
+if(DISABLE_UI)
+target_sources(jge300
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JSfx_dummy.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JGfx_dummy.cpp
+    )
+elseif(DEFINED PSP)
 target_sources(jge300
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/JSocket.cpp 
@@ -114,31 +120,19 @@ target_sources(jge300
         ${CMAKE_CURRENT_SOURCE_DIR}/src/JMP3.cpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/decoder_prx.c 
     )
-endif()
-
-if(DEFINED UNIX OR WIN32)
-
-    if(NOT STANDALONE_TESTSUITE)
+elseif(DEFINED UNIX OR WIN32)
 target_sources(jge300
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JSfx.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JGfx.cpp
-    )
-else()
-target_sources(jge300
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JSfx_dummy.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JGfx_dummy.cpp
-    )
-endif()
-target_sources(jge300
-    PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JSocket.cpp
     )
 endif()
 
+
+
 if(NOT DEFINED WIN32)
-target_compile_options(jge300 PRIVATE "$<$<CONFIG:DEBUG>:-ggdb3>")
+    target_compile_options(jge300 PRIVATE "$<$<CONFIG:DEBUG>:-ggdb3>")
 endif()
 
 target_include_directories(jge300
@@ -159,10 +153,13 @@ target_link_libraries(jge300
 )
 
 
-if(NOT STANDALONE_TESTUITE)
-    if(DEFINED UNIX OR DEFINED WIN32)
-        target_link_libraries(jge300 PUBLIC SDL2::SDL2 OpenGL::GL OpenGL::GLU )
-    endif()
+if(DEFINED WOTH_SDL_BUILD)
+    target_link_libraries(jge300 PUBLIC SDL2::SDL2)
+endif()
+
+if(DEFINED WIN32 OR DEFINED UNIX)
+    find_package(OpenGL COMPONENTS OpenGL REQUIRED)
+    target_link_libraries(jge300 PUBLIC OpenGL::GL OpenGL::GLU )
 endif()
 
 if(DEFINED WIN32)

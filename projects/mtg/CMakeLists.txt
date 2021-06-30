@@ -148,19 +148,22 @@ target_link_libraries(wth
 
 add_library(WotH::wth ALIAS wth)
 
-add_executable(wth_woth)
-target_link_libraries(wth_woth PRIVATE WotH::wth WotH::options)
 
-if(DEFINED WOTH_PSP_BUILD)
-    target_sources(wth_woth PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/main_psp.cpp)
-    create_pbp_file(TARGET wth_woth
-                    TITLE "Wagic, the Homebrew?!" 
-                    ICON_PATH ${CMAKE_CURRENT_SOURCE_DIR}/icon.png
-                    BACKGROUND_PATH ${CMAKE_CURRENT_SOURCE_DIR}/pic1.png
-                    PREVIEW_PATH ${CMAKE_CURRENT_SOURCE_DIR}/pic0.png
-    )
-elseif(DEFINED WOTH_SDL_BUILD)
-    target_sources(wth_woth PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/main_sdl2.cpp)
-elseif(STANDALONE_TESTSUITE)
-    target_sources(wth_woth PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/main_testsuite.cpp)
+if(NOT DISABLE_UI)
+    add_executable(wth_woth)
+    target_link_libraries(wth_woth PRIVATE WotH::wth WotH::options)
+
+    if(DEFINED WOTH_PSP_BUILD)
+        target_sources(wth_woth PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/main_psp.cpp)
+        create_pbp_file(TARGET wth_woth
+                        TITLE "Wagic, the Homebrew?!" 
+                        ICON_PATH ${CMAKE_CURRENT_SOURCE_DIR}/icon.png
+                        BACKGROUND_PATH ${CMAKE_CURRENT_SOURCE_DIR}/pic1.png
+                        PREVIEW_PATH ${CMAKE_CURRENT_SOURCE_DIR}/pic0.png
+        )
+    elseif(DEFINED WOTH_SDL_BUILD)
+        target_sources(wth_woth PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/main_sdl2.cpp)
+    endif()
 endif()
+
+add_subdirectory(tests)

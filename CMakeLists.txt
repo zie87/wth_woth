@@ -22,10 +22,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-option(STANDALONE_TESTSUITE "build commandline testsuite" OFF)
-if(STANDALONE_TESTSUITE AND NOT DEFINED UNIX AND NOT DEFINED WIN32 )
-    message(FATAL_ERROR "standalone testsuite is only supported for windows or linux")
-endif()
+option(DISABLE_UI "disable ui application (only for tests)" OFF)
 
 # Generate compile_commands.json to make it easier to work with clang based tools
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -46,7 +43,7 @@ enable_sanitizers(woth_options)
 
 include(StaticAnalyzers)
 
-if(NOT STANDALONE_TESTSUITE)
+if(NOT DISABLE_UI)
     if(DEFINED PSP)
         set(WOTH_PSP_BUILD ON)
     else()

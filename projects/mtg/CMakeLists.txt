@@ -159,9 +159,12 @@ if(NOT DISABLE_UI)
             ${CMAKE_CURRENT_SOURCE_DIR}/pic0.png
         )
 
-        install(FILES "${CMAKE_CURRENT_BINARY_DIR}/EBOOT.PBP" "${CMAKE_CURRENT_BINARY_DIR}/PARAM.SFO" DESTINATION .)
-        install(FILES ${CMAKE_SOURCE_DIR}/extern/psp_exception_handler/prx/exception.prx  DESTINATION .)
-        install(DIRECTORY ${WOTH_RESOURCES_DIR} DESTINATION .)
+        set(WOTH_PSP_INSTALL_PATH "PSP/GAME/WOTH")
+        set(EXCEPTION_HANDLER_DIR "${CMAKE_SOURCE_DIR}/extern/psp_exception_handler/prx")
+
+        install(FILES "${CMAKE_CURRENT_BINARY_DIR}/EBOOT.PBP" DESTINATION ${WOTH_PSP_INSTALL_PATH})
+        install(FILES "${EXCEPTION_HANDLER_DIR}/exception.prx" DESTINATION ${WOTH_PSP_INSTALL_PATH})
+        install(DIRECTORY ${WOTH_RESOURCES_DIR} DESTINATION ${WOTH_PSP_INSTALL_PATH})
 
     elseif(DEFINED WOTH_SDL_BUILD)
         target_sources(wth_woth PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/main_sdl2.cpp)
@@ -170,22 +173,18 @@ endif()
 
 if(DEFINED WIN32)
     install(TARGETS wth_woth DESTINATION .)
-    install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} 
-            DESTINATION . FILES_MATCHING PATTERN "*.dll"
+    install(
+        DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/
+        DESTINATION .
+        FILES_MATCHING
+        PATTERN "*.dll"
     )
     install(FILES "${CMAKE_SOURCE_DIR}/extern/fmod/lib/fmod.dll" DESTINATION .)
+    install(DIRECTORY ${WOTH_RESOURCES_DIR} DESTINATION "Res")
 endif()
 
 if(DEFINED UNIX)
     install(TARGETS wth_woth RUNTIME DESTINATION bin)
-    # install(FILES "res/augustus.desktop" DESTINATION "share/applications" RENAME "com.github.keriew.augustus.desktop")
-    # install(FILES "res/augustus.metainfo.xml" DESTINATION "share/metainfo" RENAME
-    # "com.github.keriew.augustus.metainfo.xml") install(FILES "res/augustus_32.png" DESTINATION
-    # "share/icons/hicolor/32x32/apps" RENAME "com.github.keriew.augustus.png") install(FILES "res/augustus_48.png"
-    # DESTINATION "share/icons/hicolor/48x48/apps" RENAME "com.github.keriew.augustus.png") install(FILES
-    # "res/augustus_256.png" DESTINATION "share/icons/hicolor/256x256/apps" RENAME "com.github.keriew.augustus.png")
-    # install(FILES "res/augustus_512.png" DESTINATION "share/icons/hicolor/512x512/apps" RENAME
-    # "com.github.keriew.augustus.png")
     install(DIRECTORY ${WOTH_RESOURCES_DIR} DESTINATION "share/wth_woth/")
 endif()
 

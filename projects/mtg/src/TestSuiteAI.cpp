@@ -450,7 +450,8 @@ int TestSuite::loadNext() {
             mWorkerThread.pop_back();
         }
 
-        constexpr unsigned int max_number_of_threads = 8U;
+        //FIXME: more threads creating a lot of false positives!
+        constexpr unsigned int max_number_of_threads = 4U;
         const auto thread_count = std::min(max_number_of_threads, wge::thread::hardware_concurrency());
         for (size_t i = 0; i < (thread_count - 1); i++) mWorkerThread.push_back(new wge::thread(ThreadProc, this));
     }

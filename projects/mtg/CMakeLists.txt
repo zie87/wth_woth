@@ -147,6 +147,7 @@ target_link_libraries(wth
 )
 
 add_library(WotH::wth ALIAS wth)
+set(WOTH_RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Res" )
 
 
 if(NOT DISABLE_UI)
@@ -165,14 +166,13 @@ if(NOT DISABLE_UI)
         install(FILES "${CMAKE_CURRENT_BINARY_DIR}/EBOOT.PBP" 
                       "${CMAKE_CURRENT_BINARY_DIR}/PARAM.SFO" 
                       DESTINATION .)
+        install(DIRECTORY ${WOTH_RESOURCES_DIR} DESTINATION .)
 
     elseif(DEFINED WOTH_SDL_BUILD)
         target_sources(wth_woth PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/main_sdl2.cpp)
         install(TARGETS wth_woth RUNTIME DESTINATION bin)
     endif()
 endif()
-
-set(WOTH_RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Res" )
 
 if(DEFINED UNIX)
     # install(FILES "res/augustus.desktop" DESTINATION "share/applications" RENAME "com.github.keriew.augustus.desktop")

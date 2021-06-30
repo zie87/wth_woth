@@ -81,7 +81,8 @@ jobs:
     - name: Tests
       shell: bash
       run: |
-        cmake --build build --config ${{ matrix.build_type }} --target test
+        cd build
+        ctest ${{ matrix.build_type }} --rerun-failed --output-on-failure
 
     - name: Build Package
       shell: bash

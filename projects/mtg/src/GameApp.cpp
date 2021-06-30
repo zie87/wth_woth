@@ -37,8 +37,8 @@
 #define DEFAULT_DURATION .25
 
 PlayerType GameApp::players[] = {PLAYER_TYPE_CPU, PLAYER_TYPE_CPU};
-bool GameApp::HasMusic = true;
-JMusic* GameApp::music           = nullptr;
+bool GameApp::HasMusic        = true;
+JMusic* GameApp::music        = nullptr;
 string GameApp::currentMusicFile;
 string GameApp::systemError;
 
@@ -55,7 +55,7 @@ GameApp::GameApp()
 {
 #ifdef DEBUG
     nbUpdates = 0;
-    totalFPS = 0;
+    totalFPS  = 0;
 #endif
 
 #ifdef DOLOG
@@ -67,9 +67,9 @@ GameApp::GameApp()
     for (int i = 0; i < GAME_STATE_MAX; i++) mGameStates[i] = nullptr;
 
     mShowDebugInfo = false;
-    players[0] = PLAYER_TYPE_CPU;
-    players[1] = PLAYER_TYPE_CPU;
-    gameType = GAME_TYPE_CLASSIC;
+    players[0]     = PLAYER_TYPE_CPU;
+    players[1]     = PLAYER_TYPE_CPU;
+    gameType       = GAME_TYPE_CLASSIC;
 
     mCurrentState = nullptr;
     mNextState    = nullptr;
@@ -81,14 +81,12 @@ GameApp::~GameApp() { WResourceManager::Terminate(); }
 
 void GameApp::Create() {
     srand((unsigned int)time(nullptr));  // initialize random
-#if !defined(QT_CONFIG)
 #if defined(WIN32)
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #elif defined(PSP)
     pspFpuSetEnable(0);  // disable FPU Exceptions until we find where the FPU errors come from
     pspDebugScreenPrintf("Wagic:Loading resources...");
 #endif
-#endif  // QT_CONFIG
     //_CrtSetBreakAlloc(368);
     WGE_LOG_TRACE("starting Game");
 
@@ -148,7 +146,7 @@ void GameApp::Create() {
     WGE_LOG_TRACE("Checking for music files");
     // Test for Music files presence
     JFileSystem* jfs = JFileSystem::GetInstance();
-    HasMusic = jfs->FileExists(WResourceManager::Instance()->musicFile("Track0.mp3")) &&
+    HasMusic         = jfs->FileExists(WResourceManager::Instance()->musicFile("Track0.mp3")) &&
                jfs->FileExists(WResourceManager::Instance()->musicFile("Track1.mp3"));
 
     WGE_LOG_TRACE("Init Collection");
@@ -167,9 +165,8 @@ void GameApp::Create() {
     for (size_t i = 0; i < items.size(); i++) {
         ModRulesBackGroundCardGuiItem* item = items[i];
         if (item->mMenuIcon == 1) {
-            manaIcons.push_back(WResourceManager::Instance()->RetrieveQuad("menuicons.png",
-                                                                           2 + (float)item->mColorId * 36, 38, 32, 32,
-                                                                           "c_" + item->MColorName, RETRIEVE_MANAGE));
+            manaIcons.push_back(WResourceManager::Instance()->RetrieveQuad(
+                "menuicons.png", 2 + (float)item->mColorId * 36, 38, 32, 32, "c_" + item->MColorName, RETRIEVE_MANAGE));
             Constants::MTGColorStrings.push_back(item->MColorName.c_str());
         }
     }
@@ -248,7 +245,7 @@ void GameApp::Create() {
     mGameStates[GAME_STATE_TRANSITION] = nullptr;
 
     mCurrentState = nullptr;
-    mNextState = mGameStates[GAME_STATE_MENU];
+    mNextState    = mGameStates[GAME_STATE_MENU];
 
     // Set Audio volume
     JSoundSystem::GetInstance()->SetSfxVolume(options[Options::SFXVOLUME].number);
@@ -384,7 +381,7 @@ void GameApp::Render() {
 
 #if defined(DEBUG)
     JGE* mEngine = JGE::GetInstance();
-    float fps = mEngine->GetFPS();
+    float fps    = mEngine->GetFPS();
     totalFPS += fps;
     nbUpdates += 1;
     WFont* mFont = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
@@ -445,7 +442,7 @@ void GameApp::DoTransition(int trans, int tostate, float dur, bool animonly) {
         tb = NEW TransitionFade(this, mCurrentState, toState, dur, false);
     }
     if (tb) {
-        tb->bAnimationOnly = animonly;
+        tb->bAnimationOnly                 = animonly;
         mGameStates[GAME_STATE_TRANSITION] = tb;
         mGameStates[GAME_STATE_TRANSITION]->Start();
         SetCurrentState(tb);  // The old current state is ended inside our transition.

@@ -36,8 +36,6 @@ const string Options::optionNames[] = {
     "interruptSeconds",
 #if defined(SDL_CONFIG)
     "keybindings_sdl",
-#elif defined(QT_CONFIG)
-    "keybindings_qt",
 #elif defined(WIN32)
     "keybindings_win",
 #elif defined(LINUX)

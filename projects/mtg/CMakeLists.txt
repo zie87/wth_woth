@@ -144,7 +144,7 @@ function(create_zip output_file input_files working_dir)
     add_custom_command(
         COMMAND ${CMAKE_COMMAND} -E tar "cf" "${output_file}" --format=zip -- ${input_files}
         WORKING_DIRECTORY "${working_dir}"
-        OUTPUT  "${output_file}"
+        OUTPUT "${output_file}"
         DEPENDS ${input_files}
         COMMENT "Zipping to ${output_file}."
     )
@@ -153,7 +153,9 @@ endfunction()
 file(GLOB ZIP_FILES "${WOTH_RESOURCES_DIR}/*")
 create_zip("${CMAKE_CURRENT_BINARY_DIR}/wth_woth_data.zip" "${ZIP_FILES}" "${WOTH_RESOURCES_DIR}")
 add_custom_target("wth_woth_data" ALL DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/wth_woth_data.zip")
-set(WOTH_CORE_ARCHIVE_NAME "core_${CMAKE_PROJECT_VERSION_MAJOR}${CMAKE_PROJECT_VERSION_MINOR}${CMAKE_PROJECT_VERSION_PATCH}")
+set(WOTH_CORE_ARCHIVE_NAME
+    "core_${CMAKE_PROJECT_VERSION_MAJOR}${CMAKE_PROJECT_VERSION_MINOR}${CMAKE_PROJECT_VERSION_PATCH}"
+)
 
 if(NOT DISABLE_UI)
     add_executable(wth_woth)
@@ -179,7 +181,11 @@ if(NOT DISABLE_UI)
 
         install(FILES "${CMAKE_CURRENT_BINARY_DIR}/EBOOT.PBP" DESTINATION ${WOTH_PSP_INSTALL_PATH})
         install(FILES "${EXCEPTION_HANDLER_DIR}/exception.prx" DESTINATION ${WOTH_PSP_INSTALL_PATH})
-        install(FILES "${CMAKE_CURRENT_BINARY_DIR}/wth_woth_data.zip" DESTINATION "${WOTH_PSP_INSTALL_PATH}/Res" RENAME "${WOTH_CORE_ARCHIVE_NAME}.zip") # Install our zip (as data000.zip)
+        install(
+            FILES "${CMAKE_CURRENT_BINARY_DIR}/wth_woth_data.zip"
+            DESTINATION "${WOTH_PSP_INSTALL_PATH}/Res"
+            RENAME "${WOTH_CORE_ARCHIVE_NAME}.zip"
+        ) # Install our zip (as data000.zip)
 
     elseif(DEFINED WOTH_SDL_BUILD)
         target_sources(wth_woth PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/main_sdl2.cpp)
@@ -188,11 +194,26 @@ endif()
 
 if(DEFINED WIN32)
     install(TARGETS wth_woth DESTINATION .)
+    # install( DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} DESTINATION . FILES_MATCHING PATTERN "*.dll" )
     install(
-        DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}
-        DESTINATION .
-        FILES_MATCHING PATTERN "*.dll"
+        CODE [[
+        file(GET_RUNTIME_DEPENDENCIES EXECUTABLES $<TARGET_FILE:wth_woth>)
+        foreach(_file ${_r_deps})
+            file(
+                INSTALL
+                DESTINATION .
+                TYPE SHARED_LIBRARY
+                FOLLLOW_SYMLINK_CHAIN
+                FILES "${_file}"
+            )
+        endforeach()
+        list(LENGTH _u_deps _u_length)
+        if("${_u_length}" GREATER 0)
+            message(WARNING "Unresolved dependencies detected!")
+        endif()
+        ]]
     )
+
     install(FILES "${CMAKE_SOURCE_DIR}/extern/fmod/lib/fmod.dll" DESTINATION .)
     install(DIRECTORY ${WOTH_RESOURCES_DIR} DESTINATION "Res")
 endif()

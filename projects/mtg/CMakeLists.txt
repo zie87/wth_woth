@@ -140,6 +140,21 @@ target_link_libraries(
 add_library(WotH::wth ALIAS wth)
 set(WOTH_RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Res")
 
+function(create_zip output_file input_files working_dir)
+    add_custom_command(
+        COMMAND ${CMAKE_COMMAND} -E tar "cf" "${output_file}" --format=zip -- ${input_files}
+        WORKING_DIRECTORY "${working_dir}"
+        OUTPUT  "${output_file}"
+        DEPENDS ${input_files}
+        COMMENT "Zipping to ${output_file}."
+    )
+endfunction()
+
+file(GLOB ZIP_FILES "${WOTH_RESOURCES_DIR}/*")
+create_zip("${CMAKE_CURRENT_BINARY_DIR}/wth_woth_data.zip" "${ZIP_FILES}" "${WOTH_RESOURCES_DIR}")
+add_custom_target("wth_woth_data" ALL DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/wth_woth_data.zip")
+set(WOTH_CORE_ARCHIVE_NAME "core_${CMAKE_PROJECT_VERSION_MAJOR}${CMAKE_PROJECT_VERSION_MINOR}${CMAKE_PROJECT_VERSION_PATCH}")
+
 if(NOT DISABLE_UI)
     add_executable(wth_woth)
     target_link_libraries(wth_woth PRIVATE WotH::wth WotH::options)
@@ -164,7 +179,7 @@ if(NOT DISABLE_UI)
 
         install(FILES "${CMAKE_CURRENT_BINARY_DIR}/EBOOT.PBP" DESTINATION ${WOTH_PSP_INSTALL_PATH})
         install(FILES "${EXCEPTION_HANDLER_DIR}/exception.prx" DESTINATION ${WOTH_PSP_INSTALL_PATH})
-        install(DIRECTORY ${WOTH_RESOURCES_DIR} DESTINATION ${WOTH_PSP_INSTALL_PATH})
+        install(FILES "${CMAKE_CURRENT_BINARY_DIR}/wth_woth_data.zip" DESTINATION "${WOTH_PSP_INSTALL_PATH}/Res" RENAME "${WOTH_CORE_ARCHIVE_NAME}.zip") # Install our zip (as data000.zip)
 
     elseif(DEFINED WOTH_SDL_BUILD)
         target_sources(wth_woth PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/main_sdl2.cpp)
@@ -174,7 +189,7 @@ endif()
 if(DEFINED WIN32)
     install(TARGETS wth_woth DESTINATION .)
     install(
-        DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/
+        DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/
         DESTINATION .
         FILES_MATCHING
         PATTERN "*.dll"

@@ -164,19 +164,25 @@ if(NOT DISABLE_UI)
 
         install(FILES "${CMAKE_CURRENT_BINARY_DIR}/EBOOT.PBP" 
                       "${CMAKE_CURRENT_BINARY_DIR}/PARAM.SFO" 
-                      DESTINATION ${WOTH_INSTALL_BINDIR})
+                      DESTINATION .)
 
     elseif(DEFINED WOTH_SDL_BUILD)
         target_sources(wth_woth PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/main_sdl2.cpp)
-
-    install(TARGETS wth_woth 
-            ARCHIVE  DESTINATION ${WOTH_INSTALL_LIBDIR}
-            LIBRARY  DESTINATION ${WOTH_INSTALL_LIBDIR}
-            RUNTIME  DESTINATION ${WOTH_INSTALL_BINDIR})
+        install(TARGETS wth_woth RUNTIME DESTINATION bin)
     endif()
 endif()
 
 set(WOTH_RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Res" )
-install(DIRECTORY ${WOTH_RESOURCES_DIR} DESTINATION ${WOTH_INSTALL_DATADIR})
+
+if(DEFINED UNIX)
+    # install(FILES "res/augustus.desktop" DESTINATION "share/applications" RENAME "com.github.keriew.augustus.desktop")
+    # install(FILES "res/augustus.metainfo.xml" DESTINATION "share/metainfo" RENAME "com.github.keriew.augustus.metainfo.xml")
+    # install(FILES "res/augustus_32.png" DESTINATION "share/icons/hicolor/32x32/apps" RENAME "com.github.keriew.augustus.png")
+    # install(FILES "res/augustus_48.png" DESTINATION "share/icons/hicolor/48x48/apps" RENAME "com.github.keriew.augustus.png")
+    # install(FILES "res/augustus_256.png" DESTINATION "share/icons/hicolor/256x256/apps" RENAME "com.github.keriew.augustus.png")
+    # install(FILES "res/augustus_512.png" DESTINATION "share/icons/hicolor/512x512/apps" RENAME "com.github.keriew.augustus.png")
+    install(DIRECTORY ${WOTH_RESOURCES_DIR} DESTINATION "share/wth_woth/")
+endif()
+
 
 add_subdirectory(tests)

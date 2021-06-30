@@ -83,15 +83,6 @@ else()
     message(FATAL_ERROR "Platform can not be detected!")
 endif()
 
-
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
-set(WOTH_INSTALL_BINDIR .)
-set(WOTH_INSTALL_LIBDIR .)
-set(WOTH_INSTALL_DATADIR .)
-
 add_library(WotH::options ALIAS woth_options)
 
 enable_testing()

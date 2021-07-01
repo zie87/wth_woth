@@ -3,7 +3,7 @@
 
 #include <wge/types.hpp>
 #include <wge/debug/assert.hpp>
-#include <wge/utils/type_traits.hpp>
+#include <wge/memory.hpp>
 
 #include <iterator>
 #include <type_traits>
@@ -33,11 +33,11 @@ public:
     constexpr span() noexcept            = default;
     constexpr span(const span&) noexcept = default;
 
-    constexpr span(pointer ptr, size_type count) noexcept : m_data(ptr), m_size(count) {}
-    constexpr span(pointer f, pointer l) noexcept : span(f, static_cast<size_type>(std::distance(f, l))) {}
-
     template <class It>
-    constexpr span(It f, It l) noexcept : span(&(*f), &(*l)) {}
+    constexpr span(It f, size_type count) noexcept : m_data(wge::to_address(f)), m_size(count) {}
+
+    template <class It, class End>
+    constexpr span(It f, End l) noexcept : span(f, static_cast<size_type>(std::distance(f, l))) {}
 
     template <size_t N>
     explicit constexpr span(element_type (&arr)[N]) noexcept : span(arr, N) {}

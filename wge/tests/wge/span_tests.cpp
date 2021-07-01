@@ -66,9 +66,68 @@ WTEST_CASE(WgeSpan, iterators_and_algorithms) {
     }
 }
 
+WTEST_CASE(WgeSpan, subspan_getter) {
+    using value_type                 = wge::i16;
+    constexpr wge::size_t array_size = 10;
+
+    using array_type = std::array<value_type, array_size>;
+    using span_type  = wge::span<array_type::value_type, array_size>;
+
+    constexpr array_type expected{1, 1, 1, 2, 2, 2, 2, 3, 3, 3};
+
+    {
+        array_type test_array{};
+        span_type test_span{test_array.begin(), test_array.end()};
+
+        {
+            auto first_part = test_span.first(3);
+            std::fill(first_part.begin(), first_part.end(), 1);
+        }
+
+        {
+            auto middle_part = test_span.subspan(3, 4);
+            std::fill(middle_part.rbegin(), middle_part.rend(), 2);
+        }
+
+        {
+            auto last_part = test_span.last(3);
+            std::fill(last_part.rbegin(), last_part.rend(), 3);
+        }
+
+        for (wge::size_t idx = 0; idx < array_size; ++idx) {
+            WTEST_ASSERT_EQUAL(expected[idx], test_span[idx]);
+        }
+    }
+
+    {
+        array_type test_array{};
+        span_type test_span{test_array.begin(), test_array.end()};
+
+        {
+            auto first_part = test_span.first<3>();
+            std::fill(first_part.begin(), first_part.end(), 1);
+        }
+
+        {
+            auto middle_part = test_span.subspan<3, 4>();
+            std::fill(middle_part.rbegin(), middle_part.rend(), 2);
+        }
+
+        {
+            auto last_part = test_span.last<3>();
+            std::fill(last_part.rbegin(), last_part.rend(), 3);
+        }
+
+        for (wge::size_t idx = 0; idx < array_size; ++idx) {
+            WTEST_ASSERT_EQUAL(expected[idx], test_span[idx]);
+        }
+    }
+}
+
 WTEST_SUITE_RUNNER(WgeSpan) {
     RUN_TEST_CASE(WgeSpan, default_construction);
     RUN_TEST_CASE(WgeSpan, construct_from_array);
     RUN_TEST_CASE(WgeSpan, construct_from_array_class);
     RUN_TEST_CASE(WgeSpan, iterators_and_algorithms);
+    RUN_TEST_CASE(WgeSpan, subspan_getter);
 }

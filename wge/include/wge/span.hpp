@@ -34,16 +34,16 @@ public:
     constexpr span(const span&) noexcept = default;
 
     constexpr span(pointer ptr, size_type count) : m_data(ptr), m_size(count) {}
-    constexpr span(pointer f, pointer l) : span(f, static_cast<size_type>(f, l)) {}
+    constexpr span(pointer f, pointer l) : span(f, static_cast<size_type>(std::distance(f, l))) {}
 
     template <size_t N>
-    constexpr span(element_type (&arr)[N]) noexcept : span(arr, N) {}
+    explicit constexpr span(element_type (&arr)[N]) noexcept : span(arr, N) {}
 
     template <size_t N>
-    constexpr span(std::array<value_type, N>& arr) noexcept : span(arr.data(), N) {}
+    explicit constexpr span(std::array<value_type, N>& arr) noexcept : span(arr.data(), N) {}
 
     template <size_t N>
-    constexpr span(const std::array<value_type, N>& arr) noexcept : span(arr.data(), N) {}
+    explicit constexpr span(const std::array<value_type, N>& arr) noexcept : span(arr.data(), N) {}
 
     constexpr span& operator=(const span&) noexcept = default;
 

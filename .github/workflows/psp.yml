@@ -26,4 +26,9 @@ jobs:
       uses: docker://zie87/wth_woth_pspdev:latest
       with:
         args: /bin/sh -c ".github/tools/psp/build.sh ${{ matrix.config }}"
-        
+
+    - name: upload package
+      uses: actions/upload-artifact@v2
+      with:
+        name: psp_${{ matrix.config }}
+        path: build_psp/wth_woth_*_psp.zip

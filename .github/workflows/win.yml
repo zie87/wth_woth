@@ -72,12 +72,26 @@ jobs:
       run: |
         source env.sh
         cmake -S . -B build -G "Visual Studio 16 2019" -A Win32 -DCMAKE_BUILD_TYPE=${{ matrix.config }} -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake
+    
     - name: Build
       shell: bash
       run: |
         cmake --build build --config ${{ matrix.build_type }}
+    
     - name: Tests
       shell: bash
       run: |
         cd build
         ctest ${{ matrix.build_type }} --rerun-failed --output-on-failure
+        cd ..
+
+    - name: Build Package
+      shell: bash
+      run: |
+        cmake --build build --config ${{ matrix.build_type }} --target package
+
+    - name: upload package
+      uses: actions/upload-artifact@v2
+      with:
+        name: win_${{ matrix.build_type }}
+        path: build/wth_woth_*_win32.zip

@@ -33,8 +33,11 @@ public:
     constexpr span() noexcept            = default;
     constexpr span(const span&) noexcept = default;
 
-    constexpr span(pointer ptr, size_type count) : m_data(ptr), m_size(count) {}
-    constexpr span(pointer f, pointer l) : span(f, static_cast<size_type>(std::distance(f, l))) {}
+    constexpr span(pointer ptr, size_type count) noexcept : m_data(ptr), m_size(count) {}
+    constexpr span(pointer f, pointer l) noexcept : span(f, static_cast<size_type>(std::distance(f, l))) {}
+
+    template <class It>
+    constexpr span(It f, It l) noexcept : span(&(*f), &(*l)) {}
 
     template <size_t N>
     explicit constexpr span(element_type (&arr)[N]) noexcept : span(arr, N) {}
@@ -61,7 +64,7 @@ public:
     constexpr pointer data() const noexcept { return m_data; }
 
     constexpr reference front() const { return *begin(); }
-    constexpr reference back() const { return *(end()- 1); }
+    constexpr reference back() const { return *(end() - 1); }
     constexpr reference operator[](size_type idx) const { return data()[idx]; }
 
     template <wge::size_t Count>

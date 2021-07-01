@@ -2,6 +2,7 @@
 #define WOTH_WTH_SPAN_HPP
 
 #include <wge/types.hpp>
+#include <wge/debug/assert.hpp>
 #include <wge/utils/type_traits.hpp>
 
 #include <iterator>
@@ -33,16 +34,16 @@ public:
     constexpr span(const span&) noexcept = default;
 
     constexpr span(pointer ptr, size_type count) : m_data(ptr), m_size(count) {}
-    constexpr span(pointer f, pointer l) : m_data(f), m_size(static_cast<size_type>(f, l)) {}
+    constexpr span(pointer f, pointer l) : span(f, static_cast<size_type>(f, l)) {}
 
     template <size_t N>
-    constexpr span(element_type (&arr)[N]) noexcept : m_data(arr), m_size(N) {}
+    constexpr span(element_type (&arr)[N]) noexcept : span(arr, N) {}
 
     template <size_t N>
-    constexpr span(std::array<value_type, N>& arr) noexcept : m_data(arr.data()), m_size(N) {}
+    constexpr span(std::array<value_type, N>& arr) noexcept : span(arr.data(), N) {}
 
     template <size_t N>
-    constexpr span(const std::array<value_type, N>& arr) noexcept : m_data(arr.data()), m_size(N) {}
+    constexpr span(const std::array<value_type, N>& arr) noexcept : span(arr.data(), N) {}
 
     constexpr span& operator=(const span&) noexcept = default;
 
@@ -54,8 +55,8 @@ public:
     constexpr iterator begin() const noexcept { return data(); }
     constexpr iterator end() const noexcept { return data() + size(); }
 
-    constexpr reverse_iterator rbegin() const noexcept { return reverse_iterator(data() + size()); }
-    constexpr reverse_iterator rend() const noexcept { return reverse_iterator(data()); }
+    constexpr reverse_iterator rbegin() const noexcept { return reverse_iterator(end()); }
+    constexpr reverse_iterator rend() const noexcept { return reverse_iterator(begin()); }
 
     constexpr pointer data() const noexcept { return m_data; }
 
@@ -63,10 +64,63 @@ public:
     constexpr reference back() const { return *end(); }
     constexpr reference operator[](size_type idx) const { return data()[idx]; }
 
+    template <wge::size_t Count>
+    constexpr auto first() const -> span<element_type, Count> {
+        wge_expects(Count <= size());
+        return {data(), Count};
+    }
+    constexpr auto first(size_type count) const -> span<element_type, wge::dynamic_extent> {
+        wge_expects(count <= size());
+        return {data(), count};
+    }
+
+    template <wge::size_t Count>
+    constexpr auto last() const -> span<element_type, Count> {
+        wge_expects(Count <= size());
+        return {data() + size() - Count, Count};
+    }
+    constexpr auto last(size_type count) const -> span<element_type, wge::dynamic_extent> {
+        wge_expects(count <= size());
+        return {data() + size() - count, count};
+    }
+
+    template <size_t Offset, size_t Count = wge::dynamic_extent>
+    constexpr span<element_type, Count> subspan() const noexcept {
+        wge_expects(Offset <= size());
+        wge_expects(Count == wge::dynamic_extent || Count <= size());
+        constexpr size_type cnt = (Count == wge::dynamic_extent ? size() - Offset : Count);
+        return span<element_type, Count>{data() + Offset, cnt};
+    }
+
+    constexpr span<element_type, wge::dynamic_extent> subspan(size_type offset,
+                                                              size_type count = wge::dynamic_extent) const noexcept {
+        wge_expects(offset <= size());
+        wge_expects(count <= size() || count == wge::dynamic_extent);
+
+        if (count == dynamic_extent) {
+            return {data() + offset, size() - offset};
+        }
+
+        wge_expects(count <= size() - offset);
+        return {data() + offset, count};
+    }
+
 private:
     pointer m_data   = nullptr;
     size_type m_size = 0U;
 };
+
+template <class T, wge::size_t N>
+wge::span<const wge::byte_t, (N == wge::dynamic_extent) ? wge::dynamic_extent : N * sizeof(T)> as_bytes(
+    wge::span<T, N> s) noexcept {
+    return {reinterpret_cast<const wge::byte_t*>(s.data()), s.size_bytes()};
+}
+
+template <class T, wge::size_t N>
+wge::span<wge::byte_t, (N == wge::dynamic_extent) ? wge::dynamic_extent : N * sizeof(T)> as_writable_bytes(
+    wge::span<T, N> s) noexcept {
+    return {reinterpret_cast<wge::byte_t*>(s.data()), s.size_bytes()};
+}
 
 }  // namespace wge
 

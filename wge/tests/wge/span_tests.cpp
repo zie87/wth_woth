@@ -94,8 +94,9 @@ WTEST_CASE(WgeSpan, subspan_getter) {
             std::fill(last_part.rbegin(), last_part.rend(), 3);
         }
 
+        const auto span_cpy = test_span.subspan(0);
         for (wge::size_t idx = 0; idx < array_size; ++idx) {
-            WTEST_ASSERT_EQUAL(expected[idx], test_span[idx]);
+            WTEST_ASSERT_EQUAL(expected[idx], span_cpy[idx]);
         }
     }
 
@@ -124,10 +125,34 @@ WTEST_CASE(WgeSpan, subspan_getter) {
     }
 }
 
+WTEST_CASE(WgeSpan, span_as_bytes) {
+    {
+        constexpr wge::size_t array_size = 5U;
+        const std::array<wge::u32, array_size> test_array{};
+
+        constexpr wge::size_t byte_size = array_size * sizeof(wge::u32);
+
+        const auto byte_span = wge::as_bytes( wge::span<const wge::u32>(test_array) );
+        WTEST_ASSERT_EQUAL(byte_size, byte_span.size() );
+    }
+
+    {
+        constexpr wge::size_t array_size = 5U;
+        std::array<wge::u32, array_size> test_array{};
+
+        constexpr wge::size_t byte_size = array_size * sizeof(wge::u32);
+
+        const auto byte_span = wge::as_writable_bytes( wge::span<wge::u32, array_size>(test_array) );
+        WTEST_ASSERT_EQUAL(byte_size, byte_span.size() );
+    }
+}
+
+
 WTEST_SUITE_RUNNER(WgeSpan) {
     RUN_TEST_CASE(WgeSpan, default_construction);
     RUN_TEST_CASE(WgeSpan, construct_from_array);
     RUN_TEST_CASE(WgeSpan, construct_from_array_class);
     RUN_TEST_CASE(WgeSpan, iterators_and_algorithms);
     RUN_TEST_CASE(WgeSpan, subspan_getter);
+    RUN_TEST_CASE(WgeSpan, span_as_bytes);
 }

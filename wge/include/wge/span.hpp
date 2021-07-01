@@ -113,14 +113,14 @@ private:
 template <class T, wge::size_t N>
 auto as_bytes(wge::span<T, N> s) noexcept
     -> wge::span<const wge::byte_t, (N == wge::dynamic_extent) ? wge::dynamic_extent : N * sizeof(T)> {
-    return {reinterpret_cast<const wge::byte_t*>(s.data()), s.size_bytes()};
+    return {reinterpret_cast<const wge::byte_t*>(s.data()), s.size_byte()};
 }
 
 template <class T, wge::size_t N>
 auto as_writable_bytes(wge::span<T, N> s) noexcept
     -> std::enable_if_t<!std::is_const_v<T>,
                         wge::span<wge::byte_t, (N == wge::dynamic_extent) ? wge::dynamic_extent : N * sizeof(T)>> {
-    return {reinterpret_cast<wge::byte_t*>(s.data()), s.size_bytes()};
+    return {reinterpret_cast<wge::byte_t*>(s.data()), s.size_byte()};
 }
 
 }  // namespace wge

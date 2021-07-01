@@ -77,7 +77,7 @@ WTEST_CASE(WgeSpan, subspan_getter) {
 
     {
         array_type test_array{};
-        span_type test_span{test_array.begin(), test_array.end()};
+        span_type test_span(test_array.begin(), test_array.end());
 
         {
             auto first_part = test_span.first(3);
@@ -101,7 +101,7 @@ WTEST_CASE(WgeSpan, subspan_getter) {
 
     {
         array_type test_array{};
-        span_type test_span{test_array.begin(), test_array.end()};
+        span_type test_span(test_array.begin(), test_array.end());
 
         {
             auto first_part = test_span.first<3>();

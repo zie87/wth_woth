@@ -8,9 +8,7 @@
 PSP_MODULE_INFO("WGE_UNITTEST", 0, 1, 1);
 
 /* Exit callback */
-int exit_callback(int arg1, int arg2, void* common) {
-    return 0;
-}
+int exit_callback(int arg1, int arg2, void* common) { return 0; }
 
 /* Callback thread */
 int CallbackThread(SceSize args, void* argp) {
@@ -64,6 +62,7 @@ static void RunAllTests() {
     RUN_TEST_GROUP(WgeSpan);
     RUN_TEST_GROUP(WgeErrorExpected);
     RUN_TEST_GROUP(WgeErrorUnexpected);
+    RUN_TEST_GROUP(WgeErrorStorage);
     RUN_TEST_GROUP(WgeUtilsDefer);
     RUN_TEST_GROUP(WgeVideoImageLoader);
 }

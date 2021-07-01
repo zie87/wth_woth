@@ -98,8 +98,9 @@ public:
         return *this;
     }
 
-    template <class Err                                                                        = error_type,
-              typename std::enable_if_t<std::is_move_assignable_v<error_type, Err>, int>::type = 0>
+    template <
+        class Err =
+            error_type /*, typename std::enable_if_t<std::is_move_assignable_v<error_type, Err>, int>::type = 0 */>
     constexpr unexpected& operator=(unexpected<Err>&& other) {
         unexpected{std::move(other.value())}.swap(*this);
         return *this;
@@ -134,6 +135,9 @@ auto swap(unexpected<E1>& x, unexpected<E1>& y) noexcept(noexcept(x.swap(y)))
     -> std::enable_if_t<std::is_swappable_v<E1>, void> {
     x.swap(y);
 }
+
+struct unexpect_t {};
+inline constexpr unexpect_t unexpect{};
 }  // namespace wge
 
 #endif  // WOTH_WGE_ERROR_UNEXPECTED_HPP

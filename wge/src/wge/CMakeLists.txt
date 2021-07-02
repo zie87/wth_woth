@@ -24,6 +24,33 @@ else()
     target_sources(wge PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/time_default.cpp)
 endif()
 
+if(NOT DEFINED WOTH_PSP_BUILD)
+    find_package(mpg123 CONFIG )
+    
+    if(NOT TARGET MPG123::libmpg123)
+        find_package(PkgConfig REQUIRED) 
+        pkg_check_modules(PC_MPG123 QUIET libmpg123)
+
+        find_path(MPG123_INCLUDE_DIR mpg123.h HINTS ${PC_MPG123_INCLUDEDIR} ${PC_MPG123_INCLUDE_DIRS})
+        find_library(MPG123_LIBRARY NAMES mpg123 mpg123-0 HINTS ${PC_MPG123_LIBDIR} ${PC_MPG123_LIBRARY_DIRS})
+
+        set(MPG123_LIBRARIES ${MPG123_LIBRARY})
+        set(MPG123_INCLUDE_DIRS ${MPG123_INCLUDE_DIR})
+
+        include(FindPackageHandleStandardArgs)
+        find_package_handle_standard_args(MPG123 DEFAULT_MSG MPG123_LIBRARY MPG123_INCLUDE_DIR)
+        mark_as_advanced(MPG123_INCLUDE_DIR MPG123_LIBRARY)
+
+        add_library(mpg123 INTERFACE)
+        target_include_directories(mpg123 INTERFACE ${MPG123_INCLUDE_DIR})
+        target_link_libraries(mpg123 INTERFACE ${MPG123_LIBRARY})
+        add_library(MPG123::libmpg123 ALIAS mpg123)
+    endif()
+
+    target_link_libraries(wge PRIVATE MPG123::libmpg123)
+endif()
+
+
 target_compile_features(wge PUBLIC cxx_std_17)
 target_include_directories(wge PUBLIC ${WOTH_WGE_ROOT_DIR}/include)
 target_link_libraries(

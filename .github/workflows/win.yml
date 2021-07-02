@@ -12,7 +12,7 @@ jobs:
     runs-on: windows-latest
 
     env:
-      VCPKG_DEPS: sdl2 zlib libpng libjpeg-turbo freetype
+      VCPKG_DEPS: sdl2 zlib libpng libjpeg-turbo mpg123 freetype
 
     strategy:
       matrix:

@@ -190,12 +190,16 @@ if(NOT DISABLE_UI)
     elseif(DEFINED WOTH_SDL_BUILD)
         target_sources(wth_woth PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/main_sdl2.cpp)
     endif()
-endif()
 
 if(DEFINED WIN32)
     install(TARGETS wth_woth DESTINATION .)
-    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Debug  ${CMAKE_CURRENT_BINARY_DIR}/Release 
-        DESTINATION . COMPONENT DLLS FILES_MATCHING PATTERN "*.dll" )
+    install(
+        DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Debug ${CMAKE_CURRENT_BINARY_DIR}/Release
+        DESTINATION .
+        COMPONENT DLLS
+        FILES_MATCHING
+        PATTERN "*.dll"
+    )
 
     install(FILES "${CMAKE_SOURCE_DIR}/extern/fmod/lib/fmod.dll" DESTINATION .)
     install(DIRECTORY ${WOTH_RESOURCES_DIR} DESTINATION .)
@@ -209,6 +213,7 @@ endif()
 if(DEFINED UNIX)
     install(TARGETS wth_woth RUNTIME DESTINATION bin)
     install(DIRECTORY ${WOTH_RESOURCES_DIR} DESTINATION "share/wth_woth/")
+endif()
 endif()
 
 add_subdirectory(tests)

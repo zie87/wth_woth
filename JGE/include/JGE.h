@@ -26,7 +26,7 @@
 #include <SDL.h>
 typedef SDL_Keycode LocalKeySym;
 #define LOCAL_KEY_NONE SDLK_UNKNOWN
-#elif defined(WOTH_PLATFORM_PSP) 
+#else
 typedef u32 LocalKeySym;
 #define LOCAL_KEY_NONE ((u32)-1)
 #endif

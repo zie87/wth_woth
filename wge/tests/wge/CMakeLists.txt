@@ -2,10 +2,13 @@ set(TEST_NAME "wge_unittests")
 
 add_executable(
     ${TEST_NAME}
-    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/math_tests.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/span_tests.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/utils/defer_tests.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/error/expected_tests.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/error/unexpected_tests.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/error/storage_tests.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/utils/defer_tests.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/video/image_loader_tests.cpp
 )
 

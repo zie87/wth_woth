@@ -31,7 +31,7 @@ jobs:
       working-directory: ${{runner.workspace}}/build
       run: |
         cmake -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
-              -DSTANDALONE_TESTSUITE=ON \
+              -DDISABLE_UI=ON \
               -DENABLE_COVERAGE=ON \
               $GITHUB_WORKSPACE
 

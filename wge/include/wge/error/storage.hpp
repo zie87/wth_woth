@@ -16,7 +16,7 @@ struct storage_impl {
     using error_type = E;
 
     constexpr storage_impl() noexcept : m_value(value_type{}), m_has_value(true) {}
-    constexpr storage_impl(no_init_t) noexcept : m_no_init(), m_has_value(false) {}
+    explicit constexpr storage_impl(no_init_t) noexcept : m_no_init(), m_has_value(false) {}
     ~storage_impl() noexcept {}
 
     explicit storage_impl(bool has_value) noexcept : m_has_value(has_value) {}
@@ -32,6 +32,26 @@ struct storage_impl {
 
     void destruct_value() { m_value.~value_type(); }
     void destruct_error() { m_error.~error_type(); }
+
+    template <class... Args>
+    void emplace_value(Args&&... args) {
+        new (value_ptr()) value_type(std::forward<Args>(args)...);
+    }
+
+    template <class U, class... Args>
+    void emplace_value(std::initializer_list<U> init_list, Args&&... args) {
+        new (value_ptr()) value_type(init_list, std::forward<Args>(args)...);
+    }
+
+    template <class... Args>
+    void emplace_error(Args&&... args) {
+        new (error_ptr()) error_type(std::forward<Args>(args)...);
+    }
+
+    template <class U, class... Args>
+    void emplace_error(std::initializer_list<U> init_list, Args&&... args) {
+        new (error_ptr()) error_type(init_list, std::forward<Args>(args)...);
+    }
 
     constexpr auto value() const& noexcept -> const value_type& { return m_value; }
     constexpr auto value() & noexcept -> value_type& { return m_value; }

@@ -15,14 +15,10 @@ class unexpected;
 namespace detail {
 template <typename E1, typename E2, typename E2R>
 using unexpected_enable_from_other = std::enable_if_t<
-     std::is_constructible_v<E1, E2R> && 
-    !std::is_constructible_v<E1, unexpected<E2>&> &&
-    !std::is_constructible_v<E1, unexpected<E2>> && 
-    !std::is_constructible_v<E1, const unexpected<E2>&> &&
-    !std::is_constructible_v<E1, const unexpected<E2>> && 
-    !std::is_convertible_v<unexpected<E2>&, E1> &&
-    !std::is_convertible_v<unexpected<E2>, E1> && 
-    !std::is_convertible_v<const unexpected<E2>&, E1> &&
+    std::is_constructible_v<E1, E2R> && !std::is_constructible_v<E1, unexpected<E2>&> &&
+    !std::is_constructible_v<E1, unexpected<E2>> && !std::is_constructible_v<E1, const unexpected<E2>&> &&
+    !std::is_constructible_v<E1, const unexpected<E2>> && !std::is_convertible_v<unexpected<E2>&, E1> &&
+    !std::is_convertible_v<unexpected<E2>, E1> && !std::is_convertible_v<const unexpected<E2>&, E1> &&
     !std::is_convertible_v<const unexpected<E2>, E1>>;
 }  // namespace detail
 
@@ -34,11 +30,11 @@ public:
     constexpr unexpected(const unexpected&) = default;
     constexpr unexpected(unexpected&&)      = default;
 
-    template <class Err                          = error_type,
-              typename std::enable_if<std::is_constructible_v<error_type, Err> &&
-                                          !std::is_same_v<wge::remove_cvref_t<Err>, std::in_place_t> &&
-                                          !std::is_same_v<wge::remove_cvref_t<Err>, unexpected>,
-                                      int>::type = 0>
+    template <class Err                       = error_type,
+              typename std::enable_if_t<std::is_constructible_v<error_type, Err> &&
+                                            !std::is_same_v<wge::remove_cvref_t<Err>, std::in_place_t> &&
+                                            !std::is_same_v<wge::remove_cvref_t<Err>, unexpected>,
+                                        int>* = nullptr>
     constexpr explicit unexpected(Err&& e) : m_value(std::forward<Err>(e)) {}
 
     template <class... Args, typename std::enable_if<std::is_constructible_v<error_type, Args&&...>, int>::type = 0>
@@ -99,6 +95,12 @@ public:
 private:
     E m_value;
 };
+
+template <class E>
+unexpected<typename std::decay<E>::type> make_unexpected(E&& e) {
+    return unexpected<typename std::decay<E>::type>(std::forward<E>(e));
+}
+
 template <class E1, class E2>
 constexpr bool operator==(const unexpected<E1>& x, const unexpected<E2>& y) {
     return x.value() == y.value();

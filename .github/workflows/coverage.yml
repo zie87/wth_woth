@@ -58,7 +58,7 @@ jobs:
       run : |
         lcov --capture --directory . --output-file cov.info
         lcov --add-tracefile ./cov_base.info --add-tracefile ./cov.info --output-file cov_total.info
-        lcov --remove ./cov_total.info '/usr/include/*' '/usr/lib/*' '*/extern/*' '*/tests/*' '*/playground/*' -o cov_filter.info
+        lcov --remove ./cov_total.info '/usr/include/*' '/usr/lib/*' '*/wtest/*' '*/extern/*' '*/tests/*' '*/playground/*' -o cov_filter.info
 
     - name: Coveralls
       uses: coverallsapp/github-action@master

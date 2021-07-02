@@ -10,6 +10,23 @@
 namespace wge {
 
 template <class E>
+class unexpected;
+
+namespace detail {
+template <typename E1, typename E2, typename E2R>
+using unexpected_enable_from_other = std::enable_if_t<
+     std::is_constructible_v<E1, E2R> && 
+    !std::is_constructible_v<E1, unexpected<E2>&> &&
+    !std::is_constructible_v<E1, unexpected<E2>> && 
+    !std::is_constructible_v<E1, const unexpected<E2>&> &&
+    !std::is_constructible_v<E1, const unexpected<E2>> && 
+    !std::is_convertible_v<unexpected<E2>&, E1> &&
+    !std::is_convertible_v<unexpected<E2>, E1> && 
+    !std::is_convertible_v<const unexpected<E2>&, E1> &&
+    !std::is_convertible_v<const unexpected<E2>, E1>>;
+}  // namespace detail
+
+template <class E>
 class unexpected {
 public:
     using error_type = E;
@@ -33,58 +50,20 @@ public:
     constexpr explicit unexpected(std::in_place_t, std::initializer_list<U> init_list, Args&&... args)
         : m_value(init_list, std::forward<Args>(args)...) {}
 
-    template <class Err,
-              typename std::enable_if<std::is_constructible_v<error_type, const Err&> &&
-                                          !std::is_constructible_v<error_type, unexpected<Err>&> &&
-                                          !std::is_constructible_v<error_type, unexpected<Err> > &&
-                                          !std::is_constructible_v<error_type, unexpected<Err> const&> &&
-                                          !std::is_constructible_v<error_type, unexpected<Err> const> &&
-                                          !std::is_convertible_v<unexpected<Err>&, error_type> &&
-                                          !std::is_convertible_v<unexpected<Err>, error_type> &&
-                                          !std::is_convertible_v<const unexpected<Err>&, error_type> &&
-                                          !std::is_convertible_v<const unexpected<Err>, error_type> &&
-                                          !std::is_convertible_v<const Err&, error_type>, /* explicit condition*/
-                                      int>::type = 0>
+    template <class Err, detail::unexpected_enable_from_other<error_type, Err, const Err&>* = nullptr,
+              std::enable_if_t<!std::is_convertible_v<const Err&, error_type>>* = nullptr> /* explicit condition*/
     constexpr explicit unexpected(const unexpected<Err>& e) : m_value(e.value()) {}
 
-    template <class Err, typename std::enable_if<std::is_constructible_v<error_type, const Err&> &&
-                                                     !std::is_constructible_v<error_type, unexpected<Err>&> &&
-                                                     !std::is_constructible_v<error_type, unexpected<Err> > &&
-                                                     !std::is_constructible_v<error_type, unexpected<Err> const&> &&
-                                                     !std::is_constructible_v<error_type, unexpected<Err> const> &&
-                                                     !std::is_convertible_v<unexpected<Err>&, error_type> &&
-                                                     !std::is_convertible_v<unexpected<Err>, error_type> &&
-                                                     !std::is_convertible_v<const unexpected<Err>&, error_type> &&
-                                                     !std::is_convertible_v<const unexpected<Err>, error_type> &&
-                                                     std::is_convertible_v<Err, error_type>, /* explicit condition*/
-                                                 int>::type = 0>
+    template <class Err, detail::unexpected_enable_from_other<error_type, Err, const Err&>* = nullptr,
+              std::enable_if_t<std::is_convertible_v<const Err&, error_type>>* = nullptr> /* explicit condition*/
     constexpr /* non explicit*/ unexpected(const unexpected<Err>& e) : m_value(e.value()) {}
 
-    template <class Err, typename std::enable_if<std::is_constructible_v<error_type, Err> &&
-                                                     !std::is_constructible_v<error_type, unexpected<Err>&> &&
-                                                     !std::is_constructible_v<error_type, unexpected<Err> > &&
-                                                     !std::is_constructible_v<error_type, unexpected<Err> const&> &&
-                                                     !std::is_constructible_v<error_type, unexpected<Err> const> &&
-                                                     !std::is_convertible_v<unexpected<Err>&, error_type> &&
-                                                     !std::is_convertible_v<unexpected<Err>, error_type> &&
-                                                     !std::is_convertible_v<const unexpected<Err>&, error_type> &&
-                                                     !std::is_convertible_v<const unexpected<Err>, error_type> &&
-                                                     !std::is_convertible_v<Err, error_type>, /* explicit condition*/
-                                                 int>::type = 0>
+    template <class Err, detail::unexpected_enable_from_other<error_type, Err, Err>* = nullptr,
+              std::enable_if_t<!std::is_convertible_v<const Err&, error_type>>* = nullptr> /* explicit condition*/
     constexpr explicit unexpected(unexpected<Err>&& e) : m_value(std::move(e.value())) {}
 
-    template <class Err,
-              typename std::enable_if<std::is_constructible_v<error_type, Err> &&
-                                          !std::is_constructible_v<error_type, unexpected<Err>&> &&
-                                          !std::is_constructible_v<error_type, unexpected<Err> > &&
-                                          !std::is_constructible_v<error_type, unexpected<Err> const&> &&
-                                          !std::is_constructible_v<error_type, unexpected<Err> const> &&
-                                          !std::is_convertible_v<unexpected<Err>&, error_type> &&
-                                          !std::is_convertible_v<unexpected<Err>, error_type> &&
-                                          !std::is_convertible_v<const unexpected<Err>&, error_type> &&
-                                          !std::is_convertible_v<const unexpected<Err>, error_type> &&
-                                          std::is_convertible_v<const Err&, error_type>, /* explicit condition*/
-                                      int>::type = 0>
+    template <class Err, detail::unexpected_enable_from_other<error_type, Err, Err>* = nullptr,
+              std::enable_if_t<std::is_convertible_v<const Err&, error_type>>* = nullptr> /* explicit condition*/
     constexpr /* non explicit*/ unexpected(unexpected<Err>&& e) : m_value(std::move(e.value())) {}
 
     constexpr unexpected& operator=(const unexpected&) = default;

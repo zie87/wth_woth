@@ -26,8 +26,10 @@ public:
         m_storage.construct_value(value_type());
     }
 
-    // constexpr expected(const expected&);
-    // constexpr expected(expected&&) noexcept(see below);
+    constexpr expected(const expected&) = default;
+    constexpr expected(expected&&) noexcept = default;
+
+
     // template<class U, class G>
     //     explicit(see below) constexpr expected(const expected<U, G>&);
     // template<class U, class G>
@@ -51,7 +53,13 @@ public:
     //     constexpr explicit expected(unexpect_t, initializer_list<U>, Args&&...);
 
     // �.�.4.2, destructor
-    ~expected();
+    ~expected() {
+        if (has_value()) {
+            m_storage.destruct_value();
+        } else {
+            m_storage.destruct_error();
+        }
+    }
 
     // �.�.4.3, assignment
     // expected& operator=(const expected&);
@@ -87,6 +95,7 @@ public:
     // constexpr T& value() &;
     // constexpr const T&& value() const&&;
     // constexpr T&& value() &&;
+
     // constexpr const E& error() const&;
     // constexpr E& error() &;
     // constexpr const E&& error() const&&;

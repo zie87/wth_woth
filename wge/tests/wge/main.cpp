@@ -4,6 +4,12 @@
 #include <pspctrl.h>
 #include <pspdisplay.h>
 
+extern "C" {
+    void *__dso_handle = NULL;
+}
+
+
+
 /* Define the module info section */
 PSP_MODULE_INFO("WGE_UNITTEST", 0, 1, 1);
 

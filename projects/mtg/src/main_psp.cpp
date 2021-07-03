@@ -25,6 +25,10 @@
 
 #include <wge/log.hpp>
 
+extern "C" {
+    void *__dso_handle = NULL;
+}
+
 #ifndef JGEApp_Title
 #define JGEApp_Title "JGE++"
 #endif

@@ -10,7 +10,8 @@ ENV PSPDEV /opt/pspsdk
 ENV PSPSDK $PSPDEV/pspsdk
 ENV PATH   $PATH:$PSPDEV/bin:$PSPSDK/bin
 
-RUN git clone --branch gcc-10.3.0 https://github.com/zie87/psptoolchain.git  /tmp/psptoolchain
+#RUN git clone --branch gcc-10.3.0 https://github.com/zie87/psptoolchain.git  /tmp/psptoolchain
+RUN git clone --branch gcc-11.1 https://github.com/zie87/psptoolchain.git  /tmp/psptoolchain
 
 # work around for musl paths
 RUN echo "#include <unistd.h>" > /usr/include/sys/unistd.h

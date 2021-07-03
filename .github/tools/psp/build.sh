@@ -5,6 +5,7 @@ echo PSPDEV = $PSPDEV
 echo psp-config = `psp-config --psp-prefix`
 
 cd extern/psp_exception_handler/prx
+make clean
 make -j $(nproc)
 cd -
 

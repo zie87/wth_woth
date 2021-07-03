@@ -23,7 +23,7 @@ jobs:
 
 
     - name: build
-      uses: docker://zie87/wth_woth_pspdev:main
+      uses: docker://zie87/wth_woth_pspdev:gcc-11.2.0
       with:
         args: /bin/sh -c ".github/tools/psp/build.sh ${{ matrix.config }}"
 

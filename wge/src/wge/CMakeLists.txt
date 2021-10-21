@@ -7,14 +7,25 @@ if(NOT TARGET fmt::fmt AND NOT TARGET fmt)
     find_package(fmt REQUIRED)
 endif()
 
-target_sources(
-    wge PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/video/image_loader.cpp ${CMAKE_CURRENT_SOURCE_DIR}/debug/log_core.cpp
+target_sources(wge 
+    PRIVATE 
+        ${CMAKE_CURRENT_SOURCE_DIR}/video/image_loader.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/debug/log_core.cpp
 )
 
 if(DEFINED WOTH_PSP_BUILD)
-    target_sources(
-        wge PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/time_psp.cpp ${CMAKE_CURRENT_SOURCE_DIR}/thread/mutex_psp.cpp
-                    ${CMAKE_CURRENT_SOURCE_DIR}/thread/thread_psp.cpp
+    target_sources(wge 
+        PRIVATE 
+            ${CMAKE_CURRENT_SOURCE_DIR}/time_psp.cpp 
+            ${CMAKE_CURRENT_SOURCE_DIR}/thread/mutex_psp.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/thread/thread_psp.cpp
+    )
+elseif(DEFINED WOTH_WII_BUILD)
+    target_sources(wge
+        PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/time_wii.cpp 
+            ${CMAKE_CURRENT_SOURCE_DIR}/thread/mutex_wii.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/thread/thread_wii.cpp
     )
 elseif(DEFINED WOTH_SDL_BUILD)
     find_package(SDL2 REQUIRED)

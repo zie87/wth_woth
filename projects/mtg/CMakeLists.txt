@@ -186,7 +186,16 @@ if(NOT DISABLE_UI)
             DESTINATION "${WOTH_PSP_INSTALL_PATH}/Res"
             RENAME "${WOTH_CORE_ARCHIVE_NAME}.zip"
         )
+    elseif(DEFINED WOTH_WII_BUILD)
+        target_sources(wth_woth PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/main_wii.cpp)
 
+        add_custom_command(
+            TARGET wth_woth
+            POST_BUILD
+            COMMAND ${WII_ELF2DOL} ARGS
+            $<TARGET_FILE:wth_woth>
+            "$<TARGET_FILE_DIR:wth_woth>/boot.dol"
+        )
     elseif(DEFINED WOTH_SDL_BUILD)
         target_sources(wth_woth PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/main_sdl2.cpp)
     endif()

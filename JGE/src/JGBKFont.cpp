@@ -24,14 +24,14 @@ JGBKFont::JGBKFont() {
 
     mCurr = 0;
 
-    mColor = ARGB(255, 255, 255, 255);
+    mColor   = ARGB(255, 255, 255, 255);
     mBgColor = ARGB(0, 0, 0, 0);
 
     mScale = 1.0f;
 
     mRotation = 0.0f;
 
-    mCount = 0;
+    mCount   = 0;
     mTexture = nullptr;
     mSprites = nullptr;
     mGBCode  = nullptr;
@@ -61,20 +61,20 @@ JGBKFont::~JGBKFont() {
 
 bool JGBKFont::Init(const char* engFileName, const char* chnFileName, int fontsize, bool smallEnglishFont) {
     mSmallEnglishFont = smallEnglishFont;
-    mFontSize = fontsize;
+    mFontSize         = fontsize;
 
-    mCacheImageWidth = 256;
+    mCacheImageWidth  = 256;
     mCacheImageHeight = 256;
 
-    mBytesPerRow = (mFontSize + 7) / 8;
+    mBytesPerRow  = (mFontSize + 7) / 8;
     mBytesPerChar = mBytesPerRow * mFontSize;
 
-    mCol = mCacheImageWidth / mFontSize;
-    mRow = mCacheImageHeight / mFontSize;
+    mCol       = mCacheImageWidth / mFontSize;
+    mRow       = mCacheImageHeight / mFontSize;
     mCacheSize = mCol * mRow;
 
     mSprites = new JQuad*[mCacheSize];
-    mGBCode = new int[mCacheSize];
+    mGBCode  = new int[mCacheSize];
 
 #if defined(WIN32) || defined(LINUX)
     mCharBuffer = new DWORD[mFontSize * mFontSize];
@@ -100,7 +100,7 @@ bool JGBKFont::Init(const char* engFileName, const char* chnFileName, int fontsi
     JFileSystem* fileSys = JFileSystem::GetInstance();
     if (!fileSys->OpenFile(engFileName)) return false;
 
-    size = fileSys->GetFileSize();
+    size     = fileSys->GetFileSize();
     mEngFont = new BYTE[size];
 
     fileSys->ReadFile(mEngFont, size);
@@ -118,22 +118,21 @@ bool JGBKFont::Init(const char* engFileName, const char* chnFileName, int fontsi
     return true;
 }
 
-#if defined(WIN32) || defined(LINUX)
-#else
+#if defined(WOTH_PLATFORM_PSP)
 void SwizzlePlot(u8* out, PIXEL_TYPE color, int i, int j, unsigned int width) {
     unsigned int rowblocks = (width >> 4);
 
     unsigned int blockx = (i >> 4);
     unsigned int blocky = (j >> 3);
 
-    unsigned int x = (i - (blockx << 4));
-    unsigned int y = (j - (blocky << 3));
-    unsigned int block_index = blockx + ((blocky)*rowblocks);
+    unsigned int x             = (i - (blockx << 4));
+    unsigned int y             = (j - (blocky << 3));
+    unsigned int block_index   = blockx + ((blocky)*rowblocks);
     unsigned int block_address = block_index << 7;
 
-    u8* p = out + (block_address + x + (y << 4));
+    u8* p            = out + (block_address + x + (y << 4));
     PIXEL_TYPE* dest = (PIXEL_TYPE*)p;
-    *dest = color;
+    *dest            = color;
 }
 #endif
 
@@ -144,7 +143,7 @@ int JGBKFont::PreCacheChar(const BYTE* ch) {
         // get offset to the proper character bits (GBK encoding)
         code = (((DWORD)(*ch - 0x81)) * 0xBF + ((DWORD)(*(ch + 1) - 0x40)));
     } else {
-        code = ((DWORD)*ch) | 0x10000;
+        code      = ((DWORD)*ch) | 0x10000;
         isChinese = false;
     }
 
@@ -159,15 +158,15 @@ int JGBKFont::PreCacheChar(const BYTE* ch) {
     int index = mCurr++;
     if (mCurr >= mCacheSize) mCurr = 0;
 
-#if defined(WIN32) || defined(LINUX)
     int x = 0;
     int y = 0;
-
+#if defined(WIN32) || defined(LINUX)
     memset(mCharBuffer, 0, sizeof(DWORD) * mFontSize * mFontSize);
-#else
+#elif defined(WOTH_PLATFORM_PSP)
     u8* pTexture = (u8*)mTexture->mBits;
-    int x;
-    int y = (int)mSprites[index]->mY;
+    y            = (int)mSprites[index]->mY;
+#else
+    // TODO: WII
 #endif
 
     BYTE* src;
@@ -181,12 +180,12 @@ int JGBKFont::PreCacheChar(const BYTE* ch) {
 
 #if defined(WIN32) || defined(LINUX)
             x = 0;
-#else
+#elif defined(WOTH_PLATFORM_PSP)
             x = (int)mSprites[index]->mX;
 #endif
 
             for (int j = 0; j < mBytesPerRow; j++) {
-                bits = src[i++];
+                bits         = src[i++];
                 BYTE bitMask = 0x80;
                 for (int z = 0; z < 8 && bitCount; z++) {
 #if defined(WIN32) || defined(LINUX)
@@ -194,7 +193,7 @@ int JGBKFont::PreCacheChar(const BYTE* ch) {
                         mCharBuffer[y * mFontSize + x] = ARGB(255, 255, 255, 255);
                     else
                         mCharBuffer[y * mFontSize + x] = ARGB(0, 0, 0, 0);
-#else
+#elif defined(WOTH_PLATFORM_PSP)
                     if ((bits & bitMask) != 0)
                         SwizzlePlot(pTexture, ARGB(255, 255, 255, 255), x * PIXEL_SIZE, y,
                                     mTexture->mTexWidth * PIXEL_SIZE);
@@ -211,14 +210,14 @@ int JGBKFont::PreCacheChar(const BYTE* ch) {
         }
     } else {
         int size = (mFontSize <= 16) ? mFontSize : mFontSize * 2;
-        src = mEngFont + (code - 0x10000) * size;
+        src      = mEngFont + (code - 0x10000) * size;
 
         int n;
 
         for (int i = 0; i < size;) {
 #if defined(WIN32) || defined(LINUX)
             x = 0;
-#else
+#elif defined(WOTH_PLATFORM_PSP)
             x = (int)mSprites[index]->mX;
 #endif
             // width of the English fonts is only half of the Chinese ones
@@ -227,7 +226,7 @@ int JGBKFont::PreCacheChar(const BYTE* ch) {
                 for (n = 0; n < (mFontSize - 8) / 2; n++) {
 #if defined(WIN32) || defined(LINUX)
                     mCharBuffer[y * mFontSize + x] = ARGB(0, 0, 0, 0);
-#else
+#elif defined(WOTH_PLATFORM_PSP)
                     SwizzlePlot(pTexture, ARGB(0, 0, 0, 0), x * PIXEL_SIZE, y, mTexture->mTexWidth * PIXEL_SIZE);
 #endif
                     x++;
@@ -235,9 +234,9 @@ int JGBKFont::PreCacheChar(const BYTE* ch) {
             }
 
             int count = (mFontSize <= 16) ? 1 : 2;
-            bitCount = mFontSize;
+            bitCount  = mFontSize;
             for (int k = 0; k < count; k++) {
-                bits = src[i++];
+                bits         = src[i++];
                 BYTE bitMask = 0x80;
                 for (int z = 0; z < 8 && bitCount; z++) {
 #if defined(WIN32) || defined(LINUX)
@@ -245,7 +244,7 @@ int JGBKFont::PreCacheChar(const BYTE* ch) {
                         mCharBuffer[y * mFontSize + x] = ARGB(255, 255, 255, 255);
                     else
                         mCharBuffer[y * mFontSize + x] = ARGB(0, 0, 0, 0);
-#else
+#elif defined(WOTH_PLATFORM_PSP)
                     if ((bits & bitMask) != 0)
                         SwizzlePlot(pTexture, ARGB(255, 255, 255, 255), x * PIXEL_SIZE, y,
                                     mTexture->mTexWidth * PIXEL_SIZE);
@@ -262,7 +261,7 @@ int JGBKFont::PreCacheChar(const BYTE* ch) {
                 for (n = 0; n < (mFontSize - 8) / 2; n++) {
 #if defined(WIN32) || defined(LINUX)
                     mCharBuffer[y * mFontSize + x] = ARGB(0, 0, 0, 0);
-#else
+#elif defined(WOTH_PLATFORM_PSP)
                     SwizzlePlot(pTexture, ARGB(0, 0, 0, 0), x * PIXEL_SIZE, y, mTexture->mTexWidth * PIXEL_SIZE);
 #endif
                     x++;
@@ -280,8 +279,7 @@ int JGBKFont::PreCacheChar(const BYTE* ch) {
     y = (int)mSprites[index]->mY;
 
     glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, mFontSize, mFontSize, GL_RGBA, GL_UNSIGNED_BYTE, mCharBuffer);
-
-#else
+#elif defined(WOTH_PLATFORM_PSP)
     sceKernelDcacheWritebackAll();
     // sceKernelDcacheWritebackInvalidateAll();
 #endif
@@ -311,7 +309,7 @@ int JGBKFont::PrepareString(BYTE* str, int* dest) {
 }
 
 void JGBKFont::RenderEncodedString(const int* text, int count, float x, float y) {
-    int n = 0;
+    int n    = 0;
     float xx = x;
     float yy = y;
     bool isChinese;
@@ -351,10 +349,10 @@ int JGBKFont::GetStringHeight(BYTE* str) {
     return h;
 }
 void JGBKFont::GetStringArea(BYTE* str, int* w, int* h) const {
-    BYTE* src = str;
-    float len = 0;
-    float xx = 0;
-    float yy = mFontSize * mScale;
+    BYTE* src      = str;
+    float len      = 0;
+    float xx       = 0;
+    float yy       = mFontSize * mScale;
     bool isChinese = true;
 
     while (*src != 0) {
@@ -449,8 +447,8 @@ void JGBKFont::RenderString(BYTE* str, float x, float y, int alignment) {
     mRenderer->BindTexture(mTexture);
 
     BYTE* src = str;
-    float xx = x;
-    float yy = y;
+    float xx  = x;
+    float yy  = y;
     int index;
 
     bool isChinese = true;

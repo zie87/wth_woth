@@ -83,7 +83,6 @@ target_sources(
             ${CMAKE_CURRENT_SOURCE_DIR}/src/tinyxml/tinyxmlerror.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Encoding.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/JTTFont.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/JMD2Model.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/JOBJModel.cpp
 )
 

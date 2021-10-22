@@ -1,0 +1,28 @@
+name: wii
+
+on:
+  push:
+    branches-ignore:
+      - 'docker'
+  schedule:
+    - cron: '0 4 * * 0' # Weekly on Sundays at 04:00
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        config: [Release, Debug, MinSizeRel]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true    
+        fetch-depth: 0
+
+
+    - name: build
+      uses: docker://zie87/wth_woth_devkit:gcc-11.1.0
+      with:
+        args: /bin/sh -c ".github/tools/wii/build.sh ${{ matrix.config }}"

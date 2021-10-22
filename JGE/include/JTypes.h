@@ -143,11 +143,13 @@ public:
 
     int mFilter;
 
-#if defined(PSP)
+#if defined(WOTH_PLATFORM_PSP)
     int mTextureFormat;
     int mTexId;
     bool mInVideoRAM;
     PIXEL_TYPE* mBits;
+#elif defined(WOTH_PLATFORM_WII)
+    //TODO: WII texture definition
 #else
     GLuint mTexId;
     u8* mBuffer;

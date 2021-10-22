@@ -39,7 +39,7 @@ target_include_directories(hgetools PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/zipF
 target_link_libraries(
     hgetools
     PUBLIC WotH::wge
-    PRIVATE WotH::options
+    PRIVATE WotH::options ZLIB::ZLIB
 )
 
 if(DEFINED WOTH_SDL_BUILD)

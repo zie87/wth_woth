@@ -40,7 +40,7 @@ public:
     void SetColor(int col, int row, PIXEL_TYPE color);
     void SetDisplacement(int col, int row, float dx, float dy, int ref);
 
-    JTexture* GetTexture() const { return quad->mTex; }
+    JTexture* GetTexture() const { return m_quad->mTex; }
     void GetTextureRect(float* x, float* y, float* w, float* h) const {
         *x = tx;
         *y = ty;
@@ -52,8 +52,8 @@ public:
     PIXEL_TYPE GetColor(int col, int row) const;
     void GetDisplacement(int col, int row, float* dx, float* dy, int ref) const;
 
-    int GetRows() { return nRows; }
-    int GetCols() { return nCols; }
+    int GetRows() const { return nRows; }
+    int GetCols() const { return nCols; }
 
 private:
     hgeDistortionMesh();
@@ -64,7 +64,7 @@ private:
     int nRows, nCols;
     float cellw, cellh;
     float tx, ty, width, height;
-    JQuad* quad;
+    JQuad* m_quad;
 };
 
 #endif

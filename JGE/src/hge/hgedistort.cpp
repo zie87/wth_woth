@@ -24,7 +24,7 @@ hgeDistortionMesh::hgeDistortionMesh(int cols, int rows) {
     // quad.tex=0;
     // quad.blend=BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_ZWRITE;
 
-    quad = nullptr;
+    m_quad = nullptr;
 
     disp_array = new Vertex[rows * cols];
 
@@ -50,7 +50,7 @@ hgeDistortionMesh::hgeDistortionMesh(const hgeDistortionMesh& dm) {
     ty = dm.ty;
     width = dm.width;
     height = dm.height;
-    quad = dm.quad;
+    m_quad = dm.m_quad;
 
     disp_array = new Vertex[nRows * nCols];
     memcpy(disp_array, dm.disp_array, sizeof(Vertex) * nRows * nCols);
@@ -58,7 +58,7 @@ hgeDistortionMesh::hgeDistortionMesh(const hgeDistortionMesh& dm) {
 
 hgeDistortionMesh::~hgeDistortionMesh() {
     delete[] disp_array;
-    SAFE_DELETE(quad);
+    SAFE_DELETE(m_quad);
 }
 
 hgeDistortionMesh& hgeDistortionMesh::operator=(const hgeDistortionMesh& dm) {
@@ -71,7 +71,7 @@ hgeDistortionMesh& hgeDistortionMesh::operator=(const hgeDistortionMesh& dm) {
         ty = dm.ty;
         width = dm.width;
         height = dm.height;
-        quad = dm.quad;
+        m_quad = dm.m_quad;
 
         delete[] disp_array;
         disp_array = new Vertex[nRows * nCols];
@@ -82,9 +82,9 @@ hgeDistortionMesh& hgeDistortionMesh::operator=(const hgeDistortionMesh& dm) {
 }
 
 void hgeDistortionMesh::SetTexture(JTexture* tex) {
-    if (quad) delete quad;
+    if (m_quad) delete m_quad;
 
-    quad = new JQuad(tex, 0, 0, 16, 16);
+    m_quad = new JQuad(tex, 0, 0, 16, 16);
     // quad.tex=tex;
 }
 
@@ -135,7 +135,7 @@ void hgeDistortionMesh::Render(float x, float y) {
         for (i = 0; i < nCols - 1; i++) {
             idx = j * nCols + i;
 
-            quad->SetTextureRect(disp_array[idx].u, disp_array[idx].v, cellw, cellh);
+            m_quad->SetTextureRect(disp_array[idx].u, disp_array[idx].v, cellw, cellh);
 
             points[0].x = x + disp_array[idx + nCols].x;
             points[0].y = y + disp_array[idx + nCols].y;
@@ -157,7 +157,7 @@ void hgeDistortionMesh::Render(float x, float y) {
             points[3].z = disp_array[idx].z;
             points[3].color = disp_array[idx].color;
 
-            renderer->RenderQuad(quad, points);
+            renderer->RenderQuad(m_quad, points);
         }
 }
 

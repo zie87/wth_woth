@@ -29,11 +29,11 @@
     #include <pspdisplay.h>
     #include <pspdebug.h>
     #include <pspctrl.h>
-    #include <time.h>
-    #include <string.h>
     #include <pspaudiolib.h>
     #include <psprtc.h>
 
+    #include <time.h>
+    #include <string.h>
 #endif
 
 #include "Vector2D.h"
@@ -540,8 +540,15 @@ public:
 private:
     static JRenderer* mInstance;
 
-#if (!defined PSP)
-
+#if defined(WOTH_PLATFORM_PSP)
+    void *fbp0, *fbp1, *zbp;
+    PIXEL_TYPE* mVRAM;
+    int mCurrentTex;
+    int mCurrentBlend;
+    int mCurrentTextureFormat;
+#elif defined(WOTH_PLATFORM_WII)
+    //TODO: WII renderer definition
+#else
     GLuint mCurrentTex;
     #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0) || (defined WIN32)
     // MVP matrix
@@ -569,12 +576,6 @@ private:
     GLint prog2_mvpLoc;
 
     #endif  // (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
-#else
-    void *fbp0, *fbp1, *zbp;
-    PIXEL_TYPE* mVRAM;
-    int mCurrentTex;
-    int mCurrentBlend;
-    int mCurrentTextureFormat;
 #endif
 
     bool mVsync;

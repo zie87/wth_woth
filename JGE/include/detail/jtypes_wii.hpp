@@ -1,0 +1,4 @@
+#ifndef JGE_DETAIL_JTYPESWII_HPP
+#define JGE_DETAIL_JTYPESWII_HPP
+
+#endif

@@ -13,6 +13,10 @@
 
 #include <wge/types.hpp>
 
+#if (defined WIN32) && (!defined LINUX)
+#include <windows.h>
+#endif
+
 #include <GL/gl.h>
 #include <GL/glu.h>
 
@@ -24,9 +28,6 @@
 #define BLEND_OPTION_BLEND GU_TFX_BLEND
 #endif
 
-#if (defined WIN32) && (!defined LINUX)
-#include <windows.h>
-#endif
 
 #if defined(LINUX)
 typedef uint32_t DWORD;

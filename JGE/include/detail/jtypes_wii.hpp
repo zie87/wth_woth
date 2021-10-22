@@ -34,10 +34,10 @@ typedef wge::i32 DWORD;
 #define RGBA(r, g, b, a) (((a) << 24) | ((b) << 16) | ((g) << 8) | (r))
 
 #define TEXTURE_FORMAT 0
-//#define GU_PSM_8888 0
-//#define GU_PSM_5551 0
-//#define GU_PSM_4444 0
-//#define GU_PSM_5650 0
+#define GU_PSM_8888 0
+#define GU_PSM_5551 0
+#define GU_PSM_4444 0
+#define GU_PSM_5650 0
 #define PIXEL_TYPE wge::pixel_t
 
 #endif

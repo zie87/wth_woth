@@ -149,6 +149,7 @@ public:
     bool mInVideoRAM;
     PIXEL_TYPE* mBits;
 #elif defined(WOTH_PLATFORM_WII)
+    int mTexId;
     //TODO: WII texture definition
 #else
     GLuint mTexId;

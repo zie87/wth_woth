@@ -32,7 +32,7 @@ const KeyRep& translateKey(LocalKeySym key) {
     return fattable[key];
 }
 
-#elif defined(WOTH_PLATFORM_UNIX)
+#elif defined(WOTH_PLATFORM_UNIX) || defined(WOTH_PLATFORM_WII)
 
 const KeyRep& translateKey(LocalKeySym key) {
     if (auto res = fattable.find(key); res != fattable.end()) {

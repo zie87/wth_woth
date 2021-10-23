@@ -72,7 +72,7 @@ if(DEFINED PSP)
 elseif(DEFINED WII)
     find_package(OGCLIB REQUIRED) 
     target_link_libraries(woth_options INTERFACE wii::interface)
-    target_link_libraries(woth_options INTERFACE wii::ogclib wii::wiiuse) 
+    target_link_libraries(woth_options INTERFACE wii::ogclib wii::wiiuse wii::bte wii::fat)
     target_compile_definitions(woth_options INTERFACE "WOTH_PLATFORM_WII")
 
     include(wii_tools) 

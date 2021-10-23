@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        config: [Release, Debug, MinSizeRel]
+        config: [Debug]
 
     steps:
     - uses: actions/checkout@v2

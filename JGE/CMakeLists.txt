@@ -87,21 +87,34 @@ target_sources(
 )
 
 if(DISABLE_UI)
-    target_sources(
-        jge300 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JSfx_dummy.cpp
-                       ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JGfx_dummy.cpp
+    target_sources(jge300 
+        PRIVATE 
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/dummy/JSfx.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/dummy/JGfx.cpp
     )
 elseif(DEFINED PSP)
-    target_sources(
-        jge300
-        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/JSocket.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/JGfx.cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/src/JSfx.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/JAudio.cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/src/JMP3.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/decoder_prx.c
+    target_sources(jge300
+        PRIVATE 
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/psp/JSocket.cpp 
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/psp/JGfx.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/psp/JSfx.cpp 
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/psp/JAudio.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/psp/JMP3.cpp 
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/psp/decoder_prx.c
     )
+elseif(DEFINED WII)
+    target_sources(jge300 
+        PRIVATE 
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/wii/JSfx.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/wii/JGfx.cpp
+    )
+
 elseif(DEFINED UNIX OR WIN32)
-    target_sources(
-        jge300 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JSfx.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JGfx.cpp
-                       ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JSocket.cpp
+    target_sources(jge300 
+        PRIVATE 
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JSfx.cpp 
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JGfx.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/JSocket.cpp
     )
 endif()
 

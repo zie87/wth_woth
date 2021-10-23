@@ -25,7 +25,15 @@ find_library(LIBOGC_LIBRARY NAMES ogc libogc.a
           PATHS ${OGCLIB_PATHS}
           PATH_SUFFIXES lib lib/wii libogc/lib libogc/lib/wii )
 
-      find_library(LIBOGC_WIIUSE_LIBRARY NAMES wiiuse libwiiuse.a
+find_library(LIBOGC_BTE_LIBRARY NAMES bte libbte.a
+          PATHS ${OGCLIB_PATHS}
+          PATH_SUFFIXES lib lib/wii libogc/lib libogc/lib/wii )
+
+find_library(LIBOGC_FAT_LIBRARY NAMES fat libfat.a
+          PATHS ${OGCLIB_PATHS}
+          PATH_SUFFIXES lib lib/wii libogc/lib libogc/lib/wii )
+
+find_library(LIBOGC_WIIUSE_LIBRARY NAMES wiiuse libwiiuse.a
           PATHS ${OGCLIB_PATHS}
           PATH_SUFFIXES lib lib/wii libogc/lib libogc/lib/wii )
 
@@ -47,13 +55,25 @@ if(OGCLIB_FOUND)
         IMPORTED_LOCATION "${LIBOGC_LIBRARY}"
     )
 
+    add_library(wii::bte STATIC IMPORTED GLOBAL)
+    set_target_properties(wii::bte PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES ${LIBOGC_INCLUDE_DIR}
+        IMPORTED_LOCATION "${LIBOGC_BTE_LIBRARY}"
+    )
+    target_link_libraries(wii::bte INTERFACE wii::ogclib)
+
+    add_library(wii::fat STATIC IMPORTED GLOBAL)
+    set_target_properties(wii::fat PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES ${LIBOGC_INCLUDE_DIR}
+        IMPORTED_LOCATION "${LIBOGC_FAT_LIBRARY}"
+    )
+    target_link_libraries(wii::fat INTERFACE wii::ogclib)
+
     add_library(wii::wiiuse STATIC IMPORTED GLOBAL)
     set_target_properties(wii::wiiuse PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES ${LIBOGC_INCLUDE_DIR}
         IMPORTED_LOCATION "${LIBOGC_WIIUSE_LIBRARY}"
     )
+    target_link_libraries(wii::wiiuse INTERFACE wii::bte wii::ogclib)
 
-    # set_target_properties(wii::ogclib PROPERTIES
-    #     IMPORTED_LOCATION "${LIBOGC_WIIUSE_LIBRARY}"
-    # )
 endif()

@@ -90,8 +90,13 @@ void GameApp::Create() {
     //_CrtSetBreakAlloc(368);
     WGE_LOG_TRACE("starting Game");
 
+ #if defined(WOTH_PLATFORM_WII)
+    std::string foldersRoot = "sd:/apps/wagic/";
+ #else
+    std::string foldersRoot;
+ #endif
+
     string systemFolder = "Res/";
-    string foldersRoot;
 
     // Find the Res folder
     std::ifstream mfile("Res.txt");

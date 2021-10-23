@@ -20,7 +20,7 @@
 #include FT_FREETYPE_H
 
 #ifdef WIN32
-    #pragma comment(lib, "freetype.lib")
+#pragma comment(lib, "freetype.lib")
 #endif
 
 #include "JGE.h"
@@ -34,33 +34,33 @@ extern void SwizzlePlot(u8* out, PIXEL_TYPE color, int i, int j, unsigned int wi
 #endif
 
 JTTFont::JTTFont(int cacheImageSize) {
-    mColor = ARGB(255, 255, 255, 255);
-    mSize = 0;
-    mAngle = 0.0;
+    mColor   = ARGB(255, 255, 255, 255);
+    mSize    = 0;
+    mAngle   = 0.0;
     mLibrary = nullptr;
     mFace    = nullptr;
 
-    mFontLoaded = false;
+    mFontLoaded  = false;
     mSharingFont = false;
-    mAntialias = true;
+    mAntialias   = true;
 
     mTexture = nullptr;
 
     switch (cacheImageSize) {
     case CACHE_IMAGE_64x64:
-        mTexWidth = 64;
+        mTexWidth  = 64;
         mTexHeight = 64;
         break;
     case CACHE_IMAGE_128x128:
-        mTexWidth = 128;
+        mTexWidth  = 128;
         mTexHeight = 128;
         break;
     case CACHE_IMAGE_512x512:
-        mTexWidth = 512;
+        mTexWidth  = 512;
         mTexHeight = 512;
         break;
     default:
-        mTexWidth = 256;
+        mTexWidth  = 256;
         mTexHeight = 256;
         break;
     }
@@ -68,9 +68,9 @@ JTTFont::JTTFont(int cacheImageSize) {
     mTexture = JRenderer::GetInstance()->CreateTexture(mTexWidth, mTexHeight);
 
     for (int i = 0; i < TTF_CACHE_SIZE; i++) {
-        mQuads[i] = new JQuad(mTexture, 0, 0, 16, 16);
+        mQuads[i]      = new JQuad(mTexture, 0, 0, 16, 16);
         mCachedCode[i] = 0;
-        mXAdvance[i] = 0;
+        mXAdvance[i]   = 0;
     }
 
     mASCIIDirectMapping = false;
@@ -97,7 +97,7 @@ bool JTTFont::SetSize(int size) {
         mCurr = 0;
 
         mMaxCharHeight = size + 6;
-        mMaxCharWidth = mMaxCharHeight;  // + size/2 + 4;
+        mMaxCharWidth  = mMaxCharHeight;  // + size/2 + 4;
 
         mColCount = (mTexWidth / mMaxCharWidth);
         mRowCount = (mTexHeight / mMaxCharHeight);
@@ -124,12 +124,12 @@ int JTTFont::GetFontBitsSize() const { return mFontBitsSize; }
 bool JTTFont::Load(JTTFont* fontSource, int size, int mode) {
     mLibrary = fontSource->GetFontLibrary();
     if (mLibrary) {
-        mFontBits = fontSource->GetFontBits();
+        mFontBits     = fontSource->GetFontBits();
         mFontBitsSize = fontSource->GetFontBitsSize();
 
         if (mFontBits && FT_New_Memory_Face(mLibrary, mFontBits, mFontBitsSize, 0, &mFace) == 0) {
             mSharingFont = true;
-            mFontSource = fontSource;
+            mFontSource  = fontSource;
 
             SetSize(size);
 
@@ -194,7 +194,7 @@ int JTTFont::PreCacheChar(u16 ch, u16 cachedCode) {
 
     if (mASCIIDirectMapping) {
         mASCIIDirectMapping = false;
-        mCurr = 0;
+        mCurr               = 0;
     }
 
     if (!mFontLoaded) return -1;
@@ -206,14 +206,12 @@ int JTTFont::PreCacheChar(u16 ch, u16 cachedCode) {
 #if defined(WIN32) || defined(LINUX)
     auto* texBuffer = new DWORD[mMaxCharWidth * mMaxCharHeight];
     memset(texBuffer, 0, mMaxCharWidth * mMaxCharHeight * sizeof(DWORD));
-#else
-
+#elif defined(WOTH_PLATFORM_PSP)
     u8* pTexture = (u8*)mTexture->mBits;
-
 #endif
 
-    int y = (mCurr / mColCount) * mMaxCharHeight;
-    int x = (mCurr % mColCount) * mMaxCharWidth;
+    int y   = (mCurr / mColCount) * mMaxCharHeight;
+    int x   = (mCurr % mColCount) * mMaxCharWidth;
     int ret = -1;
 
     int renderFlag = FT_LOAD_RENDER;
@@ -223,7 +221,7 @@ int JTTFont::PreCacheChar(u16 ch, u16 cachedCode) {
 
 #if defined(WIN32) || defined(LINUX)
         int offset = top * mMaxCharWidth + slot->bitmap_left + 2;
-#else
+#elif defined(WOTH_PLATFORM_PSP)
         int xx = x + slot->bitmap_left + 2;
         int yy = y + top;
 
@@ -243,7 +241,7 @@ int JTTFont::PreCacheChar(u16 ch, u16 cachedCode) {
 
 #if defined(WIN32) || defined(LINUX)
                     texBuffer[i * mMaxCharWidth + j + offset] = RGBA(255, 255, 255, grey);
-#else
+#elif defined(WOTH_PLATFORM_PSP)
                     SwizzlePlot(pTexture, ARGB(grey, 255, 255, 255), (xx + j) * PIXEL_SIZE, yy + i,
                                 mTexWidth * PIXEL_SIZE);
 #endif
@@ -260,7 +258,7 @@ int JTTFont::PreCacheChar(u16 ch, u16 cachedCode) {
                         if (bits & mask) {
 #if defined(WIN32) || defined(LINUX)
                             texBuffer[i * mMaxCharWidth + j * 8 + k + offset] = RGBA(255, 255, 255, 255);
-#else
+#elif defined(WOTH_PLATFORM_PSP)
                             SwizzlePlot(pTexture, ARGB(255, 255, 255, 255), (xx + j * 8 + k) * PIXEL_SIZE, yy + i,
                                         mTexWidth * PIXEL_SIZE);
 #endif
@@ -278,12 +276,12 @@ int JTTFont::PreCacheChar(u16 ch, u16 cachedCode) {
 
 #if defined(WIN32) || defined(LINUX)
     glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, mMaxCharWidth, mMaxCharHeight, GL_RGBA, GL_UNSIGNED_BYTE, texBuffer);
-#else
+#elif defined(WOTH_PLATFORM_PSP)
     sceKernelDcacheWritebackAll();
 #endif
 
     mCachedCode[mCurr] = cachedCode;
-    ret = mCurr;
+    ret                = mCurr;
 
     mQuads[mCurr++]->SetTextureRect((float)(x + 2), (float)(y + 1), (float)(slot->bitmap_left + slot->bitmap.width),
                                     (float)mMaxCharHeight - 1);
@@ -435,7 +433,7 @@ int JTTFont::RenderString(const u8* text, float x, float y, bool render) {
             index = GetCachedChar(n);
             if (index == -1) {
                 u16 unicode = charsets_gbk_to_ucs(text);
-                index = PreCacheChar(unicode, n);  // use GBK code for caching
+                index       = PreCacheChar(unicode, n);  // use GBK code for caching
             }
             text += 2;
         }

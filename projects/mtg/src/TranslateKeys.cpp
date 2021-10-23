@@ -3,81 +3,50 @@
 #include "Translate.h"
 #include "WResourceManager.h"
 #include "TranslateKeys.h"
+
 #ifdef SDL_CONFIG
 #include <SDL.h>
 #endif
+
 using std::map;
 using std::string;
 
 static std::map<const LocalKeySym, KeyRep> fattable;
 static std::map<const JButton, KeyRep> slimtable;
 
-#if defined(LINUX) || defined(SDL_CONFIG)
+#if defined(SDL_CONFIG)
+
 const KeyRep& translateKey(LocalKeySym key) {
-    {
-        std::map<const LocalKeySym, KeyRep>::iterator res;
-        if ((res = fattable.find(key)) != fattable.end()) return res->second;
+    if (auto res = fattable.find(key); res != fattable.end()) {
+        return res->second;
     }
 
-    char* str = nullptr;
-
-#if defined(SDL_CONFIG)
-    str = (char*)SDL_GetKeyName(key);
-#endif
+    char* str = (char*)SDL_GetKeyName(key);
     if (!str) {
         str = NEW char[11];
-        sprintf(str, "%lu",
-                (long unsigned int)key);  // TODO: Wagic is not supposed to know that a key actually is an unsingned
-                                          // long, so this part should probably be platform specific (move to JGE ?)
+        sprintf(str, "%lu", (long unsigned int)key);
+        // TODO: Wagic is not supposed to know that a key actually is an unsingned
+        // long, so this part should probably be platform specific (move to JGE ?)
     }
-    const KeyRep k = std::make_pair(str, static_cast<JQuad*>(nullptr));
-    fattable[key]  = k;
+    fattable[key] = std::make_pair(str, static_cast<JQuad*>(nullptr));
     return fattable[key];
 }
-#elif defined(WIN32)
+
+#elif defined(WOTH_PLATFORM_UNIX) || defined(WOTH_PLATFORM_WII)
+
 const KeyRep& translateKey(LocalKeySym key) {
-    {
-        auto res = fattable.find(key);
-        if (res != fattable.end()) return (res->second);
-    }
-    unsigned int sc = MapVirtualKey(key, 0);
-
-    switch (key) {
-    case VK_LEFT:
-    case VK_UP:
-    case VK_RIGHT:
-    case VK_DOWN:  // arrow keys
-    case VK_PRIOR:
-    case VK_NEXT:  // page up and page down
-    case VK_END:
-    case VK_HOME:
-    case VK_INSERT:
-    case VK_DELETE:
-    case VK_DIVIDE:  // numpad slash
-    case VK_NUMLOCK: {
-        sc |= 0x100;  // set extended bit
-        break;
-    }
+    if (auto res = fattable.find(key); res != fattable.end()) {
+        return res->second;
     }
 
-    char buf[256];
-    memset(buf, 0, 256);
+    auto* str = NEW char[11];
+    sprintf(str, "%lu", (long unsigned int)key);
 
-    string s;
-    // Convert to ANSI string
-    if (GetKeyNameTextA(sc << 16, buf, 256) > 0) s = buf;
-
-    KeyRep k;
-    if (0 == s.length()) {
-        char* str = NEW char[11];
-        sprintf(str, "%d", key);
-        k = std::make_pair(str, static_cast<JQuad*>(NULL));
-    } else
-        k = std::make_pair(s, static_cast<JQuad*>(NULL));
-    fattable[key] = k;
+    fattable[key] = std::make_pair(str, static_cast<JQuad*>(nullptr));
     return fattable[key];
 }
-#else  // PSP
+
+#elif defined(WOTH_PLATFORM_PSP)
 
 const KeyRep& translateKey(LocalKeySym key) {
     std::map<const LocalKeySym, KeyRep>::iterator res;
